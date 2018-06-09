@@ -48,7 +48,16 @@ namespace RavenBOT.Handlers
             LogHandler.PrintApplicationInformation();
             if (!File.Exists("setup/DBConfig.json"))
             {
-                File.WriteAllText("setup/DBConfig.json", JsonConvert.SerializeObject(new DBObject(), Formatting.Indented), Encoding.UTF8);
+                LogHandler.LogMessage("Enter the database Name: (ie. MyRavenDatabase)");
+                var dbname = Console.ReadLine();
+                LogHandler.LogMessage("Enter the database URL: (typically http://127.0.0.1:8080 if hosting locally)");
+                var dburl = Console.ReadLine();
+                File.WriteAllText("setup/DBConfig.json", JsonConvert.SerializeObject(new DBObject
+                {
+                    Name = dbname,
+                    URL = dburl
+                }, Formatting.Indented), Encoding.UTF8);
+
                 Settings = JsonConvert.DeserializeObject<DBObject>(File.ReadAllText("setup/DBConfig.json"));
             }
             else
