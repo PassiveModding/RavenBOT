@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Discord;
+using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
-using Raven.Client.Documents;
-using Raven.Client.Documents.Session;
-using RavenBOT.Discord.Context.Interactive.Callbacks;
-using RavenBOT.Discord.Context.Interactive.Criteria;
-using RavenBOT.Discord.Context.Interactive.Paginator;
 using RavenBOT.Handlers;
 using RavenBOT.Models;
 
@@ -36,7 +31,6 @@ namespace RavenBOT.Discord.Context
         {
             return await base.ReplyAsync("", false, embed.Build());
         }
-
         public async Task<IUserMessage> ReplyAsync(Embed embed)
         {
             return await base.ReplyAsync("", false, embed);
@@ -54,7 +48,19 @@ namespace RavenBOT.Discord.Context
             return Msg;
         }
 
+        /// <summary>
+        /// Just shorthand for saving our guild config
+        /// </summary>
+        public void Save()
+        {
+            Context.Server.Save();
+        }
 
+        /// <summary>
+        /// Rather than just replying, we can spice things up a bit and embed them in a small message
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
         public async Task<IUserMessage> SimpleEmbedAsync(string message)
         {
             var embed = new EmbedBuilder
@@ -65,30 +71,22 @@ namespace RavenBOT.Discord.Context
             return await base.ReplyAsync("", false, embed.Build());
         }
 
-        private SocketCommandContext PassiveSContext()
+        /// <summary>
+        /// This is just a shorthand conversion from out custom context to a socketcontext, for use in things like Interactive
+        /// </summary>
+        /// <returns></returns>
+        private SocketCommandContext SocketContext()
         {
             return new SocketCommandContext(Context.Client as DiscordSocketClient, Context.Message as SocketUserMessage);
         }
 
         /// <summary>
-        ///     creates a new paginated message
+        /// This will gnerate a paginated message which allows users to use reactions to change the content of the message
         /// </summary>
         /// <param name="pager"></param>
-        /// <param name="fromSourceUser"></param>
-        /// <param name="showall"></param>
-        /// <param name="showindex"></param>
+        /// <param name="Reactions">The reaction config</param>
+        /// <param name="fromSourceUser">True = only Context.User may react to the message</param>
         /// <returns></returns>
-        public Task<IUserMessage> PagedReplyAsync(PaginatedMessage pager, bool fromSourceUser = true, bool showall = false, bool showindex = false)
-        {
-            var criterion = new Criteria<SocketReaction>();
-            if (fromSourceUser)
-            {
-                criterion.AddCriterion(new EnsureReactionFromSourceUserCriterion());
-            }
-
-            return PagedReplyAsync(pager, criterion, showall, showindex);
-        }
-
         public Task<IUserMessage> PagedReplyAsync(PaginatedMessage pager, ReactionList Reactions, bool fromSourceUser = true)
         {
             var criterion = new Criteria<SocketReaction>();
@@ -102,40 +100,47 @@ namespace RavenBOT.Discord.Context
 
         public Task<IUserMessage> PagedReplyAsync(PaginatedMessage pager, ICriterion<SocketReaction> criterion, ReactionList Reactions)
         {
-            return Interactive.SendPaginatedMessageAsync(PassiveSContext(), pager, Reactions, criterion);
+            return Interactive.SendPaginatedMessageAsync(SocketContext(), pager, Reactions, criterion);
         }
 
-        public Task<IUserMessage> PagedReplyAsync(PaginatedMessage pager, ICriterion<SocketReaction> criterion, bool showall = false, bool showindex = false)
-        {
-            return Interactive.SendPaginatedMessageAsync(PassiveSContext(), pager, criterion, showall, showindex);
-        }
-
+        /// <summary>
+        /// Waits for the next message. NOTE: Your runmode must be async or this will lock up.
+        /// </summary>
+        /// <param name="criterion"></param>
+        /// <param name="timeout"></param>
+        /// <returns></returns>
         public Task<SocketMessage> NextMessageAsync(ICriterion<SocketMessage> criterion, TimeSpan? timeout = null)
         {
-            return Interactive.NextMessageAsync(PassiveSContext(), criterion, timeout);
+            return Interactive.NextMessageAsync(SocketContext(), criterion, timeout);
         }
 
         public Task<SocketMessage> NextMessageAsync(bool fromSourceUser = true, bool inSourceChannel = true,
             TimeSpan? timeout = null)
         {
-            return Interactive.NextMessageAsync(PassiveSContext(), fromSourceUser, inSourceChannel, timeout);
+            return Interactive.NextMessageAsync(SocketContext(), fromSourceUser, inSourceChannel, timeout);
         }
 
-        public Task<IUserMessage> ReplyAndDeleteAsync(string content, bool isTTS = false, Embed embed = null,
+        /// <summary>
+        /// Sends a message that will do a custom action upon reactions
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="fromSourceUser"></param>
+        /// <returns></returns>
+        public Task<IUserMessage> InlineReactionReplyAsync(ReactionCallbackData data, bool fromSourceUser = true)
+            => Interactive.SendMessageWithReactionCallbacksAsync(SocketContext(), data, fromSourceUser);
+
+        /// <summary>
+        /// Send a message that self destructs after a certain period of time
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="embed"></param>
+        /// <param name="timeout"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        public Task<IUserMessage> ReplyAndDeleteAsync(string content, Embed embed = null,
             TimeSpan? timeout = null, RequestOptions options = null)
         {
-            return Interactive.ReplyAndDeleteAsync(PassiveSContext(), content, isTTS, embed, timeout, options);
-        }
-
-        public class ReactionList
-        {
-            public bool First { get; set; } = false;
-            public bool Last { get; set; } = false;
-            public bool Forward { get; set; } = true;
-            public bool Backward { get; set; } = true;
-            public bool Jump { get; set; } = false;
-            public bool Trash { get; set; } = false;
-            public bool Info { get; set; } = false;
+            return Interactive.ReplyAndDeleteAsync(SocketContext(), content, false, embed, timeout, options);
         }
     }
 
@@ -160,20 +165,18 @@ namespace RavenBOT.Discord.Context
             };
 
             //These are our custom additions to the context, giving access to the server object and all server objects through Context.
-            Server = Channel is IDMChannel ? null : DatabaseHandler.GetGuild(Guild.Id);
-            Session = ServiceProvider.GetRequiredService<IDocumentStore>().OpenSession();
-            Prefix = CommandHandler.Config.Prefix;
+            Server = Channel is IDMChannel ? null : ServiceProvider.GetRequiredService<DatabaseHandler>().Execute<GuildModel>(DatabaseHandler.Operation.LOAD, null, Guild.Id);
+            Provider = ServiceProvider;
         }
 
         public GuildModel Server { get; }
-        public IDocumentSession Session { get; }
         public SocketContext Socket { get; }
-        public string Prefix { get; }
         public IUser User { get; }
         public IGuild Guild { get; }
         public IDiscordClient Client { get; }
         public IUserMessage Message { get; }
         public IMessageChannel Channel { get; }
+        public IServiceProvider Provider { get; }
 
         public class SocketContext
         {
@@ -182,136 +185,6 @@ namespace RavenBOT.Discord.Context
             public DiscordSocketClient Client { get; set; }
             public SocketUserMessage Message { get; set; }
             public ISocketMessageChannel Channel { get; set; }
-        }
-    }
-
-
-    public class InteractiveService : IDisposable
-    {
-        private readonly Dictionary<ulong, IReactionCallback> _callbacks;
-        private readonly TimeSpan _defaultTimeout;
-
-        public InteractiveService(DiscordSocketClient discord, TimeSpan? defaultTimeout = null)
-        {
-            Discord = discord;
-            Discord.ReactionAdded += HandleReactionAsync;
-
-            _callbacks = new Dictionary<ulong, IReactionCallback>();
-            _defaultTimeout = defaultTimeout ?? TimeSpan.FromSeconds(15);
-        }
-
-        public DiscordSocketClient Discord { get; }
-
-        public void Dispose()
-        {
-            Discord.ReactionAdded -= HandleReactionAsync;
-        }
-
-        public Task<SocketMessage> NextMessageAsync(SocketCommandContext context, bool fromSourceUser = true,
-            bool inSourceChannel = true, TimeSpan? timeout = null)
-        {
-            var criterion = new Criteria<SocketMessage>();
-            if (fromSourceUser)
-                criterion.AddCriterion(new EnsureSourceUserCriterion());
-            if (inSourceChannel)
-                criterion.AddCriterion(new EnsureSourceChannelCriterion());
-            return NextMessageAsync(context, criterion, timeout);
-        }
-
-        public async Task<SocketMessage> NextMessageAsync(SocketCommandContext context,
-            ICriterion<SocketMessage> criterion, TimeSpan? timeout = null)
-        {
-            timeout = timeout ?? _defaultTimeout;
-
-            var eventTrigger = new TaskCompletionSource<SocketMessage>();
-
-            async Task Handler(SocketMessage message)
-            {
-                var result = await criterion.JudgeAsync(context, message).ConfigureAwait(false);
-                if (result)
-                    eventTrigger.SetResult(message);
-            }
-
-            context.Client.MessageReceived += Handler;
-
-            var trigger = eventTrigger.Task;
-            var delay = Task.Delay(timeout.Value);
-            var task = await Task.WhenAny(trigger, delay).ConfigureAwait(false);
-
-            context.Client.MessageReceived -= Handler;
-
-            if (task == trigger)
-                return await trigger.ConfigureAwait(false);
-            return null;
-        }
-
-        public async Task<IUserMessage> ReplyAndDeleteAsync(SocketCommandContext context, string content,
-            bool isTTS = false, Embed embed = null, TimeSpan? timeout = null, RequestOptions options = null)
-        {
-            timeout = timeout ?? _defaultTimeout;
-            var message = await context.Channel.SendMessageAsync(content, isTTS, embed, options).ConfigureAwait(false);
-            _ = Task.Delay(timeout.Value)
-                .ContinueWith(_ => message.DeleteAsync().ConfigureAwait(false))
-                .ConfigureAwait(false);
-            return message;
-        }
-
-        public async Task<IUserMessage> SendPaginatedMessageAsync(SocketCommandContext context, PaginatedMessage pager,
-            ICriterion<SocketReaction> criterion = null, bool showall = false, bool showindex = false)
-        {
-            var callback = new PaginatedMessageCallback(this, context, pager, criterion);
-            await callback.DisplayAsync(showall, showindex).ConfigureAwait(false);
-            return callback.Message;
-        }
-
-        public async Task<IUserMessage> SendPaginatedMessageAsync(SocketCommandContext context, PaginatedMessage pager, Base.ReactionList Reactions, ICriterion<SocketReaction> criterion = null)
-        {
-            var callback = new PaginatedMessageCallback(this, context, pager, criterion);
-            await callback.DisplayAsync(Reactions).ConfigureAwait(false);
-            return callback.Message;
-        }
-
-        public void AddReactionCallback(IMessage message, IReactionCallback callback)
-        {
-            _callbacks[message.Id] = callback;
-        }
-
-        public void RemoveReactionCallback(IMessage message)
-        {
-            RemoveReactionCallback(message.Id);
-        }
-
-        public void RemoveReactionCallback(ulong id)
-        {
-            _callbacks.Remove(id);
-        }
-
-        public void ClearReactionCallbacks()
-        {
-            _callbacks.Clear();
-        }
-
-        private async Task HandleReactionAsync(Cacheable<IUserMessage, ulong> message, ISocketMessageChannel channel,
-            SocketReaction reaction)
-        {
-            if (reaction.UserId == Discord.CurrentUser.Id) return;
-            if (!_callbacks.TryGetValue(message.Id, out var callback)) return;
-            if (!await callback.Criterion.JudgeAsync(callback.Context, reaction).ConfigureAwait(false))
-                return;
-            switch (callback.RunMode)
-            {
-                case RunMode.Async:
-                    _ = Task.Run(async () =>
-                    {
-                        if (await callback.HandleCallbackAsync(reaction).ConfigureAwait(false))
-                            RemoveReactionCallback(message.Id);
-                    });
-                    break;
-                default:
-                    if (await callback.HandleCallbackAsync(reaction).ConfigureAwait(false))
-                        RemoveReactionCallback(message.Id);
-                    break;
-            }
         }
     }
 }

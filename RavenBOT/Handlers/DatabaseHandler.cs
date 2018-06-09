@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Net;
+using System.Text;
 using Discord;
-using Discord.WebSocket;
+using Newtonsoft.Json;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Operations.Backups;
 using Raven.Client.ServerWide;
@@ -14,34 +14,105 @@ using RavenBOT.Models;
 
 namespace RavenBOT.Handlers
 {
+    public class DBObject
+    {
+        public string Name = "RavenBOT";
+        public bool IsConfigCreated;
+        public string FullBackup = "0 */6 * * *";
+        public string URL = "http://127.0.0.1:8080";
+        public string IncrementalBackup = "0 2 * * *";
+        public string BackupFolder => Directory.CreateDirectory("Backup").FullName;
+    }
+
     public class DatabaseHandler
     {
-        public DatabaseHandler(IDocumentStore store)
-        {
-            Store = store;
-        }
-
-        /// <summary>
-        ///     This is the document store, an interface that represents our database
-        /// </summary>
+        public static DBObject Settings { get; set; }
         public static IDocumentStore Store { get; set; }
 
-        /// <summary>
-        ///     Check whether RavenDB is running
-        ///     Check whether or not a database already exists with the DBName
-        ///     Set up auto-backup of the database
-        ///     Ensure that all guilds shared with the bot have been added to the database
-        /// </summary>
-        /// <param name="client"></param>
+        public bool Ping(string url)
+        {
+            try
+            {
+                var webClient = new WebClient();
+                var _ = webClient.DownloadData(url);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public void Initialize()
+        {
+            LogHandler.PrintApplicationInformation();
+            if (!File.Exists("setup/DBConfig.json"))
+            {
+                File.WriteAllText("setup/DBConfig.json", JsonConvert.SerializeObject(new DBObject(), Formatting.Indented), Encoding.UTF8);
+                Settings = JsonConvert.DeserializeObject<DBObject>(File.ReadAllText("setup/DBConfig.json"));
+            }
+            else
+            {
+                Settings = JsonConvert.DeserializeObject<DBObject>(File.ReadAllText("setup/DBConfig.json"));
+            }
+
+            Store = new Lazy<IDocumentStore>(() => new DocumentStore { Database = Settings.Name, Urls = new[] { Settings.URL } }.Initialize(), true).Value;
+            if (Store == null) LogHandler.LogMessage("Failed to build document store.", LogSeverity.Critical);
+
+            if (Store.Maintenance.Server.Send(new GetDatabaseNamesOperation(0, 5)).All(x => x != Settings.Name))
+                Store.Maintenance.Server.Send(new CreateDatabaseOperation(new DatabaseRecord(Settings.Name)));
+
+            var Record = Store.Maintenance.Server.Send(new GetDatabaseRecordOperation(Settings.Name));
+            var backupop = Record.PeriodicBackups.FirstOrDefault(x => x.Name == "Backup");
+            try
+            {
+                if (backupop == null)
+                {
+                    var newbackup = new PeriodicBackupConfiguration
+                    {
+                        Name = "Backup",
+                        BackupType = BackupType.Backup,
+                        FullBackupFrequency = Settings.FullBackup,
+                        IncrementalBackupFrequency = Settings.IncrementalBackup,
+                        LocalSettings = new LocalSettings { FolderPath = Settings.BackupFolder }
+                    };
+                    Store.Maintenance.ForDatabase(Settings.Name).Send(new UpdatePeriodicBackupOperation(newbackup));
+                }
+                else
+                {
+                    //In the case that we already have a backup operation setup, ensure that we update the backup location accordingly
+                    backupop.LocalSettings = new LocalSettings { FolderPath = Settings.BackupFolder };
+                    Store.Maintenance.ForDatabase(Settings.Name).Send(new UpdatePeriodicBackupOperation(backupop));
+                }
+            }
+            catch
+            {
+                LogHandler.LogMessage("RavenDB: Failed to set Backup Operation. Backups may not be saved", LogSeverity.Warning);
+            }
+
+
+            if (Settings.IsConfigCreated == false)
+            {
+                LogHandler.LogMessage("Enter bot's token: ");
+                var Token = Console.ReadLine();
+                LogHandler.LogMessage("Enter bot's prefix: ");
+                var Prefix = Console.ReadLine();
+                Execute<ConfigModel>(Operation.CREATE, new ConfigModel
+                {
+                    Prefix = Prefix,
+                    Token = Token
+
+                }, "Config");
+                File.WriteAllText("setup/DBConfig.json", JsonConvert.SerializeObject(new DBObject { IsConfigCreated = true }, Formatting.Indented));
+            }
+            Settings = null;
+        }
+
+        /*
         public static async void DatabaseInitialise(DiscordSocketClient client)
         {
-            if (Process.GetProcesses().FirstOrDefault(x => x.ProcessName == "Raven.Server") == null)
-            {
-                LogHandler.LogMessage("RavenDB: Server isn't running. Please make sure RavenDB is running.\n" +
-                                      "Exiting ...", LogSeverity.Critical);
-                await Task.Delay(5000);
-                Environment.Exit(Environment.ExitCode);
-            }
+
+
 
             var dbcreated = false;
             if (Store.Maintenance.Server.Send(new GetDatabaseNamesOperation(0, 5)).All(x => x != CommandHandler.Config.DBName))
@@ -58,7 +129,7 @@ namespace RavenBOT.Handlers
                 Name = "Backup",
                 BackupType = BackupType.Backup,
                 //Backup every 6 hours
-                FullBackupFrequency = "0 */6 * * *",
+                FullBackupFrequency = "0 6 * * *", //REMEMBER TO CHANGE BACK
                 IncrementalBackupFrequency = "0 2 * * *",
                 LocalSettings = new LocalSettings { FolderPath = Path.Combine(AppContext.BaseDirectory, "setup/backups/") }
             };
@@ -100,91 +171,64 @@ namespace RavenBOT.Handlers
                 }
             }
         }
+        */
 
 
-        /// <summary>
-        ///     This adds a new guild to the RavenDB
-        /// </summary>
-        /// <param name="Id">The Server's ID</param>
-        public static void AddGuild(ulong Id)
+        public List<T> Query<T>()
         {
-            using (var Session = Store.OpenSession(CommandHandler.Config.DBName))
+            using (var session = Store.OpenSession())
             {
-                if (Session.Advanced.Exists($"{Id}")) return;
-                Session.Store(new GuildModel
-                {
-                    ID = Id
-                }, Id.ToString());
-                Session.SaveChanges();
-            }
-
-            LogHandler.LogMessage($"Added Server With Id: {Id}", LogSeverity.Debug);
-        }
-
-        /// <summary>
-        ///     This adds a new guild to the RavenDB
-        /// </summary>
-        /// <param name="Gmodel"></param>
-        public static void InsertGuildObject(GuildModel Gmodel)
-        {
-            using (var Session = Store.OpenSession(CommandHandler.Config.DBName))
-            {
-                if (Session.Advanced.Exists($"{Gmodel.ID}")) return;
-                Session.Store(Gmodel, $"{Gmodel.ID}");
-                Session.SaveChanges();
-            }
-
-            LogHandler.LogMessage($"Inserted Guild with ID: {Gmodel.ID}", LogSeverity.Debug);
-        }
-
-        /// <summary>
-        ///     Remove a guild's config completely from the database
-        /// </summary>
-        /// <param name="Id"></param>
-        public static void RemoveGuild(ulong Id)
-        {
-            using (var Session = Store.OpenSession(CommandHandler.Config.DBName))
-            {
-                Session.Delete($"{Id}");
-                Session.SaveChanges();
-            }
-
-            LogHandler.LogMessage($"Removed Server With Id: {Id}", LogSeverity.Debug);
-        }
-
-        /// <summary>
-        ///     Load a Guild Object from the database
-        /// </summary>
-        /// <param name="Id"></param>
-        /// <returns></returns>
-        public static GuildModel GetGuild(ulong Id)
-        {
-            using (var Session = Store.OpenSession(CommandHandler.Config.DBName))
-            {
-                return Session.Load<GuildModel>(Id.ToString());
-            }
-        }
-
-        /// <summary>
-        ///     Load all documents matching GuildModel from the database
-        /// </summary>
-        /// <returns></returns>
-        public static List<GuildModel> GetFullConfig()
-        {
-            using (var session = Store.OpenSession(CommandHandler.Config.DBName))
-            {
-                List<GuildModel> dbGuilds;
+                List<T> QueriedItems;
                 try
                 {
-                    dbGuilds = session.Query<GuildModel>().ToList();
+                    QueriedItems = session.Query<T>().ToList();
                 }
                 catch
                 {
-                    dbGuilds = new List<GuildModel>();
+                    QueriedItems = new List<T>();
                 }
 
-                return dbGuilds;
+                return QueriedItems;
             }
+        }
+
+        public enum Operation
+        {
+            SAVE,
+            LOAD,
+            DELETE,
+            CREATE
+        }
+
+        public T Execute<T>(Operation Operation, object Data = null, object Id = null) where T : class
+        {
+            using (var Session = Store.OpenSession(Store.Database))
+            {
+                switch (Operation)
+                {
+                    case Operation.CREATE:
+                        if (Session.Advanced.Exists($"{Id}")) break;
+                        Session.Store((T)Data, $"{Id}");
+                        LogHandler.LogMessage($"RavenDB: Created => {typeof(T).Name} | ID: {Id}");
+                        break;
+
+                    case Operation.DELETE:
+                        LogHandler.LogMessage($"RavenDB: Removed => {typeof(T).Name} | ID: {Id}");
+                        Session.Delete(Session.Load<T>($"{Id}")); break;
+                    case Operation.LOAD:
+                        return Session.Load<T>($"{Id}");
+                    case Operation.SAVE:
+                        var Load = Session.Load<T>($"{Id}");
+                        if (Session.Advanced.IsLoaded($"{Id}") == false || Load == Data) break;
+                        Session.Advanced.Evict(Load);
+                        Session.Store((T)Data, $"{Id}");
+                        Session.SaveChanges();
+                        break;
+                }
+                if (Operation == Operation.CREATE || Operation == Operation.DELETE) Session.SaveChanges();
+                Session.Dispose();
+            }
+            return null;
         }
     }
 }

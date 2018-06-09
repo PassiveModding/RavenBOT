@@ -18,11 +18,12 @@ namespace RavenBOT.Discord.Preconditions
         /// <returns></returns>
         public override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)
         {
-            return context.Channel is IDMChannel ?
-                Task.FromResult(PreconditionResult.FromSuccess()) :
-                Task.FromResult(context.Guild.OwnerId == context.User.Id ?
-                    PreconditionResult.FromSuccess() :
-                    PreconditionResult.FromError("User is not the Guild Owner!"));
+            //If the command is invoked in a DM channel we return success
+            if (context.Channel is IDMChannel)
+                return Task.FromResult(PreconditionResult.FromSuccess());
+
+            //Check to see if the current user's ID matchs the guild owners 
+            return Task.FromResult(context.Guild.OwnerId == context.User.Id ? PreconditionResult.FromSuccess() : PreconditionResult.FromError("User is not the Guild Owner!"));
         }
     }
 }

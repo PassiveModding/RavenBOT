@@ -2,84 +2,53 @@
 using System.IO;
 using System.Threading.Tasks;
 using Discord;
+using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
-using Raven.Client.Documents;
-using RavenBOT.Discord.Context;
 using RavenBOT.Handlers;
 using RavenBOT.Models;
-using Serilog;
+using EventHandler = RavenBOT.Handlers.EventHandler;
 
 namespace RavenBOT
 {
     public class Program
     {
-        private CommandHandler _handler;
         public DiscordSocketClient Client;
 
-        public static void Main(string[] args)
-        {
-            new Program().Start().GetAwaiter().GetResult();
-        }
+        public static void Main(string[] args) => Start().GetAwaiter().GetResult();
 
-        public async Task Start()
+        private static async Task Start()
         {
             if (!Directory.Exists(Path.Combine(AppContext.BaseDirectory, "setup/")))
                 Directory.CreateDirectory(Path.Combine(AppContext.BaseDirectory, "setup/"));
 
-            ConfigModel.CheckExistence();
-            
-            Client = new DiscordSocketClient(new DiscordSocketConfig
-            {
-                LogLevel = LogSeverity.Info
-            });
-
-            var token = ConfigModel.Load().Token;
-
-            try
-            {
-                await Client.LoginAsync(TokenType.Bot, token);
-                await Client.StartAsync();
-            }
-            catch (Exception e)
-            {
-                Log.Information("Discord Token Rejected\n" +
-                                $"{e}", LogSeverity.Critical);
-            }
-            
-            var serviceProvider = new ServiceCollection()
-                .AddSingleton(Client)
-                .AddSingleton(new DocumentStore
+            var Services = new ServiceCollection()
+                .AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
                 {
-                    Database = ConfigModel.Load().DBName,
-                    Urls = new[]
-                    {
-                        ConfigModel.Load().DBUrl
-                    }
-                }.Initialize())
-                .AddSingleton(new DatabaseHandler(new DocumentStore
+                    MessageCacheSize = 20,
+                    AlwaysDownloadUsers = true,
+                    LogLevel = LogSeverity.Warning
+                }))
+                .AddSingleton(new CommandService(new CommandServiceConfig
                 {
-                    Urls = new[]
-                    {
-                        ConfigModel.Load().DBUrl
-                    }
-                }.Initialize()))
-                .AddSingleton(new InteractiveService(Client))
-                .AddSingleton(new CommandService(
-                    new CommandServiceConfig { CaseSensitiveCommands = false, ThrowOnError = false })).BuildServiceProvider();
-            DatabaseHandler.DatabaseInitialise(Client);
-            _handler = new CommandHandler(serviceProvider);
-            await _handler.ConfigureAsync();
+                    ThrowOnError = false,
+                    IgnoreExtraArgs = false,
+                    DefaultRunMode = RunMode.Async
+                }))
+                .AddSingleton<DatabaseHandler>()
+                .AddSingleton<BotHandler>()
+                .AddSingleton<EventHandler>()
+                .AddSingleton<InteractiveService>()
+                .AddSingleton(new Random(Guid.NewGuid().GetHashCode()))
+                .AddSingleton(x => x.GetRequiredService<DatabaseHandler>().Execute<ConfigModel>(DatabaseHandler.Operation.LOAD, Id: "Config"));
 
-            Client.Log += Client_Log;
+            var Provider = Services.BuildServiceProvider();
+            Provider.GetRequiredService<DatabaseHandler>().Initialize();
+            await Provider.GetRequiredService<BotHandler>().InitializeAsync();
+            await Provider.GetRequiredService<EventHandler>().InitializeAsync();
+
             await Task.Delay(-1);
-        }
-
-        private static Task Client_Log(LogMessage arg)
-        {
-            LogHandler.LogMessage(arg.Message, arg.Severity);
-            return Task.CompletedTask;
         }
     }
 }

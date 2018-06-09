@@ -10,6 +10,7 @@ namespace RavenBOT.Models
         public ulong ID { get; set; }
 
         public GuildSettings Settings { get; set; } = new GuildSettings();
+
         public class GuildSettings
         {
             public string CustomPrefix { get; set; } = null;
@@ -17,7 +18,7 @@ namespace RavenBOT.Models
 
         public void Save()
         {
-            using (var Session = DatabaseHandler.Store.OpenSession(CommandHandler.Config.DBName))
+            using (var Session = DatabaseHandler.Store.OpenSession())
             {
                 Session.Store(this, ID.ToString());
                 Session.SaveChanges();

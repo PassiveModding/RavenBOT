@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿using System;
+using Discord;
 using RavenBOT.Discord.Context;
 using Serilog;
 using Serilog.Core;
@@ -75,6 +76,14 @@ namespace RavenBOT.Handlers
                     log.Information(message);
                     break;
             }
+        }
+
+        public static void PrintApplicationInformation()
+        {
+            Console.WriteLine("-> INFORMATION\n" +
+                          "    Author: PassiveModding | Discord: https://discord.me/Passive\n" +
+                          $"=======================[ {DateTime.UtcNow} ]=======================");
+
         }
     }
 }

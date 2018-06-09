@@ -3,11 +3,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Discord;
+using Discord.Addons.Interactive;
 using Discord.Commands;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using RavenBOT.Discord.Context;
 using RavenBOT.Discord.Preconditions;
-using RavenBOT.Handlers;
+using RavenBOT.Models;
 
 namespace RavenBOT.Modules
 {
@@ -63,7 +65,7 @@ namespace RavenBOT.Modules
         [Summary("Downloads the config file of the guild")]
         public async Task DBDownload()
         {
-            var DC = DatabaseHandler.GetGuild(Context.Guild.Id);
+            var DC = Context.Server;
             var serialised = JsonConvert.SerializeObject(DC, Formatting.Indented);
 
             var uniEncoding = new UnicodeEncoding();
@@ -97,7 +99,30 @@ namespace RavenBOT.Modules
             Context.Server.Save();
 
             //If prefix is null, we default back to the default bot prefix
-            await SimpleEmbedAsync($"Prefix is now: {prefix ?? Context.Prefix}");
+            await SimpleEmbedAsync($"Prefix is now: {prefix ?? Context.Provider.GetRequiredService<ConfigModel>().Prefix}");
+        }
+
+        [Command("embedreaction")]
+        [Summary("Sends a custom message that performs a specific action upon reacting")]
+        [Remarks("N/A")]
+        public async Task Test_EmedReactionReply(bool expires, bool singleuse, bool singleuser)
+        {
+            var one = new Emoji("1⃣");
+            var two = new Emoji("2⃣");
+
+            var embed = new EmbedBuilder()
+                .WithTitle("Choose one")
+                .AddField(one.Name, "Beer", true)
+                .AddField(two.Name, "Drink", true)
+                .Build();
+
+            //This message does not expire after a single
+            //it will not allow a user to react more than once
+            //it allows more than one user to react
+            await InlineReactionReplyAsync(new ReactionCallbackData("text", embed, expires, singleuse)
+                    .WithCallback(one, (c, r) => c.Channel.SendMessageAsync($"{r.User.Value.Mention} Here you go :beer:"))
+                    .WithCallback(two, (c, r) => c.Channel.SendMessageAsync($"{r.User.Value.Mention} Here you go :tropical_drink:")), singleuser
+            );
         }
     }
 }
