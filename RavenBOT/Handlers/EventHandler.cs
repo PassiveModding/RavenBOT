@@ -1,49 +1,106 @@
-﻿using System;
-using System.Linq;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
-using Discord;
-using Discord.Commands;
-using Discord.WebSocket;
-using Microsoft.Extensions.DependencyInjection;
-using RavenBOT.Discord.Context;
-using RavenBOT.Models;
-
-namespace RavenBOT.Handlers
+﻿namespace RavenBOT.Handlers
 {
+    using System;
+    using System.Linq;
+    using System.Reflection;
+    using System.Threading;
+    using System.Threading.Tasks;
+
+    using global::Discord;
+
+    using global::Discord.Commands;
+
+    using global::Discord.WebSocket;
+
+    using Microsoft.Extensions.DependencyInjection;
+
+    using RavenBOT.Discord.Context;
+    using RavenBOT.Models;
+
+    /// <summary>
+    /// The event handler.
+    /// </summary>
     public class EventHandler
     {
-        private bool GuildCheck = true;
-        private readonly bool SingleShard = false;
+        /// <summary>
+        /// true = check and update all missing servers on start.
+        /// </summary>
+        private bool guildCheck = true;
 
-        public EventHandler(DiscordShardedClient client, ConfigModel config, IServiceProvider service, CommandService commandService, Random random)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EventHandler"/> class.
+        /// </summary>
+        /// <param name="client">
+        /// The client.
+        /// </param>
+        /// <param name="config">
+        /// The config.
+        /// </param>
+        /// <param name="service">
+        /// The service.
+        /// </param>
+        /// <param name="commandService">
+        /// The command service.
+        /// </param>
+        public EventHandler(DiscordShardedClient client, ConfigModel config, IServiceProvider service, CommandService commandService)
         {
             Client = client;
             Config = config;
             Provider = service;
-            Random = random;
             CommandService = commandService;
             CancellationToken = new CancellationTokenSource();
         }
 
-        private Random Random { get; }
+        /// <summary>
+        /// Gets the config.
+        /// </summary>
         private ConfigModel Config { get; }
+
+        /// <summary>
+        /// Gets the provider.
+        /// </summary>
         private IServiceProvider Provider { get; }
+
+        /// <summary>
+        /// Gets the client.
+        /// </summary>
         private DiscordShardedClient Client { get; }
+
+        /// <summary>
+        /// Gets the command service.
+        /// </summary>
         private CommandService CommandService { get; }
+
+        /// <summary>
+        /// Gets or sets the cancellation token.
+        /// </summary>
         private CancellationTokenSource CancellationToken { get; set; }
 
+        /// <summary>
+        /// The initialize async.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
         public async Task InitializeAsync()
         {
+            // This will add all our modules to the command service, allowing them to be accessed as necessary
             await CommandService.AddModulesAsync(Assembly.GetEntryAssembly());
             LogHandler.LogMessage("RavenBOT: Modules Added");
         }
 
-        internal async Task ShardReady(DiscordSocketClient _client)
+        /// <summary>
+        /// The shard ready.
+        /// </summary>
+        /// <param name="socketClient">
+        /// The socketClient.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        internal async Task ShardReady(DiscordSocketClient socketClient)
         {
-            
-            await _client.SetActivityAsync(new Game($"Shard: {_client.ShardId}"));
+            await socketClient.SetActivityAsync(new Game($"Shard: {socketClient.ShardId}"));
             
             /*
             //Here we select at random out 'playing' message.
@@ -55,128 +112,171 @@ namespace RavenBOT.Handlers
             };
             var RandomActivity = Games.Keys.ToList()[Random.Next(Games.Keys.Count)];
             var RandomName = Games[RandomActivity][Random.Next(Games[RandomActivity].Length)];
-            await _client.SetActivityAsync(new Game(RandomName, RandomActivity));
+            await socketClient.SetActivityAsync(new Game(RandomName, RandomActivity));
             LogHandler.LogMessage($"Game has been set to: [{RandomActivity}] {RandomName}");
             Games.Clear();
             */
 
-            if (GuildCheck)
+            if (this.guildCheck)
             {
-                //This will check to ensure that all our servers are initialised, whilst also allowing the bot to continue starting
+                // This will check to ensure that all our servers are initialized, whilst also allowing the bot to continue starting
                 _ = Task.Run(() =>
                 {
-                    //This will load all guild models and reterive their IDs
-                    var Servers = Provider.GetRequiredService<DatabaseHandler>().Query<GuildModel>().Select(x => Convert.ToUInt64(x.ID)).ToList();
-                    //Now if the bot's server list contains a guild but 'Servers' does not, we create a new object for the Guild
-                    foreach (var Guild in _client.Guilds.Select(x => x.Id))
+                    // This will load all guild models and retrieve their IDs
+                    var Servers = this.Provider.GetRequiredService<DatabaseHandler>().Query<GuildModel>().Select(x => Convert.ToUInt64(x.ID)).ToList();
+
+                    // Now if the bots server list contains a guild but 'Servers' does not, we create a new object for the guild
+                    foreach (var Guild in socketClient.Guilds.Select(x => x.Id))
                     {
                         if (!Servers.Contains(Guild))
-                            Provider.GetRequiredService<DatabaseHandler>().Execute<GuildModel>(DatabaseHandler.Operation.CREATE, new GuildModel
-                            {
-                                ID = Guild
-                            }, Guild);
-                    }
-
-                    //We also auto-remove any servers that no longer use the bot, to reduce un-necessary disk usage. 
-                    //You may want to remove this however if you are storing things and want to keep them.
-                    //You should also disable this if you are working with shards.
-                    if (SingleShard)
-                    {
-                        foreach (var Server in Servers)
                         {
-                            if (!_client.Guilds.Select(x => x.Id).Contains(Convert.ToUInt64(Server)))
-                                Provider.GetRequiredService<DatabaseHandler>().Execute<GuildModel>(DatabaseHandler.Operation.DELETE, Id: Server);
+                            this.Provider.GetRequiredService<DatabaseHandler>().Execute<GuildModel>(DatabaseHandler.Operation.CREATE, new GuildModel { ID = Guild }, Guild);
                         }
                     }
 
-                    //Ensure that this is only run once as the bot initially connects.
-                    GuildCheck = false;
+                    // We also auto-remove any servers that no longer use the bot, to reduce un-necessary disk usage. 
+                    // You may want to remove this however if you are storing things and want to keep them.
+                    // You should also disable this if you are working with multiple shards.
+                    if (Client.Shards.Count == 1)
+                    {
+                        foreach (var Server in Servers)
+                        {
+                            if (!socketClient.Guilds.Select(x => x.Id).Contains(Convert.ToUInt64(Server)))
+                            {
+                                Provider.GetRequiredService<DatabaseHandler>().Execute<GuildModel>(DatabaseHandler.Operation.DELETE, Id: Server);
+                            }
+                        }
+                    }
+
+                    // Ensure that this is only run once as the bot initially connects.
+                    this.guildCheck = false;
                 });
             }
 
-            //This will log a message with the bot's invite link so the developer can access the bot's invite with ease. Note the permissions are configured to allow everything in the server.
-            //var application = _client.GetApplicationInfoAsync();
-            //LogHandler.LogMessage($"Invite: https://discordapp.com/oauth2/authorize?client_id={application.Id}&scope=bot&permissions=2146958591");
-            LogHandler.LogMessage($"Shard: {_client.ShardId} Ready");
+            // This will log a message with the bots invite link so the developer can access the bots invite with ease. Note the permissions are configured to allow everything in the server.
+            // var application = socketClient.GetApplicationInfoAsync();
+            // LogHandler.LogMessage($"Invite: https://discordapp.com/oauth2/authorize?client_id={application.Id}&scope=bot&permissions=2146958591");
+            LogHandler.LogMessage($"Shard: {socketClient.ShardId} Ready");
         }
 
-        internal Task ShardConnected(DiscordSocketClient _client)
+        /// <summary>
+        /// The shard connected.
+        /// </summary>
+        /// <param name="socketClient">
+        /// The Client.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        internal Task ShardConnected(DiscordSocketClient socketClient)
         {
             Task.Run(()
                 => CancellationToken.Cancel()).ContinueWith(x
                 => CancellationToken = new CancellationTokenSource());
-            LogHandler.LogMessage($"Shard: {_client.ShardId} Connected");
+            LogHandler.LogMessage($"Shard: {socketClient.ShardId} Connected with {socketClient.Guilds.Count} Guilds and {socketClient.Guilds.Sum(x => x.MemberCount)} Users");
             return Task.CompletedTask;
         }
 
-
-        internal Task Log(LogMessage Message)
+        /// <summary>
+        /// This logs discord messages to our LogHandler
+        /// </summary>
+        /// <param name="message">
+        /// The message.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        internal Task Log(LogMessage message)
         {
-            return Task.Run(() => LogHandler.LogMessage(Message.Message, Message.Severity));
+            return Task.Run(() => LogHandler.LogMessage(message.Message, message.Severity));
         }
-
-        //This will auto-remove the bot from servers as it gets removed. NOTE: Remove this if you want to save configs.
-        internal Task LeftGuild(SocketGuild Guild)
+        
+        /// <summary>
+        /// This will auto-remove the bot from servers as it gets removed. NOTE: Remove this if you want to save configs.
+        /// </summary>
+        /// <param name="guild">
+        /// The guild.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        internal Task LeftGuild(SocketGuild guild)
         {
             return Task.Run(()
-                => Provider.GetRequiredService<DatabaseHandler>().Execute<GuildModel>(DatabaseHandler.Operation.DELETE, Id: Guild.Id));
+                => Provider.GetRequiredService<DatabaseHandler>().Execute<GuildModel>(DatabaseHandler.Operation.DELETE, Id: guild.Id));
         }
-
-        //This event is triggered every time the a user sends a message in a channel, dm etc. that the bot has access to view.
+        
+        /// <summary>
+        /// This event is triggered every time the a user sends a message in a channel, dm etc. that the bot has access to view.
+        /// </summary>
+        /// <param name="socketMessage">
+        /// The socket message.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
         internal async Task MessageReceivedAsync(SocketMessage socketMessage)
         {
-            if (!(socketMessage is SocketUserMessage Message) || Message.Channel is IDMChannel) return;
-            var Context = new Context(Client, Message, Provider);
+            if (!(socketMessage is SocketUserMessage Message) || Message.Channel is IDMChannel)
+            {
+                return;
+            }
+
+            var context = new Context(Client, Message, Provider);
 
             var argPos = 0;
-            //Filter out all messages that don't start with our Bot Prefix, bot mention or server specific prefix.
-            if (!(Message.HasStringPrefix(Config.Prefix, ref argPos) || Message.HasMentionPrefix(Context.Client.CurrentUser, ref argPos) || Message.HasStringPrefix(Context.Server.Settings.CustomPrefix, ref argPos))) return;
 
-            //Here we attempt to execute a command based on the user message
-            var Result = await CommandService.ExecuteAsync(Context, argPos, Provider, MultiMatchHandling.Best);
-
-            //Generate an error message for users if a command is unsuccessful
-            if (!Result.IsSuccess)
+            // Filter out all messages that don't start with our Bot Prefix, bot mention or server specific prefix.
+            if (!(Message.HasStringPrefix(Config.Prefix, ref argPos) || Message.HasMentionPrefix(context.Client.CurrentUser, ref argPos) || Message.HasStringPrefix(context.Server.Settings.CustomPrefix, ref argPos)))
             {
-                string ErrorMessage;
-                if (Result.Error == CommandError.UnknownCommand)
+                return;
+            }
+
+            // Here we attempt to execute a command based on the user message
+            var result = await CommandService.ExecuteAsync(context, argPos, Provider, MultiMatchHandling.Best);
+
+            // Generate an error message for users if a command is unsuccessful
+            if (!result.IsSuccess)
+            {
+                string errorMessage;
+                if (result.Error == CommandError.UnknownCommand)
                 {
-                    ErrorMessage = "**Command:** N/A";
+                    errorMessage = "**Command:** N/A";
                 }
                 else
                 {
-                    //Search the commandservice based on the message, then respond accordingly with information about the command.
-                    var srch = CommandService.Search(Context, argPos);
-                    var cmd = srch.Commands.FirstOrDefault();
-                    ErrorMessage = $"**Command Name:** `{cmd.Command.Name}`\n" +
+                    // Search the commandservice based on the message, then respond accordingly with information about the command.
+                    var search = CommandService.Search(context, argPos);
+                    var cmd = search.Commands.FirstOrDefault();
+                    errorMessage = $"**Command Name:** `{cmd.Command.Name}`\n" +
                                    $"**Summary:** `{cmd.Command?.Summary ?? "N/A"}`\n" +
                                    $"**Remarks:** `{cmd.Command?.Remarks ?? "N/A"}`\n" +
                                    $"**Aliases:** {(cmd.Command.Aliases.Any() ? string.Join(" ", cmd.Command.Aliases.Select(x => $"`{x}`")) : "N/A")}\n" +
                                    $"**Parameters:** {(cmd.Command.Parameters.Any() ? string.Join(" ", cmd.Command.Parameters.Select(x => x.IsOptional ? $" `<(Optional){x.Name}>` " : $" `<{x.Name}>` ")) : "N/A")}\n" +
                                    "**Error Reason**\n" +
-                                   $"{Result.ErrorReason}";
+                                   $"{result.ErrorReason}";
                 }
 
                 try
                 {
-                    await Context.Channel.SendMessageAsync("", false, new EmbedBuilder
-                    {
-                        Title = "ERROR",
-                        Description = ErrorMessage
-                    }.Build());
+                    await context.Channel.SendMessageAsync(string.Empty, false, new EmbedBuilder
+                            {
+                                Title = "ERROR",
+                                Description = errorMessage
+                            }.Build());
                 }
                 catch
                 {
-                    //
+                    // ignored
                 }
 
-                switch (Result.Error)
+                switch (result.Error)
                 {
                     case CommandError.MultipleMatches:
-                        LogHandler.LogMessage(Result.ErrorReason, LogSeverity.Error);
+                        LogHandler.LogMessage(result.ErrorReason, LogSeverity.Error);
                         break;
                     case CommandError.ObjectNotFound:
-                        LogHandler.LogMessage(Result.ErrorReason, LogSeverity.Error);
+                        LogHandler.LogMessage(result.ErrorReason, LogSeverity.Error);
                         break;
                     case CommandError.Unsuccessful:
                         await Message.Channel.SendMessageAsync("You may have found a bug. Please report this error in my server https://discord.me/Passive");

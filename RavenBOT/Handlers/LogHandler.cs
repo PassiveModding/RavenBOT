@@ -80,7 +80,7 @@ namespace RavenBOT.Handlers
             }
         }
 
-        public static void PrintApplicationInformation(DBObject Settings, ConfigModel Config)
+        public static void PrintApplicationInformation(DatabaseObject Settings, ConfigModel Config)
         {
             Console.WriteLine("-> INFORMATION\n" +
                               $"-> Database URL: {Settings?.URL}\n" +

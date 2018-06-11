@@ -1,22 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Discord;
-using Discord.Addons.Interactive;
-using Discord.Commands;
-using Discord.WebSocket;
-
-namespace RavenBOT.Discord.Context
+﻿namespace RavenBOT.Discord.Context
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+
+    using global::Discord;
+    using global::Discord.Addons.Interactive;
+    using global::Discord.Commands;
+    using global::Discord.WebSocket;
+
     /// <inheritdoc />
     /// <summary>
-    ///     This is out own customised InteractiveService, giving support for DiscordShardedClient
+    ///     This is out own customized InteractiveService, giving support for DiscordShardedClient
     /// </summary>
     public class Interactive : IDisposable
     {
         private readonly Dictionary<ulong, IReactionCallback> _callbacks;
         private readonly TimeSpan _defaultTimeout;
 
+        /// <summary>
+        /// Sets our necessary things
+        /// </summary>
+        /// <param name="discord"></param>
+        /// <param name="defaultTimeout"></param>
         public Interactive(DiscordShardedClient discord, TimeSpan? defaultTimeout = null)
         {
             Discord = discord;
@@ -26,13 +32,27 @@ namespace RavenBOT.Discord.Context
             _defaultTimeout = defaultTimeout ?? TimeSpan.FromSeconds(15);
         }
 
+        /// <summary>
+        /// Gets the discordShardedclient
+        /// </summary>
         public DiscordShardedClient Discord { get; }
 
+        /// <summary>
+        /// Disposes the reaction
+        /// </summary>
         public void Dispose()
         {
             Discord.ReactionAdded -= HandleReactionAsync;
         }
 
+        /// <summary>
+        /// Waits for the next message
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="fromSourceUser"></param>
+        /// <param name="inSourceChannel"></param>
+        /// <param name="timeout"></param>
+        /// <returns></returns>
         public Task<SocketMessage> NextMessageAsync(SocketCommandContext context, bool fromSourceUser = true, bool inSourceChannel = true, TimeSpan? timeout = null)
         {
             var criterion = new Criteria<SocketMessage>();
@@ -43,6 +63,14 @@ namespace RavenBOT.Discord.Context
             return NextMessageAsync(context, criterion, timeout);
         }
 
+
+        /// <summary>
+        /// Waits for the next message to be sent
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="criterion"></param>
+        /// <param name="timeout"></param>
+        /// <returns></returns>
         public async Task<SocketMessage> NextMessageAsync(SocketCommandContext context, ICriterion<SocketMessage> criterion, TimeSpan? timeout = null)
         {
             timeout = timeout ?? _defaultTimeout;
@@ -69,6 +97,13 @@ namespace RavenBOT.Discord.Context
             return null;
         }
 
+        /// <summary>
+        /// Sends a message with reaction callback
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="callbacks"></param>
+        /// <param name="fromSourceUser"></param>
+        /// <returns></returns>
         public async Task<IUserMessage> SendMessageWithReactionCallbacksAsync(SocketCommandContext context, ReactionCallbackData callbacks, bool fromSourceUser = true)
         {
             var criterion = new Criteria<SocketReaction>();
@@ -79,6 +114,16 @@ namespace RavenBOT.Discord.Context
             return callback.Message;
         }
 
+        /// <summary>
+        /// Sends a message then deletes it
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="content"></param>
+        /// <param name="isTTS"></param>
+        /// <param name="embed"></param>
+        /// <param name="timeout"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
         public async Task<IUserMessage> ReplyAndDeleteAsync(SocketCommandContext context, string content, bool isTTS = false, Embed embed = null, TimeSpan? timeout = null, RequestOptions options = null)
         {
             timeout = timeout ?? _defaultTimeout;
@@ -89,6 +134,14 @@ namespace RavenBOT.Discord.Context
             return message;
         }
 
+        /// <summary>
+        /// Sends a multi-pages message
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="pager"></param>
+        /// <param name="Reactions"></param>
+        /// <param name="criterion"></param>
+        /// <returns></returns>
         public async Task<IUserMessage> SendPaginatedMessageAsync(SocketCommandContext context, PaginatedMessage pager, ReactionList Reactions, ICriterion<SocketReaction> criterion = null)
         {
             var callback = new PaginatedMessageCallback(new InteractiveService(Discord.GetShardFor(context.Guild)), context, pager, criterion);
@@ -96,21 +149,37 @@ namespace RavenBOT.Discord.Context
             return callback.Message;
         }
 
+        /// <summary>
+        /// Adds reaction callback
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="callback"></param>
         public void AddReactionCallback(IMessage message, IReactionCallback callback)
         {
             _callbacks[message.Id] = callback;
         }
 
+        /// <summary>
+        /// Removes reaction callback
+        /// </summary>
+        /// <param name="message"></param>
         public void RemoveReactionCallback(IMessage message)
         {
             RemoveReactionCallback(message.Id);
         }
 
+        /// <summary>
+        /// Removes reaction callback
+        /// </summary>
+        /// <param name="id"></param>
         public void RemoveReactionCallback(ulong id)
         {
             _callbacks.Remove(id);
         }
 
+        /// <summary>
+        /// Clears all reaction callbacks
+        /// </summary>
         public void ClearReactionCallbacks()
         {
             _callbacks.Clear();

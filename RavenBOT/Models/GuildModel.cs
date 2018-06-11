@@ -1,27 +1,42 @@
-﻿using RavenBOT.Handlers;
-
-namespace RavenBOT.Models
+﻿namespace RavenBOT.Models
 {
+    using RavenBOT.Handlers;
+
+    /// <summary>
+    /// The guild model.
+    /// </summary>
     public class GuildModel
     {
         /// <summary>
-        ///     The Server ID
+        /// Gets or sets The Server ID
         /// </summary>
         public ulong ID { get; set; }
 
+        /// <summary>
+        /// Gets or sets the settings.
+        /// </summary>
         public GuildSettings Settings { get; set; } = new GuildSettings();
 
+        /// <summary>
+        /// Saves the GuildModel
+        /// </summary>
         public void Save()
         {
-            using (var Session = DatabaseHandler.Store.OpenSession())
+            using (var session = DatabaseHandler.Store.OpenSession())
             {
-                Session.Store(this, ID.ToString());
-                Session.SaveChanges();
+                session.Store(this, ID.ToString());
+                session.SaveChanges();
             }
         }
 
+        /// <summary>
+        /// The guild settings.
+        /// </summary>
         public class GuildSettings
         {
+            /// <summary>
+            /// Gets or sets the custom prefix.
+            /// </summary>
             public string CustomPrefix { get; set; } = null;
         }
     }

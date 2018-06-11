@@ -14,35 +14,63 @@ using RavenBOT.Models;
 
 namespace RavenBOT.Handlers
 {
-    public class DBObject
-    {
-        public string FullBackup = "0 */6 * * *";
-        public string IncrementalBackup = "0 2 * * *";
-        public bool IsConfigCreated;
-        public string Name = "RavenBOT";
-        public string URL = "http://127.0.0.1:8080";
-        public string BackupFolder => Directory.CreateDirectory("Backup").FullName;
-    }
 
+    /// <summary>
+    /// The database handler.
+    /// </summary>
     public class DatabaseHandler
     {
+        /// <summary>
+        /// The operation.
+        /// </summary>
         public enum Operation
         {
+            /// <summary>
+            /// Saves the a document
+            /// </summary>
             SAVE,
+
+            /// <summary>
+            /// Loads a document
+            /// </summary>
             LOAD,
+
+            /// <summary>
+            /// Deletes a document
+            /// </summary>
             DELETE,
+
+            /// <summary>
+            /// Adds a new document
+            /// </summary>
             CREATE
         }
 
-        public DBObject Settings { get; set; }
+        /// <summary>
+        /// Gets or sets the settings.
+        /// </summary>
+        public DatabaseObject Settings { get; set; }
+
+        /// <summary>
+        /// Gets or sets the store.
+        /// </summary>
         public static IDocumentStore Store { get; set; }
 
+        /// <summary>
+        /// Pings a web url
+        /// </summary>
+        /// <param name="url">
+        /// The url.
+        /// </param>
+        /// <returns>
+        /// The <see cref="bool"/>.
+        /// </returns>
         public bool Ping(string url)
         {
             try
             {
                 var webClient = new WebClient();
-                var _ = webClient.DownloadData(url);
+                var discarded = webClient.DownloadData(url);
                 return true;
             }
             catch
@@ -71,17 +99,17 @@ namespace RavenBOT.Handlers
                     dburl = "http://127.0.0.1:8080";
                 }
 
-                File.WriteAllText("setup/DBConfig.json", JsonConvert.SerializeObject(new DBObject
+                File.WriteAllText("setup/DBConfig.json", JsonConvert.SerializeObject(new DatabaseObject
                 {
                     Name = dbname,
                     URL = dburl
                 }, Formatting.Indented), Encoding.UTF8);
 
-                Settings = JsonConvert.DeserializeObject<DBObject>(File.ReadAllText("setup/DBConfig.json"));
+                Settings = JsonConvert.DeserializeObject<DatabaseObject>(File.ReadAllText("setup/DBConfig.json"));
             }
             else
             {
-                Settings = JsonConvert.DeserializeObject<DBObject>(File.ReadAllText("setup/DBConfig.json"));
+                Settings = JsonConvert.DeserializeObject<DatabaseObject>(File.ReadAllText("setup/DBConfig.json"));
             }
 
             //This initialises the document store, and ensures that RavenDB is working properly
@@ -149,7 +177,7 @@ namespace RavenBOT.Handlers
 
                 //This inserts the config object into the database and writes the DatabaseConfig to file.
                 Execute<ConfigModel>(Operation.CREATE, Cmodel, "Config");
-                File.WriteAllText("setup/DBConfig.json", JsonConvert.SerializeObject(new DBObject {IsConfigCreated = true}, Formatting.Indented));
+                File.WriteAllText("setup/DBConfig.json", JsonConvert.SerializeObject(new DatabaseObject {IsConfigCreated = true}, Formatting.Indented));
             }
 
             LogHandler.PrintApplicationInformation(Settings, Cmodel);
