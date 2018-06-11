@@ -53,6 +53,7 @@ namespace RavenBOT.Handlers
 
         public void Initialize()
         {
+            //Ensure that the bot's database settings are setup, if not prompt to enter details
             if (!File.Exists("setup/DBConfig.json"))
             {
                 LogHandler.LogMessage("Please enter details about your bot and database configuration. NOTE: You can hit enter for a default value. ");
@@ -83,12 +84,20 @@ namespace RavenBOT.Handlers
                 Settings = JsonConvert.DeserializeObject<DBObject>(File.ReadAllText("setup/DBConfig.json"));
             }
 
+            //This initialises the document store, and ensures that RavenDB is working properly
             Store = new Lazy<IDocumentStore>(() => new DocumentStore {Database = Settings.Name, Urls = new[] {Settings.URL}}.Initialize(), true).Value;
-            if (Store == null) LogHandler.LogMessage("Failed to build document store.", LogSeverity.Critical);
+            if (Store == null)
+            {
+                LogHandler.LogMessage("Failed to build document store.", LogSeverity.Critical);
+            }
 
+            //This creates the database
             if (Store.Maintenance.Server.Send(new GetDatabaseNamesOperation(0, 5)).All(x => x != Settings.Name))
+            {
                 Store.Maintenance.Server.Send(new CreateDatabaseOperation(new DatabaseRecord(Settings.Name)));
+            }
 
+            //To ensure the backup operation is functioning and backing up to our bot's directory we update the backup operation on each boot of the bot
             var Record = Store.Maintenance.Server.Send(new GetDatabaseRecordOperation(Settings.Name));
             var backupop = Record.PeriodicBackups.FirstOrDefault(x => x.Name == "Backup");
             try
@@ -118,6 +127,7 @@ namespace RavenBOT.Handlers
             }
 
             var Cmodel = new ConfigModel();
+            //Prompt the user to set up the bot's configuration.
             if (Settings.IsConfigCreated == false)
             {
                 LogHandler.LogMessage("Enter bot's token: (You can get this from https://discordapp.com/developers/applications/me)");
@@ -137,6 +147,7 @@ namespace RavenBOT.Handlers
                 Cmodel.Token = Token;
                 Cmodel.Prefix = Prefix;
 
+                //This inserts the config object into the database and writes the DatabaseConfig to file.
                 Execute<ConfigModel>(Operation.CREATE, Cmodel, "Config");
                 File.WriteAllText("setup/DBConfig.json", JsonConvert.SerializeObject(new DBObject {IsConfigCreated = true}, Formatting.Indented));
             }
@@ -145,6 +156,7 @@ namespace RavenBOT.Handlers
             Settings = null;
         }
 
+        //RavenDb allows the user to query all objects in the database based on their Object Type.
         public List<T> Query<T>()
         {
             using (var session = Store.OpenSession())
