@@ -9,8 +9,8 @@ namespace RavenBOT.Handlers
     {
         private ConfigModel Config { get; }
         private EventHandler Event { get; }
-        private DiscordSocketClient Client { get; }
-        public BotHandler(DiscordSocketClient client, EventHandler events, ConfigModel config)
+        private DiscordShardedClient Client { get; }
+        public BotHandler(DiscordShardedClient client, EventHandler events, ConfigModel config)
         {
             Client = client;
             Event = events;
@@ -21,9 +21,9 @@ namespace RavenBOT.Handlers
         {
             //These are our events, each time one of these is triggered it runs the corresponding method. Ie, the bot receives a message we run Event.MessageReceivedAsync
             Client.Log += Event.Log;
-            Client.Ready += Event.Ready;
+            Client.ShardReady += Event.ShardReady;
             Client.LeftGuild += Event.LeftGuild;
-            Client.Connected += Event.Connected;
+            Client.ShardConnected += Event.ShardConnected;
             Client.MessageReceived += Event.MessageReceivedAsync;
 
             //Here we log the bot in and start it. This MUST run for the bot to connect to discord.

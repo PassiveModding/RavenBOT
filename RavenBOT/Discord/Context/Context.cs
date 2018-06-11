@@ -10,10 +10,10 @@ using RavenBOT.Models;
 
 namespace RavenBOT.Discord.Context
 {
+
     public abstract class Base : ModuleBase<Context>
     {
-        public InteractiveService Interactive { get; set; }
-
+        public Interactive Interactive { get; set; }
 
         /// <summary>
         ///     Reply in the server. This is a shortcut for context.channel.sendmessageasync
@@ -21,7 +21,7 @@ namespace RavenBOT.Discord.Context
         public async Task<IUserMessage> ReplyAsync(string Message, Embed Embed = null)
         {
             await Context.Channel.TriggerTypingAsync();
-            return await base.ReplyAsync(Message, false, Embed);
+            return await ReplyAsync(Message, false, Embed);
         }
 
         /// <summary>
@@ -29,11 +29,11 @@ namespace RavenBOT.Discord.Context
         /// </summary>
         public async Task<IUserMessage> ReplyAsync(EmbedBuilder embed)
         {
-            return await base.ReplyAsync("", false, embed.Build());
+            return await ReplyAsync("", false, embed.Build());
         }
         public async Task<IUserMessage> ReplyAsync(Embed embed)
         {
-            return await base.ReplyAsync("", false, embed);
+            return await ReplyAsync("", false, embed);
         }
 
 
@@ -43,7 +43,7 @@ namespace RavenBOT.Discord.Context
         public async Task<IUserMessage> ReplyAndDeleteAsync(string Message, TimeSpan? Timeout = null)
         {
             Timeout = Timeout ?? TimeSpan.FromSeconds(5);
-            var Msg = await ReplyAsync(Message).ConfigureAwait(false);
+            var Msg = await Context.Channel.SendMessageAsync(Message).ConfigureAwait(false);
             _ = Task.Delay(Timeout.Value).ContinueWith(_ => Msg.DeleteAsync().ConfigureAwait(false)).ConfigureAwait(false);
             return Msg;
         }
@@ -68,7 +68,7 @@ namespace RavenBOT.Discord.Context
                 Description = message,
                 Color = Color.DarkOrange
             };
-            return await base.ReplyAsync("", false, embed.Build());
+            return await ReplyAsync("", false, embed.Build());
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace RavenBOT.Discord.Context
         /// <returns></returns>
         private SocketCommandContext SocketContext()
         {
-            return new SocketCommandContext(Context.Client as DiscordSocketClient, Context.Message as SocketUserMessage);
+            return new SocketCommandContext(Context.Client.GetShardFor(Context.Guild), Context.Message);
         }
 
         /// <summary>
@@ -144,47 +144,16 @@ namespace RavenBOT.Discord.Context
         }
     }
 
-    public class Context : ICommandContext
+    public class Context : ShardedCommandContext
     {
-        public Context(IDiscordClient ClientParam, IUserMessage MessageParam, IServiceProvider ServiceProvider)
+        public Context(DiscordShardedClient ClientParam, SocketUserMessage MessageParam, IServiceProvider ServiceProvider) : base(ClientParam, MessageParam)
         {
-            Client = ClientParam;
-            Message = MessageParam;
-            User = MessageParam.Author;
-            Channel = MessageParam.Channel;
-            Guild = MessageParam.Channel is IDMChannel ? null : (MessageParam.Channel as IGuildChannel).Guild;
-
-            //This is a shorthand conversion for our context, giving access to socket context stuff without the need to cast within out commands
-            Socket = new SocketContext
-            {
-                Guild = Guild as SocketGuild,
-                User = User as SocketUser,
-                Client = Client as DiscordSocketClient,
-                Message = Message as SocketUserMessage,
-                Channel = Channel as ISocketMessageChannel
-            };
-
             //These are our custom additions to the context, giving access to the server object and all server objects through Context.
-            Server = Channel is IDMChannel ? null : ServiceProvider.GetRequiredService<DatabaseHandler>().Execute<GuildModel>(DatabaseHandler.Operation.LOAD, null, Guild.Id);
+            Server = ServiceProvider.GetRequiredService<DatabaseHandler>().Execute<GuildModel>(DatabaseHandler.Operation.LOAD, null, Guild.Id);
             Provider = ServiceProvider;
         }
 
         public GuildModel Server { get; }
-        public SocketContext Socket { get; }
-        public IUser User { get; }
-        public IGuild Guild { get; }
-        public IDiscordClient Client { get; }
-        public IUserMessage Message { get; }
-        public IMessageChannel Channel { get; }
         public IServiceProvider Provider { get; }
-
-        public class SocketContext
-        {
-            public SocketUser User { get; set; }
-            public SocketGuild Guild { get; set; }
-            public DiscordSocketClient Client { get; set; }
-            public SocketUserMessage Message { get; set; }
-            public ISocketMessageChannel Channel { get; set; }
-        }
     }
 }

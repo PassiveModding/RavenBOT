@@ -15,17 +15,16 @@ namespace RavenBOT.Handlers
 {
     public class EventHandler
     {
-        private DatabaseHandler DB { get; }
         private Random Random { get; }
         private ConfigModel Config { get; }
         private IServiceProvider Provider { get; }
-        private DiscordSocketClient Client { get; }
+        private DiscordShardedClient Client { get; }
         private bool GuildCheck = true;
+        private bool SingleShard = false;
         private CommandService CommandService { get; }
         private CancellationTokenSource CancellationToken { get; set; }
-        public EventHandler(DatabaseHandler db, DiscordSocketClient client, ConfigModel config, IServiceProvider service, CommandService commandService, Random random)
+        public EventHandler(DiscordShardedClient client, ConfigModel config, IServiceProvider service, CommandService commandService, Random random)
         {
-            DB = db;
             Client = client;
             Config = config;
             Provider = service;
@@ -40,9 +39,11 @@ namespace RavenBOT.Handlers
             LogHandler.LogMessage("RavenBOT: Modules Added");
         }
 
-        internal async Task Ready()
+        internal async Task ShardReady(DiscordSocketClient _client)
         {
             //Here we select at random out 'playing' message.
+            await _client.SetActivityAsync(new Game($"Shard: {_client.ShardId}"));
+            /*
             var Games = new Dictionary<ActivityType, string[]>
             {
                 {ActivityType.Listening, new[]{"YT/PassiveModding", "Tech N9ne"} },
@@ -51,10 +52,10 @@ namespace RavenBOT.Handlers
             };
             var RandomActivity = Games.Keys.ToList()[Random.Next(Games.Keys.Count)];
             var RandomName = Games[RandomActivity][Random.Next(Games[RandomActivity].Length)];
-            await Client.SetActivityAsync(new Game(RandomName, RandomActivity));
+            await _client.SetActivityAsync(new Game(RandomName, RandomActivity));
             LogHandler.LogMessage($"Game has been set to: [{RandomActivity}] {RandomName}");
             Games.Clear();
-
+            */
             
             if (GuildCheck)
             {
@@ -64,7 +65,7 @@ namespace RavenBOT.Handlers
                     //This will load all guild models and reterive their IDs
                     var Servers = Provider.GetRequiredService<DatabaseHandler>().Query<GuildModel>().Select(x => Convert.ToUInt64(x.ID)).ToList();
                     //Now if the bot's server list contains a guild but 'Servers' does not, we create a new object for the Guild
-                    foreach (var Guild in Client.Guilds.Select(x => x.Id))
+                    foreach (var Guild in _client.Guilds.Select(x => x.Id))
                     {
                         if (!Servers.Contains(Guild))
                             Provider.GetRequiredService<DatabaseHandler>().Execute<GuildModel>(DatabaseHandler.Operation.CREATE, new GuildModel
@@ -75,10 +76,14 @@ namespace RavenBOT.Handlers
 
                     //We also auto-remove any servers that no longer use the bot, to reduce un-necessary disk usage. 
                     //You may want to remove this however if you are storing things and want to keep them.
-                    foreach (var Server in Servers)
+                    //You should also disable this if you are working with shards.
+                    if (SingleShard)
                     {
-                        if (!Client.Guilds.Select(x => x.Id).Contains(Convert.ToUInt64(Server)))
-                            Provider.GetRequiredService<DatabaseHandler>().Execute<GuildModel>(DatabaseHandler.Operation.DELETE, Id: Server);
+                        foreach (var Server in Servers)
+                        {
+                            if (!_client.Guilds.Select(x => x.Id).Contains(Convert.ToUInt64(Server)))
+                                Provider.GetRequiredService<DatabaseHandler>().Execute<GuildModel>(DatabaseHandler.Operation.DELETE, Id: Server);
+                        }
                     }
 
                     //Ensure that this is only run once as the bot initially connects.
@@ -87,14 +92,19 @@ namespace RavenBOT.Handlers
             }
 
             //This will log a message with the bot's invite link so the developer can access the bot's invite with ease. Note the permissions are configured to allow everything in the server.
-            var application = Client.GetApplicationInfoAsync();
-            LogHandler.LogMessage($"Invite: https://discordapp.com/oauth2/authorize?client_id={application.Id}&scope=bot&permissions=2146958591");
+            //var application = _client.GetApplicationInfoAsync();
+            //LogHandler.LogMessage($"Invite: https://discordapp.com/oauth2/authorize?client_id={application.Id}&scope=bot&permissions=2146958591");
+            LogHandler.LogMessage($"Shard: {_client.ShardId} Ready");
         }
 
-        internal Task Connected()
-            => Task.Run(()
+        internal Task ShardConnected(DiscordSocketClient _client)
+        {
+            Task.Run(()
                 => CancellationToken.Cancel()).ContinueWith(x
                 => CancellationToken = new CancellationTokenSource());
+            LogHandler.LogMessage($"Shard: {_client.ShardId} Connected");
+            return Task.CompletedTask;
+        }
 
 
         internal Task Log(LogMessage Message)
@@ -153,10 +163,6 @@ namespace RavenBOT.Handlers
 
                 switch (Result.Error)
                 {
-                    case CommandError.UnmetPrecondition:
-                        var Permissions = (Message.Channel as SocketGuildChannel).Guild.CurrentUser.GuildPermissions;
-                        if (!string.IsNullOrWhiteSpace(Result.ErrorReason) && Permissions.SendMessages)
-                            await Message.Channel.SendMessageAsync(Result.ErrorReason); break;
                     case CommandError.MultipleMatches: LogHandler.LogMessage(Result.ErrorReason, LogSeverity.Error); break;
                     case CommandError.ObjectNotFound: LogHandler.LogMessage(Result.ErrorReason, LogSeverity.Error); break;
                     case CommandError.Unsuccessful:

@@ -26,7 +26,7 @@ namespace RavenBOT.Handlers
 
     public class DatabaseHandler
     {
-        public static DBObject Settings { get; set; }
+        public DBObject Settings { get; set; }
         public static IDocumentStore Store { get; set; }
 
         public bool Ping(string url)
@@ -45,7 +45,6 @@ namespace RavenBOT.Handlers
 
         public void Initialize()
         {
-            LogHandler.PrintApplicationInformation();
             if (!File.Exists("setup/DBConfig.json"))
             {
                 LogHandler.LogMessage("Please enter details about your bot and database configuration. NOTE: You can hit enter for a default value. ");
@@ -108,7 +107,7 @@ namespace RavenBOT.Handlers
                 LogHandler.LogMessage("RavenDB: Failed to set Backup Operation. Backups may not be saved", LogSeverity.Warning);
             }
 
-
+            var Cmodel = new ConfigModel();
             if (Settings.IsConfigCreated == false)
             {
                 LogHandler.LogMessage("Enter bot's token: (You can get this from https://discordapp.com/developers/applications/me)");
@@ -123,14 +122,14 @@ namespace RavenBOT.Handlers
                 {
                     Prefix = "+";
                 }
-                Execute<ConfigModel>(Operation.CREATE, new ConfigModel
-                {
-                    Prefix = Prefix,
-                    Token = Token
 
-                }, "Config");
+                Cmodel.Token = Token;
+                Cmodel.Prefix = Prefix;
+
+                Execute<ConfigModel>(Operation.CREATE, Cmodel, "Config");
                 File.WriteAllText("setup/DBConfig.json", JsonConvert.SerializeObject(new DBObject { IsConfigCreated = true }, Formatting.Indented));
             }
+            LogHandler.PrintApplicationInformation(Settings, Cmodel);
             Settings = null;
         }
 

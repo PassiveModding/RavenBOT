@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using RavenBOT.Discord.Context;
 using RavenBOT.Discord.Preconditions;
+using RavenBOT.Handlers;
 using RavenBOT.Models;
 
 namespace RavenBOT.Modules
@@ -32,20 +33,20 @@ namespace RavenBOT.Modules
                 Color = Color.Blue
             };
             embed.AddField("Server Name", Context.Guild.Name);
-            embed.AddField("Server Owner", $"Name: {Context.Socket.Guild.Owner}\n" +
-                                           $"ID: {Context.Socket.Guild.OwnerId}");
-            embed.AddField("Users", $"User Count: {Context.Socket.Guild.MemberCount}\n" +
-                                    $"Cached User Count: {Context.Socket.Guild.Users.Count}\n" +
-                                    $"Cached Bots Count: {Context.Socket.Guild.Users.Count(x => x.IsBot)}");
-            embed.AddField("Counts", $"Channels: {Context.Socket.Guild.TextChannels.Count + Context.Socket.Guild.VoiceChannels.Count}\n" +
-                                     $"Text Channels: {Context.Socket.Guild.TextChannels.Count}\n" +
-                                     $"Voice Channels: {Context.Socket.Guild.VoiceChannels.Count}\n" +
-                                     $"Categories: {Context.Socket.Guild.CategoryChannels.Count}");
+            embed.AddField("Server Owner", $"Name: {Context.Guild.Owner}\n" +
+                                           $"ID: {Context.Guild.OwnerId}");
+            embed.AddField("Users", $"User Count: {Context.Guild.MemberCount}\n" +
+                                    $"Cached User Count: {Context.Guild.Users.Count}\n" +
+                                    $"Cached Bots Count: {Context.Guild.Users.Count(x => x.IsBot)}");
+            embed.AddField("Counts", $"Channels: {Context.Guild.TextChannels.Count + Context.Guild.VoiceChannels.Count}\n" +
+                                     $"Text Channels: {Context.Guild.TextChannels.Count}\n" +
+                                     $"Voice Channels: {Context.Guild.VoiceChannels.Count}\n" +
+                                     $"Categories: {Context.Guild.CategoryChannels.Count}");
             await ReplyAsync("", false, embed.Build());
         }
 
         [Command("Say")]
-        [Alias("Echo")]
+        [Alias("Echo", "Repeat")]
         [Summary("Repeats the given message")]
         public async Task Echo([Remainder]string message)
         {
@@ -78,7 +79,7 @@ namespace RavenBOT.Modules
                     sw.Write(serialised);
                     sw.Flush();
                     ms.Seek(0, SeekOrigin.Begin);
-
+                    //You can send files from a stream in discord too, This allows us to avoid having to read and write directly from a file for this command.
                     await Context.Channel.SendFileAsync(ms, $"{Context.Guild.Name}[{Context.Guild.Id}] BotConfig.json");
                 }
                 finally
@@ -129,6 +130,22 @@ namespace RavenBOT.Modules
                     })
                     .WithCallback(two, (c, r) => c.Channel.SendMessageAsync($"{r.User.Value.Mention} Here you go :tropical_drink:")), singleuser
             );
+        }
+
+        [Command("SetShards")]
+        [RequireContext(ContextType.Guild)]
+        [RequireOwner]
+        [Summary("Set total amount of shards for the bot")]
+        public async Task SetShards(int shards)
+        {
+            //Here we can access the service provider via our custom context.
+            var config = Context.Provider.GetRequiredService<ConfigModel>();
+            config.shards = shards;
+            Context.Provider.GetRequiredService<DatabaseHandler>().Execute<ConfigModel>(DatabaseHandler.Operation.SAVE, config, "Config");
+            await SimpleEmbedAsync($"Shard Count updated to: {shards}\n" +
+                                   $"This will be effective after a restart.\n" +
+                                   //Note, 2500 Guilds is the max amount per shard, so this should be updated based on around 2000 as if you hit the 2500 limit discord will ban the account associated.
+                                   $"Recommended shard count: {(Context.Client.Guilds.Count/2000 < 1 ? 1 : Context.Client.Guilds.Count/2000)}");
         }
     }
 }

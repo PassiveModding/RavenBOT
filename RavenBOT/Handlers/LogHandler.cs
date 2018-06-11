@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Linq;
 using Discord;
+using Microsoft.Extensions.DependencyInjection;
 using RavenBOT.Discord.Context;
+using RavenBOT.Models;
 using Serilog;
 using Serilog.Core;
 
@@ -9,6 +12,7 @@ namespace RavenBOT.Handlers
     public static class LogHandler
     {
         private static readonly Logger log = new LoggerConfiguration().WriteTo.Console().CreateLogger();
+
         public static string Left(this string s, int len)
         {
             return s.Length == len ? s : (s.Length < len ? s.PadRight(len) : s.Substring(0, len));
@@ -78,9 +82,12 @@ namespace RavenBOT.Handlers
             }
         }
 
-        public static void PrintApplicationInformation()
+        public static void PrintApplicationInformation(DBObject Settings, ConfigModel Config)
         {
             Console.WriteLine("-> INFORMATION\n" +
+                              $"-> Database URL: {Settings?.URL}\n" +
+                              $"-> Database Name: {Settings?.Name}\n" +
+                              $"-> Prefix: {Config.Prefix}\n" +
                           "    Author: PassiveModding | Discord: https://discord.me/Passive\n" +
                           $"=======================[ {DateTime.UtcNow} ]=======================");
 
