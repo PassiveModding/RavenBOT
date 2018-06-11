@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
+using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using RavenBOT.Discord.Context;
@@ -120,7 +121,12 @@ namespace RavenBOT.Modules
             //it will not allow a user to react more than once
             //it allows more than one user to react
             await InlineReactionReplyAsync(new ReactionCallbackData("text", embed, expires, singleuse)
-                    .WithCallback(one, (c, r) => c.Channel.SendMessageAsync($"{r.User.Value.Mention} Here you go :beer:"))
+                    .WithCallback(one, (c, r) =>
+                    {
+                        //You can do additional things with your reaction here, NOTE: c references this commands context whereas r references our added reaction.
+                        //This is important to note because context.user can be a different user to reaction.user
+                        return c.Channel.SendMessageAsync($"{r.User.Value.Mention} Here you go :beer:");
+                    })
                     .WithCallback(two, (c, r) => c.Channel.SendMessageAsync($"{r.User.Value.Mention} Here you go :tropical_drink:")), singleuser
             );
         }

@@ -48,10 +48,19 @@ namespace RavenBOT.Handlers
             LogHandler.PrintApplicationInformation();
             if (!File.Exists("setup/DBConfig.json"))
             {
-                LogHandler.LogMessage("Enter the database Name: (ie. MyRavenDatabase)");
+                LogHandler.LogMessage("Please enter details about your bot and database configuration. NOTE: You can hit enter for a default value. ");
+                LogHandler.LogMessage("Enter the database Name: (ie. MyRavenDatabase) DEFAULT: RavenBOT");
                 var dbname = Console.ReadLine();
-                LogHandler.LogMessage("Enter the database URL: (typically http://127.0.0.1:8080 if hosting locally)");
+                if (string.IsNullOrEmpty(dbname))
+                {
+                    dbname = "RavenBOT";
+                }
+                LogHandler.LogMessage("Enter the database URL: (typically http://127.0.0.1:8080 if hosting locally) DEFAULT: http://127.0.0.1:8080");
                 var dburl = Console.ReadLine();
+                if (string.IsNullOrEmpty(dburl))
+                {
+                    dburl = "http://127.0.0.1:8080";
+                }
                 File.WriteAllText("setup/DBConfig.json", JsonConvert.SerializeObject(new DBObject
                 {
                     Name = dbname,
@@ -102,10 +111,18 @@ namespace RavenBOT.Handlers
 
             if (Settings.IsConfigCreated == false)
             {
-                LogHandler.LogMessage("Enter bot's token: ");
+                LogHandler.LogMessage("Enter bot's token: (You can get this from https://discordapp.com/developers/applications/me)");
                 var Token = Console.ReadLine();
-                LogHandler.LogMessage("Enter bot's prefix: ");
+                if (string.IsNullOrEmpty(Token))
+                {
+                    throw new Exception("You must supply a token for this bot to operate.");
+                }
+                LogHandler.LogMessage("Enter bot's prefix: (This will be used to initiate a command, ie. +say or +help) DEFAULT: +");
                 var Prefix = Console.ReadLine();
+                if (string.IsNullOrEmpty(Prefix))
+                {
+                    Prefix = "+";
+                }
                 Execute<ConfigModel>(Operation.CREATE, new ConfigModel
                 {
                     Prefix = Prefix,
@@ -116,72 +133,6 @@ namespace RavenBOT.Handlers
             }
             Settings = null;
         }
-
-        /*
-        public static async void DatabaseInitialise(DiscordSocketClient client)
-        {
-
-
-
-            var dbcreated = false;
-            if (Store.Maintenance.Server.Send(new GetDatabaseNamesOperation(0, 5)).All(x => x != CommandHandler.Config.DBName))
-            {
-                await Store.Maintenance.Server.SendAsync(new CreateDatabaseOperation(new DatabaseRecord(CommandHandler.Config.DBName)));
-                LogHandler.LogMessage($"Created Database {CommandHandler.Config.DBName}.");
-                dbcreated = true;
-            }
-
-
-            LogHandler.LogMessage("Setting up backup operation...");
-            var newbackup = new PeriodicBackupConfiguration
-            {
-                Name = "Backup",
-                BackupType = BackupType.Backup,
-                //Backup every 6 hours
-                FullBackupFrequency = "0 6 * * *", //REMEMBER TO CHANGE BACK
-                IncrementalBackupFrequency = "0 2 * * *",
-                LocalSettings = new LocalSettings { FolderPath = Path.Combine(AppContext.BaseDirectory, "setup/backups/") }
-            };
-            var Record = Store.Maintenance.ForDatabase(CommandHandler.Config.DBName).Server.Send(new GetDatabaseRecordOperation(CommandHandler.Config.DBName));
-            var backupop = Record.PeriodicBackups.FirstOrDefault(x => x.Name == "Backup");
-            if (backupop == null)
-            {
-                await Store.Maintenance.ForDatabase(CommandHandler.Config.DBName).SendAsync(new UpdatePeriodicBackupOperation(newbackup)).ConfigureAwait(false);
-            }
-            else
-            {
-                //In the case that we already have a backup operation setup, ensure that we update the backup location accordingly
-                backupop.LocalSettings = new LocalSettings { FolderPath = Path.Combine(AppContext.BaseDirectory, "setup/backups/") };
-                await Store.Maintenance.ForDatabase(CommandHandler.Config.DBName).SendAsync(new UpdatePeriodicBackupOperation(backupop));
-            }
-
-            if (!dbcreated) return;
-
-            using (var session = Store.OpenSession(CommandHandler.Config.DBName))
-            {
-                try
-                {
-                    //Check to see wether or not we can actually load the Guilds List saved in our RavenDB
-                    var _ = session.Query<GuildModel>().ToList();
-                }
-                catch
-                {
-                    //In the case that the check fails, ensure we initalise all servers that contain the bot.
-                    var glist = client.Guilds.Select(x => new GuildModel
-                    {
-                        ID = x.Id
-                    }).ToList();
-                    foreach (var gobj in glist)
-                    {
-                        session.Store(gobj, gobj.ID.ToString());
-                    }
-
-                    session.SaveChanges();
-                }
-            }
-        }
-        */
-
 
         public List<T> Query<T>()
         {
