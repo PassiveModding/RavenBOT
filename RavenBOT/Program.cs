@@ -38,8 +38,7 @@ namespace RavenBOT
                     .AddSingleton<BotHandler>()
                     .AddSingleton<EventHandler>()
                     .AddSingleton<InteractiveService>()
-                    .AddSingleton(new Random(Guid.NewGuid().GetHashCode()))
-                ;
+                    .AddSingleton(new Random(Guid.NewGuid().GetHashCode()));
 
             var Provider = Services.BuildServiceProvider();
             Provider.GetRequiredService<DatabaseHandler>().Initialize();

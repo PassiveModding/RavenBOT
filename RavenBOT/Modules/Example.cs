@@ -14,6 +14,10 @@ using RavenBOT.Models;
 
 namespace RavenBOT.Modules
 {
+    //You can add a group attribute to a module to prefix all commands in that module. ie. +Example ServerStats rather than +ServerStats
+    [Group("Example")]
+    //You can also use precondition attributes on a module to ensure commands are only run if they pass the precondition
+    [RequireContext(ContextType.Guild)]
     //Base is what we inherit our context from, ie ReplyAsync, Context.Guild etc.
     public class Example : Base
     {
@@ -45,6 +49,7 @@ namespace RavenBOT.Modules
         }
 
         [Command("Say")]
+        //Commands can be initialted using different names, ie, Echo, Repeat and Say will all have the same effect.
         [Alias("Echo", "Repeat")]
         [Summary("Repeats the given message")]
         public async Task Echo([Remainder] string message)
@@ -57,6 +62,8 @@ namespace RavenBOT.Modules
         [Summary("Loads the guildID from the database")]
         public async Task DBLoad()
         {
+            //Simpleembedasync is one of our additions in our custom context
+            //This is an example of how you can use cusom additions to the bot context. ie. Context.Server
             await SimpleEmbedAsync(Context.Server.ID.ToString());
         }
 
