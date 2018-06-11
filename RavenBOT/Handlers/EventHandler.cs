@@ -42,10 +42,12 @@ namespace RavenBOT.Handlers
 
         internal async Task ShardReady(DiscordSocketClient _client)
         {
-            //Here we select at random out 'playing' message.
+            
             await _client.SetActivityAsync(new Game($"Shard: {_client.ShardId}"));
+            
             /*
-            var Games = new Dictionary<ActivityType, string[]>
+            //Here we select at random out 'playing' message.
+             var Games = new Dictionary<ActivityType, string[]>
             {
                 {ActivityType.Listening, new[]{"YT/PassiveModding", "Tech N9ne"} },
                 {ActivityType.Playing, new[]{$"{Config.Prefix}help"} },
@@ -143,6 +145,7 @@ namespace RavenBOT.Handlers
                 }
                 else
                 {
+                    //Search the commandservice based on the message, then respond accordingly with information about the command.
                     var srch = CommandService.Search(Context, argPos);
                     var cmd = srch.Commands.FirstOrDefault();
                     ErrorMessage = $"**Command Name:** `{cmd.Command.Name}`\n" +
