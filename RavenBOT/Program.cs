@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
@@ -8,7 +7,6 @@ using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using RavenBOT.Handlers;
 using RavenBOT.Models;
-using Sparrow.Platform.Posix.macOS;
 using EventHandler = RavenBOT.Handlers.EventHandler;
 using InteractiveService = RavenBOT.Discord.Context.Interactive;
 
@@ -21,7 +19,7 @@ namespace RavenBOT
         public static void Main(string[] args)
         {
             Start().GetAwaiter().GetResult();
-        } 
+        }
 
         private static async Task Start()
         {
@@ -29,19 +27,19 @@ namespace RavenBOT
                 Directory.CreateDirectory(Path.Combine(AppContext.BaseDirectory, "setup/"));
 
             var Services = new ServiceCollection()
-                .AddSingleton<DatabaseHandler>()
-                .AddSingleton(x => x.GetRequiredService<DatabaseHandler>().Execute<ConfigModel>(DatabaseHandler.Operation.LOAD, Id: "Config"))
-                .AddSingleton(new CommandService(new CommandServiceConfig
-                {
-                    ThrowOnError = false,
-                    IgnoreExtraArgs = false,
-                    DefaultRunMode = RunMode.Async
-                }))
-                .AddSingleton<BotHandler>()
-                .AddSingleton<EventHandler>()
-                .AddSingleton<InteractiveService>()
-                .AddSingleton(new Random(Guid.NewGuid().GetHashCode()))
-;
+                    .AddSingleton<DatabaseHandler>()
+                    .AddSingleton(x => x.GetRequiredService<DatabaseHandler>().Execute<ConfigModel>(DatabaseHandler.Operation.LOAD, Id: "Config"))
+                    .AddSingleton(new CommandService(new CommandServiceConfig
+                    {
+                        ThrowOnError = false,
+                        IgnoreExtraArgs = false,
+                        DefaultRunMode = RunMode.Async
+                    }))
+                    .AddSingleton<BotHandler>()
+                    .AddSingleton<EventHandler>()
+                    .AddSingleton<InteractiveService>()
+                    .AddSingleton(new Random(Guid.NewGuid().GetHashCode()))
+                ;
 
             var Provider = Services.BuildServiceProvider();
             Provider.GetRequiredService<DatabaseHandler>().Initialize();

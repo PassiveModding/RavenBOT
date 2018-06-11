@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Linq;
 using Discord;
-using Microsoft.Extensions.DependencyInjection;
 using RavenBOT.Discord.Context;
 using RavenBOT.Models;
 using Serilog;
@@ -88,9 +86,8 @@ namespace RavenBOT.Handlers
                               $"-> Database URL: {Settings?.URL}\n" +
                               $"-> Database Name: {Settings?.Name}\n" +
                               $"-> Prefix: {Config.Prefix}\n" +
-                          "    Author: PassiveModding | Discord: https://discord.me/Passive\n" +
-                          $"=======================[ {DateTime.UtcNow} ]=======================");
-
+                              "    Author: PassiveModding | Discord: https://discord.me/Passive\n" +
+                              $"=======================[ {DateTime.UtcNow} ]=======================");
         }
     }
 }

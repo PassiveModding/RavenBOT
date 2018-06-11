@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
-using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using RavenBOT.Discord.Context;
@@ -48,7 +47,7 @@ namespace RavenBOT.Modules
         [Command("Say")]
         [Alias("Echo", "Repeat")]
         [Summary("Repeats the given message")]
-        public async Task Echo([Remainder]string message)
+        public async Task Echo([Remainder] string message)
         {
             await ReplyAsync(message);
         }
@@ -94,7 +93,7 @@ namespace RavenBOT.Modules
         [GuildOwner]
         [Summary("Loads the guildID from the database")]
         [Remarks("This command can only be invoked by the server owner")]
-        public async Task CustomPrefix([Remainder]string prefix = null)
+        public async Task CustomPrefix([Remainder] string prefix = null)
         {
             //Modify the prefix and then update the object within the database.
             Context.Server.Settings.CustomPrefix = prefix;
@@ -145,7 +144,7 @@ namespace RavenBOT.Modules
             await SimpleEmbedAsync($"Shard Count updated to: {shards}\n" +
                                    $"This will be effective after a restart.\n" +
                                    //Note, 2500 Guilds is the max amount per shard, so this should be updated based on around 2000 as if you hit the 2500 limit discord will ban the account associated.
-                                   $"Recommended shard count: {(Context.Client.Guilds.Count/2000 < 1 ? 1 : Context.Client.Guilds.Count/2000)}");
+                                   $"Recommended shard count: {(Context.Client.Guilds.Count / 2000 < 1 ? 1 : Context.Client.Guilds.Count / 2000)}");
         }
     }
 }

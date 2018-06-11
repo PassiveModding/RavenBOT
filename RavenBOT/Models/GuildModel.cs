@@ -11,11 +11,6 @@ namespace RavenBOT.Models
 
         public GuildSettings Settings { get; set; } = new GuildSettings();
 
-        public class GuildSettings
-        {
-            public string CustomPrefix { get; set; } = null;
-        }
-
         public void Save()
         {
             using (var Session = DatabaseHandler.Store.OpenSession())
@@ -23,6 +18,11 @@ namespace RavenBOT.Models
                 Session.Store(this, ID.ToString());
                 Session.SaveChanges();
             }
+        }
+
+        public class GuildSettings
+        {
+            public string CustomPrefix { get; set; } = null;
         }
     }
 }

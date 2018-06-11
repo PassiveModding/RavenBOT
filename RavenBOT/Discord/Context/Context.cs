@@ -10,7 +10,6 @@ using RavenBOT.Models;
 
 namespace RavenBOT.Discord.Context
 {
-
     public abstract class Base : ModuleBase<Context>
     {
         public Interactive Interactive { get; set; }
@@ -31,6 +30,7 @@ namespace RavenBOT.Discord.Context
         {
             return await ReplyAsync("", false, embed.Build());
         }
+
         public async Task<IUserMessage> ReplyAsync(Embed embed)
         {
             return await ReplyAsync("", false, embed);
@@ -49,7 +49,7 @@ namespace RavenBOT.Discord.Context
         }
 
         /// <summary>
-        /// Just shorthand for saving our guild config
+        ///     Just shorthand for saving our guild config
         /// </summary>
         public void Save()
         {
@@ -57,7 +57,7 @@ namespace RavenBOT.Discord.Context
         }
 
         /// <summary>
-        /// Rather than just replying, we can spice things up a bit and embed them in a small message
+        ///     Rather than just replying, we can spice things up a bit and embed them in a small message
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
@@ -72,7 +72,7 @@ namespace RavenBOT.Discord.Context
         }
 
         /// <summary>
-        /// This is just a shorthand conversion from out custom context to a socketcontext, for use in things like Interactive
+        ///     This is just a shorthand conversion from out custom context to a socketcontext, for use in things like Interactive
         /// </summary>
         /// <returns></returns>
         private SocketCommandContext SocketContext()
@@ -81,7 +81,7 @@ namespace RavenBOT.Discord.Context
         }
 
         /// <summary>
-        /// This will gnerate a paginated message which allows users to use reactions to change the content of the message
+        ///     This will gnerate a paginated message which allows users to use reactions to change the content of the message
         /// </summary>
         /// <param name="pager"></param>
         /// <param name="Reactions">The reaction config</param>
@@ -104,7 +104,7 @@ namespace RavenBOT.Discord.Context
         }
 
         /// <summary>
-        /// Waits for the next message. NOTE: Your runmode must be async or this will lock up.
+        ///     Waits for the next message. NOTE: Your runmode must be async or this will lock up.
         /// </summary>
         /// <param name="criterion"></param>
         /// <param name="timeout"></param>
@@ -121,16 +121,18 @@ namespace RavenBOT.Discord.Context
         }
 
         /// <summary>
-        /// Sends a message that will do a custom action upon reactions
+        ///     Sends a message that will do a custom action upon reactions
         /// </summary>
         /// <param name="data"></param>
         /// <param name="fromSourceUser"></param>
         /// <returns></returns>
         public Task<IUserMessage> InlineReactionReplyAsync(ReactionCallbackData data, bool fromSourceUser = true)
-            => Interactive.SendMessageWithReactionCallbacksAsync(SocketContext(), data, fromSourceUser);
+        {
+            return Interactive.SendMessageWithReactionCallbacksAsync(SocketContext(), data, fromSourceUser);
+        }
 
         /// <summary>
-        /// Send a message that self destructs after a certain period of time
+        ///     Send a message that self destructs after a certain period of time
         /// </summary>
         /// <param name="content"></param>
         /// <param name="embed"></param>

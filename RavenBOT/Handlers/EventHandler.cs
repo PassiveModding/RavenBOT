@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -15,14 +14,9 @@ namespace RavenBOT.Handlers
 {
     public class EventHandler
     {
-        private Random Random { get; }
-        private ConfigModel Config { get; }
-        private IServiceProvider Provider { get; }
-        private DiscordShardedClient Client { get; }
         private bool GuildCheck = true;
-        private bool SingleShard = false;
-        private CommandService CommandService { get; }
-        private CancellationTokenSource CancellationToken { get; set; }
+        private readonly bool SingleShard = false;
+
         public EventHandler(DiscordShardedClient client, ConfigModel config, IServiceProvider service, CommandService commandService, Random random)
         {
             Client = client;
@@ -32,6 +26,13 @@ namespace RavenBOT.Handlers
             CommandService = commandService;
             CancellationToken = new CancellationTokenSource();
         }
+
+        private Random Random { get; }
+        private ConfigModel Config { get; }
+        private IServiceProvider Provider { get; }
+        private DiscordShardedClient Client { get; }
+        private CommandService CommandService { get; }
+        private CancellationTokenSource CancellationToken { get; set; }
 
         public async Task InitializeAsync()
         {
@@ -56,7 +57,7 @@ namespace RavenBOT.Handlers
             LogHandler.LogMessage($"Game has been set to: [{RandomActivity}] {RandomName}");
             Games.Clear();
             */
-            
+
             if (GuildCheck)
             {
                 //This will check to ensure that all our servers are initialised, whilst also allowing the bot to continue starting
@@ -108,11 +109,16 @@ namespace RavenBOT.Handlers
 
 
         internal Task Log(LogMessage Message)
-            => Task.Run(() => LogHandler.LogMessage(Message.Message, Message.Severity));
+        {
+            return Task.Run(() => LogHandler.LogMessage(Message.Message, Message.Severity));
+        }
 
         //This will auto-remove the bot from servers as it gets removed. NOTE: Remove this if you want to save configs.
-        internal Task LeftGuild(SocketGuild Guild) => Task.Run(()
-            => Provider.GetRequiredService<DatabaseHandler>().Execute<GuildModel>(DatabaseHandler.Operation.DELETE, Id: Guild.Id));
+        internal Task LeftGuild(SocketGuild Guild)
+        {
+            return Task.Run(()
+                => Provider.GetRequiredService<DatabaseHandler>().Execute<GuildModel>(DatabaseHandler.Operation.DELETE, Id: Guild.Id));
+        }
 
         //This event is triggered every time the a user sends a message in a channel, dm etc. that the bot has access to view.
         internal async Task MessageReceivedAsync(SocketMessage socketMessage)
@@ -163,8 +169,12 @@ namespace RavenBOT.Handlers
 
                 switch (Result.Error)
                 {
-                    case CommandError.MultipleMatches: LogHandler.LogMessage(Result.ErrorReason, LogSeverity.Error); break;
-                    case CommandError.ObjectNotFound: LogHandler.LogMessage(Result.ErrorReason, LogSeverity.Error); break;
+                    case CommandError.MultipleMatches:
+                        LogHandler.LogMessage(Result.ErrorReason, LogSeverity.Error);
+                        break;
+                    case CommandError.ObjectNotFound:
+                        LogHandler.LogMessage(Result.ErrorReason, LogSeverity.Error);
+                        break;
                     case CommandError.Unsuccessful:
                         await Message.Channel.SendMessageAsync("You may have found a bug. Please report this error in my server https://discord.me/Passive");
                         break;

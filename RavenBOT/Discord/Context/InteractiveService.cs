@@ -10,12 +10,10 @@ namespace RavenBOT.Discord.Context
 {
     /// <inheritdoc />
     /// <summary>
-    /// This is out own customised InteractiveService, giving support for DiscordShardedClient
+    ///     This is out own customised InteractiveService, giving support for DiscordShardedClient
     /// </summary>
     public class Interactive : IDisposable
     {
-        public DiscordShardedClient Discord { get; }
-
         private readonly Dictionary<ulong, IReactionCallback> _callbacks;
         private readonly TimeSpan _defaultTimeout;
 
@@ -28,6 +26,13 @@ namespace RavenBOT.Discord.Context
             _defaultTimeout = defaultTimeout ?? TimeSpan.FromSeconds(15);
         }
 
+        public DiscordShardedClient Discord { get; }
+
+        public void Dispose()
+        {
+            Discord.ReactionAdded -= HandleReactionAsync;
+        }
+
         public Task<SocketMessage> NextMessageAsync(SocketCommandContext context, bool fromSourceUser = true, bool inSourceChannel = true, TimeSpan? timeout = null)
         {
             var criterion = new Criteria<SocketMessage>();
@@ -37,6 +42,7 @@ namespace RavenBOT.Discord.Context
                 criterion.AddCriterion(new EnsureSourceChannelCriterion());
             return NextMessageAsync(context, criterion, timeout);
         }
+
         public async Task<SocketMessage> NextMessageAsync(SocketCommandContext context, ICriterion<SocketMessage> criterion, TimeSpan? timeout = null)
         {
             timeout = timeout ?? _defaultTimeout;
@@ -60,8 +66,7 @@ namespace RavenBOT.Discord.Context
 
             if (task == trigger)
                 return await trigger.ConfigureAwait(false);
-            else
-                return null;
+            return null;
         }
 
         public async Task<IUserMessage> SendMessageWithReactionCallbacksAsync(SocketCommandContext context, ReactionCallbackData callbacks, bool fromSourceUser = true)
@@ -92,19 +97,30 @@ namespace RavenBOT.Discord.Context
         }
 
         public void AddReactionCallback(IMessage message, IReactionCallback callback)
-            => _callbacks[message.Id] = callback;
+        {
+            _callbacks[message.Id] = callback;
+        }
+
         public void RemoveReactionCallback(IMessage message)
-            => RemoveReactionCallback(message.Id);
+        {
+            RemoveReactionCallback(message.Id);
+        }
+
         public void RemoveReactionCallback(ulong id)
-            => _callbacks.Remove(id);
+        {
+            _callbacks.Remove(id);
+        }
+
         public void ClearReactionCallbacks()
-            => _callbacks.Clear();
+        {
+            _callbacks.Clear();
+        }
 
         private async Task HandleReactionAsync(Cacheable<IUserMessage, ulong> message, ISocketMessageChannel channel, SocketReaction reaction)
         {
             if (reaction.UserId == Discord.CurrentUser.Id) return;
-            if (!(_callbacks.TryGetValue(message.Id, out var callback))) return;
-            if (!(await callback.Criterion.JudgeAsync(callback.Context, reaction).ConfigureAwait(false)))
+            if (!_callbacks.TryGetValue(message.Id, out var callback)) return;
+            if (!await callback.Criterion.JudgeAsync(callback.Context, reaction).ConfigureAwait(false))
                 return;
             switch (callback.RunMode)
             {
@@ -120,11 +136,6 @@ namespace RavenBOT.Discord.Context
                         RemoveReactionCallback(message.Id);
                     break;
             }
-        }
-
-        public void Dispose()
-        {
-            Discord.ReactionAdded -= HandleReactionAsync;
         }
     }
 }

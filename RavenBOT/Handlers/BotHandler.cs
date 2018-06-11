@@ -7,15 +7,16 @@ namespace RavenBOT.Handlers
 {
     public class BotHandler
     {
-        private ConfigModel Config { get; }
-        private EventHandler Event { get; }
-        private DiscordShardedClient Client { get; }
         public BotHandler(DiscordShardedClient client, EventHandler events, ConfigModel config)
         {
             Client = client;
             Event = events;
             Config = config;
         }
+
+        private ConfigModel Config { get; }
+        private EventHandler Event { get; }
+        private DiscordShardedClient Client { get; }
 
         public async Task InitializeAsync()
         {

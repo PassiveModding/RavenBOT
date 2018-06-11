@@ -16,16 +16,24 @@ namespace RavenBOT.Handlers
 {
     public class DBObject
     {
-        public string Name = "RavenBOT";
-        public bool IsConfigCreated;
         public string FullBackup = "0 */6 * * *";
-        public string URL = "http://127.0.0.1:8080";
         public string IncrementalBackup = "0 2 * * *";
+        public bool IsConfigCreated;
+        public string Name = "RavenBOT";
+        public string URL = "http://127.0.0.1:8080";
         public string BackupFolder => Directory.CreateDirectory("Backup").FullName;
     }
 
     public class DatabaseHandler
     {
+        public enum Operation
+        {
+            SAVE,
+            LOAD,
+            DELETE,
+            CREATE
+        }
+
         public DBObject Settings { get; set; }
         public static IDocumentStore Store { get; set; }
 
@@ -54,12 +62,14 @@ namespace RavenBOT.Handlers
                 {
                     dbname = "RavenBOT";
                 }
+
                 LogHandler.LogMessage("Enter the database URL: (typically http://127.0.0.1:8080 if hosting locally) DEFAULT: http://127.0.0.1:8080");
                 var dburl = Console.ReadLine();
                 if (string.IsNullOrEmpty(dburl))
                 {
                     dburl = "http://127.0.0.1:8080";
                 }
+
                 File.WriteAllText("setup/DBConfig.json", JsonConvert.SerializeObject(new DBObject
                 {
                     Name = dbname,
@@ -73,7 +83,7 @@ namespace RavenBOT.Handlers
                 Settings = JsonConvert.DeserializeObject<DBObject>(File.ReadAllText("setup/DBConfig.json"));
             }
 
-            Store = new Lazy<IDocumentStore>(() => new DocumentStore { Database = Settings.Name, Urls = new[] { Settings.URL } }.Initialize(), true).Value;
+            Store = new Lazy<IDocumentStore>(() => new DocumentStore {Database = Settings.Name, Urls = new[] {Settings.URL}}.Initialize(), true).Value;
             if (Store == null) LogHandler.LogMessage("Failed to build document store.", LogSeverity.Critical);
 
             if (Store.Maintenance.Server.Send(new GetDatabaseNamesOperation(0, 5)).All(x => x != Settings.Name))
@@ -91,14 +101,14 @@ namespace RavenBOT.Handlers
                         BackupType = BackupType.Backup,
                         FullBackupFrequency = Settings.FullBackup,
                         IncrementalBackupFrequency = Settings.IncrementalBackup,
-                        LocalSettings = new LocalSettings { FolderPath = Settings.BackupFolder }
+                        LocalSettings = new LocalSettings {FolderPath = Settings.BackupFolder}
                     };
                     Store.Maintenance.ForDatabase(Settings.Name).Send(new UpdatePeriodicBackupOperation(newbackup));
                 }
                 else
                 {
                     //In the case that we already have a backup operation setup, ensure that we update the backup location accordingly
-                    backupop.LocalSettings = new LocalSettings { FolderPath = Settings.BackupFolder };
+                    backupop.LocalSettings = new LocalSettings {FolderPath = Settings.BackupFolder};
                     Store.Maintenance.ForDatabase(Settings.Name).Send(new UpdatePeriodicBackupOperation(backupop));
                 }
             }
@@ -116,6 +126,7 @@ namespace RavenBOT.Handlers
                 {
                     throw new Exception("You must supply a token for this bot to operate.");
                 }
+
                 LogHandler.LogMessage("Enter bot's prefix: (This will be used to initiate a command, ie. +say or +help) DEFAULT: +");
                 var Prefix = Console.ReadLine();
                 if (string.IsNullOrEmpty(Prefix))
@@ -127,8 +138,9 @@ namespace RavenBOT.Handlers
                 Cmodel.Prefix = Prefix;
 
                 Execute<ConfigModel>(Operation.CREATE, Cmodel, "Config");
-                File.WriteAllText("setup/DBConfig.json", JsonConvert.SerializeObject(new DBObject { IsConfigCreated = true }, Formatting.Indented));
+                File.WriteAllText("setup/DBConfig.json", JsonConvert.SerializeObject(new DBObject {IsConfigCreated = true}, Formatting.Indented));
             }
+
             LogHandler.PrintApplicationInformation(Settings, Cmodel);
             Settings = null;
         }
@@ -151,14 +163,6 @@ namespace RavenBOT.Handlers
             }
         }
 
-        public enum Operation
-        {
-            SAVE,
-            LOAD,
-            DELETE,
-            CREATE
-        }
-
         public T Execute<T>(Operation Operation, object Data = null, object Id = null) where T : class
         {
             using (var Session = Store.OpenSession(Store.Database))
@@ -167,26 +171,29 @@ namespace RavenBOT.Handlers
                 {
                     case Operation.CREATE:
                         if (Session.Advanced.Exists($"{Id}")) break;
-                        Session.Store((T)Data, $"{Id}");
+                        Session.Store((T) Data, $"{Id}");
                         LogHandler.LogMessage($"RavenDB: Created => {typeof(T).Name} | ID: {Id}");
                         break;
 
                     case Operation.DELETE:
                         LogHandler.LogMessage($"RavenDB: Removed => {typeof(T).Name} | ID: {Id}");
-                        Session.Delete(Session.Load<T>($"{Id}")); break;
+                        Session.Delete(Session.Load<T>($"{Id}"));
+                        break;
                     case Operation.LOAD:
                         return Session.Load<T>($"{Id}");
                     case Operation.SAVE:
                         var Load = Session.Load<T>($"{Id}");
                         if (Session.Advanced.IsLoaded($"{Id}") == false || Load == Data) break;
                         Session.Advanced.Evict(Load);
-                        Session.Store((T)Data, $"{Id}");
+                        Session.Store((T) Data, $"{Id}");
                         Session.SaveChanges();
                         break;
                 }
+
                 if (Operation == Operation.CREATE || Operation == Operation.DELETE) Session.SaveChanges();
                 Session.Dispose();
             }
+
             return null;
         }
     }
