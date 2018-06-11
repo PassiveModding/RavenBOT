@@ -90,7 +90,7 @@
         }
 
         /// <summary>
-        /// The shard ready.
+        /// Triggers when a shard is ready
         /// </summary>
         /// <param name="socketClient">
         /// The socketClient.
@@ -143,7 +143,7 @@
                         {
                             if (!socketClient.Guilds.Select(x => x.Id).Contains(Convert.ToUInt64(Server)))
                             {
-                                Provider.GetRequiredService<DatabaseHandler>().Execute<GuildModel>(DatabaseHandler.Operation.DELETE, Id: Server);
+                                Provider.GetRequiredService<DatabaseHandler>().Execute<GuildModel>(DatabaseHandler.Operation.DELETE, id: Server);
                             }
                         }
                     }
@@ -155,12 +155,12 @@
 
             // This will log a message with the bots invite link so the developer can access the bots invite with ease. Note the permissions are configured to allow everything in the server.
             // var application = socketClient.GetApplicationInfoAsync();
-            // LogHandler.LogMessage($"Invite: https://discordapp.com/oauth2/authorize?client_id={application.Id}&scope=bot&permissions=2146958591");
+            // LogHandler.LogMessage($"Invite: https://discordapp.com/oauth2/authorize?client_id={application.id}&scope=bot&permissions=2146958591");
             LogHandler.LogMessage($"Shard: {socketClient.ShardId} Ready");
         }
 
         /// <summary>
-        /// The shard connected.
+        /// Triggers when a shard connects.
         /// </summary>
         /// <param name="socketClient">
         /// The Client.
@@ -203,7 +203,7 @@
         internal Task LeftGuild(SocketGuild guild)
         {
             return Task.Run(()
-                => Provider.GetRequiredService<DatabaseHandler>().Execute<GuildModel>(DatabaseHandler.Operation.DELETE, Id: guild.Id));
+                => Provider.GetRequiredService<DatabaseHandler>().Execute<GuildModel>(DatabaseHandler.Operation.DELETE, id: guild.Id));
         }
         
         /// <summary>
@@ -238,50 +238,87 @@
             // Generate an error message for users if a command is unsuccessful
             if (!result.IsSuccess)
             {
-                string errorMessage;
-                if (result.Error == CommandError.UnknownCommand)
-                {
-                    errorMessage = "**Command:** N/A";
-                }
-                else
-                {
-                    // Search the commandservice based on the message, then respond accordingly with information about the command.
-                    var search = CommandService.Search(context, argPos);
-                    var cmd = search.Commands.FirstOrDefault();
-                    errorMessage = $"**Command Name:** `{cmd.Command.Name}`\n" +
-                                   $"**Summary:** `{cmd.Command?.Summary ?? "N/A"}`\n" +
-                                   $"**Remarks:** `{cmd.Command?.Remarks ?? "N/A"}`\n" +
-                                   $"**Aliases:** {(cmd.Command.Aliases.Any() ? string.Join(" ", cmd.Command.Aliases.Select(x => $"`{x}`")) : "N/A")}\n" +
-                                   $"**Parameters:** {(cmd.Command.Parameters.Any() ? string.Join(" ", cmd.Command.Parameters.Select(x => x.IsOptional ? $" `<(Optional){x.Name}>` " : $" `<{x.Name}>` ")) : "N/A")}\n" +
-                                   "**Error Reason**\n" +
-                                   $"{result.ErrorReason}";
-                }
+                await CmdError(context, result, argPos);
+            }
+        }
 
-                try
-                {
-                    await context.Channel.SendMessageAsync(string.Empty, false, new EmbedBuilder
-                            {
-                                Title = "ERROR",
-                                Description = errorMessage
-                            }.Build());
-                }
-                catch
-                {
-                    // ignored
-                }
+        /// <summary>
+        /// Generates an error message based on a command error.
+        /// </summary>
+        /// <param name="context">
+        /// The context.
+        /// </param>
+        /// <param name="result">
+        /// The result.
+        /// </param>
+        /// <param name="argPos">
+        /// The arg pos.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        internal async Task CmdError(Context context, IResult result, int argPos)
+        {
+            string errorMessage;
+            if (result.Error == CommandError.UnknownCommand)
+            {
+                errorMessage = "**Command:** N/A";
+            }
+            else
+            {
+                // Search the commandservice based on the message, then respond accordingly with information about the command.
+                var search = CommandService.Search(context, argPos);
+                var cmd = search.Commands.FirstOrDefault();
+                errorMessage = $"**Command Name:** `{cmd.Command.Name}`\n" +
+                               $"**Summary:** `{cmd.Command?.Summary ?? "N/A"}`\n" +
+                               $"**Remarks:** `{cmd.Command?.Remarks ?? "N/A"}`\n" +
+                               $"**Aliases:** {(cmd.Command.Aliases.Any() ? string.Join(" ", cmd.Command.Aliases.Select(x => $"`{x}`")) : "N/A")}\n" +
+                               $"**Parameters:** {(cmd.Command.Parameters.Any() ? string.Join(" ", cmd.Command.Parameters.Select(x => x.IsOptional ? $" `<(Optional){x.Name}>` " : $" `<{x.Name}>` ")) : "N/A")}\n" +
+                               "**Error Reason**\n" +
+                               $"{result.ErrorReason}";
+            }
 
-                switch (result.Error)
+            try
+            {
+                await context.Channel.SendMessageAsync(string.Empty, false, new EmbedBuilder
                 {
-                    case CommandError.MultipleMatches:
-                        LogHandler.LogMessage(result.ErrorReason, LogSeverity.Error);
-                        break;
-                    case CommandError.ObjectNotFound:
-                        LogHandler.LogMessage(result.ErrorReason, LogSeverity.Error);
-                        break;
-                    case CommandError.Unsuccessful:
-                        await Message.Channel.SendMessageAsync("You may have found a bug. Please report this error in my server https://discord.me/Passive");
-                        break;
-                }
+                    Title = "ERROR",
+                    Description = errorMessage
+                }.Build());
+            }
+            catch
+            {
+                // ignored
+            }
+
+            await LogError(result, context);
+        }
+
+        /// <summary>
+        /// Logs specified errors based on type.
+        /// </summary>
+        /// <param name="result">
+        /// The result.
+        /// </param>
+        /// <param name="context">
+        /// The context.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        internal async Task LogError(IResult result, Context context)
+        {
+            switch (result.Error)
+            {
+                case CommandError.MultipleMatches:
+                    LogHandler.LogMessage(result.ErrorReason, LogSeverity.Error);
+                    break;
+                case CommandError.ObjectNotFound:
+                    LogHandler.LogMessage(result.ErrorReason, LogSeverity.Error);
+                    break;
+                case CommandError.Unsuccessful:
+                    await context.Channel.SendMessageAsync("You may have found a bug. Please report this error in my server https://discord.me/Passive");
+                    break;
             }
         }
     }

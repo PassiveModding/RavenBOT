@@ -53,7 +53,7 @@
 
             var services = new ServiceCollection()
                     .AddSingleton<DatabaseHandler>()
-                    .AddSingleton(x => x.GetRequiredService<DatabaseHandler>().Execute<ConfigModel>(DatabaseHandler.Operation.LOAD, Id: "Config"))
+                    .AddSingleton(x => x.GetRequiredService<DatabaseHandler>().Execute<ConfigModel>(DatabaseHandler.Operation.LOAD, id: "Config"))
                     .AddSingleton(new CommandService(new CommandServiceConfig
                     {
                         ThrowOnError = false,
@@ -76,7 +76,7 @@
 
             // The provider is split here so we can get our shard count from the database before actually logging into discord.
             // This is important to do so the bot always logs in with the required amount of shards.
-            var shards = provider.GetRequiredService<DatabaseHandler>().Execute<ConfigModel>(DatabaseHandler.Operation.LOAD, Id: "Config").Shards;
+            var shards = provider.GetRequiredService<DatabaseHandler>().Execute<ConfigModel>(DatabaseHandler.Operation.LOAD, id: "Config").Shards;
             services.AddSingleton(new DiscordShardedClient(new DiscordSocketConfig
             {
                 MessageCacheSize = 20,

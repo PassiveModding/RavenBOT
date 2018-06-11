@@ -1,91 +1,142 @@
-﻿using System;
-using Discord;
-using RavenBOT.Discord.Context;
-using RavenBOT.Models;
-using Serilog;
-using Serilog.Core;
-
-namespace RavenBOT.Handlers
+﻿namespace RavenBOT.Handlers
 {
+    using System;
+
+    using global::Discord;
+
+    using RavenBOT.Discord.Context;
+    using RavenBOT.Models;
+
+    using Serilog;
+    using Serilog.Core;
+
+    /// <summary>
+    /// The Log handler.
+    /// </summary>
     public static class LogHandler
     {
-        private static readonly Logger log = new LoggerConfiguration().WriteTo.Console().CreateLogger();
+        /// <summary>
+        /// The Log.
+        /// </summary>
+        private static readonly Logger Log = new LoggerConfiguration().WriteTo.Console().CreateLogger();
 
+        /// <summary>
+        /// Ensures a string is aligned and kept to the specified length
+        /// Uses substring if it is too long and pads if too short.
+        /// </summary>
+        /// <param name="s">
+        /// The string to modify
+        /// </param>
+        /// <param name="len">
+        /// The desired string length
+        /// </param>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
         public static string Left(this string s, int len)
         {
             return s.Length == len ? s : (s.Length < len ? s.PadRight(len) : s.Substring(0, len));
         }
 
-        public static void LogMessage(Context Context, string message = null, LogSeverity Level = LogSeverity.Info)
+        /// <summary>
+        /// Logs a message to console with the specified severity. Includes info based on context
+        /// </summary>
+        /// <param name="context">
+        /// The context.
+        /// </param>
+        /// <param name="message">
+        /// The message.
+        /// </param>
+        /// <param name="logSeverity">
+        /// The Severity of the message
+        /// </param>
+        public static void LogMessage(Context context, string message = null, LogSeverity logSeverity = LogSeverity.Info)
         {
-            var custom = $"G: {Context.Guild.Name.Left(20)} || C: {Context.Channel.Name.Left(20)} || U: {Context.User.Username.Left(20)} || M: {Context.Message.Content.Left(100)}";
+            var custom = $"G: {context.Guild.Name.Left(20)} || C: {context.Channel.Name.Left(20)} || U: {context.User.Username.Left(20)} || M: {context.Message.Content.Left(100)}";
 
             if (message != null)
             {
                 custom += $"\nE: {message.Left(100)}";
             }
 
-            switch (Level)
+            switch (logSeverity)
             {
                 case LogSeverity.Info:
-                    log.Information(custom);
+                    Log.Information(custom);
                     break;
                 case LogSeverity.Warning:
-                    log.Warning(custom);
+                    Log.Warning(custom);
                     break;
                 case LogSeverity.Error:
-                    log.Error(custom);
+                    Log.Error(custom);
                     break;
                 case LogSeverity.Debug:
-                    log.Debug(custom);
+                    Log.Debug(custom);
                     break;
                 case LogSeverity.Critical:
-                    log.Fatal(custom);
+                    Log.Fatal(custom);
                     break;
                 case LogSeverity.Verbose:
-                    log.Verbose(custom);
+                    Log.Verbose(custom);
                     break;
                 default:
-                    log.Information(message);
+                    Log.Information(message);
                     break;
             }
         }
 
-
-        public static void LogMessage(string message, LogSeverity Level = LogSeverity.Info)
+        /// <summary>
+        /// Logs a message to console
+        /// </summary>
+        /// <param name="message">
+        /// The message.
+        /// </param>
+        /// <param name="logSeverity">
+        /// The severity of the message
+        /// </param>
+        public static void LogMessage(string message, LogSeverity logSeverity = LogSeverity.Info)
         {
-            switch (Level)
+            switch (logSeverity)
             {
                 case LogSeverity.Info:
-                    log.Information(message);
+                    Log.Information(message);
                     break;
                 case LogSeverity.Warning:
-                    log.Warning(message);
+                    Log.Warning(message);
                     break;
                 case LogSeverity.Error:
-                    log.Error(message);
+                    Log.Error(message);
                     break;
                 case LogSeverity.Debug:
-                    log.Debug(message);
+                    Log.Debug(message);
                     break;
                 case LogSeverity.Critical:
-                    log.Fatal(message);
+                    Log.Fatal(message);
                     break;
                 case LogSeverity.Verbose:
-                    log.Verbose(message);
+                    Log.Verbose(message);
                     break;
                 default:
-                    log.Information(message);
+                    Log.Information(message);
                     break;
             }
         }
 
-        public static void PrintApplicationInformation(DatabaseObject Settings, ConfigModel Config)
+        /// <summary>
+        /// Prints application info to console
+        /// </summary>
+        /// <param name="settings">
+        /// The settings.
+        /// </param>
+        /// <param name="config">
+        /// The config.
+        /// </param>
+        public static void PrintApplicationInformation(DatabaseObject settings, ConfigModel config)
         {
             Console.WriteLine("-> INFORMATION\n" +
-                              $"-> Database URL: {Settings?.URL}\n" +
-                              $"-> Database Name: {Settings?.Name}\n" +
-                              $"-> Prefix: {Config.Prefix}\n" +
+                              $"-> Database URL: {settings?.URL}\n" +
+                              $"-> Database Name: {settings?.Name}\n" +
+                              $"-> Prefix: {config.Prefix}\n" +
                               "    Author: PassiveModding | Discord: https://discord.me/Passive\n" +
                               $"=======================[ {DateTime.UtcNow} ]=======================");
         }
