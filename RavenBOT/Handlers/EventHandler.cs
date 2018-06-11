@@ -28,6 +28,11 @@
         private bool guildCheck = true;
 
         /// <summary>
+        /// Displays bot invite on connection Once then gets toggled off.
+        /// </summary>
+        private bool displayinvite = true;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="EventHandler"/> class.
         /// </summary>
         /// <param name="client">
@@ -117,20 +122,20 @@
             Games.Clear();
             */
 
-            if (this.guildCheck)
+            if (guildCheck)
             {
                 // This will check to ensure that all our servers are initialized, whilst also allowing the bot to continue starting
                 _ = Task.Run(() =>
                 {
                     // This will load all guild models and retrieve their IDs
-                    var Servers = this.Provider.GetRequiredService<DatabaseHandler>().Query<GuildModel>().Select(x => Convert.ToUInt64(x.ID)).ToList();
+                    var Servers = Provider.GetRequiredService<DatabaseHandler>().Query<GuildModel>().Select(x => Convert.ToUInt64(x.ID)).ToList();
 
                     // Now if the bots server list contains a guild but 'Servers' does not, we create a new object for the guild
                     foreach (var Guild in socketClient.Guilds.Select(x => x.Id))
                     {
                         if (!Servers.Contains(Guild))
                         {
-                            this.Provider.GetRequiredService<DatabaseHandler>().Execute<GuildModel>(DatabaseHandler.Operation.CREATE, new GuildModel { ID = Guild }, Guild);
+                            Provider.GetRequiredService<DatabaseHandler>().Execute<GuildModel>(DatabaseHandler.Operation.CREATE, new GuildModel { ID = Guild }, Guild);
                         }
                     }
 
@@ -149,14 +154,16 @@
                     }
 
                     // Ensure that this is only run once as the bot initially connects.
-                    this.guildCheck = false;
+                    guildCheck = false;
                 });
             }
 
-            // This will log a message with the bots invite link so the developer can access the bots invite with ease. Note the permissions are configured to allow everything in the server.
-            // var application = socketClient.GetApplicationInfoAsync();
-            // LogHandler.LogMessage($"Invite: https://discordapp.com/oauth2/authorize?client_id={application.id}&scope=bot&permissions=2146958591");
             LogHandler.LogMessage($"Shard: {socketClient.ShardId} Ready");
+            if (displayinvite)
+            {
+                LogHandler.LogMessage($"Invite: https://discordapp.com/oauth2/authorize?client_id={Client.CurrentUser.Id}&scope=bot&permissions=2146958591");
+                displayinvite = false;
+            }
         }
 
         /// <summary>
@@ -224,6 +231,11 @@
 
             var context = new Context(Client, Message, Provider);
 
+            if (Config.LogUserMessages)
+            {
+                LogHandler.LogMessage(context, Message.Content);
+            }
+
             var argPos = 0;
 
             // Filter out all messages that don't start with our Bot Prefix, bot mention or server specific prefix.
@@ -239,6 +251,13 @@
             if (!result.IsSuccess)
             {
                 await CmdError(context, result, argPos);
+            }
+            else
+            {
+                if (Config.LogCommandUsages)
+                {
+                    LogHandler.LogMessage(context, Message.Content);
+                }
             }
         }
 
@@ -311,10 +330,18 @@
             switch (result.Error)
             {
                 case CommandError.MultipleMatches:
-                    LogHandler.LogMessage(result.ErrorReason, LogSeverity.Error);
+                    if (Config.LogCommandUsages)
+                    {
+                        LogHandler.LogMessage(result.ErrorReason, LogSeverity.Error);
+                    }
+
                     break;
                 case CommandError.ObjectNotFound:
-                    LogHandler.LogMessage(result.ErrorReason, LogSeverity.Error);
+                    if (Config.LogCommandUsages)
+                    {
+                        LogHandler.LogMessage(result.ErrorReason, LogSeverity.Error);
+                    }
+
                     break;
                 case CommandError.Unsuccessful:
                     await context.Channel.SendMessageAsync("You may have found a bug. Please report this error in my server https://discord.me/Passive");

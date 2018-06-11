@@ -34,7 +34,16 @@
         /// <param name="args">Discarded Args</param>
         public static void Main(string[] args)
         {
-            Start().GetAwaiter().GetResult();
+            try
+            {
+                Start().GetAwaiter().GetResult();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                Console.ReadKey();
+            }
+            
         }
 
         /// <summary>

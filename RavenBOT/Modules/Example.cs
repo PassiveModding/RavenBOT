@@ -209,5 +209,41 @@
                                    // Note, 2500 Guilds is the max amount per shard, so this should be updated based on around 2000 as if you hit the 2500 limit discord will ban the account associated.
                                    $"Recommended shard count: {(Context.Client.Guilds.Count / 2000 < 1 ? 1 : Context.Client.Guilds.Count / 2000)}");
         }
+
+        /// <summary>
+        /// toggle message logging.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        [Command("ToggleMessageLog")]
+        [RequireContext(ContextType.Guild)]
+        [RequireOwner]
+        [Summary("Toggle the logging of all user messages to console")]
+        public async Task ToggleMessageLog()
+        {
+            var config = Context.Provider.GetRequiredService<ConfigModel>();
+            config.LogUserMessages = !config.LogUserMessages;
+            Context.Provider.GetRequiredService<DatabaseHandler>().Execute<ConfigModel>(DatabaseHandler.Operation.SAVE, config, "Config");
+            await SimpleEmbedAsync($"Log User Messages: {config.LogUserMessages}");
+        }
+
+        /// <summary>
+        /// toggle command logging.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        [Command("ToggleCommandLog")]
+        [RequireContext(ContextType.Guild)]
+        [RequireOwner]
+        [Summary("Toggle the logging of all user messages to console")]
+        public async Task ToggleCommandLog()
+        {
+            var config = Context.Provider.GetRequiredService<ConfigModel>();
+            config.LogCommandUsages = !config.LogCommandUsages;
+            Context.Provider.GetRequiredService<DatabaseHandler>().Execute<ConfigModel>(DatabaseHandler.Operation.SAVE, config, "Config");
+            await SimpleEmbedAsync($"Log Command Usages: {config.LogCommandUsages}");
+        }
     }
 }
