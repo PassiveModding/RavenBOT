@@ -65,7 +65,6 @@
                     .AddSingleton<InteractiveService>()
                     .AddSingleton(new Random(Guid.NewGuid().GetHashCode()));
 
-
             var provider = services.BuildServiceProvider();
 
             // This method ensures that the database is
