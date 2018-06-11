@@ -44,19 +44,19 @@
         /// <param name="context">
         /// The context.
         /// </param>
-        /// <param name="message">
-        /// The message.
+        /// <param name="error">
+        /// Optional error message.
         /// </param>
         /// <param name="logSeverity">
         /// The Severity of the message
         /// </param>
-        public static void LogMessage(Context context, string message = null, LogSeverity logSeverity = LogSeverity.Info)
+        public static void LogMessage(Context context, string error = null, LogSeverity logSeverity = LogSeverity.Info)
         {
             var custom = $"G: {context.Guild.Name.Left(20)} || C: {context.Channel.Name.Left(20)} || U: {context.User.Username.Left(20)} || M: {context.Message.Content.Left(100)}";
 
-            if (message != null)
+            if (error != null)
             {
-                custom += $"\nE: {message.Left(100)}";
+                custom += $"\nE: {error}";
             }
 
             switch (logSeverity)
@@ -80,7 +80,7 @@
                     Log.Verbose(custom);
                     break;
                 default:
-                    Log.Information(message);
+                    Log.Information(custom);
                     break;
             }
         }

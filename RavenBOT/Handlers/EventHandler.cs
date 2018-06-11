@@ -30,7 +30,7 @@
         /// <summary>
         /// Displays bot invite on connection Once then gets toggled off.
         /// </summary>
-        private bool displayinvite = true;
+        private bool hideInvite;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EventHandler"/> class.
@@ -159,10 +159,10 @@
             }
 
             LogHandler.LogMessage($"Shard: {socketClient.ShardId} Ready");
-            if (displayinvite)
+            if (!hideInvite)
             {
                 LogHandler.LogMessage($"Invite: https://discordapp.com/oauth2/authorize?client_id={Client.CurrentUser.Id}&scope=bot&permissions=2146958591");
-                displayinvite = false;
+                hideInvite = true;
             }
         }
 
@@ -233,7 +233,7 @@
 
             if (Config.LogUserMessages)
             {
-                LogHandler.LogMessage(context, Message.Content);
+                LogHandler.LogMessage(context);
             }
 
             var argPos = 0;
@@ -250,13 +250,13 @@
             // Generate an error message for users if a command is unsuccessful
             if (!result.IsSuccess)
             {
-                await CmdError(context, result, argPos);
+                var _ = Task.Run(() => CmdError(context, result, argPos));
             }
             else
             {
                 if (Config.LogCommandUsages)
                 {
-                    LogHandler.LogMessage(context, Message.Content);
+                    LogHandler.LogMessage(context);
                 }
             }
         }
@@ -332,14 +332,14 @@
                 case CommandError.MultipleMatches:
                     if (Config.LogCommandUsages)
                     {
-                        LogHandler.LogMessage(result.ErrorReason, LogSeverity.Error);
+                        LogHandler.LogMessage(context, result.ErrorReason, LogSeverity.Error);
                     }
 
                     break;
                 case CommandError.ObjectNotFound:
                     if (Config.LogCommandUsages)
                     {
-                        LogHandler.LogMessage(result.ErrorReason, LogSeverity.Error);
+                        LogHandler.LogMessage(context, result.ErrorReason, LogSeverity.Error);
                     }
 
                     break;
