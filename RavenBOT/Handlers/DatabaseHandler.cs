@@ -184,11 +184,11 @@
 
                 // This inserts the config object into the database and writes the DatabaseConfig to file.
                 Execute<ConfigModel>(Operation.CREATE, configModel, "Config");
-                File.WriteAllText("setup/DBConfig.json", JsonConvert.SerializeObject(new DatabaseObject { IsConfigCreated = true }, Formatting.Indented));
+                Settings.IsConfigCreated = true;
+                File.WriteAllText("setup/DBConfig.json", JsonConvert.SerializeObject(Settings, Formatting.Indented));
             }
 
             LogHandler.PrintApplicationInformation(Settings, configModel);
-            Settings = null;
         }
 
         /// <summary>
