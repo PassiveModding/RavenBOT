@@ -59,6 +59,7 @@
             Client.Log += Event.Log;
             Client.ShardReady += Event.ShardReady;
             Client.LeftGuild += Event.LeftGuild;
+            Client.JoinedGuild += Event.JoinedGuild;
             Client.ShardConnected += Event.ShardConnected;
             Client.MessageReceived += Event.MessageReceivedAsync;
 

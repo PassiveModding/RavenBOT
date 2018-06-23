@@ -212,7 +212,28 @@
             return Task.Run(()
                 => Provider.GetRequiredService<DatabaseHandler>().Execute<GuildModel>(DatabaseHandler.Operation.DELETE, id: guild.Id));
         }
-        
+
+        /// <summary>
+        /// This will automatically initialize any new guilds for the bot.
+        /// </summary>
+        /// <param name="guild">
+        /// The guild.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        internal Task JoinedGuild(SocketGuild guild)
+        {
+            return Task.Run(()=>
+            {
+                var handler = Provider.GetRequiredService<DatabaseHandler>();
+                if (handler.Execute<GuildModel>(DatabaseHandler.Operation.LOAD, id: guild.Id) == null)
+                {
+                    handler.Execute<GuildModel>(DatabaseHandler.Operation.CREATE, new GuildModel { ID = guild.Id }, guild.Id);
+                }
+            });
+        }
+
         /// <summary>
         /// This event is triggered every time the a user sends a message in a channel, dm etc. that the bot has access to view.
         /// </summary>
