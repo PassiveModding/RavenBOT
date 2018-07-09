@@ -124,10 +124,16 @@
                 // If all shards are connected, try to remove all guilds that no longer use the bot
                 if (Client.Shards.All(x => x.ConnectionState == ConnectionState.Connected))
                 {
-                    if (DBConfig.Local.PrefixOverride != null)
+                    if (DBConfig.Local.Developing)
+                    {
+                        LogHandler.LogMessage("Bot is in Developer Mode!", LogSeverity.Warning);
+                    }
+
+                    if (DBConfig.Local.Developing && DBConfig.Local.PrefixOverride != null)
                     {
                         LogHandler.LogMessage("Bot is in Prefix Override Mode!", LogSeverity.Warning);
                     }
+
 
                     _ = Task.Run(
                         () =>
@@ -268,9 +274,12 @@
 
             var argPos = 0;
 
-            if (DBConfig.Local.Developing)
+            if (DBConfig.Local.Developing && DBConfig.Local.PrefixOverride != null)
             {
-
+                if (!Message.HasStringPrefix(DBConfig.Local.PrefixOverride, ref argPos))
+                {
+                    return;
+                }
             }
             else
             {
