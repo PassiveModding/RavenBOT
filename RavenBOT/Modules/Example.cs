@@ -11,8 +11,6 @@
 
     using global::Discord.Commands;
 
-    using Microsoft.Extensions.DependencyInjection;
-
     using Newtonsoft.Json;
 
     using RavenBOT.Discord.Context;
@@ -38,7 +36,6 @@
             DatabaseHandler = dbHandler;
         }
 
-
         /// <summary>
         /// The stats.
         /// </summary>
@@ -49,7 +46,7 @@
         [Summary("Bot Statistics Command")] // A summary of what the command does
         [Remarks("Can only be run within a server")] // Extra notes on the command
         [RequireContext(ContextType.Guild)] // A Precondition, limiting access to the command
-        public async Task Stats()
+        public Task StatsAsync()
         {
             var embed = new EmbedBuilder
             {
@@ -65,7 +62,7 @@
                                      $"Text Channels: {Context.Guild.TextChannels.Count}\n" +
                                      $"Voice Channels: {Context.Guild.VoiceChannels.Count}\n" +
                                      $"Categories: {Context.Guild.CategoryChannels.Count}");
-            await ReplyAsync(string.Empty, false, embed.Build());
+            return ReplyAsync(string.Empty, false, embed.Build());
         }
 
         /// <summary>
@@ -80,9 +77,9 @@
         [Command("Say")]
         [Alias("Echo", "Repeat")]// Commands can be initialized using different names, ie, Echo, Repeat and Say will all have the same effect.
         [Summary("Repeats the given message")]
-        public async Task Echo([Remainder] string message)
+        public Task EchoAsync([Remainder] string message)
         {
-            await ReplyAsync(message);
+            return ReplyAsync(message);
         }
 
         /// <summary>
@@ -94,11 +91,11 @@
         [Command("GetDatabaseGuildID")]
         [RequireContext(ContextType.Guild)]
         [Summary("Loads the guildID from the database")]
-        public async Task DBLoad()
+        public Task DBLoadAsync()
         {
             // SimpleEmbedAsync is one of our additions in our custom context
             // This is an example of how you can use custom additions to the bot context. ie. Context.Server
-            await SimpleEmbedAsync(Context.Server.ID.ToString());
+            return SimpleEmbedAsync(Context.Server.ID.ToString());
         }
 
         /// <summary>
@@ -107,11 +104,12 @@
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        [Command("DownloadConfig")]
+        /// Using RunMode.Async you can send tasks to their own thread. This should only be used on commands that do NOT Modify a database file
+        [Command("DownloadConfig", RunMode = RunMode.Async)] 
         [RequireContext(ContextType.Guild)]
         [GuildOwner]
         [Summary("Downloads the config file of the guild")]
-        public async Task DBDownload()
+        public async Task DBDownloadAsync()
         {
             var database = Context.Server;
             var serialized = JsonConvert.SerializeObject(database, Formatting.Indented);
@@ -122,8 +120,8 @@
                 var sw = new StreamWriter(ms, uniEncoding);
                 try
                 {
-                    sw.Write(serialized);
-                    sw.Flush();
+                    await sw.WriteAsync(serialized).ConfigureAwait(false);
+                    await sw.FlushAsync().ConfigureAwait(false);
                     ms.Seek(0, SeekOrigin.Begin);
 
                     // You can send files from a stream in discord too, This allows us to avoid having to read and write directly from a file for this command.
@@ -179,7 +177,7 @@
         [Command("embedreaction")]
         [Summary("Sends a custom message that performs a specific action upon reacting")]
         [Remarks("N/A")]
-        public async Task Test_EmbedReactionReply(bool expires, bool singleuse, bool singleuser)
+        public Task Test_EmbedReactionReplyAsync(bool expires, bool singleuse, bool singleuser)
         {
             var one = new Emoji("1⃣");
             var two = new Emoji("2⃣");
@@ -193,14 +191,14 @@
             // This message does not expire after a single
             // it will not allow a user to react more than once
             // it allows more than one user to react
-            await InlineReactionReplyAsync(new ReactionCallbackData("text", embed, expires, singleuse)
+            return InlineReactionReplyAsync(new ReactionCallbackData("text", embed, expires, singleuse)
                     .WithCallback(one, (c, r) =>
-                    {
-                        // You can do additional things with your reaction here, NOTE: c references this commands context whereas r references our added reaction.
-                        // This is important to note because context.user can be a different user to reaction.user
-                        var reactor = r.User.Value;
-                        return c.Channel.SendMessageAsync($"{reactor.Mention} Here you go :beer:");
-                    }).WithCallback(two, (c, r) => c.Channel.SendMessageAsync($"{r.User.Value.Mention} Here you go :tropical_drink:")),
+                        {
+                            // You can do additional things with your reaction here, NOTE: c references this commands context whereas r references our added reaction.
+                            // This is important to note because context.user can be a different user to reaction.user
+                            var reactor = r.User.Value;
+                            return c.Channel.SendMessageAsync($"{reactor.Mention} Here you go :beer:");
+                        }).WithCallback(two, (c, r) => c.Channel.SendMessageAsync($"{r.User.Value.Mention} Here you go :tropical_drink:")),
                 singleuser);
         }
 
@@ -217,17 +215,17 @@
         [RequireContext(ContextType.Guild)]
         [RequireOwner]
         [Summary("Set total amount of shards for the bot")]
-        public async Task SetShards(int shards)
+        public Task SetShardsAsync(int shards)
         {
             // Here we can access the service provider via our custom context.
             var config = ConfigModel;
             config.Shards = shards;
             DatabaseHandler.Execute<ConfigModel>(DatabaseHandler.Operation.SAVE, config, "Config");
-            await SimpleEmbedAsync($"Shard Count updated to: {shards}\n" +
-                                   "This will be effective after a restart.\n" +
+            return SimpleEmbedAsync($"Shard Count updated to: {shards}\n" +
+                                    "This will be effective after a restart.\n" +
 
-                                   // Note, 2500 Guilds is the max amount per shard, so this should be updated based on around 2000 as if you hit the 2500 limit discord will ban the account associated.
-                                   $"Recommended shard count: {(Context.Client.Guilds.Count / 2000 < 1 ? 1 : Context.Client.Guilds.Count / 2000)}");
+                                    // Note, 2500 Guilds is the max amount per shard, so this should be updated based on around 2000 as if you hit the 2500 limit discord will ban the account associated.
+                                    $"Recommended shard count: {(Context.Client.Guilds.Count / 2000 < 1 ? 1 : Context.Client.Guilds.Count / 2000)}");
         }
 
         /// <summary>
@@ -240,12 +238,12 @@
         [RequireContext(ContextType.Guild)]
         [RequireOwner]
         [Summary("Toggle the logging of all user messages to console")]
-        public async Task ToggleMessageLog()
+        public Task ToggleMessageLogAsync()
         {
             var config = ConfigModel;
             config.LogUserMessages = !config.LogUserMessages;
             DatabaseHandler.Execute<ConfigModel>(DatabaseHandler.Operation.SAVE, config, "Config");
-            await SimpleEmbedAsync($"Log User Messages: {config.LogUserMessages}");
+            return SimpleEmbedAsync($"Log User Messages: {config.LogUserMessages}");
         }
 
         /// <summary>
@@ -258,12 +256,12 @@
         [RequireContext(ContextType.Guild)]
         [RequireOwner]
         [Summary("Toggle the logging of all user messages to console")]
-        public async Task ToggleCommandLog()
+        public Task ToggleCommandLogAsync()
         {
             var config = ConfigModel;
             config.LogCommandUsages = !config.LogCommandUsages;
             DatabaseHandler.Execute<ConfigModel>(DatabaseHandler.Operation.SAVE, config, "Config");
-            await SimpleEmbedAsync($"Log Command Usages: {config.LogCommandUsages}");
+            return SimpleEmbedAsync($"Log Command Usages: {config.LogCommandUsages}");
         }
     }
 }
