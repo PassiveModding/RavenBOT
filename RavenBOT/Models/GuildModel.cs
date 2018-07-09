@@ -34,10 +34,6 @@
         /// </summary>
         public class GuildSettings
         {
-            /// <summary>
-            /// Gets or sets the custom prefix.
-            /// </summary>
-            // public string CustomPrefix { get; set; } = null;
         }
     }
 }

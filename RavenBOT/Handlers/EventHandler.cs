@@ -41,9 +41,6 @@
         /// <param name="config">
         /// The config.
         /// </param>
-        /// <param name="dbConfig">
-        /// The db Config.
-        /// </param>
         /// <param name="service">
         /// The service.
         /// </param>
@@ -65,7 +62,7 @@
         private ConfigModel Config { get; }
 
         /// <summary>
-        /// Gets the db config.
+        /// Gets or sets the db config.
         /// </summary>
         private DatabaseObject DBConfig { get; set; }
 
@@ -134,7 +131,7 @@
                         LogHandler.LogMessage("Bot is in Prefix Override Mode!", LogSeverity.Warning);
                     }
 
-
+                    // Push this to another thread to avoid blocking the gateway
                     _ = Task.Run(
                         () =>
                             {
@@ -289,7 +286,6 @@
                     return;
                 }
             }
-
 
             // Here we attempt to execute a command based on the user message
             var result = await CommandService.ExecuteAsync(context, argPos, Provider, MultiMatchHandling.Best);

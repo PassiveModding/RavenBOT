@@ -54,6 +54,5 @@
             /// </summary>
             public string PrefixOverride { get; set; } = null;
         }
-
     }
 }
