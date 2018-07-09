@@ -28,6 +28,17 @@
     [RequireContext(ContextType.Guild)] // You can also use precondition attributes on a module to ensure commands are only run if they pass the precondition
     public class Example : Base
     {
+        private ConfigModel ConfigModel { get; }
+
+        private DatabaseHandler DatabaseHandler { get; }
+
+        public Example(ConfigModel configModel, DatabaseHandler dbHandler)
+        {
+            ConfigModel = configModel;
+            DatabaseHandler = dbHandler;
+        }
+
+
         /// <summary>
         /// The stats.
         /// </summary>
@@ -146,7 +157,7 @@
             Context.Server.Save();
 
             // If prefix is null, we default back to the default bot prefix
-            await SimpleEmbedAsync($"Prefix is now: {prefix ?? Context.Provider.GetRequiredService<ConfigModel>().Prefix}");
+            await SimpleEmbedAsync($"Prefix is now: {prefix ?? ConfigModel.Prefix}");
         }
 
         /// <summary>
@@ -200,9 +211,9 @@
         public async Task SetShards(int shards)
         {
             // Here we can access the service provider via our custom context.
-            var config = Context.Provider.GetRequiredService<ConfigModel>();
+            var config = ConfigModel;
             config.Shards = shards;
-            Context.Provider.GetRequiredService<DatabaseHandler>().Execute<ConfigModel>(DatabaseHandler.Operation.SAVE, config, "Config");
+            DatabaseHandler.Execute<ConfigModel>(DatabaseHandler.Operation.SAVE, config, "Config");
             await SimpleEmbedAsync($"Shard Count updated to: {shards}\n" +
                                    "This will be effective after a restart.\n" +
 
@@ -222,9 +233,9 @@
         [Summary("Toggle the logging of all user messages to console")]
         public async Task ToggleMessageLog()
         {
-            var config = Context.Provider.GetRequiredService<ConfigModel>();
+            var config = ConfigModel;
             config.LogUserMessages = !config.LogUserMessages;
-            Context.Provider.GetRequiredService<DatabaseHandler>().Execute<ConfigModel>(DatabaseHandler.Operation.SAVE, config, "Config");
+            DatabaseHandler.Execute<ConfigModel>(DatabaseHandler.Operation.SAVE, config, "Config");
             await SimpleEmbedAsync($"Log User Messages: {config.LogUserMessages}");
         }
 
@@ -240,9 +251,9 @@
         [Summary("Toggle the logging of all user messages to console")]
         public async Task ToggleCommandLog()
         {
-            var config = Context.Provider.GetRequiredService<ConfigModel>();
+            var config = ConfigModel;
             config.LogCommandUsages = !config.LogCommandUsages;
-            Context.Provider.GetRequiredService<DatabaseHandler>().Execute<ConfigModel>(DatabaseHandler.Operation.SAVE, config, "Config");
+            DatabaseHandler.Execute<ConfigModel>(DatabaseHandler.Operation.SAVE, config, "Config");
             await SimpleEmbedAsync($"Log Command Usages: {config.LogCommandUsages}");
         }
     }
