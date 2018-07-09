@@ -37,7 +37,7 @@
             /// <summary>
             /// Gets or sets the custom prefix.
             /// </summary>
-            public string CustomPrefix { get; set; } = null;
+            // public string CustomPrefix { get; set; } = null;
         }
     }
 }

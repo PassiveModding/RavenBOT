@@ -150,14 +150,23 @@
         [GuildOwner]
         [Summary("Loads the guildID from the database")]
         [Remarks("This command can only be invoked by the server owner")]
-        public async Task CustomPrefix([Remainder] string prefix = null)
+        public Task CustomPrefixAsync([Remainder] string prefix = null)
         {
             // Modify the prefix and then update the object within the database.
-            Context.Server.Settings.CustomPrefix = prefix;
-            Context.Server.Save();
+            var prefixDict = PrefixDictionary.Load();
+            if (prefix == null)
+            {
+                prefixDict.PrefixList.Remove(Context.Guild.Id);
+            }
+            else
+            {
+                prefixDict.PrefixList.Add(Context.Guild.Id, prefix);
+            }
+
+            prefixDict.Save();
 
             // If prefix is null, we default back to the default bot prefix
-            await SimpleEmbedAsync($"Prefix is now: {prefix ?? ConfigModel.Prefix}");
+            return SimpleEmbedAsync($"Prefix is now: {prefix ?? ConfigModel.Prefix}");
         }
 
         /// <summary>

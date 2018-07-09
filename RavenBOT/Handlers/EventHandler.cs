@@ -284,7 +284,7 @@
             else
             {
                 // Filter out all messages that don't start with our Bot Prefix, bot mention or server specific prefix.
-                if (!(Message.HasStringPrefix(Config.Prefix, ref argPos) || Message.HasMentionPrefix(context.Client.CurrentUser, ref argPos) || Message.HasStringPrefix(context.Server.Settings.CustomPrefix, ref argPos)))
+                if (!(Message.HasStringPrefix(PrefixDictionary.Load().GuildPrefix(context.Guild.Id) ?? Config.Prefix, ref argPos) || Message.HasMentionPrefix(context.Client.CurrentUser, ref argPos)))
                 {
                     return;
                 }
