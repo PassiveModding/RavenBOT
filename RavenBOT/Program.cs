@@ -36,7 +36,7 @@
         {
             try
             {
-                Start().GetAwaiter().GetResult();
+                StartAsync().GetAwaiter().GetResult();
             }
             catch (Exception e)
             {
@@ -52,7 +52,7 @@
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        private static async Task Start()
+        private static async Task StartAsync()
         {
             // This ensures that our bots setup directory is initialized and will be were the database config is stored.
             if (!Directory.Exists(Path.Combine(AppContext.BaseDirectory, "setup/")))
@@ -67,7 +67,7 @@
                     {
                         ThrowOnError = false,
                         IgnoreExtraArgs = false,
-                        DefaultRunMode = RunMode.Async
+                        DefaultRunMode = RunMode.Sync
                     }))
                     .AddSingleton<BotHandler>()
                     .AddSingleton<EventHandler>()
@@ -80,7 +80,7 @@
             // 1. Running
             // 2. Set up properly 
             // 3. contains the bot config itself
-            provider.GetRequiredService<DatabaseHandler>().Initialize();
+            var dbConfig = provider.GetRequiredService<DatabaseHandler>().Initialize();
 
             // The provider is split here so we can get our shard count from the database before actually logging into discord.
             // This is important to do so the bot always logs in with the required amount of shards.
@@ -89,7 +89,7 @@
             {
                 MessageCacheSize = 20,
                 AlwaysDownloadUsers = true,
-                LogLevel = LogSeverity.Warning,
+                LogLevel = dbConfig.Local.Developing ? LogSeverity.Debug : LogSeverity.Warning,
 
                 // Please change increase this as your server count grows beyond 2000 guilds. ie. < 2000 = 1, 2000 = 2, 4000 = 2 ...
                 TotalShards = shards
@@ -99,7 +99,7 @@
             provider = services.BuildServiceProvider();
 
             await provider.GetRequiredService<BotHandler>().InitializeAsync();
-            await provider.GetRequiredService<EventHandler>().InitializeAsync();
+            await provider.GetRequiredService<EventHandler>().InitializeAsync(dbConfig);
 
             // Indefinitely delay the method from finishing so that the program stays running until stopped.
             await Task.Delay(-1);

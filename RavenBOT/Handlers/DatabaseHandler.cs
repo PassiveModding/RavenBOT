@@ -18,6 +18,8 @@
 
     using RavenBOT.Models;
 
+    using Serilog;
+
     /// <summary>
     /// The database handler.
     /// </summary>
@@ -85,7 +87,10 @@
         /// <summary>
         /// Initializes the database for use
         /// </summary>
-        public void Initialize()
+        /// <returns>
+        /// The <see cref="DatabaseObject"/>.
+        /// </returns>
+        public DatabaseObject Initialize()
         {
             // Ensure that the bots database settings are setup, if not prompt to enter details
             if (!File.Exists("setup/DBConfig.json"))
@@ -189,6 +194,13 @@
             }
 
             LogHandler.PrintApplicationInformation(Settings, configModel);
+            LogHandler.Log = new LoggerConfiguration()
+                .WriteTo
+                .Console()
+                .WriteTo
+                .RavenDB(Store)
+                .CreateLogger();
+            return Settings;
         }
 
         /// <summary>

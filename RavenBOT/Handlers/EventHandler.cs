@@ -41,6 +41,9 @@
         /// <param name="config">
         /// The config.
         /// </param>
+        /// <param name="dbConfig">
+        /// The db Config.
+        /// </param>
         /// <param name="service">
         /// The service.
         /// </param>
@@ -60,6 +63,11 @@
         /// Gets the config.
         /// </summary>
         private ConfigModel Config { get; }
+
+        /// <summary>
+        /// Gets the db config.
+        /// </summary>
+        private DatabaseObject DBConfig { get; set; }
 
         /// <summary>
         /// Gets the provider.
@@ -84,12 +92,16 @@
         /// <summary>
         /// The initialize async.
         /// </summary>
+        /// <param name="dbConfig">
+        /// The db Config.
+        /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        public async Task InitializeAsync()
+        public async Task InitializeAsync(DatabaseObject dbConfig)
         {
             // This will add all our modules to the command service, allowing them to be accessed as necessary
+            DBConfig = dbConfig;
             await CommandService.AddModulesAsync(Assembly.GetEntryAssembly());
             LogHandler.LogMessage("RavenBOT: Modules Added");
         }
@@ -103,66 +115,63 @@
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        internal async Task ShardReady(DiscordSocketClient socketClient)
+        internal async Task ShardReadyAsync(DiscordSocketClient socketClient)
         {
             await socketClient.SetActivityAsync(new Game($"Shard: {socketClient.ShardId}"));
-            
-            /*
-            //Here we select at random out 'playing' message.
-             var Games = new Dictionary<ActivityType, string[]>
-            {
-                {ActivityType.Listening, new[]{"YT/PassiveModding", "Tech N9ne"} },
-                {ActivityType.Playing, new[]{$"{Config.Prefix}help"} },
-                {ActivityType.Watching, new []{"YT/PassiveModding"} }
-            };
-            var RandomActivity = Games.Keys.ToList()[Random.Next(Games.Keys.Count)];
-            var RandomName = Games[RandomActivity][Random.Next(Games[RandomActivity].Length)];
-            await socketClient.SetActivityAsync(new Game(RandomName, RandomActivity));
-            LogHandler.LogMessage($"Game has been set to: [{RandomActivity}] {RandomName}");
-            Games.Clear();
-            */
 
             if (guildCheck)
             {
-                // This will check to ensure that all our servers are initialized, whilst also allowing the bot to continue starting
-                _ = Task.Run(() =>
+                // If all shards are connected, try to remove all guilds that no longer use the bot
+                if (Client.Shards.All(x => x.ConnectionState == ConnectionState.Connected))
                 {
-                    // This will load all guild models and retrieve their IDs
-                    var Servers = Provider.GetRequiredService<DatabaseHandler>().Query<GuildModel>().Select(x => Convert.ToUInt64(x.ID)).ToList();
-
-                    // Now if the bots server list contains a guild but 'Servers' does not, we create a new object for the guild
-                    foreach (var Guild in socketClient.Guilds.Select(x => x.Id))
+                    if (DBConfig.Local.PrefixOverride != null)
                     {
-                        if (!Servers.Contains(Guild))
-                        {
-                            Provider.GetRequiredService<DatabaseHandler>().Execute<GuildModel>(DatabaseHandler.Operation.CREATE, new GuildModel { ID = Guild }, Guild);
-                        }
+                        LogHandler.LogMessage("Bot is in Prefix Override Mode!", LogSeverity.Warning);
                     }
 
-                    // We also auto-remove any servers that no longer use the bot, to reduce un-necessary disk usage. 
-                    // You may want to remove this however if you are storing things and want to keep them.
-                    // You should also disable this if you are working with multiple shards.
-                    if (Client.Shards.Count == 1)
-                    {
-                        foreach (var Server in Servers)
-                        {
-                            if (!socketClient.Guilds.Select(x => x.Id).Contains(Convert.ToUInt64(Server)))
+                    _ = Task.Run(
+                        () =>
                             {
-                                Provider.GetRequiredService<DatabaseHandler>().Execute<GuildModel>(DatabaseHandler.Operation.DELETE, id: Server);
-                            }
-                        }
-                    }
+                                var handler = Provider.GetRequiredService<DatabaseHandler>();
+
+                                // Returns all stored guild models
+                                var guildIds = Client.Guilds.Select(g => g.Id).ToList();
+                                var missingList = handler.Query<GuildModel>().Select(x => x.ID).Where(x => !guildIds.Contains(x)).ToList();
+
+                                foreach (var id in missingList)
+                                {
+                                    handler.Execute<GuildModel>(DatabaseHandler.Operation.DELETE, id: id.ToString());
+                                }
+                            });
 
                     // Ensure that this is only run once as the bot initially connects.
                     guildCheck = false;
-                });
-            }
+                }
+                else
+                {
+                    // This will check to ensure that all our servers are initialized, whilst also allowing the bot to continue starting
+                    _ = Task.Run(
+                        () =>
+                            {
+                                var handler = Provider.GetRequiredService<DatabaseHandler>();
 
-            LogHandler.LogMessage($"Shard: {socketClient.ShardId} Ready");
-            if (!hideInvite)
-            {
-                LogHandler.LogMessage($"Invite: https://discordapp.com/oauth2/authorize?client_id={Client.CurrentUser.Id}&scope=bot&permissions=2146958591");
-                hideInvite = true;
+                                // This will load all guild models and retrieve their IDs
+                                var Servers = handler.Query<GuildModel>().Select(x => x.ID).ToList();
+
+                                // Now if the bots server list contains a guild but 'Servers' does not, we create a new object for the guild
+                                foreach (var Guild in socketClient.Guilds.Select(x => x.Id).Where(x => !Servers.Contains(x)))
+                                {
+                                    handler.Execute<GuildModel>(DatabaseHandler.Operation.CREATE, new GuildModel { ID = Guild }, Guild);
+                                }
+                            });
+                }
+
+                LogHandler.LogMessage($"Shard: {socketClient.ShardId} Ready");
+                if (!hideInvite)
+                {
+                    LogHandler.LogMessage($"Invite: https://discordapp.com/oauth2/authorize?client_id={Client.CurrentUser.Id}&scope=bot&permissions=2146958591");
+                    hideInvite = true;
+                }
             }
         }
 
@@ -175,7 +184,7 @@
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        internal Task ShardConnected(DiscordSocketClient socketClient)
+        internal Task ShardConnectedAsync(DiscordSocketClient socketClient)
         {
             Task.Run(()
                 => CancellationToken.Cancel()).ContinueWith(x
@@ -193,7 +202,7 @@
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        internal Task Log(LogMessage message)
+        internal Task LogAsync(LogMessage message)
         {
             return Task.Run(() => LogHandler.LogMessage(message.Message, message.Severity));
         }
@@ -207,7 +216,7 @@
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        internal Task LeftGuild(SocketGuild guild)
+        internal Task LeftGuildAsync(SocketGuild guild)
         {
             return Task.Run(()
                 => Provider.GetRequiredService<DatabaseHandler>().Execute<GuildModel>(DatabaseHandler.Operation.DELETE, id: guild.Id));
@@ -222,7 +231,7 @@
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        internal Task JoinedGuild(SocketGuild guild)
+        internal Task JoinedGuildAsync(SocketGuild guild)
         {
             return Task.Run(()=>
             {
@@ -259,11 +268,19 @@
 
             var argPos = 0;
 
-            // Filter out all messages that don't start with our Bot Prefix, bot mention or server specific prefix.
-            if (!(Message.HasStringPrefix(Config.Prefix, ref argPos) || Message.HasMentionPrefix(context.Client.CurrentUser, ref argPos) || Message.HasStringPrefix(context.Server.Settings.CustomPrefix, ref argPos)))
+            if (DBConfig.Local.Developing)
             {
-                return;
+
             }
+            else
+            {
+                // Filter out all messages that don't start with our Bot Prefix, bot mention or server specific prefix.
+                if (!(Message.HasStringPrefix(Config.Prefix, ref argPos) || Message.HasMentionPrefix(context.Client.CurrentUser, ref argPos) || Message.HasStringPrefix(context.Server.Settings.CustomPrefix, ref argPos)))
+                {
+                    return;
+                }
+            }
+
 
             // Here we attempt to execute a command based on the user message
             var result = await CommandService.ExecuteAsync(context, argPos, Provider, MultiMatchHandling.Best);
@@ -271,7 +288,7 @@
             // Generate an error message for users if a command is unsuccessful
             if (!result.IsSuccess)
             {
-                var _ = Task.Run(() => CmdError(context, result, argPos));
+                var _ = Task.Run(() => CmdErrorAsync(context, result, argPos));
             }
             else
             {
@@ -297,7 +314,7 @@
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        internal async Task CmdError(Context context, IResult result, int argPos)
+        internal async Task CmdErrorAsync(Context context, IResult result, int argPos)
         {
             string errorMessage;
             if (result.Error == CommandError.UnknownCommand)
@@ -331,7 +348,7 @@
                 // ignored
             }
 
-            await LogError(result, context);
+            await LogErrorAsync(result, context);
         }
 
         /// <summary>
@@ -346,7 +363,7 @@
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        internal async Task LogError(IResult result, Context context)
+        internal async Task LogErrorAsync(IResult result, Context context)
         {
             switch (result.Error)
             {

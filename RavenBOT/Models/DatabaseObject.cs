@@ -36,5 +36,24 @@
         /// The backup folder.
         /// </summary>
         public string BackupFolder => Directory.CreateDirectory("Backup").FullName;
+
+        /// <summary>
+        /// Gets or sets local variables
+        /// </summary>
+        public LocalVariables Local { get; set; } = new LocalVariables();
+
+        public class LocalVariables
+        {
+            /// <summary>
+            /// Gets or sets a value indicating whether the bot is being developed
+            /// </summary>
+            public bool Developing { get; set; } = false;
+
+            /// <summary>
+            /// Gets or sets the prefix override.
+            /// </summary>
+            public string PrefixOverride { get; set; } = null;
+        }
+
     }
 }

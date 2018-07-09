@@ -56,11 +56,11 @@
         public async Task InitializeAsync()
         {
             // These are our events, each time one of these is triggered it runs the corresponding method. Ie, the bot receives a message we run Event.MessageReceivedAsync
-            Client.Log += Event.Log;
-            Client.ShardReady += Event.ShardReady;
-            Client.LeftGuild += Event.LeftGuild;
-            Client.JoinedGuild += Event.JoinedGuild;
-            Client.ShardConnected += Event.ShardConnected;
+            Client.Log += Event.LogAsync;
+            Client.ShardReady += Event.ShardReadyAsync;
+            Client.LeftGuild += Event.LeftGuildAsync;
+            Client.JoinedGuild += Event.JoinedGuildAsync;
+            Client.ShardConnected += Event.ShardConnectedAsync;
             Client.MessageReceived += Event.MessageReceivedAsync;
 
             // Here we log the bot in and start it. This MUST run for the bot to connect to discord.

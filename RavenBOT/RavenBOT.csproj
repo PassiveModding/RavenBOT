@@ -13,6 +13,7 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Arx.Serilog.Sinks.RavenDb" Version="1.0.0" />
     <PackageReference Include="Discord.Addons.PassiveInteractive" Version="2.0.2-Beta" />
     <PackageReference Include="Discord.Net" Version="2.0.0-beta" />
     <PackageReference Include="RavenDB.Client" Version="4.0.3" />
