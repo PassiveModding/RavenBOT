@@ -192,6 +192,10 @@
                 Settings.IsConfigCreated = true;
                 File.WriteAllText("setup/DBConfig.json", JsonConvert.SerializeObject(Settings, Formatting.Indented));
             }
+            else
+            {
+                configModel = Execute<ConfigModel>(Operation.LOAD, null, "Config");
+            }
 
             LogHandler.PrintApplicationInformation(Settings, configModel);
             LogHandler.Log = new LoggerConfiguration()
