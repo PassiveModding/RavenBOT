@@ -1,144 +1,148 @@
-﻿namespace RavenBOT.Handlers
+﻿using System;
+using Discord;
+using Discord.WebSocket;
+using Raven.Client.Documents;
+using RavenBOT.Extensions;
+using RavenBOT.Models;
+
+namespace RavenBOT.Handlers
 {
-    using System;
-
-    using global::Discord;
-
-    using RavenBOT.Discord.Context;
-    using RavenBOT.Models;
-
-    using Serilog;
-    using Serilog.Core;
-
-    /// <summary>
-    /// The Log handler.
-    /// </summary>
-    public static class LogHandler
+    public class LogHandler
     {
-        /// <summary>
-        /// Gets or sets the log
-        /// </summary>
-        public static Logger Log { get; set; } = new LoggerConfiguration().WriteTo.Console().CreateLogger();
+        private DiscordShardedClient Client { get; }
 
-        /// <summary>
-        /// Ensures a string is aligned and kept to the specified length
-        /// Uses substring if it is too long and pads if too short.
-        /// </summary>
-        /// <param name="s">
-        /// The string to modify
-        /// </param>
-        /// <param name="len">
-        /// The desired string length
-        /// </param>
-        /// <returns>
-        /// The <see cref="string"/>.
-        /// </returns>
-        public static string Left(this string s, int len)
+        private IDocumentStore Store { get; }
+
+        private LoggerConfig Config { get; }
+
+        public LoggerConfig GetLoggerConfig()
         {
-            return s.Length == len ? s : (s.Length < len ? s.PadRight(len) : s.Substring(0, len));
+            return Config;
         }
 
-        /// <summary>
-        /// Logs a message to console with the specified severity. Includes info based on context
-        /// </summary>
-        /// <param name="context">
-        /// The context.
-        /// </param>
-        /// <param name="error">
-        /// Optional error message.
-        /// </param>
-        /// <param name="logSeverity">
-        /// The Severity of the message
-        /// </param>
-        public static void LogMessage(Context context, string error = null, LogSeverity logSeverity = LogSeverity.Info)
+        public void SetLoggerConfig(LoggerConfig newConfig)
         {
-            var custom = $"G: {context.Guild.Name.Left(20)} || C: {context.Channel.Name.Left(20)} || U: {context.User.Username.Left(20)} || M: {context.Message.Content.Left(100)}";
-
-            if (error != null)
+            using (var session = Store.OpenSession())
             {
-                custom += $"\nE: {error}";
-            }
-
-            switch (logSeverity)
-            {
-                case LogSeverity.Info:
-                    Log.Information(custom);
-                    break;
-                case LogSeverity.Warning:
-                    Log.Warning(custom);
-                    break;
-                case LogSeverity.Error:
-                    Log.Error(custom);
-                    break;
-                case LogSeverity.Debug:
-                    Log.Debug(custom);
-                    break;
-                case LogSeverity.Critical:
-                    Log.Fatal(custom);
-                    break;
-                case LogSeverity.Verbose:
-                    Log.Verbose(custom);
-                    break;
-                default:
-                    Log.Information(custom);
-                    break;
+                session.Store(newConfig, "LogConfig");
+                session.SaveChanges();
             }
         }
 
-        /// <summary>
-        /// Logs a message to console
-        /// </summary>
-        /// <param name="message">
-        /// The message.
-        /// </param>
-        /// <param name="logSeverity">
-        /// The severity of the message
-        /// </param>
-        public static void LogMessage(string message, LogSeverity logSeverity = LogSeverity.Info)
+        public LogHandler(DiscordShardedClient client, IDocumentStore store)
         {
-            switch (logSeverity)
+            Client = client;
+            Store = store;
+            using (var session = store.OpenSession())
+            {
+                Config = session.Load<LoggerConfig>("LogConfig");
+                if (Config == null)
+                {
+                    Config = new LoggerConfig();
+                    session.Store(Config, "LogConfig");
+                    session.SaveChanges();
+                }
+            }
+        }
+
+        public void Log(string message, LogSeverity severity = LogSeverity.Info, object additional = null)
+        {
+            var logObject = new BotLogObject(message, severity, additional);
+            Console.WriteLine(makeLogMessage(message, severity));
+            if (Config.LogToDatabase)
+            {
+                using (var session = Store.OpenSession())
+                {
+                    session.Store(logObject);
+                    session.SaveChanges();
+                }
+            }
+
+            if (Config.LogToChannel)
+            {
+                try
+                {
+                    var channel = Client?.GetGuild(Config.GuildId)?.GetTextChannel(Config.ChannelId);
+                    channel?.SendMessageAsync(string.Empty, false, new EmbedBuilder
+                    {
+                        Description = message.FixLength(),
+                        Color = LogSeverityAsColor(severity),
+                        Title = severity.ToString()
+                    }.Build());
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+        }
+
+        private Discord.Color LogSeverityAsColor(LogSeverity severity)
+        {
+            switch (severity)
             {
                 case LogSeverity.Info:
-                    Log.Information(message);
-                    break;
-                case LogSeverity.Warning:
-                    Log.Warning(message);
-                    break;
-                case LogSeverity.Error:
-                    Log.Error(message);
-                    break;
-                case LogSeverity.Debug:
-                    Log.Debug(message);
-                    break;
+                    return Color.Blue;
                 case LogSeverity.Critical:
-                    Log.Fatal(message);
-                    break;
+                    return Color.DarkRed;
+                case LogSeverity.Error:
+                    return Color.Red;
+                case LogSeverity.Warning:
+                    return Color.Gold;
+                case LogSeverity.Debug:
+                    return Color.DarkerGrey;
                 case LogSeverity.Verbose:
-                    Log.Verbose(message);
-                    break;
+                    return Color.Green;
                 default:
-                    Log.Information(message);
-                    break;
+                    return Color.Purple;
             }
         }
 
-        /// <summary>
-        /// Prints application info to console
-        /// </summary>
-        /// <param name="settings">
-        /// The settings.
-        /// </param>
-        /// <param name="config">
-        /// The config.
-        /// </param>
-        public static void PrintApplicationInformation(DatabaseObject settings, ConfigModel config)
+        private string makeLogMessage(string message, LogSeverity severity, LogContext context = null)
         {
-            Console.WriteLine("-> INFORMATION\n" +
-                              $"-> Database URL: {settings?.URL}\n" +
-                              $"-> Database Name: {settings?.Name}\n" +
-                              $"-> Prefix: {config.Prefix}\n" +
-                              "    Author: PassiveModding | Discord: https://discord.me/Passive\n" +
-                              $"=======================[ {DateTime.UtcNow} ]=======================");
+            var newSev = severity.ToString().PadRight(20).Substring(0, 4).ToUpper();
+            var contextString = "";
+            if (context != null)
+            {
+                contextString = $"\n[U:{context.userId} G:{context.guildId} C:{context.channelId} M:{context.message}]";
+            }
+            return $"[{newSev}][{DateTime.UtcNow.ToShortDateString()} {DateTime.UtcNow.ToShortTimeString()}] {message}{contextString}";
+        }
+
+        public void Log(string message, LogContext context, LogSeverity severity = LogSeverity.Info, object additional = null)
+        {
+            var logObject = new CommandLogObject(message, context, severity, additional);
+            Console.WriteLine(makeLogMessage(message, severity));
+            if (Config.LogToDatabase)
+            {
+                using (var session = Store.OpenSession())
+                {
+                    session.Store(logObject);
+                    session.SaveChanges();
+                }
+            }
+
+            if (Config.LogToChannel)
+            {
+                try
+                {
+                    var channel = Client?.GetGuild(Config.GuildId)?.GetTextChannel(Config.ChannelId);
+                    channel?.SendMessageAsync(string.Empty, false, new EmbedBuilder
+                    {
+                        Description = message.FixLength(),
+                        Color = LogSeverityAsColor(severity),
+                        Title = severity.ToString()
+                    }.AddField("Context", 
+                        $"Channel: {context.channelId}\n" +
+                        $"Guild: {context.guildId}\n" +
+                        $"User: {context.userId}\n" +
+                        $"Message: {context.message}".FixLength()).Build());
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
         }
     }
 }
