@@ -29,12 +29,17 @@ namespace RavenBOT.Handlers
             if (message.HasStringPrefix(PrefixService.GetPrefix(context.Guild?.Id ?? 0), ref argPos) || message.HasMentionPrefix(context.Client.CurrentUser, ref argPos))
             {
                 var gMatch = CmdService.Trees.FirstOrDefault(x => x.GuildId == context.Guild.Id);
+                var ignoreUnknownCommand = false;
                 if (gMatch != null)
                 {
-                    //TODO: Possible command overrides (maybe allow this to happen but check with user in setup to see if original command is blocked or still executed)
-                    //Custom Prefixes for custom stuff
-                    //Serialization and deserialization
-                    await gMatch.Execute(context, argPos);
+                    //TODO: Serialization and deserialization
+                    var executionResult = (await gMatch.Execute(context, argPos));
+                    if (executionResult.OverrideCommand)
+                    {
+                        return;
+                    }
+
+                    ignoreUnknownCommand = executionResult.Success;
                 }
 
                 
@@ -43,6 +48,13 @@ namespace RavenBOT.Handlers
 
                 if (!result.IsSuccess)
                 {
+                    if (result.Error == CommandError.UnknownCommand)
+                    {
+                        if (ignoreUnknownCommand)
+                        {
+                            return;
+                        }
+                    }
                     Logger.Log(context.Message.Content + "\n" + result.ErrorReason, new LogContext(context), LogSeverity.Error);
                 }
                 else

@@ -18,31 +18,45 @@ namespace RavenBOT.Services.SerializableCommandFramwrork
 
         public class JsonNodeTree
         {
-            public JsonNodeTree(string commandName, List<IJsonNode> nodes, string entryNodeId, ulong guildId)
+            public JsonNodeTree(string commandName, List<IJsonNode> nodes, string entryNodeId, ulong guildId, bool overrideCommand = true)
             {
                 CommandName = commandName;
                 Nodes = nodes;
                 EntryNodeId = entryNodeId;
                 GuildId = guildId;
+                OverrideCommand = overrideCommand;
             }
 
             public string CommandName { get; set; }
             public List<IJsonNode> Nodes { get; set; }
             public string EntryNodeId { get; }
             public ulong GuildId { get; }
+            public bool OverrideCommand { get; }
 
             public IJsonNode GetNode(string nodeId)
             {
                 var nodeMatch = Nodes.FirstOrDefault(x => x.GetNodeId() == nodeId);
                 return nodeMatch;
             }
-            
-            public async Task Execute(SocketCommandContext context, int argpos)
+
+            public class CommandServiceResponse
+            {
+                public CommandServiceResponse(bool overrideCommand, bool success)
+                {
+                    this.OverrideCommand = OverrideCommand;
+                    this.Success = success;
+                }
+
+                public bool OverrideCommand { get; set; }
+                public bool Success { get; set; }
+            }
+
+            public async Task<CommandServiceResponse> Execute(SocketCommandContext context, int argpos)
             {
                 string command = context.Message.Content.Substring(argpos);
                 if (!command.StartsWith(CommandName))
                 {
-                    return;
+                    return null;
                 }
 
                 //May be needed for something
@@ -54,6 +68,8 @@ namespace RavenBOT.Services.SerializableCommandFramwrork
                 {
                     nodeId = await GetNode(nodeId)?.Execute(context);
                 }
+
+                return new CommandServiceResponse(OverrideCommand, true);
             }
 
             public string DoReplacements(string message, SocketCommandContext context)
