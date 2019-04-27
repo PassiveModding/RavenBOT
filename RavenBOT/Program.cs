@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using RavenBOT.Handlers;
 using RavenBOT.Models;
 using RavenBOT.Services;
+using RavenBOT.Services.Licensing;
 using EventHandler = RavenBOT.Handlers.EventHandler;
 
 namespace RavenBOT
@@ -63,6 +64,8 @@ namespace RavenBOT
                 .AddSingleton<TimerService>()
                 .AddSingleton(x => new PrefixService(x.GetRequiredService<DatabaseService>().GetStore(), x.GetRequiredService<BotConfig>().Prefix))
                 .AddSingleton<EventHandler>()
+                .AddSingleton(x => new QuantifiableLicenseService(x.GetRequiredService<DatabaseService>().GetStore()))
+                .AddSingleton(x => new TimedLicenseService(x.GetRequiredService<DatabaseService>().GetStore()))
                 .BuildServiceProvider();
 
             try

@@ -3,10 +3,12 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using RavenBOT.Handlers;
+using RavenBOT.Services.Licensing;
 
 namespace RavenBOT.Modules
 {
     [RequireUserPermission(GuildPermission.Administrator)]
+    [RequireOwner]
     public class Developer : ModuleBase<SocketCommandContext>
     {
         public LogHandler Logger { get; }

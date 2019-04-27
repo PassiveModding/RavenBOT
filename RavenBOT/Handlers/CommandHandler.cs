@@ -28,6 +28,7 @@ namespace RavenBOT.Handlers
             var context = new ShardedCommandContext(Client, message);
             if (message.HasStringPrefix(PrefixService.GetPrefix(context.Guild?.Id ?? 0), ref argPos) || message.HasMentionPrefix(context.Client.CurrentUser, ref argPos))
             {
+                /*
                 var gMatch = CmdService.Trees.FirstOrDefault(x => x.GuildId == context.Guild.Id);
                 var ignoreUnknownCommand = false;
                 if (gMatch != null)
@@ -41,13 +42,14 @@ namespace RavenBOT.Handlers
 
                     ignoreUnknownCommand = executionResult.Success;
                 }
-
+                */
                 
                 
                 var result = await CommandService.ExecuteAsync(context, argPos, Provider);
 
                 if (!result.IsSuccess)
                 {
+                    /*
                     if (result.Error == CommandError.UnknownCommand)
                     {
                         if (ignoreUnknownCommand)
@@ -55,6 +57,7 @@ namespace RavenBOT.Handlers
                             return;
                         }
                     }
+                    */
                     Logger.Log(context.Message.Content + "\n" + result.ErrorReason, new LogContext(context), LogSeverity.Error);
                 }
                 else
