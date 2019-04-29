@@ -3,27 +3,152 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Discord.Commands;
+using Discord.WebSocket;
 
 namespace RavenBOT.Services.SerializableCommandFramwrork
 {
     public class GuildMessageReplacementTypes
     {
-        public interface IGuildMessageReplacementType
+        public interface IContextReplacement
         {
             string Value { get; set; }
-
+           
             string ReplacementValue(SocketCommandContext context);
         }
 
-        public List<IGuildMessageReplacementType> GetIGuildMessageReplacementTypes()
+        public interface ITextChannelReplacement
+        {
+            string Value { get; set; }
+
+            string ReplacementValue(SocketTextChannel channel);
+        }
+        
+        public static string DoReplacements(string message, SocketCommandContext context, string textChannelId = null)
+        {
+            foreach (var messageReplacementType in GetIGuildMessageReplacementTypes())
+            {
+                if (message.Contains($"{{{messageReplacementType.Value}}}"))
+                {
+                    message = message.Replace($"{{{messageReplacementType.Value}}}", messageReplacementType.ReplacementValue(context));
+                }
+            }
+
+
+            //Note that channels will be limited to the current guild and will NOT be able to modify or contact any channels outside it.
+            if (textChannelId != null)
+            {
+                if (!string.IsNullOrWhiteSpace(textChannelId))
+                {
+                    if (ulong.TryParse(textChannelId, out var chanId))
+                    {
+                        var textChannel = context.Guild.TextChannels.FirstOrDefault(x => x.Id == chanId);
+                        if (textChannel != null)
+                        {
+                            foreach (var messageReplacementType in GetIChannelMessageReplacementTypes())
+                            {
+                                if (message.Contains($"{{{messageReplacementType.Value}}}"))
+                                {
+                                    message = message.Replace($"{{{messageReplacementType.Value}}}", messageReplacementType.ReplacementValue(textChannel));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return message;
+        }
+
+        public class ChannelName : ITextChannelReplacement
+        {
+            public string Value { get; set; } = "channelName";
+            public string ReplacementValue(SocketTextChannel channel)
+            {
+                return channel.Name;
+            }
+        }
+
+        public class ChannelTopic : ITextChannelReplacement
+        {
+            public string Value { get; set; } = "channelTopic";
+            public string ReplacementValue(SocketTextChannel channel)
+            {
+                return channel.Topic ?? "";
+            }
+        }
+
+        public class ChannelMention : ITextChannelReplacement
+        {
+            public string Value { get; set; } = "channelMention";
+            public string ReplacementValue(SocketTextChannel channel)
+            {
+                return channel.Mention;
+            }
+        }
+
+        public class ChannelNsfw : ITextChannelReplacement
+        {
+            public string Value { get; set; } = "channelIsNsfw";
+            public string ReplacementValue(SocketTextChannel channel)
+            {
+                return channel.IsNsfw.ToString();
+            }
+        }
+
+        public class ChannelCreationDateTime : ITextChannelReplacement
+        {
+            public string Value { get; set; } = "channelCreationDateTime";
+            public string ReplacementValue(SocketTextChannel channel)
+            {
+                return channel.CreatedAt.DateTime.ToShortDateString() + " " + channel.CreatedAt.DateTime.ToShortTimeString();
+            }
+        }
+
+        public class ChannelCreationDate : ITextChannelReplacement
+        {
+            public string Value { get; set; } = "channelCreationDate";
+            public string ReplacementValue(SocketTextChannel channel)
+            {
+                return channel.CreatedAt.DateTime.ToShortDateString();
+            }
+        }
+
+        public class ChannelCreationTime : ITextChannelReplacement
+        {
+            public string Value { get; set; } = "channelCreationTime";
+            public string ReplacementValue(SocketTextChannel channel)
+            {
+                return channel.CreatedAt.DateTime.ToShortTimeString();
+            }
+        }
+
+        public class ChannelUsers : ITextChannelReplacement
+        {
+            public string Value { get; set; } = "channelMembers";
+            public string ReplacementValue(SocketTextChannel channel)
+            {
+                return channel.Users.Count.ToString();
+            }
+        }
+
+        public static List<IContextReplacement> GetIGuildMessageReplacementTypes()
         {
             var tests = Assembly.GetExecutingAssembly().GetTypes()
-                .Where(t => t.GetInterfaces().Contains(typeof(IGuildMessageReplacementType)))
-                .Select((t, i) => Activator.CreateInstance(t) as IGuildMessageReplacementType);
+                .Where(t => t.GetInterfaces().Contains(typeof(IContextReplacement)))
+                .Select((t, i) => Activator.CreateInstance(t) as IContextReplacement);
             return tests.ToList();
         }
 
-        public class GuildName : IGuildMessageReplacementType
+        
+        public static List<ITextChannelReplacement> GetIChannelMessageReplacementTypes()
+        {
+            var tests = Assembly.GetExecutingAssembly().GetTypes()
+                .Where(t => t.GetInterfaces().Contains(typeof(ITextChannelReplacement)))
+                .Select((t, i) => Activator.CreateInstance(t) as ITextChannelReplacement);
+            return tests.ToList();
+        }
+
+        public class GuildName : IContextReplacement
         {
             public string Value { get; set; } = "guildName";
             public string ReplacementValue(SocketCommandContext context)
@@ -32,7 +157,7 @@ namespace RavenBOT.Services.SerializableCommandFramwrork
             }
         }
 
-        public class GuildId : IGuildMessageReplacementType
+        public class GuildId : IContextReplacement
         {
             public string Value { get; set; } = "guildId";
             public string ReplacementValue(SocketCommandContext context)
@@ -41,7 +166,56 @@ namespace RavenBOT.Services.SerializableCommandFramwrork
             }
         }
 
-        public class GuildOwnerDisplayName : IGuildMessageReplacementType
+        public class CurrentChannelId : IContextReplacement
+        {
+            public string Value { get; set; } = "currentChannelId";
+            public string ReplacementValue(SocketCommandContext context)
+            {
+                return context.Channel.Id.ToString();
+            }
+        }
+
+        public class CurrentChannelName : IContextReplacement
+        {
+            public string Value { get; set; } = "currentChannelName";
+
+            public string ReplacementValue(SocketCommandContext context)
+            {
+                return context.Channel.Name;
+            }
+        }
+
+        public class CurrentUserUsername : IContextReplacement
+        {
+            public string Value { get; set; } = "currentUserUsername";
+
+            public string ReplacementValue(SocketCommandContext context)
+            {
+                return context.User.Username;
+            }
+        }
+
+        public class CurrentUserMention : IContextReplacement
+        {
+            public string Value { get; set; } = "currentUserMention";
+
+            public string ReplacementValue(SocketCommandContext context)
+            {
+                return context.User.Mention;
+            }
+        }
+
+        public class CurrentUserId : IContextReplacement
+        {
+            public string Value { get; set; } = "currentUserId";
+
+            public string ReplacementValue(SocketCommandContext context)
+            {
+                return context.User.Id.ToString();
+            }
+        }
+
+        public class GuildOwnerDisplayName : IContextReplacement
         {
             public string Value { get; set; } = "guildOwnerDisplayName";
             public string ReplacementValue(SocketCommandContext context)
@@ -50,7 +224,7 @@ namespace RavenBOT.Services.SerializableCommandFramwrork
             }
         }
 
-        public class GuildownerUserName : IGuildMessageReplacementType
+        public class GuildownerUserName : IContextReplacement
         {
             public string Value { get; set; } = "guildOwnerUserName";
             public string ReplacementValue(SocketCommandContext context)
@@ -59,7 +233,7 @@ namespace RavenBOT.Services.SerializableCommandFramwrork
             }
         }
 
-        public class GuildOwnerId : IGuildMessageReplacementType
+        public class GuildOwnerId : IContextReplacement
         {
             public string Value { get; set; } = "guildOwnerId";
             public string ReplacementValue(SocketCommandContext context)
@@ -68,7 +242,7 @@ namespace RavenBOT.Services.SerializableCommandFramwrork
             }
         }
 
-        public class GuildIconUrl : IGuildMessageReplacementType
+        public class GuildIconUrl : IContextReplacement
         {
             public string Value { get; set; } = "guildIconUrl";
             public string ReplacementValue(SocketCommandContext context)
@@ -77,7 +251,7 @@ namespace RavenBOT.Services.SerializableCommandFramwrork
             }
         }
 
-        public class GuildChannelNames : IGuildMessageReplacementType
+        public class GuildChannelNames : IContextReplacement
         {
             public string Value { get; set; } = "guildChannelNames";
             public string ReplacementValue(SocketCommandContext context)
@@ -87,7 +261,7 @@ namespace RavenBOT.Services.SerializableCommandFramwrork
         }
 
         
-        public class GuildChannelIds : IGuildMessageReplacementType
+        public class GuildChannelIds : IContextReplacement
         {
             public string Value { get; set; } = "guildChannelIds";
             public string ReplacementValue(SocketCommandContext context)
@@ -97,7 +271,7 @@ namespace RavenBOT.Services.SerializableCommandFramwrork
         }
 
         
-        public class GuildTextChannelNames : IGuildMessageReplacementType
+        public class GuildTextChannelNames : IContextReplacement
         {
             public string Value { get; set; } = "guildTextChannelNames";
             public string ReplacementValue(SocketCommandContext context)
@@ -106,7 +280,7 @@ namespace RavenBOT.Services.SerializableCommandFramwrork
             }
         }
 
-        public class GuildTextChannelIds : IGuildMessageReplacementType
+        public class GuildTextChannelIds : IContextReplacement
         {
             public string Value { get; set; } = "guildTextChannelIds";
             public string ReplacementValue(SocketCommandContext context)
@@ -116,7 +290,7 @@ namespace RavenBOT.Services.SerializableCommandFramwrork
         }
 
         
-        public class GuildVoiceChannelNames : IGuildMessageReplacementType
+        public class GuildVoiceChannelNames : IContextReplacement
         {
             public string Value { get; set; } = "guildVoiceChannelNames";
             public string ReplacementValue(SocketCommandContext context)
@@ -125,7 +299,7 @@ namespace RavenBOT.Services.SerializableCommandFramwrork
             }
         }
 
-        public class GuildVoiceChannelIds : IGuildMessageReplacementType
+        public class GuildVoiceChannelIds : IContextReplacement
         {
             public string Value { get; set; } = "guildVoiceChannelIds";
             public string ReplacementValue(SocketCommandContext context)
@@ -134,7 +308,7 @@ namespace RavenBOT.Services.SerializableCommandFramwrork
             }
         }
         
-        public class GuildCategoryChannelNames : IGuildMessageReplacementType
+        public class GuildCategoryChannelNames : IContextReplacement
         {
             public string Value { get; set; } = "guildCategoryChannelNames";
             public string ReplacementValue(SocketCommandContext context)
@@ -143,7 +317,7 @@ namespace RavenBOT.Services.SerializableCommandFramwrork
             }
         }
 
-        public class GuildCategoryChannelIds : IGuildMessageReplacementType
+        public class GuildCategoryChannelIds : IContextReplacement
         {
             public string Value { get; set; } = "guildCategoryChannelIds";
             public string ReplacementValue(SocketCommandContext context)
@@ -152,7 +326,7 @@ namespace RavenBOT.Services.SerializableCommandFramwrork
             }
         }
 
-        public class GuildRoleNames : IGuildMessageReplacementType
+        public class GuildRoleNames : IContextReplacement
         {
             public string Value { get; set; } = "guildRoleNames";
             public string ReplacementValue(SocketCommandContext context)
@@ -161,7 +335,7 @@ namespace RavenBOT.Services.SerializableCommandFramwrork
             }
         }
 
-        public class GuildRoleIds : IGuildMessageReplacementType
+        public class GuildRoleIds : IContextReplacement
         {
             public string Value { get; set; } = "guildRoleIds";
             public string ReplacementValue(SocketCommandContext context)
@@ -170,7 +344,7 @@ namespace RavenBOT.Services.SerializableCommandFramwrork
             }
         }
 
-        public class GuildEmoteUrls : IGuildMessageReplacementType
+        public class GuildEmoteUrls : IContextReplacement
         {
             public string Value { get; set; } = "guildEmoteUrls";
             public string ReplacementValue(SocketCommandContext context)
@@ -179,7 +353,7 @@ namespace RavenBOT.Services.SerializableCommandFramwrork
             }
         }
 
-        public class GuildEmoteIds : IGuildMessageReplacementType
+        public class GuildEmoteIds : IContextReplacement
         {
             public string Value { get; set; } = "guildEmoteIds";
             public string ReplacementValue(SocketCommandContext context)
@@ -189,7 +363,7 @@ namespace RavenBOT.Services.SerializableCommandFramwrork
         }
 
         
-        public class GuildEmoteNames : IGuildMessageReplacementType
+        public class GuildEmoteNames : IContextReplacement
         {
             public string Value { get; set; } = "guildEmoteNames";
             public string ReplacementValue(SocketCommandContext context)

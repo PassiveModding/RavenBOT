@@ -9,7 +9,6 @@ namespace RavenBOT.Services.SerializableCommandFramwrork
     {
         public JsonCommandService()
         {
-            GuildMessageReplacementTypes = new GuildMessageReplacementTypes().GetIGuildMessageReplacementTypes();
         }
 
         public static List<GuildMessageReplacementTypes.IGuildMessageReplacementType> GuildMessageReplacementTypes { get; set; }
@@ -72,19 +71,6 @@ namespace RavenBOT.Services.SerializableCommandFramwrork
                 return new CommandServiceResponse(OverrideCommand, true);
             }
 
-            public string DoReplacements(string message, SocketCommandContext context)
-            {
-                foreach (var messageReplacementType in GuildMessageReplacementTypes)
-                {
-                    if (message.Contains($"{{{messageReplacementType.Value}}}"))
-                    {
-                        message = message.Replace($"{{{messageReplacementType.Value}}}", messageReplacementType.ReplacementValue(context));
-                    }
-                }
-
-                return message;
-            }
-
             public interface IJsonNode
             {
                 string GetNodeId();
@@ -128,24 +114,27 @@ namespace RavenBOT.Services.SerializableCommandFramwrork
 
                 private readonly string failNodeId;
 
-                private readonly string compareValue;
+                private readonly string valueA;
+
+                private readonly string valueB;
 
                 private readonly ConditionExecution.ICondition condition;
 
 
 
-                public BooleanNode(string id, string successNodeId, string failNodeId, ConditionExecution.ICondition condition, string compareValue = null)
+                public BooleanNode(string id, string successNodeId, string failNodeId, ConditionExecution.ICondition condition, string valueA, string valueB)
                 {
                     this.id = id;
                     this.successNodeId = successNodeId;
                     this.failNodeId = failNodeId;
                     this.condition = condition;
-                    this.compareValue = compareValue;
+                    this.valueA = valueA;
+                    this.valueB = valueB;
                 }
 
                 private bool TryPass(SocketCommandContext context)
                 {
-                    return condition.Condition(context, compareValue);
+                    return condition.Condition(context, valueA, valueB);
                 }
 
                 public async Task<string> Execute(SocketCommandContext context)

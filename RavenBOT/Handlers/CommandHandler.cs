@@ -74,7 +74,7 @@ namespace RavenBOT.Handlers
             {
                 new JsonCommandService.JsonNodeTree("testJsonCommandService", new List<JsonCommandService.JsonNodeTree.IJsonNode>
                 {
-                    new JsonCommandService.JsonNodeTree.BooleanNode("1", "success", "fail", new ConditionExecution.ChannelIdEquals(), "440036982014345216"),
+                    new JsonCommandService.JsonNodeTree.BooleanNode("1", "success", "fail", new ConditionExecution.Comparator(), $"{{{new GuildMessageReplacementTypes.CurrentChannelId()}}}", "440036982014345216"),
                     new JsonCommandService.JsonNodeTree.MessageSendActionNode("success", null, "Success message"),
                     new JsonCommandService.JsonNodeTree.MessageSendActionNode("fail", "EndNode", "Fail message"),
                     new JsonCommandService.JsonNodeTree.EndNode("EndNode")

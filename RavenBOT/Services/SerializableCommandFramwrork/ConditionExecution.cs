@@ -1,4 +1,5 @@
-﻿using Discord.Commands;
+﻿using System.Collections.Generic;
+using Discord.Commands;
 
 namespace RavenBOT.Services.SerializableCommandFramwrork
 {
@@ -6,19 +7,22 @@ namespace RavenBOT.Services.SerializableCommandFramwrork
     {
         public interface ICondition
         {
-            bool Condition(SocketCommandContext context, string compareValue);
+            bool Condition(SocketCommandContext context, string valueA, string valueB);
 
             string Name { get; set; }
         }
 
-        public class ChannelIdEquals : ICondition
+        public class Comparator : ICondition
         {
-            public bool Condition(SocketCommandContext context, string compareValue)
-            {
-                return context.Channel.Id.ToString().Equals(compareValue);
-            }
+            public string Name { get; set; } = "compareValues";
 
-            public string Name { get; set; } = "channelIdEquals";
+            public bool Condition(SocketCommandContext context, string valueA, string valueB)
+            {
+                valueA = GuildMessageReplacementTypes.DoReplacements(valueA, context);
+                valueB = GuildMessageReplacementTypes.DoReplacements(valueB, context);
+
+                return valueA.Equals(valueB);
+            }
         }
     }
 }
