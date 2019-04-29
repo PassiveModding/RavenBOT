@@ -5,7 +5,7 @@ using System.Reflection;
 using Discord.Commands;
 using Discord.WebSocket;
 
-namespace RavenBOT.Services.SerializableCommandFramwrork
+namespace RavenBOT.Services.SerializableCommandFramework
 {
     public class GuildMessageReplacementTypes
     {

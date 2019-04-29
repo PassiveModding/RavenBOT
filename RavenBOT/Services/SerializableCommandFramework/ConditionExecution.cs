@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Discord.Commands;
 
-namespace RavenBOT.Services.SerializableCommandFramwrork
+namespace RavenBOT.Services.SerializableCommandFramework
 {
     public class ConditionExecution
     {

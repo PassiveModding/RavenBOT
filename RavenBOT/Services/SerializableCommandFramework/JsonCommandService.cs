@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Discord.Commands;
 
-namespace RavenBOT.Services.SerializableCommandFramwrork
+namespace RavenBOT.Services.SerializableCommandFramework
 {
     public class JsonCommandService
     {
@@ -11,7 +11,7 @@ namespace RavenBOT.Services.SerializableCommandFramwrork
         {
         }
 
-        public static List<GuildMessageReplacementTypes.IGuildMessageReplacementType> GuildMessageReplacementTypes { get; set; }
+        public static List<GuildMessageReplacementTypes.IContextReplacement> GuildMessageReplacementTypes { get; set; }
 
         public List<JsonNodeTree> Trees = new List<JsonNodeTree>();
 
