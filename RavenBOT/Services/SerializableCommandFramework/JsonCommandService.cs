@@ -7,10 +7,6 @@ namespace RavenBOT.Services.SerializableCommandFramework
 {
     public class JsonCommandService
     {
-        public JsonCommandService()
-        {
-        }
-
         public static List<GuildMessageReplacementTypes.IContextReplacement> GuildMessageReplacementTypes { get; set; }
 
         public List<JsonNodeTree> Trees = new List<JsonNodeTree>();

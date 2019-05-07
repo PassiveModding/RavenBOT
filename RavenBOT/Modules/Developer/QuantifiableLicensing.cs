@@ -24,8 +24,7 @@ namespace RavenBOT.Modules.Developer
         {
             if (string.IsNullOrWhiteSpace(key))
             {
-                //TODO: Add Store url
-                await ReplyAsync("Please enter a key or purchase one at: ");
+                await ReplyAsync("Please enter a key or purchase one at: ...");
                 return;
             }
 

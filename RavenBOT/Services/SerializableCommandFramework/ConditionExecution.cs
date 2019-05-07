@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Discord.Commands;
+﻿using Discord.Commands;
 
 namespace RavenBOT.Services.SerializableCommandFramework
 {
