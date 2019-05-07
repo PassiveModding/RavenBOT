@@ -139,7 +139,8 @@ namespace RavenBOT.Modules
 
             if (!fields.Any())
             {
-                throw new Exception("There are no matches for this input.");
+                await ReplyAsync("There are no matches for this input.");
+                return;
             }
 
             await InlineReactionReplyAsync(

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using RavenBOT.Extensions;
 using RavenBOT.Models;
 using RavenBOT.Services;
 using Sparrow.Platform.Posix.macOS;
@@ -60,6 +61,14 @@ namespace RavenBOT.Handlers
             else
             {
                 Logger.Log($"{context.Message.Content}\n{result.Error}\n{result.ErrorReason}", new LogContext(context), LogSeverity.Error);
+                await context.Channel.SendMessageAsync("", false, new EmbedBuilder
+                {
+                    Title = $"Command Error{(result.Error.HasValue ? $": {result.Error.Value}" : "")}",
+                    Description = $"Message: {context.Message.Content.FixLength(512)}\n" +
+                                  "__**Error**__\n" +
+                                  $"{result.ErrorReason.FixLength(512)}"
+
+                }.Build());
             }
         }
 
