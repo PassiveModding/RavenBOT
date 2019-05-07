@@ -8,10 +8,14 @@ namespace RavenBOT.Services
         private IDocumentStore Store { get; }
         private PrefixInfo Info { get; }
         private string DocumentName { get; }
+        private bool Developer { get; }
+        private string DeveloperPrefix { get; }
 
-        public PrefixService(IDocumentStore store, string defaultPrefix)
+        public PrefixService(IDocumentStore store, string defaultPrefix, bool developer = false, string developerPrefix = "dev.")
         {
             DocumentName = "PrefixSetup";
+            Developer = developer;
+            DeveloperPrefix = developerPrefix;
             Store = store;
             using (var session = Store.OpenSession())
             {
@@ -29,6 +33,11 @@ namespace RavenBOT.Services
 
         public string GetPrefix(ulong guildId)
         {
+            if (Developer)
+            {
+                return DeveloperPrefix;
+            }
+
             return Info.GetPrefix(guildId);
         }
 

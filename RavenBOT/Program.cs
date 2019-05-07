@@ -64,7 +64,7 @@ namespace RavenBOT
                 }))
                 .AddSingleton(x => new GraphiteService(x.GetRequiredService<DatabaseService>().GetGraphiteClient()))
                 .AddSingleton<TimerService>()
-                .AddSingleton(x => new PrefixService(x.GetRequiredService<DatabaseService>().GetStore(), x.GetRequiredService<BotConfig>().Prefix))
+                .AddSingleton(x => new PrefixService(x.GetRequiredService<DatabaseService>().GetStore(), x.GetRequiredService<BotConfig>().Prefix, x.GetRequiredService<DatabaseService>().GetOrInitializeConfig().Developer, x.GetRequiredService<DatabaseService>().GetOrInitializeConfig().DeveloperPrefix))
                 .AddSingleton<EventHandler>()
                 .AddSingleton(x => new LicenseService(x.GetRequiredService<DatabaseService>().GetStore()))
                 .AddSingleton<InteractiveService>()

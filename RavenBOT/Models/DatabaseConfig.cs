@@ -11,5 +11,9 @@ namespace RavenBOT.Models
         public string pathToCertificate { get; set; } = null;
 
         public string GraphiteUrl { get; set; } = null;
+
+        public bool Developer { get; set; } = false;
+
+        public string DeveloperPrefix { get; set; } = "dev.";
     }
 }
