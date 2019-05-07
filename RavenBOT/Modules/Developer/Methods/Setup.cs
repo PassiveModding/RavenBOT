@@ -1,40 +1,32 @@
 ﻿using System.Collections.Generic;
-using Raven.Client.Documents;
+using RavenBOT.Services;
 
 namespace RavenBOT.Modules.Developer.Methods
 {
     public class Setup
     {
-        public IDocumentStore Store { get; }
+        public IDatabase Store { get; }
 
-        public Setup(IDocumentStore store)
+        public Setup(IDatabase store)
         {
             Store = store;
         }
 
         public Settings GetDeveloperSettings()
         {
-            using (var session = Store.OpenSession())
+            var settings = Store.Load<Settings>("DeveloperSettings");
+            if (settings == null)
             {
-                var settings = session.Load<Settings>("DeveloperSettings");
-                if (settings == null)
-                {
-                    settings = new Settings();
-                    session.Store(settings, "DeveloperSettings");
-                    session.SaveChanges();
-                }
-
-                return settings;
+                settings = new Settings();
+                Store.Store(settings, "DeveloperSettings");
             }
+
+            return settings;
         }
 
         public void SetDeveloperSettings(Settings newSettings)
         {
-            using (var session = Store.OpenSession())
-            {
-                session.Store(newSettings, "DeveloperSettings");
-                session.SaveChanges();
-            }
+            Store.Store(newSettings, "DeveloperSettings");
         }
 
         public class Settings

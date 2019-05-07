@@ -4,6 +4,7 @@ using Discord.WebSocket;
 using Raven.Client.Documents;
 using RavenBOT.Extensions;
 using RavenBOT.Models;
+using RavenBOT.Services;
 
 namespace RavenBOT.Handlers
 {
@@ -11,7 +12,7 @@ namespace RavenBOT.Handlers
     {
         private DiscordShardedClient Client { get; }
 
-        private IDocumentStore Store { get; }
+        private IDatabase Store { get; }
 
         private LoggerConfig Config { get; }
 
@@ -22,26 +23,19 @@ namespace RavenBOT.Handlers
 
         public void SetLoggerConfig(LoggerConfig newConfig)
         {
-            using (var session = Store.OpenSession())
-            {
-                session.Store(newConfig, "LogConfig");
-                session.SaveChanges();
-            }
+            Store.Store(newConfig, "LogConfig");
         }
 
-        public LogHandler(DiscordShardedClient client, IDocumentStore store)
+        public LogHandler(DiscordShardedClient client, IDatabase store)
         {
             Client = client;
             Store = store;
-            using (var session = store.OpenSession())
+
+            Config = Store.Load<LoggerConfig>("LogConfig");
+            if (Config == null)
             {
-                Config = session.Load<LoggerConfig>("LogConfig");
-                if (Config == null)
-                {
-                    Config = new LoggerConfig();
-                    session.Store(Config, "LogConfig");
-                    session.SaveChanges();
-                }
+                Config = new LoggerConfig();
+                Store.Store(Config, "LogConfig");
             }
         }
 
@@ -51,11 +45,7 @@ namespace RavenBOT.Handlers
             Console.WriteLine(makeLogMessage(message, severity));
             if (Config.LogToDatabase)
             {
-                using (var session = Store.OpenSession())
-                {
-                    session.Store(logObject);
-                    session.SaveChanges();
-                }
+                Store.Store(logObject);
             }
 
             if (Config.LogToChannel)
@@ -115,11 +105,7 @@ namespace RavenBOT.Handlers
             Console.WriteLine(makeLogMessage(message, severity));
             if (Config.LogToDatabase)
             {
-                using (var session = Store.OpenSession())
-                {
-                    session.Store(logObject);
-                    session.SaveChanges();
-                }
+                Store.Store(logObject);
             }
 
             if (Config.LogToChannel)

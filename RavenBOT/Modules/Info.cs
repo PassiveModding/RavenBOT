@@ -8,7 +8,6 @@ using Discord.Addons.Interactive;
 using Discord.Commands;
 using Microsoft.Extensions.DependencyInjection;
 using RavenBOT.Extensions;
-using RavenBOT.Modules.Developer;
 using RavenBOT.Modules.Developer.Methods;
 using RavenBOT.Services;
 
@@ -26,7 +25,7 @@ namespace RavenBOT.Modules
             CommandService = commandService;
             PrefixService = prefixService;
             Provider = provider;
-            Setup = new Setup(provider.GetRequiredService<DatabaseService>().GetStore());
+            Setup = new Setup(provider.GetRequiredService<IDatabase>());
         }
 
         [Command("Invite")]
@@ -38,7 +37,7 @@ namespace RavenBOT.Modules
         [Command("Help")]
         public async Task HelpAsync([Remainder]string moduleOrCommand = null)
         {
-            await GenerateHelpAsync(moduleOrCommand, true);
+            await GenerateHelpAsync(moduleOrCommand);
         }
 
         [Command("FullHelp")]

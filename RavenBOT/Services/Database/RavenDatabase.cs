@@ -12,19 +12,15 @@ using RavenBOT.Models;
 
 namespace RavenBOT.Services
 {
-    public class DatabaseService
+    public class RavenDatabase : IDatabase
     {
-        private IDocumentStore Store { get; }
-
+        private IDocumentStore DocumentStore { get; }
         private GraphiteClient Graphite { get; }
-
         private DatabaseConfig Config { get; }
-
         private static readonly string ConfigDirectory = Path.Combine(AppContext.BaseDirectory, "setup");
-
         private static readonly string ConfigPath = Path.Combine(ConfigDirectory, "Config.json");
 
-        public DatabaseService()
+        public RavenDatabase()
         {
             Config = GetOrInitializeConfig();
 
@@ -32,7 +28,7 @@ namespace RavenBOT.Services
             {
                 if (Config.pathToCertificate != null && File.Exists(Config.pathToCertificate))
                 {
-                    Store = new DocumentStore
+                    DocumentStore = new DocumentStore
                                 {
                                     Database = Config.DatabaseName,
                                     Urls = Config.DatabaseUrls.ToArray(),
@@ -41,7 +37,7 @@ namespace RavenBOT.Services
                 }
                 else
                 {
-                    Store = new DocumentStore
+                    DocumentStore = new DocumentStore
                                 {
                                     Database = Config.DatabaseName,
                                     Urls = Config.DatabaseUrls.ToArray()
@@ -49,9 +45,9 @@ namespace RavenBOT.Services
                 }
 
 
-                if (Store.Maintenance.Server.Send(new GetDatabaseNamesOperation(0, 5)).All(x => !x.Equals(Config.DatabaseName)))
+                if (DocumentStore.Maintenance.Server.Send(new GetDatabaseNamesOperation(0, 5)).All(x => !x.Equals(Config.DatabaseName)))
                 {
-                    Store.Maintenance.Server.Send(new CreateDatabaseOperation(new DatabaseRecord(Config.DatabaseName)));
+                    DocumentStore.Maintenance.Server.Send(new CreateDatabaseOperation(new DatabaseRecord(Config.DatabaseName)));
                 }
             }
             catch (Exception e)
@@ -84,11 +80,6 @@ namespace RavenBOT.Services
         {
             //Remember, this can return null
             return Graphite;
-        }
-
-        public IDocumentStore GetStore()
-        {
-            return Store;
         }
 
         public DatabaseConfig GetOrInitializeConfig()
@@ -135,6 +126,64 @@ namespace RavenBOT.Services
             }
 
             return JsonConvert.DeserializeObject<DatabaseConfig>(File.ReadAllText(ConfigPath));
+        }
+
+
+        public void Store<T>(T document, string name = null)
+        {
+            using (var session = DocumentStore.OpenSession())
+            {
+                if (name == null)
+                {
+                    session.Store(document);
+                }
+                else
+                {
+                    session.Store(document, name);
+                }
+
+                session.SaveChanges();
+            }
+        }
+
+        public void StoreMany<T>(List<T> documents, Func<T, string> docName = null)
+        {
+            using (var session = DocumentStore.OpenSession())
+            {
+                if (docName == null)
+                {
+                    foreach (var document in documents)
+                    {
+                        session.Store(document);
+                    }
+                }
+                else
+                {
+                    foreach (var document in documents)
+                    {
+                        session.Store(document, docName(document));
+                    }
+                }
+
+                session.SaveChanges();
+            }
+        }
+
+        public T Load<T>(string documentName)
+        {
+            using (var session = DocumentStore.OpenSession())
+            {
+                var document = session.Load<T>(documentName);
+                return document;
+            }
+        }
+
+        public List<T> Query<T>()
+        {
+            using (var session = DocumentStore.OpenSession())
+            {
+                return session.Query<T>().ToList();
+            }
         }
     }
 }

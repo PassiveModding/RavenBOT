@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Raven.Client.Documents;
 
 namespace RavenBOT.Services.Licensing
 {
     public class LicenseService
     {
-        public IDocumentStore Store { get; }
+        public IDatabase Store { get; }
         private Random Random { get; }
 
-        public LicenseService(IDocumentStore store)
+        public LicenseService(IDatabase store)
         {
             Store = store;
             Random = new Random();
@@ -18,43 +17,31 @@ namespace RavenBOT.Services.Licensing
 
         public TimedUserProfile GetTimedUser(string type, ulong userId)
         {
-            using (var session = Store.OpenSession())
-            {
-                var uProfile = session.Load<TimedUserProfile>($"TimedProfile-{type}-{userId}");
+            var uProfile = Store.Load<TimedUserProfile>($"TimedProfile-{type}-{userId}");
 
-                if (uProfile != null) return uProfile;
+            if (uProfile != null) return uProfile;
 
-                //if the user profile is non-existent, create it and add it to the database
-                uProfile = new TimedUserProfile(type, userId);
-                session.Store(uProfile);
-                session.SaveChanges();
-                return uProfile;
-            }
+            //if the user profile is non-existent, create it and add it to the database
+            uProfile = new TimedUserProfile(type, userId);
+            Store.Store(uProfile);
+            return uProfile;
         }
 
         public QuantifiableUserProfile GetQuantifiableUser(string type, ulong userId)
         {
-            using (var session = Store.OpenSession())
-            {
-                var uProfile = session.Load<QuantifiableUserProfile>($"QuantifiableProfile-{type}-{userId}");
+            var uProfile = Store.Load<QuantifiableUserProfile>($"QuantifiableProfile-{type}-{userId}");
 
-                if (uProfile != null) return uProfile;
+            if (uProfile != null) return uProfile;
 
-                //if the user profile is non-existent, create it and add it to the database
-                uProfile = new QuantifiableUserProfile(type, userId);
-                session.Store(uProfile);
-                session.SaveChanges();
-                return uProfile;
-            }
+            //if the user profile is non-existent, create it and add it to the database
+            uProfile = new QuantifiableUserProfile(type, userId);
+            Store.Store(uProfile);
+            return uProfile;
         }
 
         public void SaveUser(IUserProfile profile)
         {
-            using (var session = Store.OpenSession())
-            {
-                session.Store(profile);
-                session.SaveChanges();
-            }
+            Store.Store(profile);
         }
 
         public enum RedemptionResult
@@ -67,9 +54,7 @@ namespace RavenBOT.Services.Licensing
         //Returns whether the operation was successful
         public RedemptionResult RedeemLicense(TimedUserProfile profile, string key)
         {
-            using (var session = Store.OpenSession())
-            {
-                var license = key != null ? session.Load<TimedLicense>($"TimedLicense-{profile.ProfileType}-{key}") : null;
+                var license = key != null ? Store.Load<TimedLicense>($"TimedLicense-{profile.ProfileType}-{key}") : null;
 
                 if (license == null)
                 {
@@ -82,100 +67,80 @@ namespace RavenBOT.Services.Licensing
                 }
 
                 profile.RedeemLicense(license);
-                session.Store(profile);
-                session.Store(license);
-                session.SaveChanges();
+                Store.Store(profile);
+                Store.Store(license);
                 return RedemptionResult.Success;
-            }
         }
 
         public RedemptionResult RedeemLicense(QuantifiableUserProfile profile, string key)
         {
-            using (var session = Store.OpenSession())
+            var license = Store.Load<QuantifiableLicense>($"QuantifiableLicense-{profile.ProfileType}-{key}");
+
+            if (license == null)
             {
-                var license = session.Load<QuantifiableLicense>($"QuantifiableLicense-{profile.ProfileType}-{key}");
-
-                if (license == null)
-                {
-                    return RedemptionResult.InvalidKey;
-                }
-
-                if (license.RedemptionDate != null)
-                {
-                    return RedemptionResult.AlreadyClaimed;
-                }
-
-                profile.RedeemLicense(license);
-                session.Store(profile);
-                session.Store(license);
-                session.SaveChanges();
-                return RedemptionResult.Success;
+                return RedemptionResult.InvalidKey;
             }
+
+            if (license.RedemptionDate != null)
+            {
+                return RedemptionResult.AlreadyClaimed;
+            }
+
+            profile.RedeemLicense(license);
+            Store.Store(profile);
+            Store.Store(license);
+            return RedemptionResult.Success;
         }
 
         public List<QuantifiableLicense> MakeLicenses(string type, int amount, int uses)
         {
-            using (var session = Store.OpenSession())
+            var oldLicenses = Store.Query<QuantifiableLicense>().Where(x => x.LicenseType.Equals(type)).ToList();
+            var newLicenses = new List<QuantifiableLicense>();
+
+            for (int i = 0; i < amount; i++)
             {
-                var oldLicenses = session.Query<QuantifiableLicense>().Where(x => x.LicenseType.Equals(type)).ToList();
-                var newLicenses = new List<QuantifiableLicense>();
+                var newLicense = MakeQuantifiableLicense(type, uses);
 
-                for (int i = 0; i < amount; i++)
+                //Avoid creating licenses with duplicate keys.
+                if (oldLicenses.Any(x => x.Key.Equals(newLicense.Key)))
                 {
-                    var newLicense = MakeQuantifiableLicense(type, uses);
-
-                    //Avoid creating licenses with duplicate keys.
-                    if (oldLicenses.Any(x => x.Key.Equals(newLicense.Key)))
-                    {
-                        i--;
-                    }
-                    else
-                    {
-                        newLicenses.Add(newLicense);
-                    }
+                    i--;
                 }
-
-                foreach (var license in newLicenses)
+                else
                 {
-                    session.Store(license);
+                    newLicenses.Add(newLicense);
                 }
-
-                session.SaveChanges();
-                return newLicenses;
             }
+
+            Store.StoreMany(newLicenses);
+            
+            return newLicenses;
         }
 
         //Returns the new licenses that have been created.
         public List<TimedLicense> MakeLicenses(string type, int amount, TimeSpan time)
         {
-            using (var session = Store.OpenSession())
+            var oldLicenses = Store.Query<TimedLicense>().Where(x => x.LicenseType.Equals(type)).ToList();
+            var newLicenses = new List<TimedLicense>();
+
+            for (int i = 0; i < amount; i++)
             {
-                var oldLicenses = session.Query<TimedLicense>().Where(x => x.LicenseType.Equals(type)).ToList();
-                var newLicenses = new List<TimedLicense>();
+                var newLicense = MakeTimedLicense(type, time);
 
-                for (int i = 0; i < amount; i++)
+                //Avoid creating licenses with duplicate keys.
+                if (oldLicenses.Any(x => x.Key.Equals(newLicense.Key)))
                 {
-                    var newLicense = MakeTimedLicense(type, time);
-
-                    //Avoid creating licenses with duplicate keys.
-                    if (oldLicenses.Any(x => x.Key.Equals(newLicense.Key)))
-                    {
-                        i--;
-                    }
-                    else
-                    {
-                        newLicenses.Add(newLicense);
-                    }
+                    i--;
                 }
-
-                foreach (var license in newLicenses)
+                else
                 {
-                    session.Store(license);
+                    newLicenses.Add(newLicense);
                 }
-
-                session.SaveChanges();
-                return newLicenses;
             }
+
+            Store.StoreMany(newLicenses);
+            
+            return newLicenses;
         }
 
         

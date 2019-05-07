@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Raven.Client.Documents;
 using RavenBOT.Handlers;
 using RavenBOT.Modules.Developer.Methods;
 using RavenBOT.Services;
@@ -15,14 +14,12 @@ namespace RavenBOT.Modules.Developer
     public class Developer : ModuleBase<SocketCommandContext>
     {
         public LogHandler Logger { get; }
-        public IDocumentStore Store { get; }
         public Setup Setup { get; }
 
-        public Developer(LogHandler logger, DatabaseService dbService)
+        public Developer(LogHandler logger, IDatabase dbService)
         {
             Logger = logger;
-            Store = dbService.GetStore();
-            Setup = new Setup(Store);
+            Setup = new Setup(dbService);
         }
 
         [Command("EditHelpPreconditionSkips")]
@@ -42,7 +39,7 @@ namespace RavenBOT.Modules.Developer
             
             Setup.SetDeveloperSettings(settings);
 
-            await ReplyAsync($"Settings:\n" +
+            await ReplyAsync("Settings:\n" +
                              $"{string.Join("\n", settings.SkippableHelpPreconditions)}");
         }
 
@@ -53,14 +50,14 @@ namespace RavenBOT.Modules.Developer
             settings.SkippableHelpPreconditions = new List<string>();
             Setup.SetDeveloperSettings(settings);
 
-            await ReplyAsync($"Set.");
+            await ReplyAsync("Set.");
         }
 
         [Command("ViewHelpPreconditionSkips")]
         public async Task ViewHelpPreconditionSkipsAsync()
         {
             var settings = Setup.GetDeveloperSettings();
-            await ReplyAsync($"Settings:\n" +
+            await ReplyAsync("Settings:\n" +
                              $"{string.Join("\n", settings.SkippableHelpPreconditions)}");
         }
 

@@ -1,34 +1,30 @@
 ﻿using System.Collections.Generic;
-using Raven.Client.Documents;
 
 namespace RavenBOT.Services
 {
     public class PrefixService
     {
-        private IDocumentStore Store { get; }
+        private IDatabase Store { get; }
         private PrefixInfo Info { get; }
         private string DocumentName { get; }
         private bool Developer { get; }
         private string DeveloperPrefix { get; }
 
-        public PrefixService(IDocumentStore store, string defaultPrefix, bool developer = false, string developerPrefix = "dev.")
+        public PrefixService(IDatabase store, string defaultPrefix, bool developer = false, string developerPrefix = "dev.")
         {
             DocumentName = "PrefixSetup";
             Developer = developer;
             DeveloperPrefix = developerPrefix;
             Store = store;
-            using (var session = Store.OpenSession())
-            {
-                var doc = session.Load<PrefixInfo>(DocumentName);
-                if (doc == null)
-                {
-                    doc = new PrefixInfo(defaultPrefix);
-                    session.Store(doc, DocumentName);
-                    session.SaveChanges();
-                }
 
-                Info = doc;
+            var doc = Store.Load<PrefixInfo>(DocumentName);
+            if (doc == null)
+            {
+                doc = new PrefixInfo(defaultPrefix);
+                store.Store(doc, DocumentName);
             }
+
+            Info = doc;
         }
 
         public string GetPrefix(ulong guildId)
@@ -44,11 +40,7 @@ namespace RavenBOT.Services
         public void SetPrefix(ulong guildId, string prefix)
         {
             Info.SetPrefix(guildId, prefix);
-            using (var session = Store.OpenSession())
-            {
-                session.Store(Info, DocumentName);
-                session.SaveChanges();
-            }
+            Store.Store(Info, DocumentName);
         }
 
         public class PrefixInfo

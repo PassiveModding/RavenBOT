@@ -7,7 +7,6 @@ using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using RavenBOT.Handlers;
 using RavenBOT.Models;
-using RavenBOT.Modules.Developer;
 using RavenBOT.Services;
 using RavenBOT.Services.Licensing;
 using EventHandler = RavenBOT.Handlers.EventHandler;
@@ -20,7 +19,7 @@ namespace RavenBOT
         {
             //Configure the service provider with all relevant and required services to be injected into other classes.
             var provider = new ServiceCollection()
-                .AddSingleton<DatabaseService>()
+                .AddSingleton(x => new RavenDatabase() as IDatabase)
                 .AddSingleton(x => new DiscordShardedClient(new DiscordSocketConfig
                 {
                     AlwaysDownloadUsers = false,
@@ -31,27 +30,23 @@ namespace RavenBOT
                     //Discord will block single shards that try to connect to more than 2500 servers
                     TotalShards = 1
                 }))
-                .AddSingleton(x => new LogHandler(x.GetRequiredService<DiscordShardedClient>(), x.GetRequiredService<DatabaseService>().GetStore()))
+                .AddSingleton(x => new LogHandler(x.GetRequiredService<DiscordShardedClient>(), x.GetRequiredService<IDatabase>()))
                 .AddSingleton(x =>
                 {
                     //Initialize the bot config by asking for token and name
-                    BotConfig config;
-                    using (var session = x.GetRequiredService<DatabaseService>().GetStore().OpenSession())
+                    var config = x.GetRequiredService<IDatabase>().Load<BotConfig>("BotConfig");
+                    if (config == null)
                     {
-                        config = session.Load<BotConfig>("BotConfig");
-                        if (config == null)
-                        {
-                            Console.WriteLine("Please enter your bot token (found at https://discordapp.com/developers/applications/ )");
-                            var token = Console.ReadLine();
-                            Console.WriteLine("Input a bot prefix (this will be used to run commands, ie. prefix = f. command will be f.command)");
-                            var prefix = Console.ReadLine();
-                            Console.WriteLine("Input a bot name (this will be used for certain database tasks)");
-                            var name = Console.ReadLine();
-                            config = new BotConfig(token, prefix, name);
-                            session.Store(config, "BotConfig");
-                            session.SaveChanges();
-                        }
+                        Console.WriteLine("Please enter your bot token (found at https://discordapp.com/developers/applications/ )");
+                        var token = Console.ReadLine();
+                        Console.WriteLine("Input a bot prefix (this will be used to run commands, ie. prefix = f. command will be f.command)");
+                        var prefix = Console.ReadLine();
+                        Console.WriteLine("Input a bot name (this will be used for certain database tasks)");
+                        var name = Console.ReadLine();
+                        config = new BotConfig(token, prefix, name);
+                        x.GetRequiredService<IDatabase>().Store(config, "BotConfig");
                     }
+
                     return config;
                 })
                 .AddSingleton(new CommandService(new CommandServiceConfig
@@ -62,11 +57,30 @@ namespace RavenBOT
                     DefaultRunMode = RunMode.Async,
                     LogLevel = LogSeverity.Info
                 }))
-                .AddSingleton(x => new GraphiteService(x.GetRequiredService<DatabaseService>().GetGraphiteClient()))
+                .AddSingleton(x =>
+                    {
+                        if (x.GetRequiredService<IDatabase>() is RavenDatabase rd)
+                        {
+                            return new GraphiteService(rd.GetGraphiteClient());
+                        }
+
+                        return null;
+                    })
                 .AddSingleton<TimerService>()
-                .AddSingleton(x => new PrefixService(x.GetRequiredService<DatabaseService>().GetStore(), x.GetRequiredService<BotConfig>().Prefix, x.GetRequiredService<DatabaseService>().GetOrInitializeConfig().Developer, x.GetRequiredService<DatabaseService>().GetOrInitializeConfig().DeveloperPrefix))
+                .AddSingleton(x =>
+                {
+                    if (x.GetRequiredService<IDatabase>() is RavenDatabase rd)
+                    {
+                        return new PrefixService(rd, x.GetRequiredService<BotConfig>().Prefix, 
+                            rd.GetOrInitializeConfig().Developer, 
+                            rd.GetOrInitializeConfig().DeveloperPrefix);
+
+                    }
+
+                    return new PrefixService(x.GetRequiredService<IDatabase>(), x.GetRequiredService<BotConfig>().Prefix);
+                })
                 .AddSingleton<EventHandler>()
-                .AddSingleton(x => new LicenseService(x.GetRequiredService<DatabaseService>().GetStore()))
+                .AddSingleton(x => new LicenseService(x.GetRequiredService<IDatabase>()))
                 .AddSingleton<InteractiveService>()
                 .BuildServiceProvider();
 
@@ -86,7 +100,6 @@ namespace RavenBOT
 
         public static void Main(string[] args)
         {
-            //Remove static usage by initializing the class.
             var program = new Program();
             program.RunAsync().GetAwaiter().GetResult();
         }

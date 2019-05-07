@@ -8,7 +8,6 @@ using Discord.WebSocket;
 using RavenBOT.Extensions;
 using RavenBOT.Models;
 using RavenBOT.Services;
-using Sparrow.Platform.Posix.macOS;
 
 namespace RavenBOT.Handlers
 {
@@ -17,7 +16,6 @@ namespace RavenBOT.Handlers
     {
         private DiscordShardedClient Client { get; }
         public PrefixService PrefixService { get; }
-        private DatabaseService DbService { get; }
         private BotConfig BotConfig { get; }
         private LogHandler Logger { get; }
         public GraphiteService GraphiteService { get; }
@@ -25,11 +23,10 @@ namespace RavenBOT.Handlers
         private IServiceProvider Provider { get; }
 
 
-        public EventHandler(DiscordShardedClient client, PrefixService prefixService, DatabaseService dbService, CommandService commandService, BotConfig config, LogHandler handler, GraphiteService graphiteService, IServiceProvider provider)
+        public EventHandler(DiscordShardedClient client, PrefixService prefixService, CommandService commandService, BotConfig config, LogHandler handler, GraphiteService graphiteService, IServiceProvider provider)
         {
             Client = client;
             PrefixService = prefixService;
-            DbService = dbService;
             Logger = handler;
             GraphiteService = graphiteService;
             BotConfig = config;
