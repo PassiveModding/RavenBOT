@@ -1,0 +1,440 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Raven.Client.Documents;
+
+namespace RavenBOT.Services.Licensing
+{
+    public class LicenseService
+    {
+        public IDocumentStore Store { get; }
+        private Random Random { get; }
+
+        public LicenseService(IDocumentStore store)
+        {
+            Store = store;
+            Random = new Random();
+        }
+
+        public TimedUserProfile GetTimedUser(string type, ulong userId)
+        {
+            using (var session = Store.OpenSession())
+            {
+                var uProfile = session.Load<TimedUserProfile>($"TimedProfile-{type}-{userId}");
+
+                if (uProfile != null) return uProfile;
+
+                //if the user profile is non-existent, create it and add it to the database
+                uProfile = new TimedUserProfile(type, userId);
+                session.Store(uProfile);
+                session.SaveChanges();
+                return uProfile;
+            }
+        }
+
+        public QuantifiableUserProfile GetQuantifiableUser(string type, ulong userId)
+        {
+            using (var session = Store.OpenSession())
+            {
+                var uProfile = session.Load<QuantifiableUserProfile>($"QuantifiableProfile-{type}-{userId}");
+
+                if (uProfile != null) return uProfile;
+
+                //if the user profile is non-existent, create it and add it to the database
+                uProfile = new QuantifiableUserProfile(type, userId);
+                session.Store(uProfile);
+                session.SaveChanges();
+                return uProfile;
+            }
+        }
+
+        public void SaveUser(IUserProfile profile)
+        {
+            using (var session = Store.OpenSession())
+            {
+                session.Store(profile);
+                session.SaveChanges();
+            }
+        }
+
+        public enum RedemptionResult
+        {
+            AlreadyClaimed,
+            InvalidKey,
+            Success
+        }
+
+        //Returns whether the operation was successful
+        public RedemptionResult RedeemLicense(TimedUserProfile profile, string key)
+        {
+            using (var session = Store.OpenSession())
+            {
+                var license = key != null ? session.Load<TimedLicense>($"TimedLicense-{profile.ProfileType}-{key}") : null;
+
+                if (license == null)
+                {
+                    return RedemptionResult.InvalidKey;
+                }
+
+                if (license.RedemptionDate != null)
+                {
+                    return RedemptionResult.AlreadyClaimed;
+                }
+
+                profile.RedeemLicense(license);
+                session.Store(profile);
+                session.Store(license);
+                session.SaveChanges();
+                return RedemptionResult.Success;
+            }
+        }
+
+        public RedemptionResult RedeemLicense(QuantifiableUserProfile profile, string key)
+        {
+            using (var session = Store.OpenSession())
+            {
+                var license = session.Load<QuantifiableLicense>($"QuantifiableLicense-{profile.ProfileType}-{key}");
+
+                if (license == null)
+                {
+                    return RedemptionResult.InvalidKey;
+                }
+
+                if (license.RedemptionDate != null)
+                {
+                    return RedemptionResult.AlreadyClaimed;
+                }
+
+                profile.RedeemLicense(license);
+                session.Store(profile);
+                session.Store(license);
+                session.SaveChanges();
+                return RedemptionResult.Success;
+            }
+        }
+
+        public List<QuantifiableLicense> MakeLicenses(string type, int amount, int uses)
+        {
+            using (var session = Store.OpenSession())
+            {
+                var oldLicenses = session.Query<QuantifiableLicense>().Where(x => x.LicenseType.Equals(type)).ToList();
+                var newLicenses = new List<QuantifiableLicense>();
+
+                for (int i = 0; i < amount; i++)
+                {
+                    var newLicense = MakeQuantifiableLicense(type, uses);
+
+                    //Avoid creating licenses with duplicate keys.
+                    if (oldLicenses.Any(x => x.Key.Equals(newLicense.Key)))
+                    {
+                        i--;
+                    }
+                    else
+                    {
+                        newLicenses.Add(newLicense);
+                    }
+                }
+
+                foreach (var license in newLicenses)
+                {
+                    session.Store(license);
+                }
+
+                session.SaveChanges();
+                return newLicenses;
+            }
+        }
+
+        //Returns the new licenses that have been created.
+        public List<TimedLicense> MakeLicenses(string type, int amount, TimeSpan time)
+        {
+            using (var session = Store.OpenSession())
+            {
+                var oldLicenses = session.Query<TimedLicense>().Where(x => x.LicenseType.Equals(type)).ToList();
+                var newLicenses = new List<TimedLicense>();
+
+                for (int i = 0; i < amount; i++)
+                {
+                    var newLicense = MakeTimedLicense(type, time);
+
+                    //Avoid creating licenses with duplicate keys.
+                    if (oldLicenses.Any(x => x.Key.Equals(newLicense.Key)))
+                    {
+                        i--;
+                    }
+                    else
+                    {
+                        newLicenses.Add(newLicense);
+                    }
+                }
+
+                foreach (var license in newLicenses)
+                {
+                    session.Store(license);
+                }
+
+                session.SaveChanges();
+                return newLicenses;
+            }
+        }
+
+        
+        private QuantifiableLicense MakeQuantifiableLicense(string type, int uses)
+        {
+            var license = new QuantifiableLicense($"{GenerateRandomNo()}-{GenerateRandomNo()}-{GenerateRandomNo()}-{GenerateRandomNo()}", type, uses);
+            return license;
+        }
+
+        private TimedLicense MakeTimedLicense(string type, TimeSpan time)
+        {
+            var license = new TimedLicense($"{GenerateRandomNo()}-{GenerateRandomNo()}-{GenerateRandomNo()}-{GenerateRandomNo()}", type, time);
+            return license;
+        }
+
+        private string GenerateRandomNo()
+        {
+            return Random.Next(0, 9999).ToString("D4");
+        }
+
+        public class QuantifiableUserProfile : IUserProfile
+        {
+            public QuantifiableUserProfile(string type, ulong userId)
+            {
+                ProfileType = type;
+                Prefix = "QuantifiableProfile";
+                Id = $"{Prefix}-{type}-{userId}";
+                UserId = userId;
+                TotalUsed = 0;
+                Licenses = new List<ILicense>();
+                UserHistory = new Dictionary<DateTime, string>();
+                UpdateHistory("User Profile Generated");
+            }
+
+            public string Prefix { get; }
+
+            //Note that ravenDB automatically uses the Id property for document names.
+            public string Id { get; set; }
+
+            public string ProfileType { get; set; }
+
+            public ulong UserId { get; }
+
+            public List<ILicense> Licenses { get; }
+
+            public int TotalUsed { get; set; }
+
+            public Dictionary<DateTime, string> UserHistory { get; set; }
+
+            public void UpdateHistory(string info)
+            {
+                UserHistory.Add(DateTime.UtcNow, info);
+            }
+
+            public bool RedeemLicense(ILicense timedLicense)
+            {
+                throw new NotImplementedException();
+            }
+
+            public int RemainingUses()
+            {
+                return Licenses.OfType<QuantifiableLicense>().Sum(x => x.Uses) - TotalUsed;
+            }
+
+            public bool Use(int amount = 1, string reason = null)
+            {
+                //Ensure that an invalid amount isn't supplied
+                if (amount <= 0)
+                {
+                    return false;
+                }
+
+                //Check to see if the amount can be deducted from the remaining uses
+                if (RemainingUses() - amount < 0) return false;
+
+                //Increment the amount used
+                TotalUsed += amount;
+                UpdateHistory($"Used {amount} uses for: {reason ?? "UNKNOWN"}");
+                return true;
+            }
+
+            //NOTE: This should only ever be used by the QuantifiableLicenseService class.
+            public bool RedeemLicense(QuantifiableLicense quantifiableLicense)
+            {
+                if (quantifiableLicense.RedemptionDate != null)
+                {
+                    return false;
+                }
+
+                quantifiableLicense.RedemptionDate = DateTime.UtcNow;
+                Licenses.Add(quantifiableLicense);
+                UpdateHistory($"Redeemed License {quantifiableLicense.Key} with {quantifiableLicense.Uses} uses. Total Balance = {RemainingUses()}");
+                return true;
+            }
+        }
+
+        public class TimedUserProfile : IUserProfile
+        {
+            public TimedUserProfile(string type, ulong userId)
+            {
+                ProfileType = type;
+                Prefix = "TimedProfile";
+                Id = $"{Prefix}-{type}-{userId}";
+                UserId = userId;
+                Licenses = new List<ILicense>();
+                UserHistory = new Dictionary<DateTime, string>();
+                UpdateHistory("User Profile Generated");
+                ExpireTime = DateTime.MinValue;
+            }
+
+            public string Prefix { get; }
+
+            //Note that ravenDB automatically uses the Id property for document names.
+            public string Id { get; set; }
+
+            public ulong UserId { get; }
+
+            public string ProfileType { get; }
+
+            public List<ILicense> Licenses { get; }
+
+            public Dictionary<DateTime, string> UserHistory { get; set; }
+
+            public void UpdateHistory(string info)
+            {
+                UserHistory.Add(DateTime.UtcNow, info);
+            }
+
+            public bool RedeemLicense(ILicense timedLicense)
+            {
+                if (timedLicense is TimedLicense timed)
+                {
+                    if (timed.RedemptionDate != null)
+                    {
+                        return false;
+                    }
+
+                    timed.RedemptionDate = DateTime.UtcNow;
+                    Licenses.Add(timedLicense);
+                
+
+                    if (ExpireTime <= DateTime.UtcNow)
+                    {
+                        ExpireTime = DateTime.UtcNow + timed.Length;
+                    }
+                    else
+                    {
+                        ExpireTime = ExpireTime + timed.Length;
+                    }
+
+                    UpdateHistory($"Redeemed License {timed.Key} with {GetReadableLength(timed.Length)}. Time Remaining: {GetReadableLength(ExpireTime - DateTime.UtcNow)}");
+
+                    return true;
+                }
+
+                return false;
+            }
+
+            private DateTime ExpireTime { get; set; }
+
+            public DateTime GetExpireTime()
+            {
+                return ExpireTime;
+            }
+
+            public bool Expired(string usedFor = null)
+            {
+                if (ExpireTime > DateTime.UtcNow)
+                {
+                    if (usedFor != null)
+                    {
+                        UpdateHistory(usedFor);
+                    }
+                    return false;
+                }
+
+                return true;
+            }
+        }
+
+        public interface IUserProfile
+        {
+            string Prefix { get; }
+            string Id { get; }
+            ulong UserId { get; }
+            string ProfileType { get; }
+            List<ILicense> Licenses { get; }
+            Dictionary<DateTime, string> UserHistory { get; }
+            void UpdateHistory(string info);
+            bool RedeemLicense(ILicense timedLicense);
+        }
+
+        public interface ILicense
+        {
+            string Id { get; set; }
+            string Key { get; set; }
+            string LicenseType { get; set; }
+            string Prefix { get; set; }
+            DateTime CreationDate { get; set; }
+            DateTime? RedemptionDate { get; set; }
+        }
+
+        public class TimedLicense : ILicense
+        {
+            public TimedLicense(string type, string key, TimeSpan length)
+            {
+                Prefix = "TimedLicense";
+                Id = $"{Prefix}-{type}-{key}";
+                Key = key;
+                Length = length;
+                RedemptionDate = null;
+                CreationDate = DateTime.UtcNow;
+                LicenseType = type;
+            }
+
+            public string Id { get; set; }
+
+            public string Key { get; set; }
+            public string LicenseType { get; set; }
+            public string Prefix { get; set; }
+
+            public TimeSpan Length { get; }
+
+            public DateTime CreationDate { get; set; }
+            public DateTime? RedemptionDate { get; set; }
+        }
+
+        public class QuantifiableLicense : ILicense
+        {
+            public QuantifiableLicense(string key, string type, int uses)
+            {
+                Prefix = "QuantifiableLicense";
+                Id = $"{Prefix}-{type}-{key}";
+                Key = key;
+                Uses = uses;
+                RedemptionDate = null;
+                CreationDate = DateTime.UtcNow;
+                LicenseType = type;
+            }
+
+            public string Id { get; set; }
+
+            public string LicenseType { get; set; }
+            public string Prefix { get; set; }
+
+            public string Key { get; set; }
+            public int Uses { get; set; }
+            public DateTime CreationDate { get; set; }
+            public DateTime? RedemptionDate { get; set; }
+        }
+
+        public static string GetReadableLength(TimeSpan length)
+        {
+            int days = (int) length.TotalDays;
+            int hours = (int) length.TotalHours - days * 24;
+            int minutes = (int) length.TotalMinutes - days * 24 * 60 - hours * 60;
+            int seconds = (int) length.TotalSeconds - days * 24 * 60 * 60 - hours * 60 * 60 - minutes * 60;
+
+            return $"{(days > 0 ? $"{days} Day(s) " : "")}{(hours > 0 ? $"{hours} Hour(s) " : "")}{(minutes > 0 ? $"{minutes} Minute(s) " : "")}{(seconds > 0 ? $"{seconds} Second(s)" : "")}";
+        }
+    }
+}

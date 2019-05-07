@@ -7,17 +7,19 @@ namespace RavenBOT.Services
     {
         private IDocumentStore Store { get; }
         private PrefixInfo Info { get; }
+        private string DocumentName { get; }
 
         public PrefixService(IDocumentStore store, string defaultPrefix)
         {
+            DocumentName = "PrefixSetup";
             Store = store;
             using (var session = Store.OpenSession())
             {
-                var doc = session.Load<PrefixInfo>("PrefixSetup");
+                var doc = session.Load<PrefixInfo>(DocumentName);
                 if (doc == null)
                 {
                     doc = new PrefixInfo(defaultPrefix);
-                    session.Store(doc, "PrefixSetup");
+                    session.Store(doc, DocumentName);
                     session.SaveChanges();
                 }
 
@@ -35,7 +37,7 @@ namespace RavenBOT.Services
             Info.SetPrefix(guildId, prefix);
             using (var session = Store.OpenSession())
             {
-                session.Store(Info);
+                session.Store(Info, DocumentName);
                 session.SaveChanges();
             }
         }

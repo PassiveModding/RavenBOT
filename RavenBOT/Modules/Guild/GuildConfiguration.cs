@@ -1,10 +1,12 @@
 ﻿using System.Threading.Tasks;
+using Discord;
 using Discord.Commands;
 using RavenBOT.Services;
 
 namespace RavenBOT.Modules.Guild
 {
     [RequireContext(ContextType.Guild)]
+    [RequireUserPermission(GuildPermission.Administrator)]
     public class GuildConfiguration : ModuleBase<SocketCommandContext>
     {
         public PrefixService PrefixService { get; }

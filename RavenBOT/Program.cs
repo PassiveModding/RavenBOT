@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Discord;
+using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using RavenBOT.Handlers;
 using RavenBOT.Models;
+using RavenBOT.Modules.Developer;
 using RavenBOT.Services;
 using RavenBOT.Services.Licensing;
 using EventHandler = RavenBOT.Handlers.EventHandler;
@@ -64,8 +66,8 @@ namespace RavenBOT
                 .AddSingleton<TimerService>()
                 .AddSingleton(x => new PrefixService(x.GetRequiredService<DatabaseService>().GetStore(), x.GetRequiredService<BotConfig>().Prefix))
                 .AddSingleton<EventHandler>()
-                .AddSingleton(x => new QuantifiableLicenseService(x.GetRequiredService<DatabaseService>().GetStore()))
-                .AddSingleton(x => new TimedLicenseService(x.GetRequiredService<DatabaseService>().GetStore()))
+                .AddSingleton(x => new LicenseService(x.GetRequiredService<DatabaseService>().GetStore()))
+                .AddSingleton<InteractiveService>()
                 .BuildServiceProvider();
 
             try

@@ -7,6 +7,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using RavenBOT.Models;
 using RavenBOT.Services;
+using Sparrow.Platform.Posix.macOS;
 
 namespace RavenBOT.Handlers
 {
@@ -34,9 +35,32 @@ namespace RavenBOT.Handlers
             CommandService = commandService;
             Provider = provider;
             client.Log += LogAsync;
+            //client.Log += async (m) => await LogAsync(m);
             client.ShardReady += ShardReadyAsync;
             client.ShardConnected += ShardConnectedAsync;
             client.MessageReceived += MessageReceivedAsync;
+            commandService.CommandExecuted += CommandExecutedAsync;
+            //commandService.CommandExecuted += async (cI, c, r) => await CommandExecutedAsync(cI, c, r);
+        }
+
+        private async Task CommandExecutedAsync(Optional<CommandInfo> commandInfo, ICommandContext context, IResult result)
+        {
+            if (commandInfo.IsSpecified)
+            {
+                if (commandInfo.Value.RunMode == RunMode.Sync)
+                {
+                    return;
+                }
+            }
+
+            if (result.IsSuccess)
+            {
+                Logger.Log(context.Message.Content, new LogContext(context));
+            }
+            else
+            {
+                Logger.Log($"{context.Message.Content}\n{result.Error}\n{result.ErrorReason}", new LogContext(context), LogSeverity.Error);
+            }
         }
 
         public async Task InitializeAsync()
@@ -60,16 +84,20 @@ namespace RavenBOT.Handlers
             return Task.CompletedTask;
         }
 
-        private Task LogAsync(LogMessage message)
+        private async Task LogAsync(LogMessage message)
         {
+            if (message.Message.Contains("Rate limit triggered", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return;
+            }
+
             if (message.Exception is CommandException exc)
             {
                 Logger.Log(message.Message, new LogContext(exc.Context), message.Severity);
-                return Task.CompletedTask;
+                return;
             }
-
+            
             Logger.Log(message.Message, message.Severity);
-            return Task.CompletedTask;
         }
     }
 }

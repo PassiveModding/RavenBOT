@@ -20,35 +20,69 @@ namespace RavenBOT.Services
         }
 
         //Exposing the send methods for the graphite client
-
         public void Report(Datapoint[] datapoints)
         {
             if (!enabled) return;
-            Client.Send(datapoints);
+            try
+            {
+                Client.Send(datapoints);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
         }
 
         public void Report(List<Datapoint> datapoints)
         {
             if (!enabled) return;
-            Client.Send(datapoints);
+            try
+            {
+                Client.Send(datapoints);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
         }
 
         public void Report(Datapoint point)
         {
             if (!enabled) return;
-            Client.Send(point);
+            try
+            {
+                Client.Send(point);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
         }
 
         public void Report(string path, double value, DateTime time)
         {
             if (!enabled) return;
-            Client.Send(path, value, time);
+            try
+            {
+                Client.Send(path, value, time);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
         }
 
         public void Report(string path, double value)
         {
             if (!enabled) return;
-            Client.Send(path, value);
+            try
+            {
+                Client.Send(path, value);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
         }
     }
 }
