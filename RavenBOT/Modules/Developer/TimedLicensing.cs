@@ -5,8 +5,9 @@ using Discord.Commands;
 using RavenBOT.Extensions;
 using RavenBOT.Services.Licensing;
 
-namespace RavenBOT.Modules.Licensing
+namespace RavenBOT.Modules.Developer
 {
+    //Example usage of timed license methods
     [RequireOwner]
     [Group("Developer Licensing Timed")]
     public class TimedLicensing : ModuleBase
