@@ -10,7 +10,7 @@ using Raven.Client.ServerWide;
 using Raven.Client.ServerWide.Operations;
 using RavenBOT.Models;
 
-namespace RavenBOT.Services
+namespace RavenBOT.Services.Database
 {
     public class RavenDatabase : IDatabase
     {

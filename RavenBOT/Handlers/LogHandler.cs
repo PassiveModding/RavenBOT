@@ -1,10 +1,10 @@
 ﻿using System;
 using Discord;
 using Discord.WebSocket;
-using Raven.Client.Documents;
 using RavenBOT.Extensions;
 using RavenBOT.Models;
 using RavenBOT.Services;
+using RavenBOT.Services.Database;
 
 namespace RavenBOT.Handlers
 {
@@ -42,7 +42,7 @@ namespace RavenBOT.Handlers
         public void Log(string message, LogSeverity severity = LogSeverity.Info, object additional = null)
         {
             var logObject = new BotLogObject(message, severity, additional);
-            Console.WriteLine(makeLogMessage(message, severity));
+            Console.WriteLine(MakeLogMessage(message, severity));
             if (Config.LogToDatabase)
             {
                 Store.Store(logObject);
@@ -67,7 +67,7 @@ namespace RavenBOT.Handlers
             }
         }
 
-        private Discord.Color LogSeverityAsColor(LogSeverity severity)
+        private Color LogSeverityAsColor(LogSeverity severity)
         {
             switch (severity)
             {
@@ -88,7 +88,7 @@ namespace RavenBOT.Handlers
             }
         }
 
-        private string makeLogMessage(string message, LogSeverity severity, LogContext context = null)
+        private string MakeLogMessage(string message, LogSeverity severity, LogContext context = null)
         {
             var newSev = severity.ToString().PadRight(20).Substring(0, 4).ToUpper();
             var contextString = "";
@@ -102,7 +102,7 @@ namespace RavenBOT.Handlers
         public void Log(string message, LogContext context, LogSeverity severity = LogSeverity.Info, object additional = null)
         {
             var logObject = new CommandLogObject(message, context, severity, additional);
-            Console.WriteLine(makeLogMessage(message, severity));
+            Console.WriteLine(MakeLogMessage(message, severity));
             if (Config.LogToDatabase)
             {
                 Store.Store(logObject);

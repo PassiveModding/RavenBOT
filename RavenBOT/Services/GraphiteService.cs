@@ -7,14 +7,14 @@ namespace RavenBOT.Services
     public class GraphiteService
     {
         private GraphiteClient Client { get; }
-        private bool enabled { get; }
+        private bool Enabled { get; }
 
         public GraphiteService(GraphiteClient client)
         {
-            enabled = true;
+            Enabled = true;
             if (client == null)
             {
-                enabled = false;
+                Enabled = false;
             }
             Client = client;
         }
@@ -22,7 +22,7 @@ namespace RavenBOT.Services
         //Exposing the send methods for the graphite client
         public void Report(Datapoint[] datapoints)
         {
-            if (!enabled) return;
+            if (!Enabled) return;
             try
             {
                 Client.Send(datapoints);
@@ -35,7 +35,7 @@ namespace RavenBOT.Services
 
         public void Report(List<Datapoint> datapoints)
         {
-            if (!enabled) return;
+            if (!Enabled) return;
             try
             {
                 Client.Send(datapoints);
@@ -48,7 +48,7 @@ namespace RavenBOT.Services
 
         public void Report(Datapoint point)
         {
-            if (!enabled) return;
+            if (!Enabled) return;
             try
             {
                 Client.Send(point);
@@ -61,7 +61,7 @@ namespace RavenBOT.Services
 
         public void Report(string path, double value, DateTime time)
         {
-            if (!enabled) return;
+            if (!Enabled) return;
             try
             {
                 Client.Send(path, value, time);
@@ -74,7 +74,7 @@ namespace RavenBOT.Services
 
         public void Report(string path, double value)
         {
-            if (!enabled) return;
+            if (!Enabled) return;
             try
             {
                 Client.Send(path, value);

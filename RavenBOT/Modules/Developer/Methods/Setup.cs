@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using RavenBOT.Services;
+using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Developer.Methods
 {

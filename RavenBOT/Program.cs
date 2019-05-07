@@ -7,7 +7,9 @@ using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using RavenBOT.Handlers;
 using RavenBOT.Models;
+using RavenBOT.Modules.Developer.Methods;
 using RavenBOT.Services;
+using RavenBOT.Services.Database;
 using RavenBOT.Services.Licensing;
 using EventHandler = RavenBOT.Handlers.EventHandler;
 
@@ -39,16 +41,36 @@ namespace RavenBOT
                     {
                         Console.WriteLine("Please enter your bot token (found at https://discordapp.com/developers/applications/ )");
                         var token = Console.ReadLine();
-                        Console.WriteLine("Input a bot prefix (this will be used to run commands, ie. prefix = f. command will be f.command)");
-                        var prefix = Console.ReadLine();
+                        
                         Console.WriteLine("Input a bot name (this will be used for certain database tasks)");
                         var name = Console.ReadLine();
-                        config = new BotConfig(token, prefix, name);
+
+                        Console.WriteLine("Would you like to use a bot prefix or a module prefix? (Y for Bot Prefix, N for Module prefix)");
+                        var choice = Console.ReadLine();
+                        while (!choice.Equals("Y", StringComparison.InvariantCultureIgnoreCase) && !choice.Equals("N", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            Console.WriteLine("Invalid choice.");
+                            choice = Console.ReadLine();
+                        }
+
+                        if (choice.Equals("Y", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            Console.WriteLine("Input a bot prefix (this will be used to run commands, ie. prefix = f. command will be f.command)");
+                            var prefix = Console.ReadLine();
+                            config = new BotConfig(token, prefix, name);
+                        }
+                        else
+                        {
+                            config = new BotConfig(token, name);
+                        }
+                        
                         x.GetRequiredService<IDatabase>().Store(config, "BotConfig");
                     }
 
                     return config;
                 })
+                .AddSingleton<Setup>()
+                .AddSingleton(x => new HelpService(x.GetRequiredService<PrefixService>(), x.GetRequiredService<CommandService>(), x.GetRequiredService<BotConfig>(), x.GetRequiredService<Setup>(), x))
                 .AddSingleton(new CommandService(new CommandServiceConfig
                 {
                     ThrowOnError = false,
@@ -71,13 +93,13 @@ namespace RavenBOT
                 {
                     if (x.GetRequiredService<IDatabase>() is RavenDatabase rd)
                     {
-                        return new PrefixService(rd, x.GetRequiredService<BotConfig>().Prefix, 
+                        return new PrefixService(rd, x.GetRequiredService<BotConfig>().GetPrefix(), 
                             rd.GetOrInitializeConfig().Developer, 
                             rd.GetOrInitializeConfig().DeveloperPrefix);
 
                     }
 
-                    return new PrefixService(x.GetRequiredService<IDatabase>(), x.GetRequiredService<BotConfig>().Prefix);
+                    return new PrefixService(x.GetRequiredService<IDatabase>(), x.GetRequiredService<BotConfig>().GetPrefix());
                 })
                 .AddSingleton<EventHandler>()
                 .AddSingleton(x => new LicenseService(x.GetRequiredService<IDatabase>()))

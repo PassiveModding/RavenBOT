@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -38,6 +39,7 @@ namespace RavenBOT.Handlers
             client.ShardConnected += ShardConnectedAsync;
             client.MessageReceived += MessageReceivedAsync;
             commandService.CommandExecuted += CommandExecutedAsync;
+            ModulePrefixes = new List<string>();
             //commandService.CommandExecuted += async (cI, c, r) => await CommandExecutedAsync(cI, c, r);
         }
 
@@ -74,6 +76,15 @@ namespace RavenBOT.Handlers
             await Client.LoginAsync(TokenType.Bot, BotConfig.Token);
             await Client.StartAsync();
             await RegisterModulesAsync();
+            if (!BotConfig.UsePrefixSystem)
+            {
+                if (CommandService.Modules.Any(x => string.IsNullOrWhiteSpace(x.Group)))
+                {
+                    Logger.Log("Some modules do not have groups assigned, this can cause unintended issues if you are not using a default prefix for the bot.", LogSeverity.Warning);
+                }
+                
+                ModulePrefixes = CommandService.Modules.Select(x => x.Group).ToList();
+            }
         }
 
         public Task RegisterModulesAsync() => CommandService.AddModulesAsync(Assembly.GetEntryAssembly(), Provider);

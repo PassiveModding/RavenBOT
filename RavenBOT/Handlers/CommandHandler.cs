@@ -12,6 +12,8 @@ namespace RavenBOT.Handlers
     //Command handling section of the event handler
     public partial class EventHandler
     {
+        private List<string> ModulePrefixes { get; set; }
+
         private async Task MessageReceivedAsync(SocketMessage discordMessage)
         {
             if (!(discordMessage is SocketUserMessage message))
@@ -24,11 +26,59 @@ namespace RavenBOT.Handlers
                 return;
             }
 
-            int argPos = 0;
-            var context = new ShardedCommandContext(Client, message);
-            if (message.HasStringPrefix(PrefixService.GetPrefix(context.Guild?.Id ?? 0), ref argPos) || message.HasMentionPrefix(context.Client.CurrentUser, ref argPos))
+
+
+            if (BotConfig.UsePrefixSystem)
             {
-                /*
+                int argPos = 0;
+                var context = new ShardedCommandContext(Client, message);
+                if (message.HasStringPrefix(PrefixService.GetPrefix(context.Guild?.Id ?? 0), ref argPos) || message.HasMentionPrefix(context.Client.CurrentUser, ref argPos))
+                {             
+                    var result = await CommandService.ExecuteAsync(context, 0, Provider);
+                    if (!result.IsSuccess)
+                    {
+                        Logger.Log(context.Message.Content + "\n" + result.ErrorReason, new LogContext(context), LogSeverity.Error);
+                    }
+                    else
+                    {
+                        Logger.Log(context.Message.Content, new LogContext(context));
+                    }
+                }
+            }
+            else
+            {
+                var discarded = 0;
+                if (ModulePrefixes.Any(x => message.HasStringPrefix(x, ref discarded)))
+                {
+                    var context = new ShardedCommandContext(Client, message);
+
+                    var prefixMatch = ModulePrefixes.FirstOrDefault(x => message.Content.StartsWith(x));
+                    IResult result;
+                    if (prefixMatch != null)
+                    {
+                        var modifiedContent = message.Content.Replace(prefixMatch, $"{prefixMatch} ");
+                        result = await CommandService.ExecuteAsync(context, modifiedContent, Provider);
+                    }
+                    else
+                    {
+                        result = await CommandService.ExecuteAsync(context, 0, Provider);
+                    }
+
+
+                    if (!result.IsSuccess)
+                    {
+                        Logger.Log(context.Message.Content + "\n" + result.ErrorReason, new LogContext(context), LogSeverity.Error);
+                    }
+                    else
+                    {
+                        Logger.Log(context.Message.Content, new LogContext(context));
+                    }
+                }
+            }
+        }
+
+        
+                    /*
                 var gMatch = CmdService.Trees.FirstOrDefault(x => x.GuildId == context.Guild.Id);
                 var ignoreUnknownCommand = false;
                 if (gMatch != null)
@@ -43,31 +93,6 @@ namespace RavenBOT.Handlers
                     ignoreUnknownCommand = executionResult.Success;
                 }
                 */
-                
-                
-                var result = await CommandService.ExecuteAsync(context, argPos, Provider);
-
-                if (!result.IsSuccess)
-                {
-                    /*
-                    if (result.Error == CommandError.UnknownCommand)
-                    {
-                        if (ignoreUnknownCommand)
-                        {
-                            return;
-                        }
-                    }
-                    */
-                    Logger.Log(context.Message.Content + "\n" + result.ErrorReason, new LogContext(context), LogSeverity.Error);
-                }
-                else
-                {
-                    Logger.Log(context.Message.Content, new LogContext(context));
-                }
-            }
-        }
-
-        
         public JsonCommandService CmdService = new JsonCommandService
         {
             Trees = new List<JsonCommandService.JsonNodeTree>

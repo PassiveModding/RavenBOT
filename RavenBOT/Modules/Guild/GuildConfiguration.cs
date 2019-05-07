@@ -7,6 +7,7 @@ namespace RavenBOT.Modules.Guild
 {
     [RequireContext(ContextType.Guild)]
     [RequireUserPermission(GuildPermission.Administrator)]
+    [Group("config.")]
     public class GuildConfiguration : ModuleBase<SocketCommandContext>
     {
         public PrefixService PrefixService { get; }

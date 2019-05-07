@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using RavenBOT.Services.Database;
 
 namespace RavenBOT.Services
 {
