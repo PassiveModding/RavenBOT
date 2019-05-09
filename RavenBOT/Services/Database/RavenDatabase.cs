@@ -185,5 +185,23 @@ namespace RavenBOT.Services.Database
                 return session.Query<T>().ToList();
             }
         }
+
+        public void Remove<T>(T document)
+        {
+            using (var session = DocumentStore.OpenSession())
+            {
+                session.Delete(document);
+                session.SaveChanges();
+            }
+        }
+
+        public void Remove(string documentName)
+        {
+            using (var session = DocumentStore.OpenSession())
+            {
+                session.Delete(documentName);
+                session.SaveChanges();
+            }
+        }
     }
 }
