@@ -26,13 +26,72 @@ namespace RavenBOT.Handlers
                 return;
             }
 
-            if (BotConfig.UsePrefixSystem)
+            if (Local.Developer)
+            {
+                int argPos = 0;
+                
+                //Prefix service handles developer prefix however we still need to check if the bot is using prefixes or the module groups.
+                if (BotConfig.UsePrefixSystem)
+                {
+                    //The bot can be used regularly if it's just using regular prefixes
+                    var context = new ShardedCommandContext(Client, message);
+                    if (message.HasStringPrefix(PrefixService.GetPrefix(context.Guild?.Id ?? 0), ref argPos) || message.HasMentionPrefix(context.Client.CurrentUser, ref argPos))
+                    {
+                        var result = await CommandService.ExecuteAsync(context, argPos, Provider);
+
+                        if (!result.IsSuccess)
+                        {
+                            Logger.Log(context.Message.Content + "\n" + result.ErrorReason, new LogContext(context), LogSeverity.Error);
+                        }
+                        else
+                        {
+                            Logger.Log(context.Message.Content, new LogContext(context));
+                        }
+                    }
+                }
+                else
+                {
+                    var discarded = 0;
+                    //Check if the command starts with the dev prefix AND the module prefix.
+                    if (ModulePrefixes.Any(x => message.HasStringPrefix(Local.DeveloperPrefix + x, ref discarded)))
+                    {
+                        var context = new ShardedCommandContext(Client, message);
+
+                        //Find the first match of the module prefix.
+                        var prefixMatch = ModulePrefixes.FirstOrDefault(x => message.Content.StartsWith(Local.DeveloperPrefix + x));
+
+                        IResult result;
+                        if (prefixMatch != null)
+                        {
+                            //Use substring to remove the developer prefix as we cannot use the argPos here
+                            var modifiedContent = message.Content.Substring(Local.DeveloperPrefix.Length).Replace(prefixMatch, $"{prefixMatch} ");
+                            result = await CommandService.ExecuteAsync(context, modifiedContent, Provider);
+                        }
+                        else
+                        {
+                            result = await CommandService.ExecuteAsync(context, 0, Provider);
+                        }
+
+
+                        if (!result.IsSuccess)
+                        {
+                            Logger.Log(context.Message.Content + "\n" + result.ErrorReason, new LogContext(context), LogSeverity.Error);
+                        }
+                        else
+                        {
+                            Logger.Log(context.Message.Content, new LogContext(context));
+                        }
+                    }
+                }
+            }
+            else if (BotConfig.UsePrefixSystem)
             {
                 int argPos = 0;
                 var context = new ShardedCommandContext(Client, message);
                 if (message.HasStringPrefix(PrefixService.GetPrefix(context.Guild?.Id ?? 0), ref argPos) || message.HasMentionPrefix(context.Client.CurrentUser, ref argPos))
-                {             
+                {
                     var result = await CommandService.ExecuteAsync(context, argPos, Provider);
+
                     if (!result.IsSuccess)
                     {
                         Logger.Log(context.Message.Content + "\n" + result.ErrorReason, new LogContext(context), LogSeverity.Error);

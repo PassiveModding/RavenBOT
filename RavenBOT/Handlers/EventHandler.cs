@@ -20,17 +20,20 @@ namespace RavenBOT.Handlers
         private BotConfig BotConfig { get; }
         private LogHandler Logger { get; }
         private CommandService CommandService { get; }
+        public LocalManagementService.LocalConfig Local { get; }
         private IServiceProvider Provider { get; }
 
 
-        public EventHandler(DiscordShardedClient client, PrefixService prefixService, CommandService commandService, BotConfig config, LogHandler handler, IServiceProvider provider)
+        public EventHandler(DiscordShardedClient client, PrefixService prefixService, CommandService commandService, LocalManagementService local, BotConfig config, LogHandler handler, IServiceProvider provider)
         {
             Client = client;
             PrefixService = prefixService;
             Logger = handler;
             BotConfig = config;
             CommandService = commandService;
+            Local = local.GetConfig();
             Provider = provider;
+
             client.Log += LogAsync;
             //client.Log += async (m) => await LogAsync(m);
             client.ShardReady += ShardReadyAsync;
