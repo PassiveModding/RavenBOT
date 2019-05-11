@@ -8,7 +8,7 @@ namespace RavenBOT.Modules.Developer
 {
     //Example usage of quantifiable license methods
     [RequireOwner]
-    [Group("Developer.Licensing Quantifiable")]
+    [Group("Developer.Licensing.Quantifiable.")]
     public class QuantifiableLicensing : ModuleBase
     {
         public LicenseService LicenseService { get; }
