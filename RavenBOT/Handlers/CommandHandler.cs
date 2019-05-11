@@ -26,15 +26,13 @@ namespace RavenBOT.Handlers
                 return;
             }
 
-
-
             if (BotConfig.UsePrefixSystem)
             {
                 int argPos = 0;
                 var context = new ShardedCommandContext(Client, message);
                 if (message.HasStringPrefix(PrefixService.GetPrefix(context.Guild?.Id ?? 0), ref argPos) || message.HasMentionPrefix(context.Client.CurrentUser, ref argPos))
                 {             
-                    var result = await CommandService.ExecuteAsync(context, 0, Provider);
+                    var result = await CommandService.ExecuteAsync(context, argPos, Provider);
                     if (!result.IsSuccess)
                     {
                         Logger.Log(context.Message.Content + "\n" + result.ErrorReason, new LogContext(context), LogSeverity.Error);

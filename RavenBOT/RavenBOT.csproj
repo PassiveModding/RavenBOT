@@ -6,12 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Modules\Licensing\**" />
-    <EmbeddedResource Remove="Modules\Licensing\**" />
-    <None Remove="Modules\Licensing\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="ahd.Graphite" Version="2.1.0-ci-20190329-121200" />
     <PackageReference Include="Discord.Addons.PassiveInteractive" Version="2.0.4" />
     <PackageReference Include="Discord.Net" Version="2.0.1" />

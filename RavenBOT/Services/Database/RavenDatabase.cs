@@ -12,7 +12,7 @@ namespace RavenBOT.Services.Database
 {
     public class RavenDatabase : IDatabase
     {
-        public class DatabaseConfig
+        public class RavenDatabaseConfig
         {
             public string DatabaseName { get; set; }
 
@@ -22,9 +22,9 @@ namespace RavenBOT.Services.Database
         }
 
         private IDocumentStore DocumentStore { get; }
-        private DatabaseConfig Config { get; }
+        private RavenDatabaseConfig Config { get; }
         private static readonly string ConfigDirectory = Path.Combine(AppContext.BaseDirectory, "setup");
-        private static readonly string ConfigPath = Path.Combine(ConfigDirectory, "Config.json");
+        private static readonly string ConfigPath = Path.Combine(ConfigDirectory, "RavenConfig.json");
 
         public RavenDatabase()
         {
@@ -63,7 +63,7 @@ namespace RavenBOT.Services.Database
             }
         }
 
-        public DatabaseConfig GetOrInitializeConfig()
+        public RavenDatabaseConfig GetOrInitializeConfig()
         {
             if (!Directory.Exists(ConfigDirectory))
             {
@@ -72,7 +72,7 @@ namespace RavenBOT.Services.Database
 
             if (!File.Exists(ConfigPath))
             {
-                var newConfig = new DatabaseConfig();
+                var newConfig = new RavenDatabaseConfig();
                 Console.WriteLine("Please input your database name (DEFAULT: RavenBOT)");
                 var databaseName = Console.ReadLine();
                 if (string.IsNullOrWhiteSpace(databaseName))
@@ -102,7 +102,7 @@ namespace RavenBOT.Services.Database
                 return newConfig;
             }
 
-            return JsonConvert.DeserializeObject<DatabaseConfig>(File.ReadAllText(ConfigPath));
+            return JsonConvert.DeserializeObject<RavenDatabaseConfig>(File.ReadAllText(ConfigPath));
         }
 
 
