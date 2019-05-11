@@ -9,14 +9,17 @@ namespace RavenBOT.Services
         private GraphiteClient Client { get; }
         private bool Enabled { get; }
 
-        public GraphiteService(GraphiteClient client)
+        public GraphiteService(string clientUrl = null)
         {
-            Enabled = true;
-            if (client == null)
+            if (clientUrl == null)
             {
                 Enabled = false;
             }
-            Client = client;
+            else
+            {
+                Client = new GraphiteClient(clientUrl);
+                Enabled = true;
+            }
         }
 
         //Exposing the send methods for the graphite client

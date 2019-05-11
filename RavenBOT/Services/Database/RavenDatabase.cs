@@ -3,19 +3,25 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
-using ahd.Graphite;
 using Newtonsoft.Json;
 using Raven.Client.Documents;
 using Raven.Client.ServerWide;
 using Raven.Client.ServerWide.Operations;
-using RavenBOT.Models;
 
 namespace RavenBOT.Services.Database
 {
     public class RavenDatabase : IDatabase
     {
+        public class DatabaseConfig
+        {
+            public string DatabaseName { get; set; }
+
+            public List<string> DatabaseUrls { get; set; } = new List<string>();
+
+            public string CertificatePath { get; set; } = null;
+        }
+
         private IDocumentStore DocumentStore { get; }
-        private GraphiteClient Graphite { get; }
         private DatabaseConfig Config { get; }
         private static readonly string ConfigDirectory = Path.Combine(AppContext.BaseDirectory, "setup");
         private static readonly string ConfigPath = Path.Combine(ConfigDirectory, "Config.json");
@@ -26,13 +32,13 @@ namespace RavenBOT.Services.Database
 
             try
             {
-                if (Config.pathToCertificate != null && File.Exists(Config.pathToCertificate))
+                if (Config.CertificatePath != null && File.Exists(Config.CertificatePath))
                 {
                     DocumentStore = new DocumentStore
                                 {
                                     Database = Config.DatabaseName,
                                     Urls = Config.DatabaseUrls.ToArray(),
-                                    Certificate = new X509Certificate2(X509Certificate.CreateFromCertFile(Config.pathToCertificate))
+                                    Certificate = new X509Certificate2(X509Certificate.CreateFromCertFile(Config.CertificatePath))
                                 }.Initialize();
                 }
                 else
@@ -55,31 +61,6 @@ namespace RavenBOT.Services.Database
                 Console.WriteLine(e);
                 throw;
             }
-
-            try
-            {
-                if (Config.GraphiteUrl != null)
-                {
-                    Graphite = new GraphiteClient(Config.GraphiteUrl);
-                }
-                
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-        }
-
-        public bool UsingGraphite()
-        {
-            return Graphite != null;
-        }
-
-        public GraphiteClient GetGraphiteClient()
-        {
-            //Remember, this can return null
-            return Graphite;
         }
 
         public DatabaseConfig GetOrInitializeConfig()
@@ -113,11 +94,7 @@ namespace RavenBOT.Services.Database
                                              };
 
                 Console.WriteLine("Please input the path to your certificate for the database (Leave blank if you are using an unauthenticated deployment of ravendb)");
-                newConfig.pathToCertificate = Console.ReadLine();
-
-                Console.WriteLine("Please input the url of your Graphite instance (Put NONE if you do not have one)");
-                var graphiteUrl = Console.ReadLine();
-                newConfig.GraphiteUrl = !graphiteUrl.Equals("none", StringComparison.InvariantCultureIgnoreCase) ? graphiteUrl : null;
+                newConfig.CertificatePath = Console.ReadLine();
 
                 Console.WriteLine($"New Config Created! It can be found at \"{ConfigPath}\" please delete or edit it if you wish to modify the database url or name");
 

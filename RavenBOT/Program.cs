@@ -33,6 +33,7 @@ namespace RavenBOT
                     TotalShards = 1
                 }))
                 .AddSingleton(x => new LogHandler(x.GetRequiredService<DiscordShardedClient>(), x.GetRequiredService<IDatabase>()))
+                .AddSingleton<LocalManagementService>()
                 .AddSingleton(x =>
                 {
                     //Initialize the bot config by asking for token and name
@@ -80,26 +81,10 @@ namespace RavenBOT
                     LogLevel = LogSeverity.Info
                 }))
                 .AddSingleton(x =>
-                    {
-                        if (x.GetRequiredService<IDatabase>() is RavenDatabase rd)
-                        {
-                            return new GraphiteService(rd.GetGraphiteClient());
-                        }
-
-                        return null;
-                    })
-                .AddSingleton<TimerService>()
-                .AddSingleton(x =>
                 {
-                    if (x.GetRequiredService<IDatabase>() is RavenDatabase rd)
-                    {
-                        return new PrefixService(rd, x.GetRequiredService<BotConfig>().GetPrefix(), 
-                            rd.GetOrInitializeConfig().Developer, 
-                            rd.GetOrInitializeConfig().DeveloperPrefix);
 
-                    }
-
-                    return new PrefixService(x.GetRequiredService<IDatabase>(), x.GetRequiredService<BotConfig>().GetPrefix());
+                    var localConfig = x.GetRequiredService<LocalManagementService>().GetConfig();
+                    return new PrefixService(x.GetRequiredService<IDatabase>(), x.GetRequiredService<BotConfig>().GetPrefix(), localConfig.Developer, localConfig.DeveloperPrefix);
                 })
                 .AddSingleton<EventHandler>()
                 .AddSingleton(x => new LicenseService(x.GetRequiredService<IDatabase>()))
@@ -109,7 +94,6 @@ namespace RavenBOT
             try
             {
                 await provider.GetRequiredService<EventHandler>().InitializeAsync();
-                provider.GetRequiredService<TimerService>().Start();
             }
             catch (Exception e)
             {

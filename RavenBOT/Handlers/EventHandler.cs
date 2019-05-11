@@ -19,17 +19,15 @@ namespace RavenBOT.Handlers
         public PrefixService PrefixService { get; }
         private BotConfig BotConfig { get; }
         private LogHandler Logger { get; }
-        public GraphiteService GraphiteService { get; }
         private CommandService CommandService { get; }
         private IServiceProvider Provider { get; }
 
 
-        public EventHandler(DiscordShardedClient client, PrefixService prefixService, CommandService commandService, BotConfig config, LogHandler handler, GraphiteService graphiteService, IServiceProvider provider)
+        public EventHandler(DiscordShardedClient client, PrefixService prefixService, CommandService commandService, BotConfig config, LogHandler handler, IServiceProvider provider)
         {
             Client = client;
             PrefixService = prefixService;
             Logger = handler;
-            GraphiteService = graphiteService;
             BotConfig = config;
             CommandService = commandService;
             Provider = provider;
