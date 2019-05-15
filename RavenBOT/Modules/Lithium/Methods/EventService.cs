@@ -21,8 +21,7 @@ namespace RavenBOT.Modules.Lithium.Methods
             Client = client;
             Database = database;
             Configs = new Dictionary<ulong, EventConfig>();
-
-            /*
+            
             Client.ChannelCreated += Client_ChannelCreated;
             Client.ChannelDestroyed += Client_ChannelDestroyed;
             Client.ChannelUpdated += Client_ChannelUpdated;
@@ -31,7 +30,6 @@ namespace RavenBOT.Modules.Lithium.Methods
             Client.UserJoined += Client_UserJoined;
             Client.UserLeft += Client_UserLeft;
             Client.GuildMemberUpdated += GuildMemberUpdated;
-            */
         }
 
         private async Task GuildMemberUpdated(SocketGuildUser userBefore, SocketGuildUser userAfter)
