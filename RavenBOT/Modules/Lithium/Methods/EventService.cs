@@ -22,6 +22,7 @@ namespace RavenBOT.Modules.Lithium.Methods
             Database = database;
             Configs = new Dictionary<ulong, EventConfig>();
 
+            /*
             Client.ChannelCreated += Client_ChannelCreated;
             Client.ChannelDestroyed += Client_ChannelDestroyed;
             Client.ChannelUpdated += Client_ChannelUpdated;
@@ -30,6 +31,7 @@ namespace RavenBOT.Modules.Lithium.Methods
             Client.UserJoined += Client_UserJoined;
             Client.UserLeft += Client_UserLeft;
             Client.GuildMemberUpdated += GuildMemberUpdated;
+            */
         }
 
         private async Task GuildMemberUpdated(SocketGuildUser userBefore, SocketGuildUser userAfter)
@@ -177,7 +179,7 @@ namespace RavenBOT.Modules.Lithium.Methods
                     return;
                 }
 
-                //TODO: Embeds
+                //TODO: Embeds although the only instances where embeds would be updated would be from bots, which are being ignored above.
                 if (messageOldCache.HasValue)
                 {
                     var oldMessage = messageOldCache.Value.Content;
@@ -273,13 +275,20 @@ namespace RavenBOT.Modules.Lithium.Methods
                         builder.AppendLine($"**Slow Mode Interval:** {textChannelBefore.SlowModeInterval} => {textChannelAfter.SlowModeInterval}");
                     }
 
-                    //TODO: Permission changes
-                    /*
-                    if (textChannelBefore.PermissionOverwrites != textChannelAfter.SlowModeInterval)
+
+                    var permissionsAdded = textChannelAfter.PermissionOverwrites.Where(x => textChannelBefore.PermissionOverwrites.All(bef => bef.TargetId != x.TargetId)).ToList();
+                    if (permissionsAdded.Any())
                     {
-                        builder.AppendLine($"**Slow Mode Interval:** {textChannelBefore.SlowModeInterval} => {textChannelAfter.SlowModeInterval}");
+                        builder.AppendLine("**Permissions Added:**\n" +
+                                           $"{PermissionList(textChannelAfter, permissionsAdded)}");
                     }
-                    */
+                    
+                    var permissionsRemoved = textChannelBefore.PermissionOverwrites.Where(x => textChannelAfter.PermissionOverwrites.All(bef => bef.TargetId != x.TargetId)).ToList();
+                    if (permissionsRemoved.Any())
+                    {
+                        builder.AppendLine("**Permissions Removed:**\n" +
+                                           $"{PermissionList(textChannelAfter, permissionsRemoved)}");
+                    }
 
                     if (builder.Length == 0)
                     {
