@@ -57,7 +57,57 @@ namespace RavenBOT.Modules.Lithium.Models.Moderation
         public bool MassMentionsIncludeChannels { get; set; } = false;
 
 
-        public bool UsePerspective { get; set; }
-        public int PerspectiveMax { get; set; }
+        public bool UsePerspective { get; set; } = false;
+        public int PerspectiveMax { get; set; } = 95;
+
+        public bool UseAntiSpam {get;set;} = false;
+        public AntiSpam SpamSettings {get;set;} = new AntiSpam();
+
+        public class AntiSpam
+        {
+            //Max messages to cache
+            public int CacheSize {get; private set;} = 10;
+
+            public bool SetCacheSize(int size)
+            {
+                if (size >= MessagesPerTime && size >= MaxRepititions)
+                {
+                    CacheSize = size;
+                    return true;
+                }
+
+                return false;
+            }
+
+            //Seconds to check for timed spam
+            public int SecondsToCheck {get;set;} = 10;
+
+            //NOTE: Change setter to ensure amount is less than cache size.
+            public int MessagesPerTime {get; private set;} = 10;
+
+            public bool SetMaxMessagesPerTime(int max)
+            {
+                if (max <= CacheSize)
+                {
+                    SecondsToCheck = max;
+                    return true;
+                }
+
+                return false;
+            }
+
+            public int MaxRepititions {get; private set;} = 5;
+
+            public bool SetMaxRepititions(int max)
+            {
+                if (max <= CacheSize)
+                {
+                    MaxRepititions = max;
+                    return true;
+                }
+
+                return false;
+            }
+        }
     }
 }

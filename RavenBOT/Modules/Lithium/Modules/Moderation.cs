@@ -9,41 +9,13 @@ using RavenBOT.Services.Database;
 namespace RavenBOT.Modules.Lithium.Modules
 {
     [Group("lithium.moderation.")]
-    public class Moderation : InteractiveBase<ShardedCommandContext>
+    public partial class Moderation : InteractiveBase<ShardedCommandContext>
     {
-        public DiscordShardedClient Client { get; }
         public ModerationService ModerationService { get; }
 
         public Moderation(IDatabase database, DiscordShardedClient client)
         {
-            Client = client;
-            ModerationService = new ModerationService(database);
-            Client.MessageReceived += MessageReceived;
-        }
-
-        private async Task MessageReceived(SocketMessage msg)
-        {
-            if (ModerationService.Perspective == null)
-            {
-                return;
-            }
-
-            if (!(msg is SocketUserMessage message))
-            {
-                return;
-            }
-
-            if (message.Author.IsBot || message.Author.IsWebhook)
-            {
-                return;
-            }
-
-            if (!(message.Channel is SocketTextChannel channel))
-            {
-                return;
-            }
-
-            await ModerationService.RunChecks(message, channel);
+            ModerationService = new ModerationService(database, client);
         }
 
         [Command("UseToxicity")]

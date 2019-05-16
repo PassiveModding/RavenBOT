@@ -16,7 +16,7 @@ namespace RavenBOT.Modules.Lithium.Methods
         public Perspective.Api Perspective { get; set; }
         private Dictionary<ulong, ModerationConfig> ModerationConfigs { get; }
 
-        public ModerationService(IDatabase database)
+        public ModerationService(IDatabase database, DiscordShardedClient client)
         {
             Database = database;
             ModerationConfigs = new Dictionary<ulong, ModerationConfig>();
@@ -28,6 +28,28 @@ namespace RavenBOT.Modules.Lithium.Methods
             }
 
             Perspective = setupDoc.PerspectiveToken != null ? new Perspective.Api(setupDoc.PerspectiveToken) : null;
+            client.MessageReceived += MessageReceived;
+        }
+
+        public async Task MessageReceived(SocketMessage socketMessage)
+        {
+            if (!(socketMessage is SocketUserMessage message))
+            {
+                return;
+            }
+
+            if (message.Author.IsBot || message.Author.IsWebhook)
+            {
+                return;
+            }
+
+            if (message.Channel is SocketTextChannel channel)
+            {
+                if (channel.Guild != null)
+                {
+                    await RunChecks(message, channel);
+                }
+            }
         }
 
         public Setup GetSetup()

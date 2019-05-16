@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord.WebSocket;
@@ -86,6 +87,33 @@ namespace RavenBOT.Modules.Lithium.Methods
                     await message.DeleteAsync();
                     return;
                     //TODO: Log message, matched value, regex.
+                }
+            }
+
+            if (guildSetup.UseAntiSpam)
+            {
+                var spamResult = CheckSpam(message, channel, out var messages);
+                if (spamResult == SpamType.RepetitiveMessage)
+                {
+                    await channel.DeleteMessagesAsync(messages.Select(x => x.MessageId));
+                    if (!messages.Any(x => x.Responded))
+                    {
+                        messages.Last().Responded = true;
+                        await channel.SendMessageAsync($"{message.Author.Mention} no spamming!");
+                        //TODO: Log
+                    }
+                    return;
+                }
+                else if (spamResult == SpamType.TooFast)
+                {
+                    await channel.DeleteMessagesAsync(messages.Select(x => x.MessageId));
+                    if (!messages.Any(x => x.Responded))
+                    {
+                        messages.Last().Responded = true;
+                        await channel.SendMessageAsync($"{message.Author.Mention} no spamming!");
+                        //TODO: Log
+                    }
+                    return;
                 }
             }
 
