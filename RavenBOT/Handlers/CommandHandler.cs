@@ -58,7 +58,8 @@ namespace RavenBOT.Handlers
                         var context = new ShardedCommandContext(Client, message);
 
                         //Find the first match of the module prefix.
-                        var prefixMatch = ModulePrefixes.FirstOrDefault(x => message.Content.StartsWith(Local.DeveloperPrefix + x));
+                        //Important to order by length as longer prefixes may be skipped due to the first being shorter
+                        var prefixMatch = ModulePrefixes.OrderByDescending(x => x.Length).FirstOrDefault(x => message.Content.StartsWith(Local.DeveloperPrefix + x));
 
                         IResult result;
                         if (prefixMatch != null)
@@ -109,7 +110,7 @@ namespace RavenBOT.Handlers
                 {
                     var context = new ShardedCommandContext(Client, message);
 
-                    var prefixMatch = ModulePrefixes.FirstOrDefault(x => message.Content.StartsWith(x));
+                    var prefixMatch = ModulePrefixes.OrderByDescending(x => x.Length).FirstOrDefault(x => message.Content.StartsWith(x));
                     IResult result;
                     if (prefixMatch != null)
                     {
