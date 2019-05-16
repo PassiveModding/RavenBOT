@@ -8,7 +8,7 @@ using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Lithium.Modules
 {
-    [Group("lithium.moderation ")]
+    [Group("lithium.moderation.")]
     public class Moderation : InteractiveBase<ShardedCommandContext>
     {
         public DiscordShardedClient Client { get; }
