@@ -161,7 +161,7 @@ namespace RavenBOT.Services
             {
                 if (specifiedModules.Any())
                 {
-                    modules = modules.Where(x => specifiedModules.Contains(x.Name)).ToList();
+                    modules = modules.Where(x => specifiedModules.Any(sm => x.Name.StartsWith(sm))).ToList();
                 }
             }
 
