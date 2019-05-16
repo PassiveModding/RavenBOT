@@ -52,25 +52,29 @@ namespace RavenBOT.Modules.Lithium.Methods
                         msg.Message = message.Content;
 
                         Messages.Add(msg);
-                        Messages = Messages.OrderByDescending(x => x.TimeStamp).Take(cacheSize).ToList();
 
+                        var returnType = SpamType.None;
                         //Consider time based spam checks as well as count based spam checks
                         if (Messages.Count(x => x.TimeStamp > DateTime.UtcNow - TimeSpan.FromSeconds(secondsCapture)) >= maxMessages)
                         {
                             msg.Responded = true;
                             messages = Messages;
-                            return SpamType.TooFast;   
+                            returnType = SpamType.TooFast;   
                         }
-
-                        if (Messages.GroupBy(x => x.Message).Max(x => x.Count()) >= maxRepetitions)
+                        else if (Messages.GroupBy(x => x.Message).Max(x => x.Count()) >= maxRepetitions)
                         {
                             msg.Responded = true;
                             messages = Messages;
-                            return SpamType.RepetitiveMessage;
+                            returnType = SpamType.RepetitiveMessage;
+                        }
+                        else
+                        {
+                            messages = null;
                         }
 
-                        messages = null;
-                        return SpamType.None;
+                        //This is done after `messages` is assigned to the reference when setting msg.Responded sets the item in the current list.
+                        Messages = Messages.OrderByDescending(x => x.TimeStamp).Take(cacheSize).ToList();
+                        return returnType;
                     }
                     public class SpamMessage
                     {

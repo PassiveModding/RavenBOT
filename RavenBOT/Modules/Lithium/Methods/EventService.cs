@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
@@ -24,6 +25,8 @@ namespace RavenBOT.Modules.Lithium.Methods
         private int UserLeft = 0;
         private int UserUpdated = 0;
 
+        private Timer Timer {get;}
+
         public EventService(DiscordShardedClient client, IDatabase database)
         {
             Client = client;
@@ -38,6 +41,170 @@ namespace RavenBOT.Modules.Lithium.Methods
             Client.UserJoined += Client_UserJoined;
             Client.UserLeft += Client_UserLeft;
             Client.GuildMemberUpdated += GuildMemberUpdated;
+
+            Timer = new Timer(TimerEvent, null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
+        }
+
+        public class EventClass
+        {
+            public enum EventType
+            {
+                ChannelCreated,
+                ChannelDestroyed,
+                ChannelUpdated,
+                MessageDeleted,
+                MessageUpdated,
+                UserJoined,
+                UserLeft,
+                GuildMemberUpdated
+            }
+
+            public EventClass(ulong guildId, EventConfig config, string title, string content, EventType type, Color color)
+            {
+                GuildId = guildId;
+                Config = config;
+                Type = type;
+                SetTitle(title);
+                SetContent(content);
+
+                Color = color;
+            }
+
+            public EventType Type {get;set;}
+
+            public Color Color {get;set;}
+
+            public ulong GuildId {get;set;}
+            public EventConfig Config {get;set;}
+
+            public string Title {get;private set;}
+
+            public void SetTitle(string title)
+            {
+                if (String.IsNullOrWhiteSpace(title))
+                {
+                    title = "N/A";
+                }
+
+                title = title.FixLength(100);
+                Title = title;
+            }
+
+            public string Content {get;private set;}
+            public void SetContent(string content)
+            {
+                if (String.IsNullOrWhiteSpace(content))
+                {
+                    content = "N/A";
+                }
+
+                content = content.FixLength(1023);
+                Content = content;
+            }
+        }
+
+        public List<EventClass> EventQueue {get;set;} = new List<EventClass>();
+
+        public class EventClassDuplicate
+        {
+            public int Count {get;set;}
+            public EventClass Class {get;set;}
+        }
+
+        private void TimerEvent(object _)
+        {
+            var task = Task.Run(async () =>
+            {
+                try
+                {
+                    foreach (var eventGroup in EventQueue.GroupBy(x => x.GuildId).ToList())
+                    {
+                        var mainColor = eventGroup.GroupBy(x => x.Color).OrderByDescending(x => x.Count()).FirstOrDefault()?.FirstOrDefault()?.Color ?? Color.DarkerGrey;
+
+                        var channel = Client.GetGuild(eventGroup.FirstOrDefault()?.GuildId ?? 0)?.GetTextChannel(eventGroup.FirstOrDefault()?.Config?.ChannelId ?? 0);
+                        if (channel != null)
+                        {
+                            var bulkEmbed = new EmbedBuilder
+                            {
+                                Color = mainColor
+                            };
+
+                            var typeGroups = eventGroup.GroupBy(x => x.Type).OrderByDescending(x => x.Count());
+                            
+
+                            foreach (var typeGroup in typeGroups)
+                            {
+                                var typeCopies = new List<EventClassDuplicate>();
+
+                                foreach (var eClass in typeGroup.ToList())
+                                {
+                                    var match = typeCopies.FirstOrDefault(x => x.Class.Content.Equals(eClass.Content) && x.Class.Title.Equals(eClass.Title));
+                                    if (match != null)
+                                    {
+                                        match.Count = match.Count + 1;
+                                    }
+                                    else
+                                    {
+                                        typeCopies.Add(new EventClassDuplicate
+                                        {
+                                            Count = 1,
+                                            Class = eClass
+                                        });
+                                    }
+                                }
+
+                                foreach (var eventClass in typeCopies)
+                                {
+                                    var field = new EmbedFieldBuilder();
+                                    if (eventClass.Count == 1)
+                                    {
+                                        field.Name = eventClass.Class.Title;
+                                    }
+                                    else
+                                    {
+                                        field.Name = eventClass.Class.Title + $" x{eventClass.Count}";
+                                    }
+                                    field.Value = eventClass.Class.Content;
+                                    if (bulkEmbed.Length + eventClass.Class.Title.Length + eventClass.Class.Content.Length >= 5000)
+                                    {
+                                        try
+                                        {
+                                            await channel.SendMessageAsync("", false, bulkEmbed.Build());
+                                            bulkEmbed = new EmbedBuilder
+                                            {
+                                                Color = mainColor
+                                            };
+                                        }
+                                        catch (System.Exception)
+                                        {
+                                            //Ignore
+                                        }
+                                    }
+
+                                    bulkEmbed.AddField(field);
+                                    EventQueue.RemoveAll(x => x.Content.Equals(eventClass.Class.Content) && x.Title.Equals(eventClass.Class.Title) && x.GuildId == eventClass.Class.GuildId);
+                                }
+                            }
+
+                            if (bulkEmbed.Fields.Any())
+                            {
+                                try
+                                {
+                                    await channel.SendMessageAsync("", false, bulkEmbed.Build());
+                                }
+                                catch (System.Exception)
+                                {
+                                    //Ignore
+                                }
+                            }
+                        } 
+                    }                 
+                }
+                catch (System.Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            });
         }
 
         private async Task GuildMemberUpdated(SocketGuildUser userBefore, SocketGuildUser userAfter)
@@ -122,15 +289,7 @@ namespace RavenBOT.Modules.Lithium.Methods
                 return;
             }
 
-            builder.AppendLine($"**{userAfter.Nickname ?? userAfter.Username} Updated**");
-
-            var embed = new EmbedBuilder
-            {
-                Title = "User Updated",
-                Description = builder.ToString()
-            };
-
-            await LogEvent(config, embed);
+            LogEvent(config, $"**{userAfter.Nickname ?? userAfter.Username} Updated**", builder.ToString(), EventClass.EventType.GuildMemberUpdated, Color.DarkMagenta);
         }
 
         private async Task Client_UserLeft(SocketGuildUser user)
@@ -143,15 +302,10 @@ namespace RavenBOT.Modules.Lithium.Methods
                 return;
             }
             
-            await LogEvent(config, new EmbedBuilder
-            {
-                Title = "User Left",
-                Description = $"Name: {user.Username}#{user.Discriminator}\n" +
+            LogEvent(config, "User Left",$"Name: {user.Username}#{user.Discriminator}\n" +
                               $"Nickname: {user.Nickname ?? "N/A"}\n" +
                               $"ID: {user.Id}\n" +
-                              $"Mention: {user.Mention}",
-                Color = Color.DarkOrange
-            });
+                              $"Mention: {user.Mention}", EventClass.EventType.UserLeft, Color.DarkOrange);
         }
 
         private async Task Client_UserJoined(SocketGuildUser user)
@@ -163,15 +317,12 @@ namespace RavenBOT.Modules.Lithium.Methods
                 return;
             }
 
-            await LogEvent(config, new EmbedBuilder
-            {
-                Title = "User Joined",
-                Description = $"Name: {user.Username}#{user.Discriminator}\n" +
+            LogEvent(config, "User Joined",$"Name: {user.Username}#{user.Discriminator}\n" +
                               $"Nickname: {user.Nickname ?? "N/A"}\n" +
                               $"ID: {user.Id}\n" +
-                              $"Mention: {user.Mention}",
-                Color = Color.Green
-            });
+                              $"Mention: {user.Mention}", EventClass.EventType.UserJoined, Color.Green);
+
+            
         }
 
         private async Task Client_MessageUpdated(Cacheable<IMessage, ulong> messageOldCache, SocketMessage messageNew, ISocketMessageChannel messageChannel)
@@ -196,16 +347,12 @@ namespace RavenBOT.Modules.Lithium.Methods
                 {
                     var oldMessage = messageOldCache.Value.Content;
 
-                    await LogEvent(config, new EmbedBuilder
-                    {
-                        Title = "Message Updated",
-                        Description = $"**Author:** {messageNew.Author.Mention}\n" +
+                    LogEvent(config, "Message Updated", $"**Author:** {messageNew.Author.Mention}\n" +
                                       "**Old:**\n" +
                                       $"{oldMessage}\n" +
                                       "**New:**\n" +
                                       $"{messageNew.Content}\n" +
-                                      $"**Channel:** {messageChannel.Name}"
-                    });
+                                      $"**Channel:** {messageChannel.Name}", EventClass.EventType.MessageUpdated, Color.DarkPurple);
                 }
             }
         }
@@ -225,26 +372,16 @@ namespace RavenBOT.Modules.Lithium.Methods
                 {
                     var oldMessage =  messageCache.Value.Content;
 
-                    await LogEvent(config, new EmbedBuilder
-                    {
-                        Title = "Message Deleted",
-                        Description = "**Message:**\n" +
+                    LogEvent(config, "Message Deleted", "**Message:**\n" +
                                       $"{oldMessage}\n" +
                                       $"**Channel:** {messageChannel.Name}\n" +
-                                      $"**Author:** {messageCache.Value.Author.Username}#{messageCache.Value.Author.Discriminator}",
-                        Color = Color.DarkTeal
-                    });
+                                      $"**Author:** {messageCache.Value.Author.Username}#{messageCache.Value.Author.Discriminator}", EventClass.EventType.MessageDeleted, Color.DarkBlue);
                 }
                 else
                 {
-                    await LogEvent(config, new EmbedBuilder
-                    {
-                        Title = "Message Deleted",
-                        Description = "**Message:**\n" +
+                    LogEvent(config, "Message Deleted", "**Message:**\n" +
                                       $"Unable to be retrieved ({messageCache.Id})\n" +
-                                      $"**Channel:** {messageChannel.Name}",
-                        Color = Color.DarkTeal
-                    });
+                                      $"**Channel:** {messageChannel.Name}", EventClass.EventType.MessageDeleted, Color.DarkBlue);
                 }
             }
         }
@@ -309,11 +446,7 @@ namespace RavenBOT.Modules.Lithium.Methods
                         return;
                     }
 
-                    await LogEvent(config, new EmbedBuilder
-                    {
-                        Title = "Channel Updated",
-                        Description = builder.ToString().FixLength(2047)
-                    });
+                    LogEvent(config, "Channel Updated", builder.ToString(), EventClass.EventType.ChannelUpdated, Color.DarkTeal);
                 }
             }
         }
@@ -331,36 +464,22 @@ namespace RavenBOT.Modules.Lithium.Methods
 
                 if (channel is SocketTextChannel tChannel)
                 {
-                    var embed = new EmbedBuilder
-                    {
-                        Title = "Channel Destroyed",
-                        Color = Color.Red,
-                        Description = $"Name: {tChannel.Name}\n" +
+                    LogEvent(config, "Text Channel Destroyed", $"Name: {tChannel.Name}\n" +
                                       $"Topic: {tChannel.Topic ?? "N/A"}\n" +
                                       $"NSFW: {tChannel.IsNsfw}\n" +
                                       $"SlowModeInterval: {tChannel.SlowModeInterval}\n" +
                                       $"Category: {tChannel.Category?.Name ?? "N/A"}\n" +
                                       $"Position: {tChannel.Position}\n" +
-                                      $"Permissions:\n{PermissionList(gChannel, tChannel.PermissionOverwrites.ToList())}".FixLength(2047)
-                    };
-
-                    await LogEvent(config, embed);
+                                      $"Permissions:\n{PermissionList(gChannel, tChannel.PermissionOverwrites.ToList())}", EventClass.EventType.ChannelDestroyed, Color.DarkRed);
                 }
                 else if (channel is SocketVoiceChannel vChannel)
                 {
-                    var embed = new EmbedBuilder
-                    {
-                        Title = "Channel Destroyed",
-                        Color = Color.Red,
-                        Description = $"Name: {vChannel.Name}\n" +
+                    LogEvent(config, "Voice Channel Destroyed", $"Name: {vChannel.Name}\n" +
                                       $"Category: {vChannel.Category?.Name ?? "N/A"}\n" +
                                       $"User Limit: {(vChannel.UserLimit == null ? "N/A" : vChannel.UserLimit.ToString())}\n" +
                                       $"BitRate: {vChannel.Bitrate}\n" +
                                       $"Position: {vChannel.Position}\n" +
-                                      $"Permissions:\n{PermissionList(gChannel, vChannel.PermissionOverwrites.ToList())}".FixLength(2047)
-                    };
-
-                    await LogEvent(config, embed);
+                                      $"Permissions:\n{PermissionList(gChannel, vChannel.PermissionOverwrites.ToList())}", EventClass.EventType.ChannelDestroyed, Color.DarkRed);
                 }
             }
         }
@@ -379,36 +498,22 @@ namespace RavenBOT.Modules.Lithium.Methods
 
                 if (channel is SocketTextChannel tChannel)
                 {
-                    var embed = new EmbedBuilder
-                    {
-                        Title = "Channel Created",
-                        Color = Color.Green,
-                        Description = $"Name: {tChannel.Name}\n" +
+                    LogEvent(config, "Text Channel Created", $"Name: {tChannel.Name}\n" +
                                       $"Topic: {tChannel.Topic ?? "N/A"}\n" +
                                       $"NSFW: {tChannel.IsNsfw}\n" +
                                       $"SlowModeInterval: {tChannel.SlowModeInterval}\n" +
                                       $"Category: {tChannel.Category?.Name ?? "N/A"}\n" +
                                       $"Position: {tChannel.Position}\n" +
-                                      $"Permissions: {PermissionList(gChannel, tChannel.PermissionOverwrites.ToList())}".FixLength(2047)
-                    };
-
-                    await LogEvent(config, embed);
+                                      $"Permissions: {PermissionList(gChannel, tChannel.PermissionOverwrites.ToList())}", EventClass.EventType.ChannelCreated, Color.Green);
                 }
                 else if (channel is SocketVoiceChannel vChannel)
                 {
-                    var embed = new EmbedBuilder
-                    {
-                        Title = "Channel Created",
-                        Color = Color.Green,
-                        Description = $"Name: {vChannel.Name}\n" +
+                    LogEvent(config, "Voice Channel Created", $"Name: {vChannel.Name}\n" +
                                       $"Category: {vChannel.Category?.Name ?? "N/A"}\n" +
                                       $"User Limit: {(vChannel.UserLimit == null ? "N/A" : vChannel.UserLimit.ToString())}\n" +
                                       $"BitRate: {vChannel.Bitrate}\n" +
                                       $"Position: {vChannel.Position}\n" +
-                                      $"Permissions: {PermissionList(gChannel, vChannel.PermissionOverwrites.ToList())}".FixLength(2047)
-                    };
-
-                    await LogEvent(config, embed);
+                                      $"Permissions: {PermissionList(gChannel, vChannel.PermissionOverwrites.ToList())}", EventClass.EventType.ChannelCreated, Color.Green);
                 }
             }
         }
@@ -461,20 +566,9 @@ namespace RavenBOT.Modules.Lithium.Methods
             return builder.ToString();
         }
 
-        public async Task LogEvent(EventConfig config, EmbedBuilder embed)
+        public void LogEvent(EventConfig config, string title, string content, EventClass.EventType type, Color color)
         {
-            try
-            {
-                var channel = Client.GetGuild(config.GuildId)?.GetTextChannel(config.ChannelId);
-                if (channel != null)
-                {
-                    await channel.SendMessageAsync("", false, embed.Build());
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
+            EventQueue.Add(new EventClass(config.GuildId, config, title, content, type, color));
         }
 
         public Dictionary<ulong, EventConfig> Configs { get; set; }

@@ -31,25 +31,30 @@ namespace RavenBOT.Modules.Lithium.Methods
             client.MessageReceived += MessageReceived;
         }
 
-        public async Task MessageReceived(SocketMessage socketMessage)
+        public Task MessageReceived(SocketMessage socketMessage)
         {
-            if (!(socketMessage is SocketUserMessage message))
+            var _ = Task.Run(async () =>
             {
-                return;
-            }
-
-            if (message.Author.IsBot || message.Author.IsWebhook)
-            {
-                return;
-            }
-
-            if (message.Channel is SocketTextChannel channel)
-            {
-                if (channel.Guild != null)
+                if (!(socketMessage is SocketUserMessage message))
                 {
-                    await RunChecks(message, channel);
+                    return;
                 }
-            }
+
+                if (message.Author.IsBot || message.Author.IsWebhook)
+                {
+                    return;
+                }
+
+                if (message.Channel is SocketTextChannel channel)
+                {
+                    if (channel.Guild != null)
+                    {
+                        await RunChecks(message, channel);
+                    }
+                }
+            });
+
+            return Task.CompletedTask;
         }
 
         public Setup GetSetup()

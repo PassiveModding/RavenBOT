@@ -96,10 +96,9 @@ namespace RavenBOT.Modules.Lithium.Methods
                 if (spamResult == SpamType.RepetitiveMessage)
                 {
                     await channel.DeleteMessagesAsync(messages.Select(x => x.MessageId));
-                    if (!messages.Any(x => x.Responded))
+                    if (messages.Count(x => x.Responded) == 1)
                     {
-                        messages.Last().Responded = true;
-                        await channel.SendMessageAsync($"{message.Author.Mention} no spamming!");
+                        await channel.SendMessageAsync($"{message.Author.Mention} no spamming! (Too many identical messages)");
                         //TODO: Log
                     }
                     return;
@@ -107,10 +106,9 @@ namespace RavenBOT.Modules.Lithium.Methods
                 else if (spamResult == SpamType.TooFast)
                 {
                     await channel.DeleteMessagesAsync(messages.Select(x => x.MessageId));
-                    if (!messages.Any(x => x.Responded))
+                    if (messages.Count(x => x.Responded) == 1)
                     {
-                        messages.Last().Responded = true;
-                        await channel.SendMessageAsync($"{message.Author.Mention} no spamming!");
+                        await channel.SendMessageAsync($"{message.Author.Mention} no spamming! (Too many messages over specified time)");
                         //TODO: Log
                     }
                     return;

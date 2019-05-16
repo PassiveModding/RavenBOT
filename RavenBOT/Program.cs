@@ -25,7 +25,7 @@ namespace RavenBOT
                 .AddSingleton(x => new DiscordShardedClient(new DiscordSocketConfig
                 {
                     AlwaysDownloadUsers = false,
-                    MessageCacheSize = 0,
+                    MessageCacheSize = 50,
                     LogLevel = LogSeverity.Info,
 
                     //You may want to edit the shard count as the bot grows more and more popular.
