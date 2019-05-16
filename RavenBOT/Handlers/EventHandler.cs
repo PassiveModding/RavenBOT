@@ -84,7 +84,7 @@ namespace RavenBOT.Handlers
                     Logger.Log("Some modules do not have groups assigned, this can cause unintended issues if you are not using a default prefix for the bot.", LogSeverity.Warning);
                 }
                 
-                ModulePrefixes = CommandService.Modules.Select(x => x.Group).ToList();
+                ModulePrefixes = CommandService.Modules.Select(x => x.Group ?? "").Distinct().ToList();
             }
         }
 

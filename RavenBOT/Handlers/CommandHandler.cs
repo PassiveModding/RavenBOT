@@ -64,9 +64,15 @@ namespace RavenBOT.Handlers
                         IResult result;
                         if (prefixMatch != null)
                         {
-                            //Use substring to remove the developer prefix as we cannot use the argPos here
-                            var modifiedContent = message.Content.Substring(Local.DeveloperPrefix.Length).Replace(prefixMatch, $"{prefixMatch} ");
-                            result = await CommandService.ExecuteAsync(context, modifiedContent, Provider);
+                            if (!string.IsNullOrWhiteSpace(prefixMatch))
+                            {               
+                                //Use substring to remove the developer prefix as we cannot use the argPos here
+                                result = await CommandService.ExecuteAsync(context, message.Content.Substring(Local.DeveloperPrefix.Length).Replace(prefixMatch, $"{prefixMatch} "), Provider);
+                            }
+                            else
+                            {
+                                result = await CommandService.ExecuteAsync(context, Local.DeveloperPrefix.Length, Provider);
+                            }  
                         }
                         else
                         {
@@ -114,8 +120,14 @@ namespace RavenBOT.Handlers
                     IResult result;
                     if (prefixMatch != null)
                     {
-                        var modifiedContent = message.Content.Replace(prefixMatch, $"{prefixMatch} ");
-                        result = await CommandService.ExecuteAsync(context, modifiedContent, Provider);
+                        if (!string.IsNullOrWhiteSpace(prefixMatch))
+                        {                            
+                            result = await CommandService.ExecuteAsync(context, message.Content.Substring(Local.DeveloperPrefix.Length).Replace(prefixMatch, $"{prefixMatch} "), Provider);
+                        }
+                        else
+                        {
+                            result = await CommandService.ExecuteAsync(context, 0, Provider);
+                        }                        
                     }
                     else
                     {
