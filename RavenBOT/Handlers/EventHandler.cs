@@ -102,20 +102,21 @@ namespace RavenBOT.Handlers
             return Task.CompletedTask;
         }
 
-        private async Task LogAsync(LogMessage message)
+        private Task LogAsync(LogMessage message)
         {
             if (message.Message.Contains("Rate limit triggered", StringComparison.InvariantCultureIgnoreCase))
             {
-                return;
+                return Task.CompletedTask;
             }
 
             if (message.Exception is CommandException exc)
             {
                 Logger.Log(message.Message, new LogContext(exc.Context), message.Severity);
-                return;
+                return Task.CompletedTask;
             }
             
             Logger.Log(message.Message, message.Severity);
+            return Task.CompletedTask;
         }
     }
 }

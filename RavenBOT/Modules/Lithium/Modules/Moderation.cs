@@ -181,11 +181,12 @@ namespace RavenBOT.Modules.Lithium.Modules
         }
 
         [Command("SetToxicityToken")]
-        public async Task ToxicityToken(string token = null)
+        public Task ToxicityToken(string token = null)
         {
             var setup = ModerationService.GetSetup();
             setup.PerspectiveToken = token;
             ModerationService.SetSetup(setup);
+            return Task.CompletedTask;
         }
     }
 }

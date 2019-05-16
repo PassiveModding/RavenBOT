@@ -214,7 +214,7 @@ namespace RavenBOT.Services
                         // Add a full page summary to our 'PageContents' list for later use
                         pageContents.TryAdd(module.Name, summary);
                     }
-                    catch (Exception e)
+                    catch
                     {
                         // Note this should only throw IF there are two modules with the same name in the bot.
                         // LogHandler.LogMessage(e.ToString(), LogSeverity.Error);

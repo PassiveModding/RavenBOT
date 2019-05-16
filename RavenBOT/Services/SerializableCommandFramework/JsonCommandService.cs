@@ -46,7 +46,7 @@ namespace RavenBOT.Services.SerializableCommandFramework
                 public bool Success { get; set; }
             }
 
-            public async Task<CommandServiceResponse> Execute(SocketCommandContext context, int argpos)
+            public CommandServiceResponse Execute(SocketCommandContext context, int argpos)
             {
                 string command = context.Message.Content.Substring(argpos);
                 if (!command.StartsWith(CommandName))
@@ -61,7 +61,7 @@ namespace RavenBOT.Services.SerializableCommandFramework
                 string nodeId = EntryNodeId;
                 while (nodeId != null)
                 {
-                    nodeId = await GetNode(nodeId)?.Execute(context);
+                    nodeId = GetNode(nodeId)?.Execute(context);
                 }
 
                 return new CommandServiceResponse(OverrideCommand, true);
@@ -72,7 +72,7 @@ namespace RavenBOT.Services.SerializableCommandFramework
                 string GetNodeId();
 
                 //Returns the node ID of the following node.
-                Task<string> Execute(SocketCommandContext context);
+                string Execute(SocketCommandContext context);
             }
 
             public class MessageSendActionNode : IJsonNode
@@ -94,9 +94,9 @@ namespace RavenBOT.Services.SerializableCommandFramework
                     return id;
                 }
 
-                public async Task<string> Execute(SocketCommandContext context)
+                public string Execute(SocketCommandContext context)
                 {
-                    await context.Channel.SendMessageAsync(messageToSend);
+                    context.Channel.SendMessageAsync(messageToSend);
                     return nextNodeId;
                 }
             }
@@ -133,7 +133,7 @@ namespace RavenBOT.Services.SerializableCommandFramework
                     return condition.Condition(context, valueA, valueB);
                 }
 
-                public async Task<string> Execute(SocketCommandContext context)
+                public string Execute(SocketCommandContext context)
                 {
                     return TryPass(context) ? successNodeId : failNodeId;
                 }
@@ -158,7 +158,7 @@ namespace RavenBOT.Services.SerializableCommandFramework
                     return NodeId;
                 }
 
-                public Task<string> Execute(SocketCommandContext context)
+                public string Execute(SocketCommandContext context)
                 {
                     return null;
                 }
