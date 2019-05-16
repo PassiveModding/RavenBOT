@@ -15,6 +15,14 @@ namespace RavenBOT.Modules.Lithium.Methods
     {
         public DiscordShardedClient Client { get; }
         public IDatabase Database { get; }
+        private int ChannelCreated = 0;
+        private int ChannelDestroyed = 0;
+        private int ChannelUpdated = 0;
+        private int MessageDeleted = 0;
+        private int MessageUpdated = 0;
+        private int UserJoined = 0;
+        private int UserLeft = 0;
+        private int UserUpdated = 0;
 
         public EventService(DiscordShardedClient client, IDatabase database)
         {
@@ -34,13 +42,7 @@ namespace RavenBOT.Modules.Lithium.Methods
 
         private async Task GuildMemberUpdated(SocketGuildUser userBefore, SocketGuildUser userAfter)
         {
-            //TODO: Reduce amount of lag this produces
-
-            var config = GetConfig(userBefore.Guild.Id);
-            if (!config.Enabled || config.ChannelId == 0 || !config.UserUpdated)
-            {
-                return;
-            }
+            UserUpdated++;
 
             var builder = new StringBuilder();
             if (userBefore.Username != userAfter.Username)
@@ -53,6 +55,7 @@ namespace RavenBOT.Modules.Lithium.Methods
                 builder.AppendLine($"**Discriminator:** {userBefore.Discriminator} => {userAfter.Discriminator}");
             }
 
+            /*
             if (userBefore.Activity?.Name != userAfter.Activity?.Name)
             {
                 builder.AppendLine($"**Activity:** {userBefore.Activity?.Name ?? "N/A"} => {userAfter.Activity?.Name ?? "N/A"}");
@@ -67,7 +70,8 @@ namespace RavenBOT.Modules.Lithium.Methods
             {
                 builder.AppendLine($"**Status:** {userBefore.Status} => {userAfter.Status}");
             }
-            
+            */
+
             if (userBefore.Hierarchy != userAfter.Hierarchy)
             {
                 builder.AppendLine($"**Hierarchy:** {userBefore.Hierarchy} => {userAfter.Hierarchy}");
@@ -112,6 +116,12 @@ namespace RavenBOT.Modules.Lithium.Methods
                 return;
             }
 
+            var config = GetConfig(userBefore.Guild.Id);
+            if (!config.Enabled || config.ChannelId == 0 || !config.UserUpdated)
+            {
+                return;
+            }
+
             builder.AppendLine($"**{userAfter.Nickname ?? userAfter.Username} Updated**");
 
             var embed = new EmbedBuilder
@@ -125,6 +135,8 @@ namespace RavenBOT.Modules.Lithium.Methods
 
         private async Task Client_UserLeft(SocketGuildUser user)
         {
+            UserLeft++;
+
             var config = GetConfig(user.Guild.Id);
             if (!config.Enabled || config.ChannelId == 0 || !config.UserLeft)
             {
@@ -144,6 +156,7 @@ namespace RavenBOT.Modules.Lithium.Methods
 
         private async Task Client_UserJoined(SocketGuildUser user)
         {
+            UserJoined++;
             var config = GetConfig(user.Guild.Id);
             if (!config.Enabled || config.ChannelId == 0 || !config.UserJoined)
             {
@@ -163,6 +176,7 @@ namespace RavenBOT.Modules.Lithium.Methods
 
         private async Task Client_MessageUpdated(Cacheable<IMessage, ulong> messageOldCache, SocketMessage messageNew, ISocketMessageChannel messageChannel)
         {
+            MessageUpdated++;
             if (messageChannel is SocketGuildChannel gChannel)
             {
                 var config = GetConfig(gChannel.Guild.Id);
@@ -198,6 +212,7 @@ namespace RavenBOT.Modules.Lithium.Methods
 
         private async Task Client_MessageDeleted(Cacheable<IMessage, ulong> messageCache, ISocketMessageChannel messageChannel)
         {
+            MessageDeleted++;
             if (messageChannel is SocketGuildChannel gChannel)
             {
                 var config = GetConfig(gChannel.Guild.Id);
@@ -236,6 +251,7 @@ namespace RavenBOT.Modules.Lithium.Methods
 
         private async Task Client_ChannelUpdated(SocketChannel channelBefore, SocketChannel channelAfter)
         {
+            ChannelUpdated++;
             if (channelBefore is SocketGuildChannel gChannel)
             {
                 var config = GetConfig(gChannel.Guild.Id);
@@ -304,6 +320,7 @@ namespace RavenBOT.Modules.Lithium.Methods
 
         private async Task Client_ChannelDestroyed(SocketChannel channel)
         {
+            ChannelDestroyed++;
             if (channel is SocketGuildChannel gChannel)
             {
                 var config = GetConfig(gChannel.Guild.Id);
@@ -350,6 +367,8 @@ namespace RavenBOT.Modules.Lithium.Methods
 
         private async Task Client_ChannelCreated(SocketChannel channel)
         {
+            ChannelCreated++;
+
             if (channel is SocketGuildChannel gChannel)
             {
                 var config = GetConfig(gChannel.Guild.Id);
