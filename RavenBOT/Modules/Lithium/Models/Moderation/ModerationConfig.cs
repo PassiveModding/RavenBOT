@@ -56,9 +56,38 @@ namespace RavenBOT.Modules.Lithium.Models.Moderation
         public bool MassMentionsIncludeRoles { get; set; } = true;
         public bool MassMentionsIncludeChannels { get; set; } = false;
 
-
         public bool UsePerspective { get; set; } = false;
         public int PerspectiveMax { get; set; } = 95;
+
+        public bool UseCaptcha {get;set;} = false;
+        
+        public Captcha CaptchaSettings {get;set;} = new Captcha();
+
+        public class Captcha
+        {
+            public ulong CaptchaTempRole {get; set;} = 0;
+
+            public int MaxFailures {get; set;} = 3;
+
+            public bool SetMaxFailures(int count)
+            {
+                if (count >= 1)
+                {
+                    MaxFailures = count;
+                    return true;
+                }
+
+                return false;
+            }
+
+            public Action MaxFailuresAction {get;set;} = Action.Kick;
+            public enum Action
+            {
+                Kick, 
+                Ban,
+                None
+            }
+        }
 
         public bool UseAntiSpam {get;set;} = false;
         public AntiSpam SpamSettings {get;set;} = new AntiSpam();

@@ -13,8 +13,12 @@ namespace RavenBOT.Modules.Lithium.Methods
     public partial class ModerationService
     {
         private IDatabase Database { get; }
+
+        private DiscordShardedClient Client {get;}
         public Perspective.Api Perspective { get; set; }
         private Dictionary<ulong, ModerationConfig> ModerationConfigs { get; }
+
+        private Random Random {get;}
 
         public ModerationService(IDatabase database, DiscordShardedClient client)
         {
@@ -28,7 +32,10 @@ namespace RavenBOT.Modules.Lithium.Methods
             }
 
             Perspective = setupDoc.PerspectiveToken != null ? new Perspective.Api(setupDoc.PerspectiveToken) : null;
-            client.MessageReceived += MessageReceived;
+            Client = client;
+            Client.MessageReceived += MessageReceived;
+            Client.UserJoined += UserJoined;
+            Random = new Random();
         }
 
         public Task MessageReceived(SocketMessage socketMessage)
