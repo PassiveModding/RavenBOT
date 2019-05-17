@@ -165,7 +165,7 @@ namespace RavenBOT.Modules.Lithium.Methods
                                         field.Name = eventClass.Class.Title + $" x{eventClass.Count}";
                                     }
                                     field.Value = eventClass.Class.Content;
-                                    if (bulkEmbed.Length + eventClass.Class.Title.Length + eventClass.Class.Content.Length >= 5000)
+                                    if (bulkEmbed.Length + eventClass.Class.Title.Length + eventClass.Class.Content.Length >= 5000 || bulkEmbed.Fields.Count > 20)
                                     {
                                         try
                                         {
