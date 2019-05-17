@@ -122,7 +122,7 @@ namespace RavenBOT.Handlers
                     {
                         if (!string.IsNullOrWhiteSpace(prefixMatch))
                         {                            
-                            result = await CommandService.ExecuteAsync(context, message.Content.Substring(Local.DeveloperPrefix.Length).Replace(prefixMatch, $"{prefixMatch} "), Provider);
+                            result = await CommandService.ExecuteAsync(context, message.Content.Replace(prefixMatch, $"{prefixMatch} "), Provider);
                         }
                         else
                         {
