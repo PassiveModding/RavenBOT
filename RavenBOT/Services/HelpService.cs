@@ -9,7 +9,6 @@ using Discord.Addons.Interactive;
 using Discord.Commands;
 using RavenBOT.Extensions;
 using RavenBOT.Models;
-using RavenBOT.Modules.Developer.Methods;
 
 namespace RavenBOT.Services
 {
@@ -18,21 +17,21 @@ namespace RavenBOT.Services
         public PrefixService PrefixService { get; }
         public CommandService CommandService { get; }
         public BotConfig Config { get; }
-        public Setup Setup { get; }
+        public DeveloperSettings DeveloperSettings { get; }
         public IServiceProvider Provider { get; }
 
-        public HelpService(PrefixService prefixService, CommandService cmdService, BotConfig config, Setup setup, IServiceProvider provider)
+        public HelpService(PrefixService prefixService, CommandService cmdService, BotConfig config, DeveloperSettings developerSettings, IServiceProvider provider)
         {
             PrefixService = prefixService;
             CommandService = cmdService;
             Config = config;
-            Setup = setup;
+            DeveloperSettings = developerSettings;
             Provider = provider;
         }
 
         public async Task<bool> TestPreconditions(ShardedCommandContext context, CommandInfo command)
         {
-            var devSettings = Setup.GetDeveloperSettings();
+            var devSettings = DeveloperSettings.GetDeveloperSettings();
 
             foreach (var preconditon in command.Preconditions)
             {

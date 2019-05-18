@@ -2,13 +2,13 @@
 using RavenBOT.Services;
 using RavenBOT.Services.Database;
 
-namespace RavenBOT.Modules.Developer.Methods
+namespace RavenBOT.Models
 {
-    public class Setup
+    public class DeveloperSettings
     {
         public IDatabase Store { get; }
 
-        public Setup(IDatabase store)
+        public DeveloperSettings(IDatabase store)
         {
             Store = store;
         }

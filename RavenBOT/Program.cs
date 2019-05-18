@@ -7,7 +7,6 @@ using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using RavenBOT.Handlers;
 using RavenBOT.Models;
-using RavenBOT.Modules.Developer.Methods;
 using RavenBOT.Services;
 using RavenBOT.Services.Database;
 using RavenBOT.Services.Licensing;
@@ -70,8 +69,8 @@ namespace RavenBOT
 
                     return config;
                 })
-                .AddSingleton<Setup>()
-                .AddSingleton(x => new HelpService(x.GetRequiredService<PrefixService>(), x.GetRequiredService<CommandService>(), x.GetRequiredService<BotConfig>(), x.GetRequiredService<Setup>(), x))
+                .AddSingleton<DeveloperSettings>()
+                .AddSingleton(x => new HelpService(x.GetRequiredService<PrefixService>(), x.GetRequiredService<CommandService>(), x.GetRequiredService<BotConfig>(), x.GetRequiredService<DeveloperSettings>(), x))
                 .AddSingleton(new CommandService(new CommandServiceConfig
                 {
                     ThrowOnError = false,

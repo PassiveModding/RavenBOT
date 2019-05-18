@@ -4,8 +4,7 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using RavenBOT.Handlers;
-using RavenBOT.Modules.Developer.Methods;
-using RavenBOT.Services;
+using RavenBOT.Models;
 using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Developer
@@ -15,18 +14,18 @@ namespace RavenBOT.Modules.Developer
     public class Developer : ModuleBase<SocketCommandContext>
     {
         public LogHandler Logger { get; }
-        public Setup Setup { get; }
+        public DeveloperSettings DeveloperSettings { get; }
 
         public Developer(LogHandler logger, IDatabase dbService)
         {
             Logger = logger;
-            Setup = new Setup(dbService);
+            DeveloperSettings = new DeveloperSettings(dbService);
         }
 
         [Command("EditHelpPreconditionSkips")]
         public async Task EditHelpPreconditionSkipsAsync(string skip)
         {
-            var settings = Setup.GetDeveloperSettings();
+            var settings = DeveloperSettings.GetDeveloperSettings();
             if (settings.SkippableHelpPreconditions.Contains(skip))
             {
                 await ReplyAsync($"Removed {skip}");
@@ -38,7 +37,7 @@ namespace RavenBOT.Modules.Developer
                 settings.SkippableHelpPreconditions.Add(skip);
             }
             
-            Setup.SetDeveloperSettings(settings);
+            DeveloperSettings.SetDeveloperSettings(settings);
 
             await ReplyAsync("Settings:\n" +
                              $"{string.Join("\n", settings.SkippableHelpPreconditions)}");
@@ -47,9 +46,9 @@ namespace RavenBOT.Modules.Developer
         [Command("ClearHelpPreconditionSkips")]
         public async Task ClearHelpPreconditionSkipsAsync()
         {
-            var settings = Setup.GetDeveloperSettings();
+            var settings = DeveloperSettings.GetDeveloperSettings();
             settings.SkippableHelpPreconditions = new List<string>();
-            Setup.SetDeveloperSettings(settings);
+            DeveloperSettings.SetDeveloperSettings(settings);
 
             await ReplyAsync("Set.");
         }
@@ -57,7 +56,7 @@ namespace RavenBOT.Modules.Developer
         [Command("ViewHelpPreconditionSkips")]
         public async Task ViewHelpPreconditionSkipsAsync()
         {
-            var settings = Setup.GetDeveloperSettings();
+            var settings = DeveloperSettings.GetDeveloperSettings();
             await ReplyAsync("Settings:\n" +
                              $"{string.Join("\n", settings.SkippableHelpPreconditions)}");
         }

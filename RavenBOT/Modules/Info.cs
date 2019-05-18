@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using Microsoft.Extensions.DependencyInjection;
-using RavenBOT.Extensions;
-using RavenBOT.Modules.Developer.Methods;
+using RavenBOT.Models;
 using RavenBOT.Services;
 using RavenBOT.Services.Database;
 
@@ -21,7 +17,7 @@ namespace RavenBOT.Modules
         public PrefixService PrefixService { get; }
         public HelpService HelpService { get; }
         public IServiceProvider Provider { get; }
-        public Setup Setup { get; }
+        public DeveloperSettings DeveloperSettings { get; }
 
         private Info(CommandService commandService, PrefixService prefixService, HelpService helpService, IServiceProvider provider)
         {
@@ -29,7 +25,7 @@ namespace RavenBOT.Modules
             PrefixService = prefixService;
             HelpService = helpService;
             Provider = provider;
-            Setup = new Setup(provider.GetRequiredService<IDatabase>());
+            DeveloperSettings = new DeveloperSettings(provider.GetRequiredService<IDatabase>());
         }
 
         [Command("Invite")]
