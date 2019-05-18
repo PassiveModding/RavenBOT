@@ -34,6 +34,7 @@ namespace RavenBOT.Modules.Lithium.Methods
             Perspective = setupDoc.PerspectiveToken != null ? new Perspective.Api(setupDoc.PerspectiveToken) : null;
             Client = client;
             Client.MessageReceived += MessageReceived;
+            Client.ChannelCreated += ChannelCreated;
             Client.UserJoined += UserJoined;
             Random = new Random();
         }

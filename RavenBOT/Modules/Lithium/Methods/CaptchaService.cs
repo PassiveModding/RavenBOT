@@ -94,6 +94,22 @@ namespace RavenBOT.Modules.Lithium.Methods
             Database.Store(user, CaptchaUser.DocumentName(user.UserId, user.GuildId));
         }
 
+        public async Task ChannelCreated(SocketChannel channel)
+        {
+            if (channel is SocketGuildChannel gChannel)
+            {
+                var config = GetModerationConfig(gChannel.Guild.Id);
+                if (config.UseCaptcha)
+                {
+                    //The GetOrCreateCaptchaRole method automatically updates all channels in a server.
+                    //The only reason this method is needed is in the case that a channel is created and a user still has the
+                    //Captcha temp role.
+                    //The Channel will need the permissions to be updated.
+                    var _ = await GetOrCreateCaptchaRole(config, gChannel.Guild);
+                }               
+            }
+        }
+
         public async Task UserJoined(SocketGuildUser user)
         {
             var config = GetModerationConfig(user.Guild.Id);
