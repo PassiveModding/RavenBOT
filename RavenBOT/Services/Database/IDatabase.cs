@@ -10,6 +10,6 @@ namespace RavenBOT.Services.Database
         T Load<T>(string documentName);
         List<T> Query<T>();
         void Remove<T>(T document);
-        void Remove(string documentName);
+        void Remove<T>(string documentName);
     }
 }

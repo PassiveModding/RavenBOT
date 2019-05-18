@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using RavenBOT.Extensions;
 using RavenBOT.Handlers;
 using RavenBOT.Models;
 using RavenBOT.Services.Database;
@@ -15,11 +17,13 @@ namespace RavenBOT.Modules.Developer
     {
         public LogHandler Logger { get; }
         public DeveloperSettings DeveloperSettings { get; }
+        public IDatabase Database { get; }
 
         public Developer(LogHandler logger, IDatabase dbService)
         {
             Logger = logger;
             DeveloperSettings = new DeveloperSettings(dbService);
+            Database = dbService;
         }
 
         [Command("EditHelpPreconditionSkips")]
@@ -36,7 +40,7 @@ namespace RavenBOT.Modules.Developer
                 await ReplyAsync($"Added {skip}");
                 settings.SkippableHelpPreconditions.Add(skip);
             }
-            
+
             DeveloperSettings.SetDeveloperSettings(settings);
 
             await ReplyAsync("Settings:\n" +
@@ -83,6 +87,38 @@ namespace RavenBOT.Modules.Developer
             originalConfig.LogToChannel = true;
             Logger.SetLoggerConfig(originalConfig);
             await ReplyAsync($"Set Logger channel to {channel.Mention}");
+        }
+
+        [Command("TestDatabase")]
+        public async Task DBTest()
+        {
+            //Yes I know this is rudimentary and probably a terrible way of doing things but oh well.
+            try
+            {
+                var testDoc = new DBTestDocument();
+
+                testDoc.value = "Test";
+
+                Database.Store(testDoc);
+                Database.Store(testDoc, "Document");
+                var docA = Database.Load<DBTestDocument>(null);
+                var docB = Database.Load<DBTestDocument>("Document");
+                var docList = Database.Query<DBTestDocument>();
+                Database.Remove(testDoc);
+                Database.Remove<DBTestDocument>("Document");
+                Database.StoreMany(new List<DBTestDocument>(), x => x.value);
+                await ReplyAsync("No Errors were thrown");
+            }
+            catch (Exception e)
+            {
+                await ReplyAsync(e.ToString().FixLength(2047));
+            }
+
+        }
+
+        public class DBTestDocument
+        {
+            public string value { get; set; }
         }
     }
 }

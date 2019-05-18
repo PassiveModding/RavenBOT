@@ -172,7 +172,7 @@ namespace RavenBOT.Services.Database
             }
         }
 
-        public void Remove(string documentName)
+        public void Remove<T>(string documentName)
         {
             using (var session = DocumentStore.OpenSession())
             {

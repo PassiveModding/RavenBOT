@@ -20,6 +20,7 @@ namespace RavenBOT
         {
             //Configure the service provider with all relevant and required services to be injected into other classes.
             var provider = new ServiceCollection()
+                //Change Database store type here.
                 .AddSingleton(x => new RavenDatabase() as IDatabase)
                 .AddSingleton(x => new DiscordShardedClient(new DiscordSocketConfig
                 {
