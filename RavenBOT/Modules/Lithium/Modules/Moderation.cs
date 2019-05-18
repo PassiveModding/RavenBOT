@@ -1,7 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
+using RavenBOT.Extensions;
 using RavenBOT.Modules.Lithium.Methods;
 using RavenBOT.Modules.Lithium.Models.Moderation;
 using RavenBOT.Services.Database;
@@ -159,6 +161,46 @@ namespace RavenBOT.Modules.Lithium.Modules
             setup.PerspectiveToken = token;
             ModerationService.SetSetup(setup);
             return Task.CompletedTask;
+        }
+
+        [Command("ShowSettings")]
+        public async Task ShowSettings()
+        {
+            var config = ModerationService.GetModerationConfig(Context.Guild.Id);
+            var blacklistSimpleSet = config.BlacklistSimple.Select(x => {
+                                if (x.Regex)
+                                {
+                                    return $"Regex Check: {x.Content}";
+                                }
+
+                                return x.Content;
+                            }).ToList();
+                            
+            await ReplyAsync("**AUTO-MOD SETTINGS**\n" +
+                            $"Block Invites: {config.BlockInvites}\n" +
+                            $"Block IP Addresses: {config.BlockIps}\n" +
+                            $"Block Mass Mentions: {config.BlockMassMentions}\n" +
+                            $"Maximum Mentions: {config.MaxMentions}\n" +
+                            $"Mass Mentions includes Users: {config.MassMentionsIncludeUsers}\n" +
+                            $"Mass Mentions includes Roles: {config.MassMentionsIncludeRoles}\n" +
+                            $"Mass Mentions includes Channels: {config.MassMentionsIncludeChannels}\n" +
+                            $"**TOXICITY SETTINGS (PERSPECTIVE)**\n" +
+                            $"Use Perspective: {config.UsePerspective}\n" +
+                            $"Max Toxicity Percent: {config.PerspectiveMax}%\n" +
+                            $"**CAPTCHA SETTINGS**\n" +
+                            $"Use Captcha: {config.UseCaptcha}\n" +
+                            $"Temp Role: {Context.Guild.GetRole(config.CaptchaSettings.CaptchaTempRole)?.Mention ?? "N/A"}\n" +
+                            $"Max Captcha Failures: {config.CaptchaSettings.MaxFailures}\n" +
+                            $"Max Captcha Failures Action: {config.CaptchaSettings.MaxFailuresAction}\n" +
+                            $"**ANTI-SPAM SETTINGS**\n" +
+                            $"Use Anti-Spam: {config.UseAntiSpam}\n" +
+                            $"Message Cache Size: {config.SpamSettings.CacheSize}\n" +
+                            $"Max Messages per x Second(s): {config.SpamSettings.MessagesPerTime} messages per {config.SpamSettings.SecondsToCheck} second(s)\n" +
+                            $"Max Identical Messages: {config.SpamSettings.MaxRepititions}\n" +
+                            $"**BLACKLIST SETTINGS**\n" +
+                            $"Use Blacklist: {config.UseBlacklist}\n" +
+                            $"Blacklisted Words: \n{string.Join("\n", blacklistSimpleSet)}\n" +
+                            $"\n\nComplex Blacklist is currently disabled for ALL Servers as it is still being developed.".FixLength(2047));
         }
     }
 }
