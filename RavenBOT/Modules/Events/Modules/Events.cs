@@ -3,12 +3,12 @@ using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
-using RavenBOT.Modules.Lithium.Methods;
+using RavenBOT.Modules.Events.Methods;
 using RavenBOT.Services.Database;
 
-namespace RavenBOT.Modules.Lithium.Modules
+namespace RavenBOT.Modules.Events.Modules
 {
-    [Group("lithium.events.")]
+    [Group("events.")]
     [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     public class Events : InteractiveBase<ShardedCommandContext>

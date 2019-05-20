@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using RavenBOT.Modules.Lithium.Models;
+using RavenBOT.Modules.Tickets.Models;
 using RavenBOT.Services.Database;
 
-namespace RavenBOT.Modules.Lithium.Methods
+namespace RavenBOT.Modules.Tickets.Methods
 {
     public class TicketService
     {

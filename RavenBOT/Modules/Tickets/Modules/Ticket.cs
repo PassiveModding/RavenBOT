@@ -5,12 +5,12 @@ using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
-using RavenBOT.Modules.Lithium.Methods;
+using RavenBOT.Modules.Tickets.Methods;
 using RavenBOT.Services.Database;
 
-namespace RavenBOT.Modules.Lithium.Modules
+namespace RavenBOT.Modules.Tickets.Modules
 {
-    [Group("lithium.ticket ")]
+    [Group("ticket ")]
     [RequireContext(ContextType.Guild)]
     public class Ticket : InteractiveBase<ShardedCommandContext>
     {

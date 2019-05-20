@@ -16,7 +16,7 @@ namespace RavenBOT.Modules.Moderator.Modules
     public partial class Moderation : InteractiveBase<ShardedCommandContext>
     {      
         //Moderator role?
-        //Unban, hackban, delete warning(s), remove softban
+        //hackban, delete warning(s)
 
         public ModerationHandler ModHandler {get;}
 
@@ -24,6 +24,22 @@ namespace RavenBOT.Modules.Moderator.Modules
         {
             ModHandler = new ModerationHandler(database, client);
         }   
+
+        [Command("HackBan")]
+        [RequireBotPermission(Discord.GuildPermission.BanMembers)]
+        [RequireUserPermission(Discord.GuildPermission.BanMembers)]
+        public async Task MaxWarnings(ulong userId, [Remainder]string reason = null)
+        {
+            var config = ModHandler.GetActionConfig(Context.Guild.Id);
+
+            var caseId = config.AddLogAction(userId, Context.User.Id, ActionConfig.Log.LogAction.Ban, reason);
+
+            ModHandler.Save(config, ActionConfig.DocumentName(Context.Guild.Id));
+
+            await Context.Guild.AddBanAsync(userId, 0, reason);
+
+            await ReplyAsync($"#{caseId} Hackbanned user with ID {userId}");
+        }
 
         [Command("SetMaxWarnings")]
         public async Task MaxWarnings(int max)

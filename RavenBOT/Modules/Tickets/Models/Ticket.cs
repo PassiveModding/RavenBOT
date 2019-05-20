@@ -6,9 +6,8 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using RavenBOT.Extensions;
-using RavenBOT.Modules.Lithium.Methods;
 
-namespace RavenBOT.Modules.Lithium.Models
+namespace RavenBOT.Modules.Tickets.Models
 {
     public class Ticket
     {

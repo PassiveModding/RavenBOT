@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace RavenBOT.Modules.Lithium.Models
+namespace RavenBOT.Modules.Tickets.Models
 {
     //Used for ticket settings for a server
     public class TicketGuild

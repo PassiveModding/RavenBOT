@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 using RavenBOT.Extensions;
-using RavenBOT.Modules.Lithium.Models.Events;
+using RavenBOT.Modules.Events.Models.Events;
 using RavenBOT.Services.Database;
 
-namespace RavenBOT.Modules.Lithium.Methods
+namespace RavenBOT.Modules.Events.Methods
 {
     public class EventService
     {
