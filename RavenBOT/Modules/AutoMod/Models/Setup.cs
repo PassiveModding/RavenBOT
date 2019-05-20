@@ -1,4 +1,4 @@
-﻿namespace RavenBOT.Modules.Lithium.Models
+﻿namespace RavenBOT.Modules.AutoMod.Models
 {
     public class Setup
     {

@@ -4,11 +4,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
-using RavenBOT.Modules.Lithium.Models.Moderation;
+using RavenBOT.Modules.AutoMod.Models.Moderation;
 using CaptchaGen.NetCore;
 using System.IO;
 
-namespace RavenBOT.Modules.Lithium.Methods
+namespace RavenBOT.Modules.AutoMod.Methods
 {
     public partial class ModerationService
     {

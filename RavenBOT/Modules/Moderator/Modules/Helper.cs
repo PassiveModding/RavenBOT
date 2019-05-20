@@ -3,19 +3,17 @@ using Discord.Addons.Interactive;
 using System.Collections.Generic;
 using Discord.Commands;
 using Discord.WebSocket;
-using RavenBOT.Modules.Lithium.Methods;
-using RavenBOT.Modules.Lithium.Models.Moderation;
 using RavenBOT.Services;
 using RavenBOT.Services.Database;
 
-namespace RavenBOT.Modules.Lithium.Modules
+namespace RavenBOT.Modules.Moderator.Modules
 {
-    [Group("lithium.")]
-    public class Lithium : InteractiveBase<ShardedCommandContext>
+    [Group("moderator.")]
+    public class Helper : InteractiveBase<ShardedCommandContext>
     {
         private HelpService HelpService { get; }
 
-        public Lithium(HelpService helpService)
+        public Helper(HelpService helpService)
         {
             HelpService = helpService;
         }
@@ -25,7 +23,7 @@ namespace RavenBOT.Modules.Lithium.Modules
         {
             var res = await HelpService.PagedHelpAsync(Context, true, new List<string>
             {
-                "lithium."
+                "moderator."
             });
 
             if (res != null)

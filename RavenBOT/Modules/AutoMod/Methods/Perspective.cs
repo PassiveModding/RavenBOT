@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Text;
 using Newtonsoft.Json;
 
-namespace RavenBOT.Modules.Lithium.Methods
+namespace RavenBOT.Modules.AutoMod.Methods
 {
     public class Perspective
     {

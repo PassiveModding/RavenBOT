@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord.WebSocket;
-using RavenBOT.Modules.Lithium.Models;
-using RavenBOT.Modules.Lithium.Models.Moderation;
+using RavenBOT.Modules.AutoMod.Models;
+using RavenBOT.Modules.AutoMod.Models.Moderation;
 using RavenBOT.Services.Database;
 
-namespace RavenBOT.Modules.Lithium.Methods
+namespace RavenBOT.Modules.AutoMod.Methods
 {
     public partial class ModerationService
     {

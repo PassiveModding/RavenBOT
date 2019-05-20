@@ -4,13 +4,13 @@ using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
 using RavenBOT.Extensions;
-using RavenBOT.Modules.Lithium.Methods;
-using RavenBOT.Modules.Lithium.Models.Moderation;
+using RavenBOT.Modules.AutoMod.Methods;
+using RavenBOT.Modules.AutoMod.Models.Moderation;
 using RavenBOT.Services.Database;
 
-namespace RavenBOT.Modules.Lithium.Modules
+namespace RavenBOT.Modules.AutoMod.Modules
 {
-    [Group("lithium.moderation.")]
+    [Group("automod.moderation.")]
     public partial class Moderation : InteractiveBase<ShardedCommandContext>
     {
         public ModerationService ModerationService { get; }

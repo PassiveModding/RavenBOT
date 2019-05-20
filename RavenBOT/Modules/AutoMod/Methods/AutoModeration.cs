@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord.WebSocket;
 
-namespace RavenBOT.Modules.Lithium.Methods
+namespace RavenBOT.Modules.AutoMod.Methods
 {
     public partial class ModerationService
     {

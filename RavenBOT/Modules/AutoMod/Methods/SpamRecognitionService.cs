@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Discord.WebSocket;
 
-namespace RavenBOT.Modules.Lithium.Methods
+namespace RavenBOT.Modules.AutoMod.Methods
 {
     public partial class ModerationService
     {

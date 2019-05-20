@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace RavenBOT.Modules.Lithium.Models.Moderation
+namespace RavenBOT.Modules.AutoMod.Models.Moderation
 {
     public class ModerationConfig
     {

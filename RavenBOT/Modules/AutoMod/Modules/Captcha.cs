@@ -1,9 +1,9 @@
 using System.Threading.Tasks;
 using Discord.Addons.Interactive;
 using Discord.Commands;
-using RavenBOT.Modules.Lithium.Models.Moderation;
+using RavenBOT.Modules.AutoMod.Models.Moderation;
 
-namespace RavenBOT.Modules.Lithium.Modules
+namespace RavenBOT.Modules.AutoMod.Modules
 {
     public partial class Moderation : InteractiveBase<ShardedCommandContext>
     {
