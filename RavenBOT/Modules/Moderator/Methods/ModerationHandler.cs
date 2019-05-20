@@ -30,7 +30,7 @@ namespace RavenBOT.Modules.Moderator.Methods
                 Database.Store(TimedActions, TimeTracker.DocumentName);
             }
 
-            Timer = new Timer(TimerEvent, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
+            Timer = new Timer(TimerEvent, null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
         }
 
         public async Task<IRole> GetOrCreateMuteRole(ActionConfig config, SocketGuild guild)

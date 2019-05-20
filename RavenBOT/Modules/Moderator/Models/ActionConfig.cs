@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace RavenBOT.Modules.Moderator.Models
 {
@@ -34,7 +35,7 @@ namespace RavenBOT.Modules.Moderator.Models
 
         public int AddLogAction(ulong user, ulong moderator, Log.LogAction action, string reason = null, TimeSpan? length = null)
         {
-            var id = LogActions.Count + 1;
+            var id = LogActions.Any() ? LogActions.Max(x => x.CaseId) + 1 : 1;
             var newAction = new Log(user, moderator, action, id, reason, length);
             LogActions.Add(newAction);
             return id;
