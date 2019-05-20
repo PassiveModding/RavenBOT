@@ -4,51 +4,86 @@ using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
-using RavenBOT.Modules.AutoMod.Models.Moderation;
 using CaptchaGen.NetCore;
 using System.IO;
+using RavenBOT.Services.Database;
+using System.Collections.Generic;
+using RavenBOT.Modules.Captcha.Models;
 
-namespace RavenBOT.Modules.AutoMod.Methods
+namespace RavenBOT.Modules.Captcha.Methods
 {
-    public partial class ModerationService
+    public partial class CaptchaService
     {
-        public async Task PerformCaptchaAction(ModerationConfig.Captcha.Action actionType, SocketGuildUser user)
+        private IDatabase Database { get; }
+        private DiscordShardedClient Client { get; }
+        private Random Random { get; }
+
+        public CaptchaService(IDatabase database, DiscordShardedClient client)
         {
-            if (actionType == ModerationConfig.Captcha.Action.None)
+            Database = database;
+
+            Client = client;
+            Client.ChannelCreated += ChannelCreated;
+            Client.UserJoined += UserJoined;
+            Random = new Random();
+        }
+
+        public async Task PerformCaptchaAction(CaptchaConfig.Action actionType, SocketGuildUser user)
+        {
+            if (actionType == CaptchaConfig.Action.None)
             {
                 return;
             }
             
-            if (actionType == ModerationConfig.Captcha.Action.Kick)
+            if (actionType == CaptchaConfig.Action.Kick)
             {
                 await user.KickAsync("Failed to pass captcha verification");
                 return;
             }
 
-            if (actionType == ModerationConfig.Captcha.Action.Ban)
+            if (actionType == CaptchaConfig.Action.Ban)
             {
                 await user.BanAsync(7, "Failed to pass captcha verification");
                 return;
             }
         }
 
-        public async Task<IRole> GetOrCreateCaptchaRole(ModerationConfig config, SocketGuild guild)
+        public void SaveCaptchaConfig(CaptchaConfig config)
+        {
+            Database.Store(config, CaptchaConfig.DocumentName(config.GuildId));
+        }
+
+        public CaptchaConfig GetCaptchaConfig(ulong guildId)
+        {
+
+            //Try to load it from database, otherwise create a new one and store it.
+            var document = Database.Load<CaptchaConfig>(CaptchaConfig.DocumentName(guildId));
+            if (document == null)
+            {
+                document = new CaptchaConfig(guildId);
+                Database.Store(document, CaptchaConfig.DocumentName(guildId));
+            }
+
+            return document;
+        }
+
+        public async Task<IRole> GetOrCreateCaptchaRole(CaptchaConfig config, SocketGuild guild)
         {
             IRole role;
-            if (config.CaptchaSettings.CaptchaTempRole == 0)
+            if (config.CaptchaTempRole == 0)
             {
                 role = await guild.CreateRoleAsync("CaptchaTempRole");
-                config.CaptchaSettings.CaptchaTempRole = role.Id;
-                SaveModerationConfig(config);
+                config.CaptchaTempRole = role.Id;
+                SaveCaptchaConfig(config);
             }
             else
             {
-                role = guild.GetRole(config.CaptchaSettings.CaptchaTempRole);
+                role = guild.GetRole(config.CaptchaTempRole);
                 if (role == null)
                 {
                     role = await guild.CreateRoleAsync("CaptchaTempRole");
-                    config.CaptchaSettings.CaptchaTempRole = role.Id;
-                    SaveModerationConfig(config);
+                    config.CaptchaTempRole = role.Id;
+                    SaveCaptchaConfig(config);
                 }
 
                 if (role.Permissions.SendMessages || role.Permissions.AddReactions || role.Permissions.Connect || role.Permissions.Speak)
@@ -98,7 +133,7 @@ namespace RavenBOT.Modules.AutoMod.Methods
         {
             if (channel is SocketGuildChannel gChannel)
             {
-                var config = GetModerationConfig(gChannel.Guild.Id);
+                var config = GetCaptchaConfig(gChannel.Guild.Id);
                 if (config.UseCaptcha)
                 {
                     //The GetOrCreateCaptchaRole method automatically updates all channels in a server.
@@ -112,7 +147,7 @@ namespace RavenBOT.Modules.AutoMod.Methods
 
         public async Task UserJoined(SocketGuildUser user)
         {
-            var config = GetModerationConfig(user.Guild.Id);
+            var config = GetCaptchaConfig(user.Guild.Id);
             if (config.UseCaptcha)
             {
                 var captchaDoc = GetOrCreateCaptchaUser(user.Id, user.Guild.Id);
@@ -126,7 +161,7 @@ namespace RavenBOT.Modules.AutoMod.Methods
 
                 await user.AddRoleAsync(role);
 
-                if (captchaDoc.FailureCount >= config.CaptchaSettings.MaxFailures)
+                if (captchaDoc.FailureCount >= config.MaxFailures)
                 {
                     return;
                 }
@@ -154,32 +189,6 @@ namespace RavenBOT.Modules.AutoMod.Methods
             }
 
             return captchaString.ToString();
-        }
-
-        public class CaptchaUser
-        {
-            public static string DocumentName(ulong userId, ulong guildId)
-            {
-                return $"CaptchaUser-{userId}-{guildId}";
-            }
-
-            public CaptchaUser(){}
-
-            public CaptchaUser(ulong userId, ulong guildId, string captcha)
-            {
-                UserId = userId;
-                GuildId = guildId;
-
-                Captcha = captcha;
-            }
-
-            public ulong UserId {get;set;}
-            public ulong GuildId {get;set;}
-
-            public string Captcha {get;set;}
-
-            public bool Passed {get;set;} = false;
-            public int FailureCount {get;set;} = 0;
         }
     }
 }

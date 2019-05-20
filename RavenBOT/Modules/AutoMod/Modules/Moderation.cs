@@ -187,11 +187,6 @@ namespace RavenBOT.Modules.AutoMod.Modules
                             $"**TOXICITY SETTINGS (PERSPECTIVE)**\n" +
                             $"Use Perspective: {config.UsePerspective}\n" +
                             $"Max Toxicity Percent: {config.PerspectiveMax}%\n" +
-                            $"**CAPTCHA SETTINGS**\n" +
-                            $"Use Captcha: {config.UseCaptcha}\n" +
-                            $"Temp Role: {Context.Guild.GetRole(config.CaptchaSettings.CaptchaTempRole)?.Mention ?? "N/A"}\n" +
-                            $"Max Captcha Failures: {config.CaptchaSettings.MaxFailures}\n" +
-                            $"Max Captcha Failures Action: {config.CaptchaSettings.MaxFailuresAction}\n" +
                             $"**ANTI-SPAM SETTINGS**\n" +
                             $"Use Anti-Spam: {config.UseAntiSpam}\n" +
                             $"Message Cache Size: {config.SpamSettings.CacheSize}\n" +

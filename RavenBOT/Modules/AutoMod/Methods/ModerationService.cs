@@ -18,8 +18,6 @@ namespace RavenBOT.Modules.AutoMod.Methods
         public Perspective.Api Perspective { get; set; }
         private Dictionary<ulong, ModerationConfig> ModerationConfigs { get; }
 
-        private Random Random {get;}
-
         public ModerationService(IDatabase database, DiscordShardedClient client)
         {
             Database = database;
@@ -34,9 +32,6 @@ namespace RavenBOT.Modules.AutoMod.Methods
             Perspective = setupDoc.PerspectiveToken != null ? new Perspective.Api(setupDoc.PerspectiveToken) : null;
             Client = client;
             Client.MessageReceived += MessageReceived;
-            Client.ChannelCreated += ChannelCreated;
-            Client.UserJoined += UserJoined;
-            Random = new Random();
         }
 
         public Task MessageReceived(SocketMessage socketMessage)

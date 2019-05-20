@@ -1,23 +1,21 @@
 using System.Threading.Tasks;
 using Discord.Addons.Interactive;
 using Discord.Commands;
-using RavenBOT.Modules.AutoMod.Models.Moderation;
+using Discord.WebSocket;
+using RavenBOT.Modules.Captcha.Methods;
+using RavenBOT.Modules.Captcha.Models;
+using RavenBOT.Services.Database;
 
-namespace RavenBOT.Modules.AutoMod.Modules
+namespace RavenBOT.Modules.Captcha.Modules
 {
-    public partial class Moderation : InteractiveBase<ShardedCommandContext>
+    [Group("captcha.")]
+    public class Captcha : InteractiveBase<ShardedCommandContext>
     {
-        //User Joins Server
-
-        //User blocked from speaking etc.
-
-        //User recieves code in dm
-
-        //User runs command with code
-
-        //If correct the user will get permissions to speak etc.
-
-        //If incorrect try again, after 3 failures, kick
+        public CaptchaService CaptchaService {get;}
+        public Captcha(IDatabase database, DiscordShardedClient client)
+        {
+            CaptchaService = new CaptchaService(database, client);
+        }
 
         [Command("Verify")]
         [RequireContext(ContextType.DM)]
@@ -29,14 +27,14 @@ namespace RavenBOT.Modules.AutoMod.Modules
                 return;
             }
 
-            var captchaUser = ModerationService.GetCaptchaUser(Context.User.Id, guildId);
+            var captchaUser = CaptchaService.GetCaptchaUser(Context.User.Id, guildId);
             if (captchaUser == null)
             {
                 await ReplyAsync("Invalid guildId");
                 return;
             }
 
-            var config = ModerationService.GetModerationConfig(guildId);
+            var config = CaptchaService.GetCaptchaConfig(guildId);
 
             var guild = Context.Client.GetGuild(guildId);
             if (guild == null)
@@ -53,21 +51,21 @@ namespace RavenBOT.Modules.AutoMod.Modules
 
             if (captchaUser.Passed)
             {
-                var role = guild.GetRole(config.CaptchaSettings.CaptchaTempRole);
+                var role = guild.GetRole(config.CaptchaTempRole);
                 
                 if (role != null && guildUser != null)
                 {
                     await guildUser.RemoveRoleAsync(role);
-                    ModerationService.SaveCaptchaUser(captchaUser);
+                    CaptchaService.SaveCaptchaUser(captchaUser);
                 }
 
                 await ReplyAsync("Successfully verified.");
                 return;
             }
 
-            if (captchaUser.FailureCount >= config.CaptchaSettings.MaxFailures)
+            if (captchaUser.FailureCount >= config.MaxFailures)
             {
-                await ModerationService.PerformCaptchaAction(config.CaptchaSettings.MaxFailuresAction, guildUser);
+                await CaptchaService.PerformCaptchaAction(config.MaxFailuresAction, guildUser);
                 await ReplyAsync("You have already exceeded the maximum attempt count.");
                 return;
             }
@@ -76,12 +74,12 @@ namespace RavenBOT.Modules.AutoMod.Modules
             {
                 captchaUser.Passed = true;            
 
-                var role = guild.GetRole(config.CaptchaSettings.CaptchaTempRole);
+                var role = guild.GetRole(config.CaptchaTempRole);
                 
                 if (role != null && guildUser != null)
                 {
                     await guildUser.RemoveRoleAsync(role);
-                    ModerationService.SaveCaptchaUser(captchaUser);
+                    CaptchaService.SaveCaptchaUser(captchaUser);
                     await ReplyAsync("Success, you have been verified.");
                     return;
                 }
@@ -92,23 +90,23 @@ namespace RavenBOT.Modules.AutoMod.Modules
             {
                 captchaUser.FailureCount++;
 
-                await ReplyAsync($"You have failed attempt {captchaUser.FailureCount}/{config.CaptchaSettings.MaxFailures}");
+                await ReplyAsync($"You have failed attempt {captchaUser.FailureCount}/{config.MaxFailures}");
                 
-                if (captchaUser.FailureCount >= config.CaptchaSettings.MaxFailures)
+                if (captchaUser.FailureCount >= config.MaxFailures)
                 {
                     await ReplyAsync("You have exceeded the maximum amount of attempts.");
-                    await ModerationService.PerformCaptchaAction(config.CaptchaSettings.MaxFailuresAction, guildUser);
+                    await CaptchaService.PerformCaptchaAction(config.MaxFailuresAction, guildUser);
                 }
-                ModerationService.SaveCaptchaUser(captchaUser);
+                CaptchaService.SaveCaptchaUser(captchaUser);
             }
         }
 
         [Command("UseCaptcha")]
         public async Task ToggleCaptcha()
         {
-            var config = ModerationService.GetModerationConfig(Context.Guild.Id);
+            var config = CaptchaService.GetCaptchaConfig(Context.Guild.Id);
             config.UseCaptcha = !config.UseCaptcha;
-            ModerationService.SaveModerationConfig(config);
+            CaptchaService.SaveCaptchaConfig(config);
 
             await ReplyAsync($"UseCaptcha: {config.UseCaptcha}");
         }
@@ -116,10 +114,10 @@ namespace RavenBOT.Modules.AutoMod.Modules
         [Command("MaxCaptchaWarnings")]
         public async Task SetCaptchaWarnings(int count = 3)
         {
-            var config = ModerationService.GetModerationConfig(Context.Guild.Id);
-            if (config.CaptchaSettings.SetMaxFailures(count))
+            var config = CaptchaService.GetCaptchaConfig(Context.Guild.Id);
+            if (config.SetMaxFailures(count))
             {
-                ModerationService.SaveModerationConfig(config);
+                CaptchaService.SaveCaptchaConfig(config);
                 await ReplyAsync("Max Failures for captcha: {count}");
             }
             else
@@ -136,12 +134,23 @@ namespace RavenBOT.Modules.AutoMod.Modules
         }
 
         [Command("SetCaptchaAction")]
-        public async Task SetCaptchaAction(ModerationConfig.Captcha.Action action = ModerationConfig.Captcha.Action.Kick)
+        public async Task SetCaptchaAction(CaptchaConfig.Action action = CaptchaConfig.Action.Kick)
         {
-            var config = ModerationService.GetModerationConfig(Context.Guild.Id);
-            config.CaptchaSettings.MaxFailuresAction = action;
-            ModerationService.SaveModerationConfig(config);
+            var config = CaptchaService.GetCaptchaConfig(Context.Guild.Id);
+            config.MaxFailuresAction = action;
+            CaptchaService.SaveCaptchaConfig(config);
             await ReplyAsync($"Max Failure Action: {action}");
+        }
+
+        [Command("CaptchaSettings")]
+        public async Task CaptchaSettings()
+        {
+            var config = CaptchaService.GetCaptchaConfig(Context.Guild.Id);
+            await ReplyAsync($"**CAPTCHA SETTINGS**\n" +
+                            $"Use Captcha: {config.UseCaptcha}\n" +
+                            $"Temp Role: {Context.Guild.GetRole(config.CaptchaTempRole)?.Mention ?? "N/A"}\n" +
+                            $"Max Captcha Failures: {config.MaxFailures}\n" +
+                            $"Max Captcha Failures Action: {config.MaxFailuresAction}\n");
         }
     }
 }
