@@ -32,6 +32,55 @@ namespace RavenBOT.Modules.Moderator.Models
 
         public ulong MuteRole {get;set;}
 
+        public int AddLogAction(ulong user, ulong moderator, Log.LogAction action, string reason = null, TimeSpan? length = null)
+        {
+            var id = LogActions.Count + 1;
+            var newAction = new Log(user, moderator, action, id, reason, length);
+            LogActions.Add(newAction);
+            return id;
+        }
+
+        public TimeSpan SoftBanLength {get;set;} = TimeSpan.FromHours(24);
+
+        public TimeSpan MuteLength {get;set;} = TimeSpan.FromHours(1);
+
+        public List<Log> LogActions {get;set;} = new List<Log>();
+
+        public class Log
+        {
+            public Log(ulong user, ulong moderator, LogAction action, int id, string reason = null, TimeSpan? length = null)
+            {
+                Target = user;
+                Moderator = moderator;
+                Action = action;
+                CaseId = id;
+                Reason = reason;
+                TimeStamp = DateTime.UtcNow;
+                Duration = length;
+            }
+
+            public Log() {}
+
+            public ulong Target {get;set;}
+            public ulong Moderator {get;set;}
+            public string Reason {get;set;}
+            public int CaseId {get;set;}
+            public DateTime TimeStamp {get;set;} = DateTime.UtcNow;
+
+            public LogAction Action {get;set;}
+
+            public TimeSpan? Duration {get;set;} = null;
+
+            public enum LogAction
+            {
+                Ban,
+                Kick,
+                Warn,
+                Mute,
+                SoftBan
+            }
+        }
+
         public class ActionUser
         {
             public static string DocumentName(ulong userId, ulong guildId)

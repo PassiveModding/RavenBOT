@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Discord.Addons.Interactive;
 using Discord.Commands;
@@ -12,7 +13,7 @@ namespace RavenBOT.Modules.Moderator.Modules
 {
     [Group("moderator.")]
     [RequireUserPermission(Discord.GuildPermission.Administrator)]
-    public class Moderation : InteractiveBase<ShardedCommandContext>
+    public partial class Moderation : InteractiveBase<ShardedCommandContext>
     {      
         //Moderator role?
         //Unban, hackban, delete warning(s), remove softban
@@ -24,6 +25,70 @@ namespace RavenBOT.Modules.Moderator.Modules
             ModHandler = new ModerationHandler(database, client);
         }   
 
+        [Command("SetMaxWarnings")]
+        public async Task MaxWarnings(int max)
+        {
+            var config = ModHandler.GetActionConfig(Context.Guild.Id);
+            config.MaxWarnings = max;
+            ModHandler.Save(config, ActionConfig.DocumentName(Context.Guild.Id));
+            await ReplyAsync($"Max Warnings is now: {max}");
+        }
+
+        [Command("MaxWarningsAction")]
+        public async Task MaxWarningsAction(ActionConfig.Action action)
+        {
+            var config = ModHandler.GetActionConfig(Context.Guild.Id);
+            config.MaxWarningsAction = action;
+            ModHandler.Save(config, ActionConfig.DocumentName(Context.Guild.Id));
+            await ReplyAsync($"Max Warnings Action is now: {action}");
+        }
+
+        [Command("SetDefaultSoftBanTime")]
+        public async Task DefaultSoftBanTime(TimeSpan time)
+        {
+            var config = ModHandler.GetActionConfig(Context.Guild.Id);
+            config.SoftBanLength = time;
+            ModHandler.Save(config, ActionConfig.DocumentName(Context.Guild.Id));
+            await ReplyAsync($"By Default users will be softbanned for {time.GetReadableLength()}");
+        }
+
+        [Command("SetDefaultMuteTime")]
+        public async Task DefaultMuteTime(TimeSpan time)
+        {
+            var config = ModHandler.GetActionConfig(Context.Guild.Id);
+            config.MuteLength = time;
+            ModHandler.Save(config, ActionConfig.DocumentName(Context.Guild.Id));
+            await ReplyAsync($"By Default users will be muted for {time.GetReadableLength()}");
+        }
+
+        [Command("SetReason")]
+        public async Task SetReason(int caseId, [Remainder]string reason)
+        {
+            var config = ModHandler.GetActionConfig(Context.Guild.Id);
+
+            var action = config.LogActions.FirstOrDefault(x => x.CaseId == caseId);
+            if (action == null)
+            {
+                await ReplyAsync("Invalid Case ID");
+                return;
+            }
+
+            //Check if reason is updated or list needs to be re-updated
+            if (action.Reason == null)
+            {
+                action.Reason = reason;
+                await ReplyAsync("Reason set.");
+            }
+            else
+            {
+                action.Reason =  $"**Original Reason**\n{action.Reason}**Updated Reason**\n{reason}";
+                //TODO: Show action in embed
+                await ReplyAsync("Appended reason to message.");
+            }
+
+            ModHandler.Save(config, ActionConfig.DocumentName(Context.Guild.Id));
+        }
+
         [Command("ban")]
         [RequireBotPermission(Discord.GuildPermission.BanMembers)]
         [RequireUserPermission(Discord.GuildPermission.BanMembers)]
@@ -32,7 +97,11 @@ namespace RavenBOT.Modules.Moderator.Modules
             //Setting for prune days is needed
             //Log this to some config file?
             await user.Guild.AddBanAsync(user, 0, reason);
-            await ReplyAsync($"{user.Mention} was banned by {Context.User.Mention} for {reason ?? "N/A"}");
+            var config = ModHandler.GetActionConfig(Context.Guild.Id);
+            var caseId = config.AddLogAction(user.Id, Context.User.Id, ActionConfig.Log.LogAction.Ban, reason);
+            await ReplyAsync($"#{caseId} {user.Mention} was banned by {Context.User.Mention} for {reason ?? "N/A"}");
+
+            ModHandler.Save(config, ActionConfig.DocumentName(Context.Guild.Id));
         }
 
         [Command("kick")]
@@ -42,7 +111,11 @@ namespace RavenBOT.Modules.Moderator.Modules
         {
             //Log this to some config file?
             await user.KickAsync(reason);
-            await ReplyAsync($"{user.Mention} was kicked by {Context.User.Mention} for {reason ?? "N/A"}");
+            var config = ModHandler.GetActionConfig(Context.Guild.Id);
+            var caseId = config.AddLogAction(user.Id, Context.User.Id, ActionConfig.Log.LogAction.Kick, reason);
+            await ReplyAsync($"#{caseId} {user.Mention} was kicked by {Context.User.Mention} for {reason ?? "N/A"}");
+
+            ModHandler.Save(config, ActionConfig.DocumentName(Context.Guild.Id));
         }
 
         [Command("warn")]
@@ -56,9 +129,13 @@ namespace RavenBOT.Modules.Moderator.Modules
             var userConfig = ModHandler.GetActionUser(Context.Guild.Id, user.Id);
 
             var warns = userConfig.WarnUser(Context.User.Id, reason);
+            var caseId = config.AddLogAction(user.Id, Context.User.Id, ActionConfig.Log.LogAction.Warn, reason);
+
+            ModHandler.Save(config, ActionConfig.DocumentName(Context.Guild.Id));
+
             ModHandler.Save(userConfig, ActionConfig.ActionUser.DocumentName(user.Id, Context.Guild.Id));
             //TODO: If reason is not set, generate ticket-like ID and have command where they can set the reason afterwards
-            await ReplyAsync($"{user.Mention} was warned by {Context.User.Mention} for {reason ?? "N/A"}");
+            await ReplyAsync($"#{caseId} {user.Mention} was warned by {Context.User.Mention} for {reason ?? "N/A"}");
             if (warns > config.MaxWarnings)
             {
                 if (config.MaxWarningsAction == Models.ActionConfig.Action.Kick)
@@ -78,16 +155,32 @@ namespace RavenBOT.Modules.Moderator.Modules
         //TODO: Mod permissions
         public async Task MuteUser(SocketGuildUser user, [Remainder]string reason = null)
         {
+           await MuteUser(user, null, reason);
+        }
+
+        [Command("mute")]
+        //TODO: Mod permissions
+        public async Task MuteUser(SocketGuildUser user, TimeSpan? time = null, [Remainder]string reason = null)
+        {
             //TODO: accept time for user to be muted or get default from config
             //Log this to some config file?
             var config = ModHandler.GetActionConfig(Context.Guild.Id);
             var muteRole = await ModHandler.GetOrCreateMuteRole(config, Context.Guild);
             await user.AddRoleAsync(muteRole);
-            var length = TimeSpan.FromMinutes(1);
-            ModHandler.TimedActions.Users.Add(new Models.TimeTracker.User(user.Id, Context.Guild.Id, Models.TimeTracker.User.TimedAction.Mute, length));
+
+            if (time == null)
+            {
+                time = config.MuteLength;
+            }
+
+            ModHandler.TimedActions.Users.Add(new Models.TimeTracker.User(user.Id, Context.Guild.Id, Models.TimeTracker.User.TimedAction.Mute, time.Value));
+            var caseId = config.AddLogAction(user.Id, Context.User.Id, ActionConfig.Log.LogAction.Mute, reason);
+
+            ModHandler.Save(config, ActionConfig.DocumentName(Context.Guild.Id));
+
             ModHandler.Save(ModHandler.TimedActions, TimeTracker.DocumentName);
-            var expiryTime = DateTime.UtcNow + length;
-            await ReplyAsync($"{user.Mention} has been muted for {length.GetReadableLength()}, Expires at: {expiryTime.ToShortDateString()} {expiryTime.ToShortTimeString()}\n**Reason:** {reason ?? "N/A"}");
+            var expiryTime = DateTime.UtcNow + time.Value;
+            await ReplyAsync($"#{caseId} {user.Mention} has been muted for {time.Value.GetReadableLength()}, Expires at: {expiryTime.ToShortDateString()} {expiryTime.ToShortTimeString()}\n**Reason:** {reason ?? "N/A"}");
             //TODO: Responses and query mutes + reasons
         }
 
@@ -97,16 +190,31 @@ namespace RavenBOT.Modules.Moderator.Modules
         //TODO: Mod permissions
         public async Task SoftBanUser(SocketGuildUser user, [Remainder]string reason = null)
         {
-            //TODO: accept time for user to be muted or get default from config
-            //Log this to some config file?
+            await SoftBanUser(user, null, reason);
+        }
+
+        [Command("softban")]
+        [RequireBotPermission(Discord.GuildPermission.BanMembers)]
+        [RequireUserPermission(Discord.GuildPermission.BanMembers)]
+        //TODO: Mod permissions
+        public async Task SoftBanUser(SocketGuildUser user, TimeSpan? time = null, [Remainder]string reason = null)
+        {
             var config = ModHandler.GetActionConfig(Context.Guild.Id);
             await Context.Guild.AddBanAsync(user, 0, reason);
 
-            var length = TimeSpan.FromMinutes(1);
-            ModHandler.TimedActions.Users.Add(new Models.TimeTracker.User(user.Id, Context.Guild.Id, Models.TimeTracker.User.TimedAction.SoftBan, length));
+            if (time == null)
+            {
+                time = config.MuteLength;
+            }
+
+            ModHandler.TimedActions.Users.Add(new Models.TimeTracker.User(user.Id, Context.Guild.Id, Models.TimeTracker.User.TimedAction.SoftBan, time.Value));
             ModHandler.Save(ModHandler.TimedActions, TimeTracker.DocumentName);
-            var expiryTime = DateTime.UtcNow + length;
-            await ReplyAsync($"{user.Mention} has been SoftBanned for {length.GetReadableLength()}, Expires at: {expiryTime.ToShortDateString()} {expiryTime.ToShortTimeString()} \n**Reason:** {reason ?? "N/A"}");
+            var caseId = config.AddLogAction(user.Id, Context.User.Id, ActionConfig.Log.LogAction.Mute, reason);
+
+            ModHandler.Save(config, ActionConfig.DocumentName(Context.Guild.Id));
+
+            var expiryTime = DateTime.UtcNow + time.Value;
+            await ReplyAsync($"#{caseId} {user.Mention} has been SoftBanned for {time.Value.GetReadableLength()}, Expires at: {expiryTime.ToShortDateString()} {expiryTime.ToShortTimeString()} \n**Reason:** {reason ?? "N/A"}");
 
             //TODO: Message user?
         }
