@@ -22,11 +22,11 @@ namespace RavenBOT.Modules.AutoMod.Methods
         {
             Database = database;
             ModerationConfigs = new Dictionary<ulong, ModerationConfig>();
-            var setupDoc = database.Load<Setup>("LithiumSetup");
+            var setupDoc = database.Load<PerspectiveSetup>(PerspectiveSetup.DocumentName());
             if (setupDoc == null)
             {
-                setupDoc = new Setup();
-                database.Store(setupDoc, "LithiumSetup");
+                setupDoc = new PerspectiveSetup();
+                database.Store(setupDoc, PerspectiveSetup.DocumentName());
             }
 
             Perspective = setupDoc.PerspectiveToken != null ? new Perspective.Api(setupDoc.PerspectiveToken) : null;
@@ -60,21 +60,21 @@ namespace RavenBOT.Modules.AutoMod.Methods
             return Task.CompletedTask;
         }
 
-        public Setup GetSetup()
+        public PerspectiveSetup GetSetup()
         {
-            var setupDoc = Database.Load<Setup>("LithiumSetup");
+            var setupDoc = Database.Load<PerspectiveSetup>(PerspectiveSetup.DocumentName());
             if (setupDoc == null)
             {
-                setupDoc = new Setup();
-                Database.Store(setupDoc, "LithiumSetup");
+                setupDoc = new PerspectiveSetup();
+                Database.Store(setupDoc, PerspectiveSetup.DocumentName());
             }
 
             return setupDoc;
         }
 
-        public void SetSetup(Setup doc)
+        public void SetPerspectiveSetup(PerspectiveSetup doc)
         {
-            Database.Store(doc, "LithiumSetup");
+            Database.Store(doc, PerspectiveSetup.DocumentName());
         }
 
         public void SaveModerationConfig(ModerationConfig config)

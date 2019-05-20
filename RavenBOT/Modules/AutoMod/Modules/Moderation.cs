@@ -159,7 +159,7 @@ namespace RavenBOT.Modules.AutoMod.Modules
         {
             var setup = ModerationService.GetSetup();
             setup.PerspectiveToken = token;
-            ModerationService.SetSetup(setup);
+            ModerationService.SetPerspectiveSetup(setup);
             return Task.CompletedTask;
         }
 
