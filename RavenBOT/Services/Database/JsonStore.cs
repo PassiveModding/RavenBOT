@@ -88,7 +88,7 @@ namespace RavenBOT.Services.Database
             return list;
         }
         
-        public void Remove<T>(T document)
+        public void RemoveDocument<T>(T document)
         {
             var docText = JsonConvert.SerializeObject(document);
             foreach (var fileName in Directory.GetFiles(StorageDirectory, "*.json"))

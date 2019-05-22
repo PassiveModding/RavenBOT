@@ -9,7 +9,7 @@ namespace RavenBOT.Services.Database
         void StoreMany<T>(List<T> documents, Func<T, string> docName = null);
         T Load<T>(string documentName);
         List<T> Query<T>();
-        void Remove<T>(T document);
+        void RemoveDocument<T>(T document);
         void Remove<T>(string documentName);
     }
 }

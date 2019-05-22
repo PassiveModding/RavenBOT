@@ -61,6 +61,8 @@ namespace RavenBOT.Services.Database
                 Console.WriteLine(e);
                 throw;
             }
+
+            DocumentStore.Initialize();
         }
 
         public RavenDatabaseConfig GetOrInitializeConfig()
@@ -163,7 +165,7 @@ namespace RavenBOT.Services.Database
             }
         }
 
-        public void Remove<T>(T document)
+        public void RemoveDocument<T>(T document)
         {
             using (var session = DocumentStore.OpenSession())
             {

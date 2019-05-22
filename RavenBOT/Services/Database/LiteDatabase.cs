@@ -76,7 +76,7 @@ namespace RavenBOT.Services.Database
             return collection.FindAll().ToList();
         }
 
-        public void Remove<T>(T document)
+        public void RemoveDocument<T>(T document)
         {
             var collection = Database.GetCollection<T>();
             collection.Delete(x => x.Equals(document));

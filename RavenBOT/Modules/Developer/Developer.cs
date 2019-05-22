@@ -104,7 +104,7 @@ namespace RavenBOT.Modules.Developer
                 var docA = Database.Load<DBTestDocument>(null);
                 var docB = Database.Load<DBTestDocument>("Document");
                 var docList = Database.Query<DBTestDocument>();
-                Database.Remove(testDoc);
+                Database.RemoveDocument<DBTestDocument>(testDoc);
                 Database.Remove<DBTestDocument>("Document");
                 Database.StoreMany(new List<DBTestDocument>(), x => x.value);
                 await ReplyAsync("No Errors were thrown");

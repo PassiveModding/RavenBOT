@@ -43,7 +43,7 @@ namespace RavenBOT.Modules.Tickets.Methods
 
         public void RemoveTicket(ulong guildId, int ticketId)
         {
-            Database.Remove(Ticket.DocumentName(guildId, ticketId));
+            Database.Remove<Ticket>(Ticket.DocumentName(guildId, ticketId));
         }
 
         //Sets or updates the live message
