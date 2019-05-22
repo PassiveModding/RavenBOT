@@ -84,7 +84,7 @@ namespace RavenBOT
                 {
 
                     var localConfig = x.GetRequiredService<LocalManagementService>().GetConfig();
-                    return new PrefixService(x.GetRequiredService<IDatabase>(), x.GetRequiredService<BotConfig>().GetPrefix(), localConfig.Developer, localConfig.DeveloperPrefix);
+                    return new PrefixService(x.GetRequiredService<IDatabase>(), x.GetRequiredService<BotConfig>().GetPrefix());
                 })
                 .AddSingleton<EventHandler>()
                 .AddSingleton(x => new LicenseService(x.GetRequiredService<IDatabase>()))

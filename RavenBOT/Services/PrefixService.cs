@@ -8,14 +8,10 @@ namespace RavenBOT.Services
         private IDatabase Store { get; }
         private PrefixInfo Info { get; }
         private string DocumentName { get; }
-        private bool Developer { get; }
-        private string DeveloperPrefix { get; }
 
-        public PrefixService(IDatabase store, string defaultPrefix, bool developer = false, string developerPrefix = "dev.")
+        public PrefixService(IDatabase store, string defaultPrefix)
         {
             DocumentName = "PrefixSetup";
-            Developer = developer;
-            DeveloperPrefix = developerPrefix;
             Store = store;
 
             var doc = Store.Load<PrefixInfo>(DocumentName);
@@ -30,11 +26,6 @@ namespace RavenBOT.Services
 
         public string GetPrefix(ulong guildId)
         {
-            if (Developer)
-            {
-                return DeveloperPrefix;
-            }
-
             return Info.GetPrefix(guildId);
         }
 
@@ -79,7 +70,7 @@ namespace RavenBOT.Services
             {
                 if (Prefixes.ContainsKey(guildId))
                 {
-                    return Prefixes[guildId];
+                    return Prefixes[guildId] ?? DefaultPrefix;
                 }
 
                 return DefaultPrefix;

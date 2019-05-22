@@ -27,78 +27,46 @@ namespace RavenBOT.Handlers
                 return;
             }
 
+            var messageContent = message.Content;
+
             if (Local.Developer)
             {
-                int argPos = 0;
-                
-                //Prefix service handles developer prefix however we still need to check if the bot is using prefixes or the module groups.
-                if (BotConfig.UsePrefixSystem)
+                //Strip away developer prefix
+                if (messageContent.StartsWith(Local.DeveloperPrefix, true, CultureInfo.CurrentCulture))
                 {
-                    //The bot can be used regularly if it's just using regular prefixes
-                    var context = new ShardedCommandContext(Client, message);
-                    if (message.HasStringPrefix(PrefixService.GetPrefix(context.Guild?.Id ?? 0), ref argPos) || message.HasMentionPrefix(context.Client.CurrentUser, ref argPos))
-                    {
-                        var result = await CommandService.ExecuteAsync(context, argPos, Provider);
-
-                        if (!result.IsSuccess)
-                        {
-                            Logger.Log(context.Message.Content + "\n" + result.ErrorReason, new LogContext(context), LogSeverity.Error);
-                        }
-                        else
-                        {
-                            Logger.Log(context.Message.Content, new LogContext(context));
-                        }
-                    }
+                    messageContent = messageContent.Substring(Local.DeveloperPrefix.Length);
                 }
                 else
                 {
-                    var discarded = 0;
-                    //Check if the command starts with the dev prefix AND the module prefix.
-                    if (ModulePrefixes.Any(x => message.HasStringPrefix(Local.DeveloperPrefix + x, ref discarded, System.StringComparison.CurrentCultureIgnoreCase)))
-                    {
-                        var context = new ShardedCommandContext(Client, message);
-
-                        //Find the first match of the module prefix.
-                        //Important to order by length as longer prefixes may be skipped due to the first being shorter
-                        var prefixMatch = ModulePrefixes.OrderByDescending(x => x.Length).FirstOrDefault(x => message.Content.StartsWith(Local.DeveloperPrefix + x, true, CultureInfo.CurrentCulture));
-
-                        IResult result;
-                        if (prefixMatch != null)
-                        {
-                            if (!string.IsNullOrWhiteSpace(prefixMatch))
-                            {               
-                                //Use substring to remove the developer prefix as we cannot use the argPos here
-                                result = await CommandService.ExecuteAsync(context, message.Content.Substring(Local.DeveloperPrefix.Length).Replace(prefixMatch, $"{prefixMatch} "), Provider);
-                            }
-                            else
-                            {
-                                result = await CommandService.ExecuteAsync(context, Local.DeveloperPrefix.Length, Provider);
-                            }  
-                        }
-                        else
-                        {
-                            result = await CommandService.ExecuteAsync(context, 0, Provider);
-                        }
-
-
-                        if (!result.IsSuccess)
-                        {
-                            Logger.Log(context.Message.Content + "\n" + result.ErrorReason, new LogContext(context), LogSeverity.Error);
-                        }
-                        else
-                        {
-                            Logger.Log(context.Message.Content, new LogContext(context));
-                        }
-                    }
+                    return;
                 }
             }
-            else if (BotConfig.UsePrefixSystem)
+            
+            if (BotConfig.UsePrefixSystem)
             {
                 int argPos = 0;
                 var context = new ShardedCommandContext(Client, message);
-                if (message.HasStringPrefix(PrefixService.GetPrefix(context.Guild?.Id ?? 0), ref argPos) || message.HasMentionPrefix(context.Client.CurrentUser, ref argPos))
+
+                var serverPrefix = PrefixService.GetPrefix(context.Guild?.Id ?? 0);
+
+                var isCommand = false;
+
+                if (messageContent.StartsWith(serverPrefix))
                 {
-                    var result = await CommandService.ExecuteAsync(context, argPos, Provider);
+                    argPos = serverPrefix.Length;
+                    messageContent = messageContent.Substring(argPos);
+                    isCommand = true;
+                }
+                else if (messageContent.StartsWith(context.Client.CurrentUser.Mention))
+                {
+                    argPos = context.Client.CurrentUser.Mention.Length;
+                    messageContent = messageContent.Substring(argPos);
+                    isCommand = true;
+                }
+
+                if (isCommand)
+                {
+                    var result = await CommandService.ExecuteAsync(context, messageContent, Provider);
 
                     if (!result.IsSuccess)
                     {
@@ -112,28 +80,23 @@ namespace RavenBOT.Handlers
             }
             else
             {
-                var discarded = 0;
-                if (ModulePrefixes.Any(x => message.HasStringPrefix(x, ref discarded, System.StringComparison.CurrentCultureIgnoreCase)))
+                var prefixMatch = ModulePrefixes.OrderByDescending(x => x.Length).FirstOrDefault(x => messageContent.StartsWith(x, true, CultureInfo.CurrentCulture));
+
+
+                if (prefixMatch != null)
                 {
                     var context = new ShardedCommandContext(Client, message);
 
-                    var prefixMatch = ModulePrefixes.OrderByDescending(x => x.Length).FirstOrDefault(x => message.Content.StartsWith(x, true, CultureInfo.CurrentCulture));
                     IResult result;
-                    if (prefixMatch != null)
-                    {
-                        if (!string.IsNullOrWhiteSpace(prefixMatch))
-                        {                            
-                            result = await CommandService.ExecuteAsync(context, message.Content.Replace(prefixMatch, $"{prefixMatch} "), Provider);
-                        }
-                        else
-                        {
-                            result = await CommandService.ExecuteAsync(context, 0, Provider);
-                        }                        
+
+                    if (!string.IsNullOrWhiteSpace(prefixMatch))
+                    {                            
+                        result = await CommandService.ExecuteAsync(context, messageContent.Replace(prefixMatch, $"{prefixMatch} ", true, CultureInfo.CurrentCulture), Provider);
                     }
                     else
                     {
                         result = await CommandService.ExecuteAsync(context, 0, Provider);
-                    }
+                    }                       
 
 
                     if (!result.IsSuccess)
