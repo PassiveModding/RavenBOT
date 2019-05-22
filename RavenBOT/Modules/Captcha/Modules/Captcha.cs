@@ -101,6 +101,16 @@ namespace RavenBOT.Modules.Captcha.Modules
             }
         }
 
+        [Command("SetChannel")]
+        public async Task SetCaptchaChannel()
+        {
+            var config = CaptchaService.GetCaptchaConfig(Context.Guild.Id);
+            config.ChannelId = Context.Channel.Id;
+            CaptchaService.SaveCaptchaConfig(config);
+
+            await ReplyAsync($"Captcha channel set to the current channel.");
+        }
+
         [Command("UseCaptcha")]
         public async Task ToggleCaptcha()
         {
@@ -108,7 +118,8 @@ namespace RavenBOT.Modules.Captcha.Modules
             config.UseCaptcha = !config.UseCaptcha;
             CaptchaService.SaveCaptchaConfig(config);
 
-            await ReplyAsync($"UseCaptcha: {config.UseCaptcha}");
+            await ReplyAsync($"UseCaptcha: {config.UseCaptcha}\n" + 
+                            "Note: Please ensure you set a captcha channel (using the `SetChannel` command) as the bot will message there in the event that it cannot dm the user directly");
         }
 
         [Command("MaxCaptchaWarnings")]
@@ -150,7 +161,8 @@ namespace RavenBOT.Modules.Captcha.Modules
                             $"Use Captcha: {config.UseCaptcha}\n" +
                             $"Temp Role: {Context.Guild.GetRole(config.CaptchaTempRole)?.Mention ?? "N/A"}\n" +
                             $"Max Captcha Failures: {config.MaxFailures}\n" +
-                            $"Max Captcha Failures Action: {config.MaxFailuresAction}\n");
+                            $"Max Captcha Failures Action: {config.MaxFailuresAction}\n" + 
+                            $"Captcha hannel: {Context.Guild.GetTextChannel(config.ChannelId)?.Mention ?? "N/A, it is recommended that you set this asap"}");
         }
     }
 }

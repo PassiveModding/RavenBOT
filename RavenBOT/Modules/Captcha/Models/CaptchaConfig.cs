@@ -13,6 +13,7 @@ namespace RavenBOT.Modules.Captcha.Models
 
         public ulong GuildId {get;set;}
 
+        public ulong ChannelId {get;set;}
 
         public bool UseCaptcha {get;set;} = false;
         public ulong CaptchaTempRole {get; set;} = 0;
