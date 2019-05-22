@@ -92,7 +92,7 @@ namespace RavenBOT.Modules.AutoMod.Methods
 
             if (guildSetup.UseAntiSpam)
             {
-                var spamResult = CheckSpam(message, channel, out var messages);
+                var spamResult = CheckSpam(guildSetup, message, channel, out var messages);
                 if (spamResult == SpamType.RepetitiveMessage)
                 {
                     await channel.DeleteMessagesAsync(messages.Select(x => x.MessageId));

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Discord.WebSocket;
+using RavenBOT.Modules.AutoMod.Models.Moderation;
 
 namespace RavenBOT.Modules.AutoMod.Methods
 {
@@ -88,8 +89,14 @@ namespace RavenBOT.Modules.AutoMod.Methods
             }
         }
 
-        public SpamType CheckSpam(SocketUserMessage message, SocketGuildChannel channel, out List<SpamGuild.SpamChannel.SpamUser.SpamMessage> messages)
+        public SpamType CheckSpam(ModerationConfig config, SocketUserMessage message, SocketGuildChannel channel, out List<SpamGuild.SpamChannel.SpamUser.SpamMessage> messages)
         {
+            if (!config.UseAntiSpam)
+            {
+                messages = null;
+                return SpamType.None;
+            }
+
             SpamGuild guild;
             if (SpamGuilds.ContainsKey(channel.Guild.Id))
             {
@@ -122,8 +129,6 @@ namespace RavenBOT.Modules.AutoMod.Methods
                 spamUser = new SpamGuild.SpamChannel.SpamUser(message.Author.Id);
                 spamChannel.SpamUsers.Add(message.Author.Id, spamUser);
             }
-
-            var config = GetModerationConfig(channel.Guild.Id);
 
             var response = spamUser.AddMessage(message, config.SpamSettings.MessagesPerTime, config.SpamSettings.SecondsToCheck, config.SpamSettings.MaxRepititions, config.SpamSettings.CacheSize, out messages);
             return response;
