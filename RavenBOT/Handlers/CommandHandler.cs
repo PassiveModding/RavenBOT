@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
@@ -53,13 +54,13 @@ namespace RavenBOT.Handlers
                 {
                     var discarded = 0;
                     //Check if the command starts with the dev prefix AND the module prefix.
-                    if (ModulePrefixes.Any(x => message.HasStringPrefix(Local.DeveloperPrefix + x, ref discarded)))
+                    if (ModulePrefixes.Any(x => message.HasStringPrefix(Local.DeveloperPrefix + x, ref discarded, System.StringComparison.CurrentCultureIgnoreCase)))
                     {
                         var context = new ShardedCommandContext(Client, message);
 
                         //Find the first match of the module prefix.
                         //Important to order by length as longer prefixes may be skipped due to the first being shorter
-                        var prefixMatch = ModulePrefixes.OrderByDescending(x => x.Length).FirstOrDefault(x => message.Content.StartsWith(Local.DeveloperPrefix + x));
+                        var prefixMatch = ModulePrefixes.OrderByDescending(x => x.Length).FirstOrDefault(x => message.Content.StartsWith(Local.DeveloperPrefix + x, true, CultureInfo.CurrentCulture));
 
                         IResult result;
                         if (prefixMatch != null)
@@ -112,11 +113,11 @@ namespace RavenBOT.Handlers
             else
             {
                 var discarded = 0;
-                if (ModulePrefixes.Any(x => message.HasStringPrefix(x, ref discarded)))
+                if (ModulePrefixes.Any(x => message.HasStringPrefix(x, ref discarded, System.StringComparison.CurrentCultureIgnoreCase)))
                 {
                     var context = new ShardedCommandContext(Client, message);
 
-                    var prefixMatch = ModulePrefixes.OrderByDescending(x => x.Length).FirstOrDefault(x => message.Content.StartsWith(x));
+                    var prefixMatch = ModulePrefixes.OrderByDescending(x => x.Length).FirstOrDefault(x => message.Content.StartsWith(x, true, CultureInfo.CurrentCulture));
                     IResult result;
                     if (prefixMatch != null)
                     {
