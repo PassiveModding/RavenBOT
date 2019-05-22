@@ -16,12 +16,12 @@ namespace RavenBOT.Modules.AutoMod.Methods
 
         private DiscordShardedClient Client {get;}
         public Perspective.Api Perspective { get; set; }
-        private Dictionary<ulong, ModerationConfig> ModerationConfigs { get; }
+        //private Dictionary<ulong, ModerationConfig> ModerationConfigs { get; }
 
         public ModerationService(IDatabase database, DiscordShardedClient client)
         {
             Database = database;
-            ModerationConfigs = new Dictionary<ulong, ModerationConfig>();
+            //ModerationConfigs = new Dictionary<ulong, ModerationConfig>();
             var setupDoc = database.Load<PerspectiveSetup>(PerspectiveSetup.DocumentName());
             if (setupDoc == null)
             {
@@ -34,30 +34,27 @@ namespace RavenBOT.Modules.AutoMod.Methods
             Client.MessageReceived += MessageReceived;
         }
 
-        public Task MessageReceived(SocketMessage socketMessage)
+        public async Task MessageReceived(SocketMessage socketMessage)
         {
-            var _ = Task.Run(async () =>
+
+            if (!(socketMessage is SocketUserMessage message))
             {
-                if (!(socketMessage is SocketUserMessage message))
-                {
-                    return;
-                }
+                return;
+            }
 
-                if (message.Author.IsBot || message.Author.IsWebhook)
-                {
-                    return;
-                }
+            if (message.Author.IsBot || message.Author.IsWebhook)
+            {
+                return;
+            }
+            
 
-                if (message.Channel is SocketTextChannel channel)
+            if (message.Channel is SocketTextChannel channel)
+            {
+                if (channel.Guild != null)
                 {
-                    if (channel.Guild != null)
-                    {
-                        await RunChecks(message, channel);
-                    }
+                    RunChecks(message, channel);
                 }
-            });
-
-            return Task.CompletedTask;
+            }
         }
 
         public PerspectiveSetup GetSetup()
@@ -79,15 +76,7 @@ namespace RavenBOT.Modules.AutoMod.Methods
 
         public void SaveModerationConfig(ModerationConfig config)
         {
-            //Update the cached version
-            if (ModerationConfigs.ContainsKey(config.GuildId))
-            {
-                ModerationConfigs[config.GuildId] = config;
-            }
-            else
-            {
-                ModerationConfigs.TryAdd(config.GuildId, config);
-            }
+            //ModerationConfigs[config.GuildId] = config;
 
             Database.Store(config, ModerationConfig.DocumentName(config.GuildId));
         }
@@ -95,13 +84,10 @@ namespace RavenBOT.Modules.AutoMod.Methods
         public ModerationConfig GetModerationConfig(ulong guildId)
         {
             //if there is a cached version, return that.
-            if (ModerationConfigs.ContainsKey(guildId))
-            {
-                if (ModerationConfigs.TryGetValue(guildId, out var cachedModeration))
-                {
-                    return cachedModeration;
-                }
-            }
+            //if (ModerationConfigs.ContainsKey(guildId))
+            //{
+           //     return ModerationConfigs[guildId];
+            //}
 
             //Try to load it from database, otherwise create a new one and store it.
             var document = Database.Load<ModerationConfig>(ModerationConfig.DocumentName(guildId));
@@ -112,7 +98,7 @@ namespace RavenBOT.Modules.AutoMod.Methods
             }
 
             //Cache the document
-            ModerationConfigs.TryAdd(document.GuildId, document);
+            //ModerationConfigs.TryAdd(document.GuildId, document);
             return document;
         }
     }
