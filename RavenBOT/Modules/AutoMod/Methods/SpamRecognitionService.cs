@@ -65,7 +65,24 @@ namespace RavenBOT.Modules.AutoMod.Methods
                         else if (Messages.GroupBy(x => x.Message).Max(x => x.Count()) >= maxRepetitions)
                         {
                             msg.Responded = true;
-                            messages = Messages;
+                            var mostCommon = Messages.GroupBy(x => x.Message).OrderByDescending(x => x.Count()).FirstOrDefault()?.Key;
+
+                            if (mostCommon != null)
+                            {
+                                if (mostCommon.Equals(message.Content, StringComparison.CurrentCultureIgnoreCase))
+                                {
+                                    messages = Messages;
+                                }
+                                else
+                                {
+                                    messages = Messages.Where(x => x.Message.Equals(mostCommon)).ToList();
+                                }
+                            }
+                            else
+                            {
+                                messages = Messages;
+                            }
+
                             returnType = SpamType.RepetitiveMessage;
                         }
                         else
