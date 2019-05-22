@@ -115,5 +115,21 @@ namespace RavenBOT.Services.Database
                 File.Delete(DocumentName(documentName));
             }
         }
+
+        public void RemoveManyDocuments<T>(List<T> documents)
+        {
+            foreach (var document in documents)
+            {
+                RemoveDocument(document);
+            }
+        }
+
+        public void RemoveMany<T>(List<string> docNames)
+        {
+            foreach (var name in docNames)
+            {
+                Remove<T>(name);
+            }
+        }
     }
 }

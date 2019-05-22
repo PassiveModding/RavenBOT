@@ -11,5 +11,7 @@ namespace RavenBOT.Services.Database
         List<T> Query<T>();
         void RemoveDocument<T>(T document);
         void Remove<T>(string documentName);
+        void RemoveManyDocuments<T>(List<T> documents);
+        void RemoveMany<T>(List<string> docNames);
     }
 }

@@ -87,5 +87,20 @@ namespace RavenBOT.Services.Database
             var collection = Database.GetCollection<T>();
             collection.Delete(new BsonValue(documentName));
         }
+
+        public void RemoveManyDocuments<T>(List<T> documents)
+        {
+            var collection = Database.GetCollection<T>();
+            collection.Delete(x => documents.Contains(x));
+        }
+
+        public void RemoveMany<T>(List<string> docNames)
+        {
+            var collection = Database.GetCollection<T>();
+            foreach (var name in docNames)
+            {
+                collection.Delete(new BsonValue(name));
+            }
+        }
     }
 }

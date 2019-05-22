@@ -169,8 +169,16 @@ namespace RavenBOT.Services.Database
         {
             using (var session = DocumentStore.OpenSession())
             {
-                session.Delete(document);
-                session.SaveChanges();
+                try
+                {
+                    session.Delete(document);
+                    session.SaveChanges();
+                }
+                catch (System.Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+
             }
         }
 
@@ -179,6 +187,32 @@ namespace RavenBOT.Services.Database
             using (var session = DocumentStore.OpenSession())
             {
                 session.Delete(documentName);
+                session.SaveChanges();
+            }
+        }
+
+        public void RemoveManyDocuments<T>(List<T> documents)
+        {
+            using (var session = DocumentStore.OpenSession())
+            {
+                foreach(var document in documents)
+                {
+                    session.Delete(document);
+                }
+
+                session.SaveChanges();
+            }
+        }
+
+        public void RemoveMany<T>(List<string> docNames)
+        {
+            using (var session = DocumentStore.OpenSession())
+            {
+                foreach(var name in docNames)
+                {
+                    session.Delete(name);
+                }
+
                 session.SaveChanges();
             }
         }
