@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -149,20 +150,24 @@ namespace RavenBOT.Services
             // This ensures that we filter out all modules where the user cannot access ANY commands
             var modules = new List<ParsedModule>();
 
-            foreach (var module in CommandService.Modules)
+            var moduleInfos = CommandService.Modules.ToList();
+
+            if (specifiedModules != null)
+            {
+                if (specifiedModules.Any())
+                {
+                    moduleInfos = moduleInfos.Where(x => specifiedModules.Any(sm => x.Name.StartsWith(sm, true, CultureInfo.CurrentCulture))).ToList();
+                    //modules = modules.Where(x => specifiedModules.Any(sm => x.Name.StartsWith(sm, true, CultureInfo.CurrentCulture))).ToList();
+                }
+            }
+
+            foreach (var module in moduleInfos)
             {
                 modules.Add(await ParseModule(context, module, checkPreconditions));
             }
 
             modules = modules.Where(x => x.Commands.Any()).OrderBy(x => x.Name).ToList();
 
-            if (specifiedModules != null)
-            {
-                if (specifiedModules.Any())
-                {
-                    modules = modules.Where(x => specifiedModules.Any(sm => x.Name.StartsWith(sm))).ToList();
-                }
-            }
 
             if (!modules.Any())
             {
