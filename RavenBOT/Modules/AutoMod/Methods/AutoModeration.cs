@@ -32,6 +32,11 @@ namespace RavenBOT.Modules.AutoMod.Methods
         }
         public async Task RunChecks(SocketUserMessage message, SocketTextChannel channel)
         {
+            if (string.IsNullOrWhiteSpace(message.Content))
+            {
+                return;
+            }
+
             var guildSetup = GetModerationConfig(channel.Guild.Id);
 
             //TODO: Spam check
