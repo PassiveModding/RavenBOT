@@ -39,8 +39,6 @@ namespace RavenBOT.Modules.AutoMod.Methods
 
             var guildSetup = GetModerationConfig(channel.Guild.Id);
 
-            //TODO: Spam check
-
             if (guildSetup.BlockInvites)
             {
                 if (Regex.IsMatch(message.Content, @"discord(?:\.gg|\.me|app\.com\/invite)\/([\w\-]+)", RegexOptions.IgnoreCase))
