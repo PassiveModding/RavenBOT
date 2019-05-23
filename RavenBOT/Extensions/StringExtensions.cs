@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace RavenBOT.Extensions
 {
@@ -35,6 +36,20 @@ namespace RavenBOT.Extensions
             int seconds = (int) length.TotalSeconds - days * 24 * 60 * 60 - hours * 60 * 60 - minutes * 60;
 
             return $"{(days > 0 ? $"{days} Day(s) " : "")}{(hours > 0 ? $"{hours} Hour(s) " : "")}{(minutes > 0 ? $"{minutes} Minute(s) " : "")}{(seconds > 0 ? $"{seconds} Second(s)" : "")}";
+        }
+
+        public static string DecodeBase64(this string original)
+        {
+            try
+            {
+                byte[] data = Convert.FromBase64String(original);
+                string decodedString = Encoding.UTF8.GetString(data);
+                return decodedString;
+            }
+            catch (Exception e)
+            {
+                return original;
+            }            
         }
     }
 }
