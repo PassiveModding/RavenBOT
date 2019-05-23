@@ -94,7 +94,7 @@ namespace RavenBOT.Modules.Games.Modules
             {
                 question = trivia.results[currentQuestionIndex];
             }
-            catch (Exception e)
+            catch
             {
                 // Ignore out of bounds error
             }

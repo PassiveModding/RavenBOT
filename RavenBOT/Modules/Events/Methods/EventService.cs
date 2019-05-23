@@ -207,7 +207,7 @@ namespace RavenBOT.Modules.Events.Methods
             });
         }
 
-        private async Task GuildMemberUpdated(SocketGuildUser userBefore, SocketGuildUser userAfter)
+        private Task GuildMemberUpdated(SocketGuildUser userBefore, SocketGuildUser userAfter)
         {
             UserUpdated++;
 
@@ -280,41 +280,43 @@ namespace RavenBOT.Modules.Events.Methods
 
             if (builder.Length == 0)
             {
-                return;
+                return Task.CompletedTask;
             }
 
             var config = GetConfig(userBefore.Guild.Id);
             if (!config.Enabled || config.ChannelId == 0 || !config.UserUpdated)
             {
-                return;
+                return Task.CompletedTask;
             }
 
             LogEvent(config, $"**{userAfter.Nickname ?? userAfter.Username} Updated**", builder.ToString(), EventClass.EventType.GuildMemberUpdated, Color.DarkMagenta);
+            return Task.CompletedTask;
         }
 
-        private async Task Client_UserLeft(SocketGuildUser user)
+        private Task Client_UserLeft(SocketGuildUser user)
         {
             UserLeft++;
 
             var config = GetConfig(user.Guild.Id);
             if (!config.Enabled || config.ChannelId == 0 || !config.UserLeft)
             {
-                return;
+                return Task.CompletedTask;
             }
             
             LogEvent(config, "User Left",$"Name: {user.Username}#{user.Discriminator}\n" +
                               $"Nickname: {user.Nickname ?? "N/A"}\n" +
                               $"ID: {user.Id}\n" +
                               $"Mention: {user.Mention}", EventClass.EventType.UserLeft, Color.DarkOrange);
+            return Task.CompletedTask;
         }
 
-        private async Task Client_UserJoined(SocketGuildUser user)
+        private Task Client_UserJoined(SocketGuildUser user)
         {
             UserJoined++;
             var config = GetConfig(user.Guild.Id);
             if (!config.Enabled || config.ChannelId == 0 || !config.UserJoined)
             {
-                return;
+                return Task.CompletedTask;
             }
 
             LogEvent(config, "User Joined",$"Name: {user.Username}#{user.Discriminator}\n" +
@@ -322,10 +324,10 @@ namespace RavenBOT.Modules.Events.Methods
                               $"ID: {user.Id}\n" +
                               $"Mention: {user.Mention}", EventClass.EventType.UserJoined, Color.Green);
 
-            
+            return Task.CompletedTask;
         }
 
-        private async Task Client_MessageUpdated(Cacheable<IMessage, ulong> messageOldCache, SocketMessage messageNew, ISocketMessageChannel messageChannel)
+        private Task Client_MessageUpdated(Cacheable<IMessage, ulong> messageOldCache, SocketMessage messageNew, ISocketMessageChannel messageChannel)
         {
             MessageUpdated++;
             if (messageChannel is SocketGuildChannel gChannel)
@@ -333,13 +335,13 @@ namespace RavenBOT.Modules.Events.Methods
                 var config = GetConfig(gChannel.Guild.Id);
                 if (!config.Enabled || config.ChannelId == 0 || !config.MessageUpdated)
                 {
-                    return;
+                    return Task.CompletedTask;
                 }
 
                 if (messageNew.Author.IsBot)
                 {
                     //To stop bot events from being logged as they are often updated
-                    return;
+                    return Task.CompletedTask;
                 }
 
                 //TODO: Embeds although the only instances where embeds would be updated would be from bots, which are being ignored above.
@@ -355,9 +357,11 @@ namespace RavenBOT.Modules.Events.Methods
                                       $"**Channel:** {messageChannel.Name}", EventClass.EventType.MessageUpdated, Color.DarkPurple);
                 }
             }
+
+            return Task.CompletedTask;
         }
 
-        private async Task Client_MessageDeleted(Cacheable<IMessage, ulong> messageCache, ISocketMessageChannel messageChannel)
+        private Task Client_MessageDeleted(Cacheable<IMessage, ulong> messageCache, ISocketMessageChannel messageChannel)
         {
             MessageDeleted++;
             if (messageChannel is SocketGuildChannel gChannel)
@@ -365,7 +369,7 @@ namespace RavenBOT.Modules.Events.Methods
                 var config = GetConfig(gChannel.Guild.Id);
                 if (!config.Enabled || config.ChannelId == 0 || !config.MessageDeleted)
                 {
-                    return;
+                    return Task.CompletedTask;
                 }
 
                 if (messageCache.HasValue)
@@ -384,9 +388,10 @@ namespace RavenBOT.Modules.Events.Methods
                                       $"**Channel:** {messageChannel.Name}", EventClass.EventType.MessageDeleted, Color.DarkBlue);
                 }
             }
+            return Task.CompletedTask;
         }
 
-        private async Task Client_ChannelUpdated(SocketChannel channelBefore, SocketChannel channelAfter)
+        private Task Client_ChannelUpdated(SocketChannel channelBefore, SocketChannel channelAfter)
         {
             ChannelUpdated++;
             if (channelBefore is SocketGuildChannel gChannel)
@@ -394,7 +399,7 @@ namespace RavenBOT.Modules.Events.Methods
                 var config = GetConfig(gChannel.Guild.Id);
                 if (!config.Enabled || config.ChannelId == 0 || !config.ChannelUpdated)
                 {
-                    return;
+                    return Task.CompletedTask;
                 }
 
                 if (channelBefore is SocketTextChannel textChannelBefore && channelAfter is SocketTextChannel textChannelAfter)
@@ -443,15 +448,16 @@ namespace RavenBOT.Modules.Events.Methods
 
                     if (builder.Length == 0)
                     {
-                        return;
+                        return Task.CompletedTask;
                     }
 
                     LogEvent(config, "Channel Updated", builder.ToString(), EventClass.EventType.ChannelUpdated, Color.DarkTeal);
                 }
             }
+            return Task.CompletedTask;
         }
 
-        private async Task Client_ChannelDestroyed(SocketChannel channel)
+        private Task Client_ChannelDestroyed(SocketChannel channel)
         {
             ChannelDestroyed++;
             if (channel is SocketGuildChannel gChannel)
@@ -459,7 +465,7 @@ namespace RavenBOT.Modules.Events.Methods
                 var config = GetConfig(gChannel.Guild.Id);
                 if (!config.Enabled || config.ChannelId == 0 || !config.ChannelDeleted)
                 {
-                    return;
+                    return Task.CompletedTask;
                 }
 
                 if (channel is SocketTextChannel tChannel)
@@ -482,9 +488,10 @@ namespace RavenBOT.Modules.Events.Methods
                                       $"Permissions:\n{PermissionList(gChannel, vChannel.PermissionOverwrites.ToList())}", EventClass.EventType.ChannelDestroyed, Color.DarkRed);
                 }
             }
+            return Task.CompletedTask;
         }
 
-        private async Task Client_ChannelCreated(SocketChannel channel)
+        private Task Client_ChannelCreated(SocketChannel channel)
         {
             ChannelCreated++;
 
@@ -493,7 +500,7 @@ namespace RavenBOT.Modules.Events.Methods
                 var config = GetConfig(gChannel.Guild.Id);
                 if (!config.Enabled || config.ChannelId == 0 || !config.ChannelCreated)
                 {
-                    return;
+                    return Task.CompletedTask;
                 }
 
                 if (channel is SocketTextChannel tChannel)
@@ -516,6 +523,7 @@ namespace RavenBOT.Modules.Events.Methods
                                       $"Permissions: {PermissionList(gChannel, vChannel.PermissionOverwrites.ToList())}", EventClass.EventType.ChannelCreated, Color.Green);
                 }
             }
+            return Task.CompletedTask;
         }
 
         public string PermissionList(SocketGuildChannel channel, List<Overwrite> permissions)
