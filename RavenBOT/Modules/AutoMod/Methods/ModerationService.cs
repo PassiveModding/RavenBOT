@@ -52,7 +52,7 @@ namespace RavenBOT.Modules.AutoMod.Methods
             {
                 if (channel.Guild != null)
                 {
-                    RunChecks(message, channel);
+                    await RunChecks(message, channel).ConfigureAwait(false);
                 }
             }
         }
