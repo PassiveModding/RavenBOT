@@ -55,9 +55,8 @@ namespace RavenBOT.Modules.Birthday.Modules
                             $"Birthday Role: {role?.Mention ?? "N/A"}");
         }
 
-        /*
-        [Command("SetTimeZone")]
-        public async Task SetTimeZone([Remainder]string timezone)
+        [Command("SetUTCOffset")]
+        public async Task SetTimeZone(double offset = 0)
         {
             var user = BirthdayService.GetUser(Context.User.Id);
             if (user == null)
@@ -66,34 +65,16 @@ namespace RavenBOT.Modules.Birthday.Modules
                 return;
             }
 
-            try
+            if (offset < -12 || offset > 14)
             {
-                TimeZoneInfo info = TimeZoneInfo.FindSystemTimeZoneById(timezone);
-                user.TimeZone = info;
-                BirthdayService.SaveUser(user);
-                await ReplyAsync("Time zone set.");
+                await ReplyAsync("UTC Offsets range from -12.00 to +14.00\nNOTE: if your offset is on a half hour use .5 instead of .30");
+                return;
             }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                await ReplyAsync("Invalid time zone, here is a list of valid ones.");
-                await PagedReplyAsync(new PaginatedMessage
-                {
-                    Pages = TimeZoneInfo.GetSystemTimeZones().Select(x => x.Id).OrderBy(x => x).ToList().SplitList(20).Select(x => new PaginatedMessage.Page
-                    {
-                        Description = string.Join("\n", x).FixLength(1999)
-                    }).ToList()
-                }, new ReactionList
-                {
-                    Forward = true,
-                    Backward = true,
-                    First = true,
-                    Last = true,
-                    Jump = true,
-                    Trash = true                    
-                }, true);
-            }
-        }*/
+
+            user.Offset = offset;
+            await ReplyAsync("Your UTC offset has been set.");
+            BirthdayService.SaveUser(user);
+        }
 
         [Command("SetBirthday")]
         [Alias("Set Birthday")]

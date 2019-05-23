@@ -22,29 +22,14 @@ namespace RavenBOT.Modules.Birthday.Models
 
         public bool ShowYear {get;set;}
 
+        public double Offset {get;set;} = 0;
+
         public int Attempts {get;set;} = 0;
-
-        public int RemainingDays()
-        {
-            DateTime today = DateTime.Today;
-            DateTime nextBirthday;
-            if (today.DayOfYear > Birthday.DayOfYear)
-            {
-                nextBirthday = new DateTime(today.Year + 1, Birthday.Month, Birthday.Day);
-            }
-            else
-            {
-                nextBirthday = new DateTime(today.Year, Birthday.Month, Birthday.Day);
-            }
-
-            int remainingDays = nextBirthday.DayOfYear - today.DayOfYear;
-            return remainingDays;
-        }
 
         public bool IsToday()
         {
-            DateTime today = DateTime.Today;
-            
+            DateTime today = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day);
+            today.AddHours(Offset);
             DateTime birthdayThisYear = Birthday.AddYears(today.Year - Birthday.Year);
 
             if (birthdayThisYear < today)
@@ -62,7 +47,7 @@ namespace RavenBOT.Modules.Birthday.Models
         {
             if (ShowYear)
             {
-                DateTime today = DateTime.Today;
+                DateTime today = DateTime.UtcNow;
                 int age = today.Year - Birthday.Year;
                 if (today < Birthday.AddYears(age))
                 {
