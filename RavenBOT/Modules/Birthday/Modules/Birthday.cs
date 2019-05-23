@@ -1,10 +1,12 @@
 using System;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
+using RavenBOT.Extensions;
 using RavenBOT.Modules.Birthday.Methods;
 using RavenBOT.Services.Database;
 
@@ -52,6 +54,46 @@ namespace RavenBOT.Modules.Birthday.Modules
             await ReplyAsync($"Birthday Service Enabled: {model.Enabled}\n" +
                             $"Birthday Role: {role?.Mention ?? "N/A"}");
         }
+
+        /*
+        [Command("SetTimeZone")]
+        public async Task SetTimeZone([Remainder]string timezone)
+        {
+            var user = BirthdayService.GetUser(Context.User.Id);
+            if (user == null)
+            {
+                await ReplyAsync("You must set your birthday prior to setting a time zone.");
+                return;
+            }
+
+            try
+            {
+                TimeZoneInfo info = TimeZoneInfo.FindSystemTimeZoneById(timezone);
+                user.TimeZone = info;
+                BirthdayService.SaveUser(user);
+                await ReplyAsync("Time zone set.");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await ReplyAsync("Invalid time zone, here is a list of valid ones.");
+                await PagedReplyAsync(new PaginatedMessage
+                {
+                    Pages = TimeZoneInfo.GetSystemTimeZones().Select(x => x.Id).OrderBy(x => x).ToList().SplitList(20).Select(x => new PaginatedMessage.Page
+                    {
+                        Description = string.Join("\n", x).FixLength(1999)
+                    }).ToList()
+                }, new ReactionList
+                {
+                    Forward = true,
+                    Backward = true,
+                    First = true,
+                    Last = true,
+                    Jump = true,
+                    Trash = true                    
+                }, true);
+            }
+        }*/
 
         [Command("SetBirthday")]
         [Alias("Set Birthday")]
