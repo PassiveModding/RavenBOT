@@ -142,5 +142,35 @@ namespace RavenBOT.Modules.Translation.Modules
                              $"{string.Join("\n", newLicenses.Select(x => x.Key))}\n" +
                              "```");
         }
+
+        [RequireOwner]
+        [Command("SetApiKey")]
+        public async Task SetApiKey(string apiKey = null)
+        {
+            var config = TranslateService.GetTranslateConfig();
+            config.APIKey = apiKey;
+            await ReplyAsync("This will take effect after a restart.");
+            TranslateService.SaveTranslateConfig(config);
+        }
+
+        [RequireOwner]
+        [Command("ToggleTranslation")]
+        public async Task ToggleTranslation()
+        {
+            var config = TranslateService.GetTranslateConfig();
+            config.Enabled = !config.Enabled;
+            await ReplyAsync($"Translation Enabled: {config.Enabled}\nNOTE: API Key needs to be set in order for translations to run.");
+            TranslateService.SaveTranslateConfig(config);
+        }
+
+        [RequireOwner]
+        [Command("SetStoreUrl")]
+        public async Task SetStoreUrl(string storeUrl = null)
+        {
+            var config = TranslateService.GetTranslateConfig();
+            config.StoreUrl = storeUrl;
+            await ReplyAsync("Store url set.");
+            TranslateService.SaveTranslateConfig(config);
+        }
     }
 }
