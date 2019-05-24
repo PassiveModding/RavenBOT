@@ -101,6 +101,7 @@ namespace RavenBOT.Modules.Translation.Methods
             }
 
             var response = TranslationClient.TranslateText(inputText, languageCode);
+            
             return response;
         }
     }

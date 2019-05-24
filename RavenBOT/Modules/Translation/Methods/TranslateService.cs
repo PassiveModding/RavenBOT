@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
@@ -114,9 +116,46 @@ namespace RavenBOT.Modules.Translation.Methods
             {
                 return null;
             }
+
+            var translationString = result.TranslateResult.TranslatedText;
+            
+            try
+            {
+                var matchUser = Regex.Matches(translationString, @"(<@!?) (\d+)>");
+                if (matchUser.Any())
+                {
+                    foreach(Match match in matchUser)
+                    {
+                        translationString = translationString.Replace(match.Value, $"{match.Groups[1].Value}{match.Groups[2].Value}>");
+                    }
+                }
+
+                var matchRole = Regex.Matches(translationString, @"<@ & (\d+)>");
+                if (matchRole.Any())
+                {
+                    foreach(Match match in matchRole)
+                    {
+                        translationString = translationString.Replace(match.Value, $"<@&{match.Groups[1].Value}>");
+                    }
+                }
+
+                var matchChannel = Regex.Matches(translationString, @"<# (\d+)>");
+                if (matchChannel.Any())
+                {
+                    foreach(Match match in matchChannel)
+                    {
+                        translationString = translationString.Replace(match.Value, $"<#{match.Groups[1].Value}>");
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+
             var embed = new EmbedBuilder();
             embed.AddField($"Original Message [{result.TranslateResult.SpecifiedSourceLanguage ?? result.TranslateResult.DetectedSourceLanguage}]", result.TranslateResult.OriginalText.FixLength());
-            embed.AddField($"Translated Message [{result.TranslateResult.TargetLanguage}]", result.TranslateResult.TranslatedText.FixLength());
+            embed.AddField($"Translated Message [{result.TranslateResult.TargetLanguage}]", translationString.FixLength());
             embed.Color = Color.Green;
             embed.Footer = new EmbedFooterBuilder
             {
