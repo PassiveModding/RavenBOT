@@ -16,14 +16,16 @@ namespace RavenBOT.Services
     public class HelpService
     {
         public PrefixService PrefixService { get; }
+        public ModuleManagementService ModuleManager { get; }
         public CommandService CommandService { get; }
         public BotConfig Config { get; }
         public DeveloperSettings DeveloperSettings { get; }
         public IServiceProvider Provider { get; }
 
-        public HelpService(PrefixService prefixService, CommandService cmdService, BotConfig config, DeveloperSettings developerSettings, IServiceProvider provider)
+        public HelpService(PrefixService prefixService, ModuleManagementService moduleManager, CommandService cmdService, BotConfig config, DeveloperSettings developerSettings, IServiceProvider provider)
         {
             PrefixService = prefixService;
+            ModuleManager = moduleManager;
             CommandService = cmdService;
             Config = config;
             DeveloperSettings = developerSettings;
@@ -161,6 +163,13 @@ namespace RavenBOT.Services
                 }
             }
 
+            var moduleConfig = ModuleManager.GetModuleConfig(context.Guild?.Id ?? 0);
+            if (moduleConfig.Blacklist.Any())
+            {
+                //Filter out any blacklisted modules for the server
+                moduleInfos = moduleInfos.Where(x => moduleConfig.Blacklist.All(bm => !x.Name.Equals(bm, StringComparison.CurrentCultureIgnoreCase))).ToList();
+            }
+
             foreach (var module in moduleInfos)
             {
                 modules.Add(await ParseModule(context, module, checkPreconditions));
@@ -194,6 +203,8 @@ namespace RavenBOT.Services
 
             var pageContents = new ConcurrentDictionary<string, List<string>>();
             var setIndex = 1;
+
+            //TODO: Handle command filters from modulemanagementservice
 
             foreach (var moduleSet in moduleSets)
             {
