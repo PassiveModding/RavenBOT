@@ -9,7 +9,7 @@ namespace RavenBOT.Modules.Media.Methods
 {
     public class NsfwHelper
     {
-        public Random Random {get;}
+        private Random Random {get;}
         public HttpClient Client {get;}
         public NsfwHelper(Random random)
         {
@@ -44,7 +44,7 @@ namespace RavenBOT.Modules.Media.Methods
         /// <returns>
         ///     The <see cref="Task" />.
         /// </returns>
-        public async Task<MatchCollection> GetMatchesAsync(NsfwType nsfwType, string url)
+        private async Task<MatchCollection> GetMatchesAsync(NsfwType nsfwType, string url)
         {
             MatchCollection matches;
             var get = await Client.GetStringAsync(url).ConfigureAwait(false);
@@ -78,16 +78,13 @@ namespace RavenBOT.Modules.Media.Methods
         }
 
         /// <summary>
-        ///     The hentai async.
+        ///    Returns the image url from the specified hentai site
         /// </summary>
-        /// <param name="random">
-        ///     The random.
-        /// </param>
         /// <param name="nsfwType">
         ///     The nsfw type.
         /// </param>
         /// <param name="tags">
-        ///     The tags.
+        ///     A list of tags used to filter the nsfw image category
         /// </param>
         /// <returns>
         ///     The <see cref="Task" />.

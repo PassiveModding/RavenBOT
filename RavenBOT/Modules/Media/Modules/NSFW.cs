@@ -50,13 +50,14 @@ namespace RavenBOT.Modules.Media.Modules
         }
 
         [Command("nsfw", RunMode = RunMode.Async)]
+        [Summary("Shorthand for redditpost nsfw")]
         public async Task NsfwPost()
         {
             await GetPostAsync("NSFW");
         }
 
-        [Command("NsfwGif", RunMode = RunMode.Async)]
-        [Summary("Gifs")]
+        [Command("NsfwGif", RunMode = RunMode.Async)]        
+        [Summary("Shorthand for redditpost with various nsfw gif subreddits")]
         public Task NsfwGifAsync()
         {
             var rnd = new Random();
@@ -64,7 +65,8 @@ namespace RavenBOT.Modules.Media.Modules
             return GetPostAsync(subs[rnd.Next(subs.Length - 1)]);
         }
 
-        [Command("pussy", RunMode = RunMode.Async)]
+        [Command("pussy", RunMode = RunMode.Async)]        
+        [Summary("Shorthand for redditpost with various subreddits focussed on the female genitals")]
         public Task PussyAsync()
         {
             var rnd = new Random();
@@ -108,7 +110,7 @@ namespace RavenBOT.Modules.Media.Modules
 
         [Command("tits", RunMode = RunMode.Async)]
         [Alias("boobs", "rack")]
-        [Summary("Fetches some sexy titties")]
+        [Summary("gets a random image from the oboobs api")]
         public async Task BoobsAsync()
         {
             JToken obj;
@@ -122,7 +124,7 @@ namespace RavenBOT.Modules.Media.Modules
         }
 
         [Command("Ass", RunMode = RunMode.Async)]
-        [Summary("Sexy Ass!")]
+        [Summary("gets a random image from the obutts api")]
         public async Task BumsAsync()
         {
             JToken obj;

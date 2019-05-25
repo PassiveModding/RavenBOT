@@ -20,9 +20,6 @@ namespace RavenBOT.Modules.Media.Methods
             Reddit = new Reddit();
         }
 
-        /// <summary>
-        ///     The request http method.
-        /// </summary>
         public enum RequestHttpMethod
         {
             Get,
@@ -31,7 +28,7 @@ namespace RavenBOT.Modules.Media.Methods
         }
 
         /// <summary>
-        ///     The get response string async.
+        ///     Uses streamreader to get a string response from the requested url
         /// </summary>
         /// <param name="url">
         ///     The url.
@@ -40,7 +37,7 @@ namespace RavenBOT.Modules.Media.Methods
         ///     The headers.
         /// </param>
         /// <param name="method">
-        ///     The method.
+        ///     Optional http request method, post/get
         /// </param>
         /// <returns>
         ///     The <see cref="Task" />.
@@ -54,7 +51,7 @@ namespace RavenBOT.Modules.Media.Methods
         }
 
         /// <summary>
-        ///     The get response stream async.
+        ///     Returns the response stream from the given url.
         /// </summary>
         /// <param name="url">
         ///     The url.
@@ -63,7 +60,7 @@ namespace RavenBOT.Modules.Media.Methods
         ///     The headers.
         /// </param>
         /// <param name="method">
-        ///     The method.
+        ///     Optional http request method, post/get
         /// </param>
         /// <returns>
         ///     The <see cref="Task" />.

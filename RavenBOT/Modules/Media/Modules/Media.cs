@@ -68,8 +68,8 @@ namespace RavenBOT.Modules.Media.Modules
             await ReplyAsync("", false, embed.Build());
         }
 
-        [Command("urbanDictionary")]
-        [Summary("Search Urban Dictionary")]
+        [Command("UrbanDictionary")]
+        [Summary("Search Urban Dictionary for the specified term")]
         public async Task UrbanAsync([Remainder] string word)
         {
             var res = await MediaHelper.Client.GetStringAsync($"http://api.urbandictionary.com/v0/define?term={word}").ConfigureAwait(false);
@@ -81,18 +81,13 @@ namespace RavenBOT.Modules.Media.Modules
             }
 
             var mostVoted = model.list.OrderByDescending(x => x.thumbs_up).First();
-            if (mostVoted.definition.Length > 1024)
-            {
-                mostVoted.definition = mostVoted.definition.Substring(0, 1020) + "...";
-            }
-
             var emb = new EmbedBuilder { Title = mostVoted.word, Color = Color.LightOrange }.AddField("Definition", $"{mostVoted.definition}", true).AddField("Example", $"{mostVoted.example.FixLength()}", true).AddField("Votes", $"^ [{mostVoted.thumbs_up}] v [{mostVoted.thumbs_down}]");
             await ReplyAsync("", false, emb.Build());
         }
 
         [Command("xkcd", RunMode = RunMode.Async)]
-        [Summary("Get a random xkcd post")]
-        public async Task XkcdAsync(string number = null)
+        [Summary("Get a random xkcd post, or the specified post numer")]
+        public async Task XkcdAsync([Summary("the post number, use 'latest' for most recent or leave empty for random")]string number = null)
         {  
             string res;
             if (number == "latest")
