@@ -1,5 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Discord;
+using Discord.Addons.Interactive;
 using Discord.Commands;
 using RavenBOT.Services;
 
@@ -8,13 +11,15 @@ namespace RavenBOT.Modules.Guild
     [RequireContext(ContextType.Guild)]
     [RequireUserPermission(GuildPermission.Administrator)]
     [Group("config.")]
-    public class GuildConfiguration : ModuleBase<SocketCommandContext>
+    public class GuildConfiguration : InteractiveBase<SocketCommandContext>
     {
         public PrefixService PrefixService { get; }
+        public ModuleManagementService ModuleManager {get;}
 
-        public GuildConfiguration(PrefixService prefixService)
+        public GuildConfiguration(PrefixService prefixService, ModuleManagementService mms)
         {
             PrefixService = prefixService;
+            ModuleManager = mms;
         }
 
         [Command("SetGuildPrefix")]
@@ -29,6 +34,54 @@ namespace RavenBOT.Modules.Guild
         {
             await ReplyAsync($"Guild Prefix set to: {PrefixService.GetPrefix(0)}");
             PrefixService.SetPrefix(Context.Guild.Id, null);
+        }
+
+        [Command("AddToBlacklist")]
+        public async Task AddToBlacklist(string name)
+        {
+            //TODO: Make this dinamically use the module name in order to remode the hardcoding of 'config.'
+            if (name.Equals("config.", StringComparison.CurrentCultureIgnoreCase) || name.Contains("config.", StringComparison.CurrentCultureIgnoreCase))
+            {
+                await ReplyAsync("It would be a bad idea to blacklist this module don't you think.");
+                return;
+            }
+
+            var config = ModuleManager.GetModuleConfig(Context.Guild.Id);
+            config.Blacklist.Add(name);
+            ModuleManager.SaveModuleConfig(config);
+            await ReplyAsync($"Added {name} to the blacklisted command/module list");
+        }
+
+        [Command("ClearBlacklist")]
+        public async Task ClearBlacklist()
+        {
+            var config = ModuleManager.GetModuleConfig(Context.Guild.Id);
+            config.Blacklist = new List<string>();
+            ModuleManager.SaveModuleConfig(config);
+            await ReplyAsync($"Cleared the module/command blacklist");
+        }
+
+        [Command("ShowBlacklist")]
+        public async Task ShowBlacklist()
+        {
+            var config = ModuleManager.GetModuleConfig(Context.Guild.Id);
+            await ReplyAsync(string.Join("\n", config.Blacklist) ?? "The blacklist is empty");
+        }
+
+        [Command("RemoveFromBlacklist")]
+        public async Task RemoveFromBlacklist(string name)
+        {
+            var config = ModuleManager.GetModuleConfig(Context.Guild.Id);
+
+            if (config.Blacklist.Remove(name))
+            {
+                await ReplyAsync($"Removed {name} from the blacklisted command/module list");
+                ModuleManager.SaveModuleConfig(config);
+            }
+            else
+            {
+                await ReplyAsync("The blacklist does not contain anything with this name. Note that is is case sensitive.\nYou can the list of blacklisted items by using the `ShowBlacklist` command");
+            }
         }
     }
 }

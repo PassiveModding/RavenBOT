@@ -66,6 +66,11 @@ namespace RavenBOT.Handlers
 
                 if (isCommand)
                 {
+                    if (!ModuleManager.IsAllowed(context.Guild?.Id ?? 0, messageContent))
+                    {
+                        return;
+                    }
+
                     var result = await CommandService.ExecuteAsync(context, messageContent, Provider);
 
                     if (!result.IsSuccess)
@@ -87,10 +92,15 @@ namespace RavenBOT.Handlers
                 {
                     var context = new ShardedCommandContext(Client, message);
 
+                    if (!ModuleManager.IsAllowed(context.Guild?.Id ?? 0, messageContent))
+                    {
+                        return;
+                    }
+
                     IResult result;
 
                     if (!string.IsNullOrWhiteSpace(prefixMatch))
-                    {                            
+                    {            
                         result = await CommandService.ExecuteAsync(context, messageContent.Replace(prefixMatch, $"{prefixMatch} ", true, CultureInfo.CurrentCulture), Provider);
                     }
                     else

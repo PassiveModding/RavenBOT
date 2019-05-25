@@ -23,8 +23,9 @@ namespace RavenBOT.Handlers
         public LocalManagementService.LocalConfig Local { get; }
         private IServiceProvider Provider { get; }
 
+        private ModuleManagementService ModuleManager {get;}
 
-        public EventHandler(DiscordShardedClient client, PrefixService prefixService, CommandService commandService, LocalManagementService local, BotConfig config, LogHandler handler, IServiceProvider provider)
+        public EventHandler(DiscordShardedClient client, ModuleManagementService moduleManager, PrefixService prefixService, CommandService commandService, LocalManagementService local, BotConfig config, LogHandler handler, IServiceProvider provider)
         {
             Client = client;
             PrefixService = prefixService;
@@ -33,6 +34,7 @@ namespace RavenBOT.Handlers
             CommandService = commandService;
             Local = local.GetConfig();
             Provider = provider;
+            ModuleManager = moduleManager;
 
             client.Log += LogAsync;
             //client.Log += async (m) => await LogAsync(m);

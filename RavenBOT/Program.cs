@@ -71,6 +71,7 @@ namespace RavenBOT
                     return config;
                 })
                 .AddSingleton<DeveloperSettings>()
+                .AddSingleton<ModuleManagementService>()
                 .AddSingleton(x => new HelpService(x.GetRequiredService<PrefixService>(), x.GetRequiredService<CommandService>(), x.GetRequiredService<BotConfig>(), x.GetRequiredService<DeveloperSettings>(), x))
                 .AddSingleton(new CommandService(new CommandServiceConfig
                 {
