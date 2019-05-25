@@ -46,7 +46,7 @@ namespace RavenBOT.Extensions
                 string decodedString = Encoding.UTF8.GetString(data);
                 return decodedString;
             }
-            catch (Exception e)
+            catch
             {
                 return original;
             }            
