@@ -33,11 +33,19 @@ namespace RavenBOT.Modules.Moderator.Methods
             Timer = new Timer(TimerEvent, null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
         }
 
+        /// <summary>
+        /// Tries to get the mute role, if unsuccessful creats a new one.
+        /// Will automatically apply relevant permissions for all channels in the guild
+        /// </summary>
+        /// <param name="config"></param>
+        /// <param name="guild"></param>
+        /// <returns></returns>
         public async Task<IRole> GetOrCreateMuteRole(ActionConfig config, SocketGuild guild)
         {
             IRole role;
             if (config.MuteRole == 0)
             {
+                //If the role isn't set just create it
                 role = await guild.CreateRoleAsync("Muted");
                 config.MuteRole = role.Id;
                 Save(config, ActionConfig.DocumentName(guild.Id));
@@ -47,11 +55,13 @@ namespace RavenBOT.Modules.Moderator.Methods
                 role = guild.GetRole(config.MuteRole);
                 if (role == null)
                 {
+                    //In the case that the role was removed or is otherwise unavailable generate a new one
                     role = await guild.CreateRoleAsync("Muted");
                     config.MuteRole = role.Id;
                     Save(config, ActionConfig.DocumentName(guild.Id));
                 }
 
+                //Set the default role permissions to deny the only ways the user can communicate in the server
                 if (role.Permissions.SendMessages || role.Permissions.AddReactions || role.Permissions.Connect || role.Permissions.Speak)
                 {
                     await role.ModifyAsync(x =>
@@ -63,6 +73,7 @@ namespace RavenBOT.Modules.Moderator.Methods
 
             foreach (var channel in guild.Channels)
             {
+                //Update channel permission overwrites to stop the user from being able to communicate
                 if (channel.PermissionOverwrites.All(x => x.TargetId != role.Id))
                 {
                     var _ = Task.Run(async () => await channel.AddPermissionOverwriteAsync(role, new OverwritePermissions(sendMessages: PermValue.Deny, addReactions: PermValue.Deny, connect: PermValue.Deny, speak: PermValue.Deny)));
