@@ -349,6 +349,11 @@ namespace RavenBOT.Modules.Events.Methods
                 {
                     var oldMessage = messageOldCache.Value.Content;
 
+                    if (oldMessage.Equals(messageNew.Content))
+                    {
+                        return Task.CompletedTask;
+                    }
+
                     LogEvent(config, "Message Updated", $"**Author:** {messageNew.Author.Mention}\n" +
                                       "**Old:**\n" +
                                       $"{oldMessage}\n" +
