@@ -68,7 +68,7 @@ namespace RavenBOT.Services
 
         public async Task<ReactionCallbackData> ModuleCommandHelpAsync(ShardedCommandContext context, bool checkPreconditions, string checkForMatch, CommandInfo currentCommand)
         {
-            var module = CommandService.Modules.FirstOrDefault(x => string.Equals(x.Name, checkForMatch, StringComparison.CurrentCultureIgnoreCase));
+            var module = CommandService.Modules.FirstOrDefault(x => string.Equals(x.Name, checkForMatch, StringComparison.InvariantCultureIgnoreCase));
             var fields = new List<EmbedFieldBuilder>();
             var pre = PrefixService.GetPrefix(context.Guild?.Id ?? 0);
 
@@ -158,8 +158,8 @@ namespace RavenBOT.Services
             {
                 if (specifiedModules.Any())
                 {
-                    moduleInfos = moduleInfos.Where(x => specifiedModules.Any(sm => x.Name.StartsWith(sm, true, CultureInfo.CurrentCulture))).ToList();
-                    //modules = modules.Where(x => specifiedModules.Any(sm => x.Name.StartsWith(sm, true, CultureInfo.CurrentCulture))).ToList();
+                    moduleInfos = moduleInfos.Where(x => specifiedModules.Any(sm => x.Name.StartsWith(sm, true, CultureInfo.InvariantCulture))).ToList();
+                    //modules = modules.Where(x => specifiedModules.Any(sm => x.Name.StartsWith(sm, true, CultureInfo.InvariantCulture))).ToList();
                 }
             }
 
@@ -167,7 +167,7 @@ namespace RavenBOT.Services
             if (moduleConfig.Blacklist.Any())
             {
                 //Filter out any blacklisted modules for the server
-                moduleInfos = moduleInfos.Where(x => moduleConfig.Blacklist.All(bm => !x.Name.Equals(bm, StringComparison.CurrentCultureIgnoreCase))).ToList();
+                moduleInfos = moduleInfos.Where(x => moduleConfig.Blacklist.All(bm => !x.Name.Equals(bm, StringComparison.InvariantCultureIgnoreCase))).ToList();
             }
 
             foreach (var module in moduleInfos)

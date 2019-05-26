@@ -127,7 +127,7 @@ namespace RavenBOT.Modules.Birthday.Modules
             }
 
             BirthdayService.SaveUser(user);
-            await ReplyAsync($"Birthday set to {parsedTime.Value.Day} {CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(parsedTime.Value.Month)} {(parsedTime.Value.Year == 0001 ? "" : parsedTime.Value.Year.ToString())}");
+            await ReplyAsync($"Birthday set to {parsedTime.Value.Day} {CultureInfo.InvariantCulture.DateTimeFormat.GetMonthName(parsedTime.Value.Month)} {(parsedTime.Value.Year == 0001 ? "" : parsedTime.Value.Year.ToString())}");
         }
     }
 }

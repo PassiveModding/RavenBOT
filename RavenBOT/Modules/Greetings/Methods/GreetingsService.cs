@@ -119,15 +119,15 @@ namespace RavenBOT.Modules.Greetings.Methods
 
         public string DoReplacements(string original, SocketGuildUser user)
         {
-            original = original.Replace("{username}", user.Username, true, CultureInfo.CurrentCulture)
-                                .Replace("{servername}", user.Guild.Name, true, CultureInfo.CurrentCulture)
-                                .Replace("{nickname}", user.Nickname ?? user.Username, true, CultureInfo.CurrentCulture)
-                                .Replace("{userid}", user.Id.ToString(), true, CultureInfo.CurrentCulture)
-                                .Replace("{discriminator}", user.Discriminator, true, CultureInfo.CurrentCulture)
-                                .Replace("{mention}", user.Mention, true, CultureInfo.CurrentCulture)
-                                .Replace("{serverownerusername}", user.Guild.Owner.Username, true, CultureInfo.CurrentCulture)
-                                .Replace("{serverownernickname}", user.Guild.Owner.Nickname ?? user.Guild.Owner.Username, true, CultureInfo.CurrentCulture)
-                                .Replace("{serverid}", user.Guild.Id.ToString(), true, CultureInfo.CurrentCulture);
+            original = original.Replace("{username}", user.Username, true, CultureInfo.InvariantCulture)
+                                .Replace("{servername}", user.Guild.Name, true, CultureInfo.InvariantCulture)
+                                .Replace("{nickname}", user.Nickname ?? user.Username, true, CultureInfo.InvariantCulture)
+                                .Replace("{userid}", user.Id.ToString(), true, CultureInfo.InvariantCulture)
+                                .Replace("{discriminator}", user.Discriminator, true, CultureInfo.InvariantCulture)
+                                .Replace("{mention}", user.Mention, true, CultureInfo.InvariantCulture)
+                                .Replace("{serverownerusername}", user.Guild.Owner.Username, true, CultureInfo.InvariantCulture)
+                                .Replace("{serverownernickname}", user.Guild.Owner.Nickname ?? user.Guild.Owner.Username, true, CultureInfo.InvariantCulture)
+                                .Replace("{serverid}", user.Guild.Id.ToString(), true, CultureInfo.InvariantCulture);
             return original;
         }
 

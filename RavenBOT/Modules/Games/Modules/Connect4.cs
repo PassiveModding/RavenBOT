@@ -137,7 +137,7 @@ namespace RavenBOT.Modules.Games.Modules
                 {
                     // Ignore author messages for the game until another player accepts
                 }
-                else if (string.Equals(next?.Content, "connect4 accept", StringComparison.CurrentCultureIgnoreCase))
+                else if (string.Equals(next?.Content, "connect4 accept", StringComparison.InvariantCultureIgnoreCase))
                 {
                     p2 = GameService.GetGameUser(next.Author.Id, Context.Guild.Id);
                     if (p2.Points < bet)

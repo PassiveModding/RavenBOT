@@ -56,7 +56,7 @@ namespace RavenBOT.Services
                 return true;
             }
 
-            if (config.Blacklist.Any(x => command.StartsWith(x, true, CultureInfo.CurrentCulture)))
+            if (config.Blacklist.Any(x => command.StartsWith(x, true, CultureInfo.InvariantCulture)))
             {
                 return false;
             }

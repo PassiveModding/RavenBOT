@@ -40,7 +40,7 @@ namespace RavenBOT.Modules.Guild
         public async Task AddToBlacklist(string name)
         {
             //TODO: Make this dinamically use the module name in order to remode the hardcoding of 'config.'
-            if (name.Equals("config.", StringComparison.CurrentCultureIgnoreCase) || name.Contains("config.", StringComparison.CurrentCultureIgnoreCase))
+            if (name.Equals("config.", StringComparison.InvariantCultureIgnoreCase) || name.Contains("config.", StringComparison.InvariantCultureIgnoreCase))
             {
                 await ReplyAsync("It would be a bad idea to blacklist this module don't you think.");
                 return;

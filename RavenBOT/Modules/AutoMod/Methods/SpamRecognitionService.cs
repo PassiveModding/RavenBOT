@@ -69,7 +69,7 @@ namespace RavenBOT.Modules.AutoMod.Methods
 
                             if (mostCommon != null)
                             {
-                                if (mostCommon.Equals(message.Content, StringComparison.CurrentCultureIgnoreCase))
+                                if (mostCommon.Equals(message.Content, StringComparison.InvariantCultureIgnoreCase))
                                 {
                                     messages = Messages;
                                 }

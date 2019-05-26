@@ -32,7 +32,7 @@ namespace RavenBOT.Handlers
             if (Local.Developer)
             {
                 //Strip away developer prefix
-                if (messageContent.StartsWith(Local.DeveloperPrefix, true, CultureInfo.CurrentCulture))
+                if (messageContent.StartsWith(Local.DeveloperPrefix, true, CultureInfo.InvariantCulture))
                 {
                     messageContent = messageContent.Substring(Local.DeveloperPrefix.Length);
                 }
@@ -85,7 +85,7 @@ namespace RavenBOT.Handlers
             }
             else
             {
-                var prefixMatch = ModulePrefixes.OrderByDescending(x => x.Length).FirstOrDefault(x => messageContent.StartsWith(x, true, CultureInfo.CurrentCulture));
+                var prefixMatch = ModulePrefixes.OrderByDescending(x => x.Length).FirstOrDefault(x => messageContent.StartsWith(x, true, CultureInfo.InvariantCulture));
 
 
                 if (prefixMatch != null)
@@ -101,7 +101,7 @@ namespace RavenBOT.Handlers
 
                     if (!string.IsNullOrWhiteSpace(prefixMatch))
                     {            
-                        result = await CommandService.ExecuteAsync(context, messageContent.Replace(prefixMatch, $"{prefixMatch} ", true, CultureInfo.CurrentCulture), Provider);
+                        result = await CommandService.ExecuteAsync(context, messageContent.Replace(prefixMatch, $"{prefixMatch} ", true, CultureInfo.InvariantCulture), Provider);
                     }
                     else
                     {
