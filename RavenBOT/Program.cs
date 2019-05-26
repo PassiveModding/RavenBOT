@@ -18,10 +18,25 @@ namespace RavenBOT
     {
         public async Task RunAsync()
         {
+            var localManagement = new LocalManagementService();
+            var localConfig = localManagement.GetConfig();
+            IDatabase database;
+            switch (localConfig.DatabaseChoice)
+            {
+                case LocalManagementService.LocalConfig.DatabaseSelection.LiteDatabase:
+                    database = new LiteDataStore();
+                    break;
+                case LocalManagementService.LocalConfig.DatabaseSelection.RavenDatabase:
+                    database = new RavenDatabase();
+                    break;
+                default:
+                    database = new LiteDataStore();
+                    break;
+            }
+
             //Configure the service provider with all relevant and required services to be injected into other classes.
             var provider = new ServiceCollection()
-                //Change Database store type here.
-                .AddSingleton(x => new RavenDatabase() as IDatabase)
+                .AddSingleton(database)
                 .AddSingleton(x => new DiscordShardedClient(new DiscordSocketConfig
                 {
                     AlwaysDownloadUsers = false,
@@ -33,7 +48,7 @@ namespace RavenBOT
                     TotalShards = 1
                 }))
                 .AddSingleton(x => new LogHandler(x.GetRequiredService<DiscordShardedClient>(), x.GetRequiredService<IDatabase>()))
-                .AddSingleton<LocalManagementService>()
+                .AddSingleton(localManagement)
                 .AddSingleton(x =>
                 {
                     //Initialize the bot config by asking for token and name
@@ -83,8 +98,6 @@ namespace RavenBOT
                 }))
                 .AddSingleton(x =>
                 {
-
-                    var localConfig = x.GetRequiredService<LocalManagementService>().GetConfig();
                     return new PrefixService(x.GetRequiredService<IDatabase>(), x.GetRequiredService<BotConfig>().GetPrefix());
                 })
                 .AddSingleton<EventHandler>()
