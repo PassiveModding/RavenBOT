@@ -8,6 +8,7 @@ using Discord.Addons.Interactive;
 using Discord.Commands;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
+using RavenBOT.Extensions;
 using RavenBOT.Models;
 using RavenBOT.Preconditions;
 using RavenBOT.Services;
@@ -55,6 +56,7 @@ namespace RavenBOT.Modules
         public async Task InformationAsync()
         {
             string changes;
+
             HttpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)");
             using (var response = await HttpClient.GetAsync("https://api.github.com/repos/PassiveModding/RavenBOT/commits"))
             {
@@ -73,12 +75,6 @@ namespace RavenBOT.Modules
 
             var embed = new EmbedBuilder();
 
-            if (changes.Length > 1000)
-            {
-                changes = changes.Substring(0, 1000);
-                changes = $"{changes}...";
-            }
-
             embed.WithAuthor(
                 x =>
                     {
@@ -86,7 +82,7 @@ namespace RavenBOT.Modules
                         x.Name = $"{Context.Client.CurrentUser.Username}'s Official Invite";
                         x.Url = $"https://discordapp.com/oauth2/authorize?client_id={Context.Client.CurrentUser.Id}&scope=bot&permissions=2146958591";
                     });
-            embed.AddField("Changes", changes);
+            embed.AddField("Changes", changes.FixLength());
 
             embed.AddField("Members", $"Bot: {Context.Client.Guilds.Sum(x => x.Users.Count(z => z.IsBot))}\n" + $"Human: {Context.Client.Guilds.Sum(x => x.Users.Count(z => !z.IsBot))}\n" + $"Total: {Context.Client.Guilds.Sum(x => x.Users.Count)}", true);
             embed.AddField("Channels", $"Text: {Context.Client.Guilds.Sum(x => x.TextChannels.Count)}\n" + $"Voice: {Context.Client.Guilds.Sum(x => x.VoiceChannels.Count)}\n" + $"Total: {Context.Client.Guilds.Sum(x => x.Channels.Count)}", true);
