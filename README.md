@@ -8,8 +8,8 @@
 </p>
 </p>
 
-A discord Example bot that uses RavenDB for document storage.
+A modular discord example bot with interchangable database solutions and independent module support.
 ### `Features`
-Custom Context, Database Support, Interactive Commands, Sharding & More
+Database support, sharding, modularity, translations, moderation, nsfw, image lookup, event logging and much more!
 ### `Contributing`
 Feel free to make a pull request, report issues etc. I would love to see everyone's input!
