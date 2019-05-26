@@ -6,7 +6,6 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using RavenBOT.Models;
-using RavenBOT.Services.SerializableCommandFramework;
 
 namespace RavenBOT.Handlers
 {
@@ -120,35 +119,5 @@ namespace RavenBOT.Handlers
                 }
             }
         }
-
-        
-                    /*
-                var gMatch = CmdService.Trees.FirstOrDefault(x => x.GuildId == context.Guild.Id);
-                var ignoreUnknownCommand = false;
-                if (gMatch != null)
-                {
-                    //TODO: Serialization and deserialization
-                    var executionResult = (await gMatch.Execute(context, argPos));
-                    if (executionResult.OverrideCommand)
-                    {
-                        return;
-                    }
-
-                    ignoreUnknownCommand = executionResult.Success;
-                }
-                */
-        public JsonCommandService CmdService = new JsonCommandService
-        {
-            Trees = new List<JsonCommandService.JsonNodeTree>
-            {
-                new JsonCommandService.JsonNodeTree("testJsonCommandService", new List<JsonCommandService.JsonNodeTree.IJsonNode>
-                {
-                    new JsonCommandService.JsonNodeTree.BooleanNode("1", "success", "fail", new ConditionExecution.Comparator(), $"{{{new GuildMessageReplacementTypes.CurrentChannelId()}}}", "440036982014345216"),
-                    new JsonCommandService.JsonNodeTree.MessageSendActionNode("success", null, "Success message"),
-                    new JsonCommandService.JsonNodeTree.MessageSendActionNode("fail", "EndNode", "Fail message"),
-                    new JsonCommandService.JsonNodeTree.EndNode("EndNode")
-                }, "1", 431613488985538560)
-            }
-        };
     }
 }
