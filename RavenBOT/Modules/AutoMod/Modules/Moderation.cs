@@ -12,7 +12,7 @@ using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.AutoMod.Modules
 {
-    [Group("automod.moderation.")]
+    [Group("automod.")]
     [RequireUserPermission(Discord.GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     public partial class Moderation : InteractiveBase<ShardedCommandContext>
