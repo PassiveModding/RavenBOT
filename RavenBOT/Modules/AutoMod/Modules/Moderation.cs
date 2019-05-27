@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Discord.Addons.Interactive;
 using Discord.Commands;
@@ -139,6 +140,16 @@ namespace RavenBOT.Modules.AutoMod.Modules
             await ReplyAsync("Added.");
         }
 
+        [Command("Blacklist Remove")]
+        public async Task BlacklistRemove([Remainder]string message)
+        {
+            var config = ModerationService.GetModerationConfig(Context.Guild.Id);
+            config.BlacklistSimple = config.BlacklistSimple.Where(x => x.Content.Equals(message, StringComparison.InvariantCultureIgnoreCase)).ToList();
+            
+            ModerationService.SaveModerationConfig(config);
+            await ReplyAsync("Removed.");
+        }
+
         [Command("Blacklist Regex Add")]
         [Summary("Adds a regex check to the blacklist")]
         public async Task BlacklistRegexAdd([Remainder]string message)
@@ -150,6 +161,42 @@ namespace RavenBOT.Modules.AutoMod.Modules
                 Regex = true
             });
             
+            ModerationService.SaveModerationConfig(config);
+            await ReplyAsync("Added.");
+        }
+
+        
+        [Command("Blacklist Username Remove")]
+        public async Task BlacklistUsernameRemove([Remainder]string name)
+        {
+            var config = ModerationService.GetModerationConfig(Context.Guild.Id);
+            config.BlacklistedUsernames = config.BlacklistedUsernames.Where(x => x.Content.Equals(name, StringComparison.InvariantCultureIgnoreCase)).ToList();
+            ModerationService.SaveModerationConfig(config);
+            await ReplyAsync($"Removed.");
+        }
+
+        [Command("Blacklist Username Add")]
+        public async Task BlacklistUsernameAdd([Remainder]string name)
+        {
+            var config = ModerationService.GetModerationConfig(Context.Guild.Id);
+            config.BlacklistedUsernames.Add(new BlacklistSet.BlacklistMessage
+            {
+                Content = name,
+                Regex = false
+            });
+            ModerationService.SaveModerationConfig(config);
+            await ReplyAsync($"Added.");
+        }
+
+        [Command("Blacklist Username Regex Add")]
+        public async Task BlacklistUsernameRegexAdd([Remainder]string name)
+        {
+            var config = ModerationService.GetModerationConfig(Context.Guild.Id);
+            config.BlacklistedUsernames.Add(new BlacklistSet.BlacklistMessage
+            {
+                Content = name,
+                Regex = true
+            });
             ModerationService.SaveModerationConfig(config);
             await ReplyAsync("Added.");
         }
@@ -195,7 +242,10 @@ namespace RavenBOT.Modules.AutoMod.Modules
                             $"**BLACKLIST SETTINGS**\n" +
                             $"Use Blacklist: {config.UseBlacklist}\n" +
                             $"Blacklisted Words: \n{string.Join("\n", blacklistSimpleSet)}\n" +
-                            $"\n\nComplex Blacklist is currently disabled for ALL Servers as it is still being developed.".FixLength(2047));
+                            $"\n*Complex Blacklist is currently disabled for ALL Servers as it is still being developed.*\n" +
+                            $"**BLACKLIST USERNAMES**\n" +
+                            $"Blacklist Usernames: {config.BlacklistUsernames}\n" +
+                            $"Blacklisted Usernames: \n{string.Join("\n", config.BlacklistedUsernames)}\n".FixLength(2047));
         }
     }
 }

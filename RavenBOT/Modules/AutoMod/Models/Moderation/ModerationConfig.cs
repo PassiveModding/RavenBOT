@@ -43,14 +43,17 @@ namespace RavenBOT.Modules.AutoMod.Models.Moderation
             return otherMatch ?? new Tuple<bool, string, bool>(false, null, false);
         }
 
-        public bool UseBlacklist { get; set; }
+        public bool UseBlacklist { get; set; } = false;
         public List<BlacklistSet> Blacklist { get; set; } = new List<BlacklistSet>();
         public List<BlacklistSet.BlacklistMessage> BlacklistSimple { get; set; } = new List<BlacklistSet.BlacklistMessage>();
 
-        public bool BlockInvites { get; set; }
-        public bool BlockIps { get; set; }
+        public bool BlockInvites { get; set; } = false;
+        public bool BlockIps { get; set; } = false;
 
-        public bool BlockMassMentions { get; set; }
+        public bool BlacklistUsernames {get;set;} = false;
+        public List<BlacklistSet.BlacklistMessage> BlacklistedUsernames {get;set;} = new List<BlacklistSet.BlacklistMessage>();
+
+        public bool BlockMassMentions { get; set; } = false;
         public int MaxMentions { get; set; } = 5;
         public bool MassMentionsIncludeUsers { get; set; } = true;
         public bool MassMentionsIncludeRoles { get; set; } = true;

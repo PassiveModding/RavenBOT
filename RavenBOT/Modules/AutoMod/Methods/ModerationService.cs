@@ -32,6 +32,78 @@ namespace RavenBOT.Modules.AutoMod.Methods
             Perspective = setupDoc.PerspectiveToken != null ? new Perspective.Api(setupDoc.PerspectiveToken) : null;
             Client = client;
             Client.MessageReceived += MessageReceived;
+            Client.UserJoined += UserJoined;
+            Client.GuildMemberUpdated += MemberUpdated;
+        }
+
+        public async Task MemberUpdated(SocketGuildUser before, SocketGuildUser after)
+        {
+            //Only run if username/nickname change is detected.
+            if (before.Username.Equals(after.Username) && before.Nickname.Equals(after.Nickname))
+            {
+                return;
+            }
+
+            if (before.Nickname != null && after.Nickname == null)
+            {
+                //Check username.
+                await CheckDisplayName(after.Username, after);
+                return;
+            }
+
+            if (!before.Username.Equals(after.Username))
+            {
+                //check usernames
+                await CheckDisplayName(after.Username, after);
+                return;
+            }
+
+            if (!before.Nickname.Equals(after.Nickname))
+            {
+                //check nicknames
+                await CheckDisplayName(after.Nickname, after);
+                return;
+            }
+        }
+
+        public async Task CheckDisplayName(string content, SocketGuildUser user)
+        {
+            var config = GetModerationConfig(user.Guild.Id);
+            if (config.BlacklistUsernames)
+            {
+                if (!config.BlacklistedUsernames.Any())
+                {
+                    return;
+                }
+
+                var match = config.BlacklistedUsernames.FirstOrDefault(x =>
+                {
+                    if (x.Regex)
+                    {
+                        return Regex.IsMatch(content, x.Content, RegexOptions.IgnoreCase);
+                    }
+
+                    return content.Contains(x.Content, StringComparison.InvariantCultureIgnoreCase);
+                });
+
+
+                if (match != null && match.Content != null)
+                {
+                    if (match.Content.Equals("💩"))
+                    {
+                        //Note that we cannot re-modify if the name is what we're setting it to.
+                        //Something something recursion.
+                        return;
+                    }
+
+                    await user.ModifyAsync(x => x.Nickname = "💩");
+                }
+            }
+        }
+
+        public async Task UserJoined(SocketGuildUser user)
+        {
+            await CheckDisplayName(user.Username, user);
         }
 
         public async Task MessageReceived(SocketMessage socketMessage)
