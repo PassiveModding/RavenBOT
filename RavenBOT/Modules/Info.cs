@@ -45,9 +45,9 @@ namespace RavenBOT.Modules
 
 
         [Command("Help")]
-        public async Task HelpAsync([Remainder]string moduleOrCommand = null)
+        public async Task HelpAsync()
         {
-            await GenerateHelpAsync(moduleOrCommand);
+            await GenerateHelpAsync();
         }
 
         [RateLimit(1, 1, Measure.Minutes, RateLimitFlags.ApplyPerGuild)]
@@ -105,39 +105,28 @@ namespace RavenBOT.Modules
         }
 
         [Command("FullHelp")]
-        public async Task FullHelpAsync([Remainder][Summary("The name of a specific module or command")]string moduleOrCommand = null)
+        public async Task FullHelpAsync()
         {
-            await GenerateHelpAsync(moduleOrCommand, false);
+            await GenerateHelpAsync(false);
         }
 
-        public async Task GenerateHelpAsync(string checkForMatch = null, bool checkPreconditions = true)
+        public async Task GenerateHelpAsync(bool checkPreconditions = true)
         {
             try
             {
-                if (checkForMatch == null)
+                var res = await HelpService.PagedHelpAsync(Context, checkPreconditions);
+                if (res != null)
                 {
-                    var res = await HelpService.PagedHelpAsync(Context, checkPreconditions);
-                    if (res != null)
+                    await PagedReplyAsync(res, new ReactionList
                     {
-                        await PagedReplyAsync(res, new ReactionList
-                        {
-                            Backward = true,
-                            First = false,
-                            Forward = true,
-                            Info = false,
-                            Jump = true,
-                            Last = false,
-                            Trash = true
-                        });
-                    }
-                }
-                else
-                {
-                    var res = await HelpService.ModuleCommandHelpAsync(Context, checkPreconditions, checkForMatch, Command);
-                    if (res != null)
-                    {
-                        await InlineReactionReplyAsync(res);
-                    }
+                        Backward = true,
+                        First = false,
+                        Forward = true,
+                        Info = false,
+                        Jump = true,
+                        Last = false,
+                        Trash = true
+                    });
                 }
             }
             catch (Exception e)
