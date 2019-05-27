@@ -13,11 +13,9 @@ namespace RavenBOT.Modules.Moderator.Modules
 {
     [Group("moderator.")]
     [RequireUserPermission(Discord.GuildPermission.Administrator)]
+    //TODO: Custom precondition that allows for commands to work based off 'moderator' list in modconfig
     public partial class Moderation : InteractiveBase<ShardedCommandContext>
     {      
-        //Moderator role?
-        //hackban, delete warning(s)
-
         public ModerationHandler ModHandler {get;}
 
         public Moderation(IDatabase database, DiscordShardedClient client)
