@@ -37,6 +37,16 @@ namespace RavenBOT.Modules.AutoMod.Methods
                 return;
             }
 
+            var gUser = channel.Guild.GetUser(message.Author.Id);
+            if (gUser != null)
+            {
+                if (gUser.GuildPermissions.Administrator)
+                {
+                    //Do not run message checks for admins.
+                    return;
+                }
+            }
+
             var guildSetup = GetModerationConfig(channel.Guild.Id);
 
             if (guildSetup.BlockInvites)
