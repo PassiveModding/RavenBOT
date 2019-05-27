@@ -49,6 +49,15 @@ namespace RavenBOT.Modules.AutoMod.Methods
 
             var guildSetup = GetModerationConfig(channel.Guild.Id);
 
+            if (gUser != null)
+            {
+                if (gUser.Roles.Any(x => guildSetup.AutoModExempt.Contains(x.Id)))
+                {
+                    //Filter out excempt roles.
+                    return;
+                }
+            }
+
             if (guildSetup.BlockInvites)
             {
                 if (Regex.IsMatch(message.Content, @"discord(?:\.gg|\.me|app\.com\/invite)\/([\w\-]+)", RegexOptions.IgnoreCase))

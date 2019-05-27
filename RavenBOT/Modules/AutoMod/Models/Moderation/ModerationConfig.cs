@@ -65,6 +65,8 @@ namespace RavenBOT.Modules.AutoMod.Models.Moderation
         public bool UseAntiSpam {get;set;} = false;
         public AntiSpam SpamSettings {get;set;} = new AntiSpam();
 
+        public List<ulong> AutoModExempt {get;set;} = new List<ulong>();
+
         public class AntiSpam
         {
             //Max messages to cache

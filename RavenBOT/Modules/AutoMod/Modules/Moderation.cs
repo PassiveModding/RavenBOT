@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -21,6 +22,24 @@ namespace RavenBOT.Modules.AutoMod.Modules
         public Moderation(IDatabase database, DiscordShardedClient client)
         {
             ModerationService = new ModerationService(database, client);
+        }
+
+        [Command("AutomodExempt")]
+        [Summary("Adds or removed the specified role from the auto-mod exempt list")]
+        public async Task AutomodExempt(IRole role)
+        {
+            var config = ModerationService.GetModerationConfig(Context.Guild.Id);
+            if (config.AutoModExempt.Contains(role.Id))
+            {
+                config.AutoModExempt.Remove(role.Id);
+                await ReplyAsync($"Role removed from auto-mod exempt list.");
+            }
+            else
+            {
+                config.AutoModExempt.Add(role.Id);
+                await ReplyAsync($"Role added to auto-mod exempt list.");
+            }
+            ModerationService.SaveModerationConfig(config);
         }
 
         [Command("UseToxicity")]
@@ -224,6 +243,7 @@ namespace RavenBOT.Modules.AutoMod.Modules
 
                                 return x.Content;
                             }).ToList();
+            var exemptlist = config.AutoModExempt.Select(x => Context.Guild.Roles.FirstOrDefault(r => r.Id == x)).Where(x => x != null).Select(x => x.Mention);
                             
             await ReplyAsync("**AUTO-MOD SETTINGS**\n" +
                             $"Block Invites: {config.BlockInvites}\n" +
@@ -247,7 +267,11 @@ namespace RavenBOT.Modules.AutoMod.Modules
                             $"\n*Complex Blacklist is currently disabled for ALL Servers as it is still being developed.*\n" +
                             $"**BLACKLIST USERNAMES**\n" +
                             $"Blacklist Usernames: {config.BlacklistUsernames}\n" +
-                            $"Blacklisted Usernames: \n{string.Join("\n", config.BlacklistedUsernames)}\n".FixLength(2047));
+                            $"Blacklisted Usernames: \n{string.Join("\n", config.BlacklistedUsernames)}\n" +
+                            $"**AUTOMOD EXEMPT**\n" +
+                            $"All Admin Roles\n" +
+                            $"Automod Exempt Roles: \n" +
+                            $"{string.Join("\n", exemptlist)}".FixLength(2047));
         }
     }
 }
