@@ -33,13 +33,15 @@ namespace RavenBOT.Modules.AutoMod.Methods
             Client = client;
             Client.MessageReceived += MessageReceived;
             Client.UserJoined += UserJoined;
-            Client.GuildMemberUpdated += MemberUpdated;
+            //Client.GuildMemberUpdated += MemberUpdated;
         }
 
         public async Task MemberUpdated(SocketGuildUser before, SocketGuildUser after)
         {
+            //TODO: Fix null ref spam
+
             //Only run if username/nickname change is detected.
-            if (before.Username.Equals(after.Username) && before.Nickname.Equals(after.Nickname))
+            if (before.Username.Equals(after.Username) && before.Nickname?.Equals(after.Nickname) == true)
             {
                 return;
             }
