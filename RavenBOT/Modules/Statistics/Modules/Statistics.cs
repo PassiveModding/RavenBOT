@@ -7,7 +7,7 @@ using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Statistics.Modules
 {
-    [Group("Stats")]
+    [Group("Stats.")]
     [RequireOwner]
     //TODO: Test this module
     public class Statistics : InteractiveBase<ShardedCommandContext>

@@ -17,7 +17,9 @@ namespace RavenBOT.Modules.Statistics.Methods
             Database = database;
             Client = client;
 
-            GraphiteService = new GraphiteService();
+            var config = GetConfig();
+
+            GraphiteService = new GraphiteService(config.GraphiteUrl);
 
             Client.UserJoined += UserCountChanged;
             Client.JoinedGuild += GuildCountChanged;
@@ -35,18 +37,18 @@ namespace RavenBOT.Modules.Statistics.Methods
             Task.Run(() =>
             {
                 MessageStatistics.ThisMinute = MessageStatistics.ThisMinute.Where(x => x + TimeSpan.FromMinutes(1) > DateTime.UtcNow).ToList();
-                GraphiteService.Report(new ahd.Graphite.Datapoint($"Bot/Messages/Minutely/", MessageStatistics.ThisMinute.Count, DateTime.UtcNow));
-                GraphiteService.Report(new ahd.Graphite.Datapoint($"Bot/Messages/Session/", MessageStatistics.ThisSession, DateTime.UtcNow));
+                GraphiteService.Report(new ahd.Graphite.Datapoint($"Bot/Messages/Minutely", MessageStatistics.ThisMinute.Count, DateTime.UtcNow));
+                GraphiteService.Report(new ahd.Graphite.Datapoint($"Bot/Messages/Session", MessageStatistics.ThisSession, DateTime.UtcNow));
                 if (MessageStatistics.LoopCount % 60 == 0)
                 {
                     MessageStatistics.ThisHour = MessageStatistics.ThisHour.Where(x => x + TimeSpan.FromHours(1) > DateTime.UtcNow).ToList();
-                    GraphiteService.Report(new ahd.Graphite.Datapoint($"Bot/Messages/Hourly/", MessageStatistics.ThisHour.Count, DateTime.UtcNow));
+                    GraphiteService.Report(new ahd.Graphite.Datapoint($"Bot/Messages/Hourly", MessageStatistics.ThisHour.Count, DateTime.UtcNow));
                 }
 
                 if (MessageStatistics.LoopCount % (60 * 24) == 0)
                 {
                     MessageStatistics.ThisDay = MessageStatistics.ThisDay.Where(x => x + TimeSpan.FromDays(1) > DateTime.UtcNow).ToList();
-                    GraphiteService.Report(new ahd.Graphite.Datapoint($"Bot/Messages/Daily/", MessageStatistics.ThisDay.Count, DateTime.UtcNow));
+                    GraphiteService.Report(new ahd.Graphite.Datapoint($"Bot/Messages/Daily", MessageStatistics.ThisDay.Count, DateTime.UtcNow));
                 }
             });
         }
@@ -74,14 +76,13 @@ namespace RavenBOT.Modules.Statistics.Methods
 
         public async Task GuildCountChanged(SocketGuild guild)
         {
-            GraphiteService.Report(new ahd.Graphite.Datapoint($"Bot/GuildCount/", Client.Guilds.Count, DateTime.UtcNow));
-            GraphiteService.Report(new ahd.Graphite.Datapoint($"Bot/MostMembers/", Client.Guilds.Max(x => x.MemberCount), DateTime.UtcNow));
-            GraphiteService.Report(new ahd.Graphite.Datapoint($"Bot/MemberCount/", Client.Guilds.Sum(x => x.MemberCount), DateTime.UtcNow));            
+            GraphiteService.Report(new ahd.Graphite.Datapoint($"Bot/GuildCount", Client.Guilds.Count, DateTime.UtcNow));
+            GraphiteService.Report(new ahd.Graphite.Datapoint($"Bot/MemberCount", Client.Guilds.Sum(x => x.MemberCount), DateTime.UtcNow));           
         }
 
         public async Task UserCountChanged(SocketGuildUser user)
         {
-            GraphiteService.Report(new ahd.Graphite.Datapoint($"Guilds/{user.Guild.Id}/UserCount/", user.Guild.MemberCount, DateTime.UtcNow));
+            GraphiteService.Report(new ahd.Graphite.Datapoint($"Guilds/{user.Guild.Id}/UserCount", user.Guild.MemberCount, DateTime.UtcNow));
         }
 
 
