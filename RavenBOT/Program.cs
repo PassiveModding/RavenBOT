@@ -103,6 +103,7 @@ namespace RavenBOT
                 .AddSingleton<EventHandler>()
                 .AddSingleton(x => new LicenseService(x.GetRequiredService<IDatabase>()))
                 .AddSingleton<InteractiveService>()
+                //.AddSingleton<ModuleService>()
                 .BuildServiceProvider();
 
             try

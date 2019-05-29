@@ -7,6 +7,7 @@ using Discord.WebSocket;
 using RavenBOT.Extensions;
 using RavenBOT.Handlers;
 using RavenBOT.Models;
+using RavenBOT.Services;
 using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Developer
@@ -25,6 +26,25 @@ namespace RavenBOT.Modules.Developer
             DeveloperSettings = new DeveloperSettings(dbService);
             Database = dbService;
         }
+
+        /*
+        [Command("AddModule")]
+        public async Task AddModule([Remainder]string location)
+        {
+            try
+            {
+                var modules = await ModuleService.RegisterModule(location);
+                foreach (var module in modules)
+                {
+                    await ReplyAsync($"Module Added: {module.Name}");
+                }
+            }
+            catch (Exception e)
+            {
+                Console.Write(e);
+            }
+        }
+        */
 
         [Command("EditHelpPreconditionSkips")]
         public async Task EditHelpPreconditionSkipsAsync(string skip)
