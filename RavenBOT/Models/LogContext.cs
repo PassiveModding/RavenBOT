@@ -9,14 +9,6 @@ namespace RavenBOT.Models
         public ulong channelId { get; set; }
         public string message { get; set; }
 
-        public LogContext(SocketCommandContext context)
-        {
-            userId = context.User?.Id ?? 0;
-            guildId = context.Channel?.Id ?? 0;
-            channelId = context.Channel?.Id ?? 0;
-            message = context.Message?.Content;
-        }
-
         public LogContext(ICommandContext context)
         {
             userId = context.User?.Id ?? 0;
