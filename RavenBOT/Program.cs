@@ -16,6 +16,8 @@ namespace RavenBOT
 {
     public class Program
     {
+        public IServiceProvider Provider { get; set; }
+
         public async Task RunAsync()
         {
             var localManagement = new LocalManagementService();
@@ -35,7 +37,7 @@ namespace RavenBOT
             }
 
             //Configure the service provider with all relevant and required services to be injected into other classes.
-            var provider = new ServiceCollection()
+            Provider = new ServiceCollection()
                 .AddSingleton(database)
                 .AddSingleton(x => new DiscordShardedClient(new DiscordSocketConfig
                 {
@@ -108,7 +110,7 @@ namespace RavenBOT
 
             try
             {
-                await provider.GetRequiredService<EventHandler>().InitializeAsync();
+                await Provider.GetRequiredService<EventHandler>().InitializeAsync();
             }
             catch (Exception e)
             {
