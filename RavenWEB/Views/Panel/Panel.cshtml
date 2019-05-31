@@ -1,0 +1,23 @@
+﻿@model RavenWEB.Models.UserAccessToken
+@{
+    ViewData["Title"] = "UserLogin";
+}
+
+<h2>User</h2>
+<h4>Login</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        @if (TempData["UserLoginFailed"] != null)
+        {
+            <p class="alert alert-danger">@TempData["UserLoginFailed"]</p>
+        }
+
+        <form asp-action="Panel">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        </form>
+    </div>
+</div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
