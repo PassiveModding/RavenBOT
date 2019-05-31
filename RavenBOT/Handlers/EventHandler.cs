@@ -90,10 +90,8 @@ namespace RavenBOT.Handlers
             }
         }
 
-        public async Task RegisterModulesAsync() 
-        {
-            await CommandService.AddModulesAsync(Assembly.GetEntryAssembly(), Provider);
-        }
+        public Task RegisterModulesAsync() => CommandService.AddModulesAsync(Assembly.GetCallingAssembly(), Provider);
+
         private Task ShardConnectedAsync(DiscordSocketClient shard)
         {
             Logger.Log($"Shard {shard.ShardId} connected! Guilds:{shard.Guilds.Count} Users:{shard.Guilds.Sum(x => x.MemberCount)}");
