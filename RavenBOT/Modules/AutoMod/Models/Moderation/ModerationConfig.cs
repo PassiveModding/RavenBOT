@@ -19,7 +19,9 @@ namespace RavenBOT.Modules.AutoMod.Models.Moderation
             PerspectiveMax = 95;
         }
         
-        public ulong GuildId { get; }
+        public ModerationConfig() { }
+
+        public ulong GuildId { get; set; }
 
         //Indicates (matched?, matched value, regex?)
         public Tuple<bool, string, bool> BlacklistCheck(string message)

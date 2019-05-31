@@ -26,12 +26,14 @@ namespace RavenBOT.Modules.Tickets.Models
             SetState(TicketState.open);
         }
 
+        public Ticket() {}
+
         public static string DocumentName(ulong guildId, int ticketId)
         {
             return $"Ticket-{guildId}-{ticketId}";
         }
 
-        public int TicketId { get; }
+        public int TicketId { get; set; }
 
         public ulong GuildId { get; set; }
 

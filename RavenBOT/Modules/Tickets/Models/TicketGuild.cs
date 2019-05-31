@@ -13,12 +13,14 @@ namespace RavenBOT.Modules.Tickets.Models
             TicketChannelId = 0;
         }
 
+        public TicketGuild() {}
+
         public static string DocumentName(ulong guildId)
         {
             return $"TicketGuild-{guildId}";
         }
 
-        public ulong GuildId { get; }
+        public ulong GuildId { get; set; }
 
         public ulong TicketChannelId { get; set; }
 

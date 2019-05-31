@@ -18,6 +18,8 @@ namespace RavenBOT.Modules.Events.Models.Events
             GuildId = guildId;
         }
 
+        public EventConfig() { }
+
         public ulong ChannelId { get; set; }
 
         public bool ChannelCreated { get; set; }
