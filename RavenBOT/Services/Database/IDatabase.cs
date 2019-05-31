@@ -8,7 +8,7 @@ namespace RavenBOT.Services.Database
         void Store<T>(T document, string name = null);
         void StoreMany<T>(List<T> documents, Func<T, string> docName = null);
         T Load<T>(string documentName);
-        List<T> Query<T>();
+        IEnumerable<T> Query<T>();
         void RemoveDocument<T>(T document);
         void Remove<T>(string documentName);
         void RemoveManyDocuments<T>(List<T> documents);

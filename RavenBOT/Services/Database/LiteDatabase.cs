@@ -70,10 +70,10 @@ namespace RavenBOT.Services.Database
             }
         }
 
-        public List<T> Query<T>()
+        public IEnumerable<T> Query<T>()
         {
             var collection = Database.GetCollection<T>();
-            return collection.FindAll().ToList();
+            return collection.FindAll();
         }
 
         public void RemoveDocument<T>(T document)

@@ -157,7 +157,7 @@ namespace RavenBOT.Services.Database
             }
         }
 
-        public List<T> Query<T>()
+        public IEnumerable<T> Query<T>()
         {
             using (var session = DocumentStore.OpenSession())
             {
