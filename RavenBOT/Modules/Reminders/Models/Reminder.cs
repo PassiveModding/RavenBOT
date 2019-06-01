@@ -41,6 +41,6 @@ namespace RavenBOT.Modules.Reminders.Models
 
         public string ReminderMessage {get;set;}
 
-        public int ReminderId {get;set;}
+        public int ReminderNumber {get;set;}
     }
 }

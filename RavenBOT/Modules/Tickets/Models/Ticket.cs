@@ -11,11 +11,11 @@ namespace RavenBOT.Modules.Tickets.Models
 {
     public class Ticket
     {
-        public Ticket(ulong guildId, ulong authorId, int ticketId, string message)
+        public Ticket(ulong guildId, ulong authorId, int ticketNumber, string message)
         {
             GuildId = guildId;
             AuthorId = authorId;
-            TicketId = ticketId;
+            TicketNumber = ticketNumber;
             LiveMessageId = 0;
 
             Message = message;
@@ -33,7 +33,7 @@ namespace RavenBOT.Modules.Tickets.Models
             return $"Ticket-{guildId}-{ticketId}";
         }
 
-        public int TicketId { get; set; }
+        public int TicketNumber { get; set; }
 
         public ulong GuildId { get; set; }
 
@@ -48,7 +48,7 @@ namespace RavenBOT.Modules.Tickets.Models
         {
             var builder = new EmbedBuilder
             {
-                Title = $"Ticket #{TicketId}",
+                Title = $"Ticket #{TicketNumber}",
                 Color = GetTicketColor(),
                 Description = Message.FixLength(512),
                 Author = GetAuthorBuilder(guild),

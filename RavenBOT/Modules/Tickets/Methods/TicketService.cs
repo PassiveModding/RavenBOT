@@ -33,7 +33,7 @@ namespace RavenBOT.Modules.Tickets.Methods
 
         public void SaveTicket(Ticket ticket)
         {
-            Database.Store(ticket, Ticket.DocumentName(ticket.GuildId, ticket.TicketId));
+            Database.Store(ticket, Ticket.DocumentName(ticket.GuildId, ticket.TicketNumber));
         }
 
         public void SaveGuild(TicketGuild guild)
@@ -92,7 +92,7 @@ namespace RavenBOT.Modules.Tickets.Methods
             int count = documents.Count;
             if (documents.Any())
             {
-                count = documents.Max(x => x.TicketId);
+                count = documents.Max(x => x.TicketNumber);
             }
 
             //In the case that a ticket was removed form database, use the highest ticket number instead.

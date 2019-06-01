@@ -83,7 +83,7 @@ namespace RavenBOT.Modules.Tickets.Modules
             TicketService.SaveGuild(guild);
 
             var _ = Task.Run(async () => { 
-                foreach (var ticket in TicketService.GetTickets(Context.Guild.Id).OrderBy(x => x.TicketId))
+                foreach (var ticket in TicketService.GetTickets(Context.Guild.Id).OrderBy(x => x.TicketNumber))
                 {
                     await Context.Channel.SendMessageAsync("", false, ticket.GenerateEmbed(Context.Guild).Build());
                 }

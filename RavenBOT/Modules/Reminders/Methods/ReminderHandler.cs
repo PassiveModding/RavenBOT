@@ -32,16 +32,16 @@ namespace RavenBOT.Modules.Reminders.Methods
         //NOTE: Reminder ID is discarded and re-set here
         public void AddReminder(Reminder reminder)
         {
-            reminder.ReminderId = Reminders.Any() ? Reminders.Max(x => x.ReminderId) + 1 : 1;;
+            reminder.ReminderNumber = Reminders.Any() ? Reminders.Max(x => x.ReminderNumber) + 1 : 1;;
             Reminders.Add(reminder);
-            Database.Store(reminder, Reminder.DocumentName(reminder.GuildId, reminder.ReminderId));
+            Database.Store(reminder, Reminder.DocumentName(reminder.GuildId, reminder.ReminderNumber));
         }
 
         public void RemoveReminder(Reminder reminder)
         {
             try
             {
-                Database.Remove<Reminder>(Reminder.DocumentName(reminder.GuildId, reminder.ReminderId));
+                Database.Remove<Reminder>(Reminder.DocumentName(reminder.GuildId, reminder.ReminderNumber));
                 Reminders.Remove(reminder);
             }
             catch (Exception e)
