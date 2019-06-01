@@ -30,6 +30,11 @@ namespace RavenBOT.Modules.Tickets.Modules
             //Check if live message, update up/downvote count
             if (reaction.Emote.Name == "👍" || reaction.Emote.Name == "👎")
             {
+                if (reaction.UserId == Client.CurrentUser.Id)
+                {
+                    //We shouldn't log upvotes from the bot itself as it adds the reactions
+                    return;
+                }
                 var ticket = TicketService.GetTicket(reaction.MessageId);
                 if (ticket != null)
                 {
@@ -37,14 +42,14 @@ namespace RavenBOT.Modules.Tickets.Modules
                     {
                         ticket.RemoveUpvote(reaction.UserId);
                         await TicketService.UpdateLiveMessageAsync((channel as SocketTextChannel).Guild, ticket);
-                        TicketService.SaveTicket(ticket);
+                        //TicketService.SaveTicket(ticket);
                     }
 
                     if (reaction.Emote.Name == "👎")
                     {
                         ticket.RemoveDownvote(reaction.UserId);
                         await TicketService.UpdateLiveMessageAsync((channel as SocketTextChannel).Guild, ticket);
-                        TicketService.SaveTicket(ticket);
+                        //TicketService.SaveTicket(ticket);
                     }
                 }
             }
@@ -55,6 +60,11 @@ namespace RavenBOT.Modules.Tickets.Modules
             //Check if live message, update up/downvote count
             if (reaction.Emote.Name == "👍" || reaction.Emote.Name == "👎")
             {
+                if (reaction.UserId == Client.CurrentUser.Id)
+                {
+                    //We shouldn't log upvotes from the bot itself as it adds the reactions
+                    return;
+                }
                 var ticket = TicketService.GetTicket(reaction.MessageId);
                 if (ticket != null)
                 {
@@ -62,14 +72,14 @@ namespace RavenBOT.Modules.Tickets.Modules
                     {
                         ticket.Upvote(reaction.UserId);
                         await TicketService.UpdateLiveMessageAsync((channel as SocketTextChannel).Guild, ticket);
-                        TicketService.SaveTicket(ticket);
+                        //TicketService.SaveTicket(ticket);
                     }
 
                     if (reaction.Emote.Name == "👎")
                     {
                         ticket.Downvote(reaction.UserId);
                         await TicketService.UpdateLiveMessageAsync((channel as SocketTextChannel).Guild, ticket);
-                        TicketService.SaveTicket(ticket);
+                        //TicketService.SaveTicket(ticket);
                     }
                 }
             }
@@ -79,16 +89,20 @@ namespace RavenBOT.Modules.Tickets.Modules
         public async Task SetChannel()
         {
             var guild = TicketService.GetTicketGuild(Context.Guild.Id);
+            if (guild.TicketChannelId == Context.Channel.Id)
+            {
+                await ReplyAsync("Channel has been set.");
+                return;
+            }
             guild.TicketChannelId = Context.Channel.Id;
             TicketService.SaveGuild(guild);
-
-            var _ = Task.Run(async () => { 
-                foreach (var ticket in TicketService.GetTickets(Context.Guild.Id).OrderBy(x => x.TicketNumber))
-                {
-                    await Context.Channel.SendMessageAsync("", false, ticket.GenerateEmbed(Context.Guild).Build());
-                }
-
-            });
+            
+            foreach (var ticket in TicketService.GetTickets(Context.Guild.Id).OrderBy(x => x.TicketNumber).ToList())
+            {
+                var message = await Context.Channel.SendMessageAsync("", false, ticket.GenerateEmbed(Context.Guild).Build());
+                ticket.LiveMessageId = message.Id;
+                TicketService.SaveTicket(ticket);
+            }
             
 
             await ReplyAsync("Channel has been set.");

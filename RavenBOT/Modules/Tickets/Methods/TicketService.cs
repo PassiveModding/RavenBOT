@@ -70,6 +70,7 @@ namespace RavenBOT.Modules.Tickets.Methods
                         if (message is IUserMessage msg)
                         {
                             await msg.ModifyAsync(x => x.Embed = ticket.GenerateEmbed(guild).Build());
+                            SaveTicket(ticket);
                             return msg;
                         }
                     }
