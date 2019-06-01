@@ -7,6 +7,7 @@ using LiteDB;
 
 namespace RavenBOT.Services.Database
 {
+    //Warning, this is buggy and many things may not work correctly.
     public class LiteDataStore : IDatabase
     {
         public string DatabaseFolder = Path.Combine(AppContext.BaseDirectory, "LiteDB");
@@ -101,6 +102,12 @@ namespace RavenBOT.Services.Database
             {
                 collection.Delete(new BsonValue(name));
             }
+        }
+
+        public bool Exists<T>(string docName)
+        {
+            var collection = Database.GetCollection<T>();
+            return collection.Exists(LiteDB.Query.Contains("_id", docName));
         }
     }
 }

@@ -216,5 +216,13 @@ namespace RavenBOT.Services.Database
                 session.SaveChanges();
             }
         }
+
+        public bool Exists<T>(string docName)
+        {
+            using (var session = DocumentStore.OpenSession())
+            {
+                return session.Advanced.Exists(docName);
+            }
+        }
     }
 }

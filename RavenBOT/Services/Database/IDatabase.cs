@@ -13,5 +13,6 @@ namespace RavenBOT.Services.Database
         void Remove<T>(string documentName);
         void RemoveManyDocuments<T>(List<T> documents);
         void RemoveMany<T>(List<string> docNames);
+        bool Exists<T>(string docName);
     }
 }
