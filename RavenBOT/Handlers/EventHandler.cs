@@ -111,6 +111,12 @@ namespace RavenBOT.Handlers
                 return Task.CompletedTask;
             }
 
+            if (message.Exception is Exception e)
+            {
+                Logger.Log($"{message.Message}\n{e}", message.Severity);
+                return Task.CompletedTask;
+            }
+
             if (message.Exception is CommandException exc)
             {
                 Logger.Log(message.Message, new LogContext(exc.Context), message.Severity);
