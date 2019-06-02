@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
@@ -36,8 +38,18 @@ namespace RavenBOT
                     break;
             }
 
+            var types = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(s => s.GetTypes())
+                .Where(p => typeof(IServiceable).IsAssignableFrom(p) && !p.IsInterface);
+
+            IServiceCollection collection = new ServiceCollection();
+            foreach (var type in types)
+            {
+                collection = collection.AddSingleton(type);
+            }
+
             //Configure the service provider with all relevant and required services to be injected into other classes.
-            Provider = new ServiceCollection()
+            Provider = collection
                 .AddSingleton(database)
                 .AddSingleton(x => new DiscordShardedClient(new DiscordSocketConfig
                 {
