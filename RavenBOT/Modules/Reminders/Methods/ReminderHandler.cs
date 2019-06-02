@@ -26,7 +26,7 @@ namespace RavenBOT.Modules.Reminders.Methods
 
             Reminders = Database.Query<Reminder>().ToList();
 
-            Timer = new Timer(TimerEvent, null, TimeSpan.FromMinutes(0), TimeSpan.FromSeconds(10));
+            Timer = new Timer(TimerEvent, null, TimeSpan.FromMinutes(0), TimeSpan.FromMinutes(1));
         }
 
         //NOTE: Reminder ID is discarded and re-set here
