@@ -85,7 +85,8 @@ namespace RavenBOT.Modules.Tickets.Modules
             }
         }
 
-        [Command("SetChannel")]
+        [Command("SetChannel")]        
+        [RequireUserPermission(Discord.GuildPermission.Administrator)]
         public async Task SetChannel()
         {
             var guild = TicketService.GetTicketGuild(Context.Guild.Id);
@@ -147,10 +148,14 @@ namespace RavenBOT.Modules.Tickets.Modules
                 await TicketService.UpdateLiveMessageAsync(Context.Guild, ticket);
                 await ReplyAsync("Re-opened. (as admin)");
             }
+            else
+            {
+                await ReplyAsync("You do not have permissions to re-open that ticket.");
+            }
         }
 
         
-        [Command("Delete")]
+        [Command("Delete")]        
         public async Task DeleteTicket(int ticketId)
         {
             var ticket = TicketService.GetTicket(Context, ticketId);
@@ -168,6 +173,10 @@ namespace RavenBOT.Modules.Tickets.Modules
             {
                 TicketService.RemoveTicket(Context.Guild.Id, ticketId);
                 await ReplyAsync("Deleted. (as admin)");
+            }
+            else
+            {
+                await ReplyAsync("You do not have permissions to delete that ticket.");
             }
         }
 
@@ -193,6 +202,10 @@ namespace RavenBOT.Modules.Tickets.Modules
                 TicketService.SaveTicket(ticket);
                 await TicketService.UpdateLiveMessageAsync(Context.Guild, ticket);
                 await ReplyAsync("Closed. (as admin)");
+            }
+            else
+            {
+                await ReplyAsync("You do not have permissions to close that ticket.");
             }
         }
 

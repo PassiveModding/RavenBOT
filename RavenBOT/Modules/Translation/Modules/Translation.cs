@@ -84,6 +84,7 @@ namespace RavenBOT.Modules.Translation.Modules
         }
 
         [RequireContext(ContextType.Guild)]
+        [RequireUserPermission(GuildPermission.Administrator)]
         [Command("Redeem")]
         public async Task RedeemUses([Remainder] string key = "")
         {
@@ -119,6 +120,7 @@ namespace RavenBOT.Modules.Translation.Modules
         }
 
         [RequireContext(ContextType.Guild)]
+        [RequireUserPermission(GuildPermission.Administrator)]
         [Command("History")]
         public async Task ServerHistory()
         {

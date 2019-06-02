@@ -8,6 +8,8 @@ using RavenBOT.Services.Database;
 namespace RavenBOT.Modules.Greetings.Modules
 {
     [Group("Greetings.")]
+    [RequireUserPermission(Discord.GuildPermission.Administrator)]
+    [RequireContext(ContextType.Guild)]
     public class Greetings : InteractiveBase<ShardedCommandContext>
     {
         public GreetingsService GreetingsService {get;}

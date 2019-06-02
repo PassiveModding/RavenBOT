@@ -18,7 +18,6 @@ namespace RavenBOT.Modules.Captcha.Modules
         }
 
         [Command("Verify")]
-        [RequireContext(ContextType.DM)]
         public async Task VerifyCaptcha(ulong guildId, [Remainder]string captcha = null)
         {
             if (captcha == null)
@@ -102,6 +101,8 @@ namespace RavenBOT.Modules.Captcha.Modules
         }
 
         [Command("SetChannel")]
+        [RequireUserPermission(Discord.GuildPermission.Administrator)]
+        [RequireContext(ContextType.Guild)]
         public async Task SetCaptchaChannel()
         {
             var config = CaptchaService.GetCaptchaConfig(Context.Guild.Id);
@@ -112,6 +113,8 @@ namespace RavenBOT.Modules.Captcha.Modules
         }
 
         [Command("UseCaptcha")]
+        [RequireUserPermission(Discord.GuildPermission.Administrator)]
+        [RequireContext(ContextType.Guild)]
         public async Task ToggleCaptcha()
         {
             var config = CaptchaService.GetCaptchaConfig(Context.Guild.Id);
@@ -123,6 +126,8 @@ namespace RavenBOT.Modules.Captcha.Modules
         }
 
         [Command("MaxCaptchaWarnings")]
+        [RequireUserPermission(Discord.GuildPermission.Administrator)]
+        [RequireContext(ContextType.Guild)]
         public async Task SetCaptchaWarnings(int count = 3)
         {
             var config = CaptchaService.GetCaptchaConfig(Context.Guild.Id);
@@ -138,6 +143,8 @@ namespace RavenBOT.Modules.Captcha.Modules
         }
 
         [Command("CaptchaActions")]
+        [RequireUserPermission(Discord.GuildPermission.Administrator)]
+        [RequireContext(ContextType.Guild)]
         public async Task ShowCaptchaActions()
         {
             await ReplyAsync("Captcha Actions:\n" +
@@ -145,6 +152,8 @@ namespace RavenBOT.Modules.Captcha.Modules
         }
 
         [Command("SetCaptchaAction")]
+        [RequireUserPermission(Discord.GuildPermission.Administrator)]
+        [RequireContext(ContextType.Guild)]
         public async Task SetCaptchaAction(CaptchaConfig.Action action = CaptchaConfig.Action.Kick)
         {
             var config = CaptchaService.GetCaptchaConfig(Context.Guild.Id);
@@ -154,6 +163,8 @@ namespace RavenBOT.Modules.Captcha.Modules
         }
 
         [Command("CaptchaSettings")]
+        [RequireUserPermission(Discord.GuildPermission.Administrator)]
+        [RequireContext(ContextType.Guild)]
         public async Task CaptchaSettings()
         {
             var config = CaptchaService.GetCaptchaConfig(Context.Guild.Id);

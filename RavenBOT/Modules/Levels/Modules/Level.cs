@@ -22,6 +22,7 @@ namespace RavenBOT.Modules.Levels.Modules
         public LevelService LevelService { get; }
 
         [Command("Toggle")]
+        [RequireUserPermission(Discord.GuildPermission.Administrator)]
         public async Task ToggleLevelingAsync()
         {
             var config = LevelService.GetOrCreateLevelConfig(Context.Guild.Id);   
@@ -31,6 +32,7 @@ namespace RavenBOT.Modules.Levels.Modules
         }
 
         [Command("SetLogChannel")]
+        [RequireUserPermission(Discord.GuildPermission.Administrator)]
         public async Task Enable()
         {
             var config = LevelService.TryGetLevelConfig(Context.Guild.Id);   
@@ -45,7 +47,8 @@ namespace RavenBOT.Modules.Levels.Modules
             await ReplyAsync($"Level up events will be logged to: {Context.Channel.Name}");            
         }
 
-        [Command("DisableLogChannel")]
+        [Command("DisableLogChannel")]        
+        [RequireUserPermission(Discord.GuildPermission.Administrator)]
         public async Task DisableLogChannel()
         {
             var config = LevelService.TryGetLevelConfig(Context.Guild.Id);   
@@ -60,7 +63,8 @@ namespace RavenBOT.Modules.Levels.Modules
             await ReplyAsync("Log channel disabled.");
         }
 
-        [Command("ToggleMessages")]
+        [Command("ToggleMessages")]        
+        [RequireUserPermission(Discord.GuildPermission.Administrator)]
         public async Task ToggleLevelUpNotifications()
         {
             var config = LevelService.TryGetLevelConfig(Context.Guild.Id);   
@@ -76,7 +80,8 @@ namespace RavenBOT.Modules.Levels.Modules
         }
 
         
-        [Command("ToggleMultiRole")]
+        [Command("ToggleMultiRole")]        
+        [RequireUserPermission(Discord.GuildPermission.Administrator)]
         public async Task ToggleMultiRole()
         {
             var config = LevelService.TryGetLevelConfig(Context.Guild.Id);   
@@ -91,7 +96,8 @@ namespace RavenBOT.Modules.Levels.Modules
             await ReplyAsync($"Multiple role rewards: {config.MultiRole}");
         }
 
-        [Command("AddRoleReward")]
+        [Command("AddRoleReward")]        
+        [RequireUserPermission(Discord.GuildPermission.Administrator)]
         public async Task AddRole(IRole role, int level)
         {
             var config = LevelService.TryGetLevelConfig(Context.Guild.Id);   
@@ -113,19 +119,22 @@ namespace RavenBOT.Modules.Levels.Modules
             await ReplyAsync($"Role Added");
         }
 
-        [Command("AddRoleReward")]
+        [Command("AddRoleReward")]        
+        [RequireUserPermission(Discord.GuildPermission.Administrator)]
         public async Task AddRole(int level, IRole role)
         {
             await AddRole(role, level);
         }
 
-        [Command("RemoveRoleReward")]
+        [Command("RemoveRoleReward")]        
+        [RequireUserPermission(Discord.GuildPermission.Administrator)]
         public async Task RemoveRole(IRole role)
         {
             await RemoveRole(role.Id);
         }  
 
-        [Command("RemoveRoleReward")]
+        [Command("RemoveRoleReward")]        
+        [RequireUserPermission(Discord.GuildPermission.Administrator)]
         public async Task RemoveRole(ulong roleId)
         {
             var config = LevelService.TryGetLevelConfig(Context.Guild.Id);   
@@ -141,7 +150,7 @@ namespace RavenBOT.Modules.Levels.Modules
             await ReplyAsync($"Role Removed\nNOTE: Users who have this role will still keep it.");
         }    
 
-        [Command("Rank")]
+        [Command("Rank")]        
         public async Task Rank(SocketGuildUser user = null)
         {
             var config = LevelService.GetLevelUser(Context.Guild.Id, user?.Id ?? Context.User.Id);   

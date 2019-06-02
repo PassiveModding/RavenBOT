@@ -22,6 +22,8 @@ namespace RavenBOT.Modules.Birthday.Modules
         }
 
         [Command("Toggle")]
+        [RequireUserPermission(Discord.GuildPermission.Administrator)]
+        [RequireContext(ContextType.Guild)]
         public async Task ToggleEnabled()
         {
             var model = BirthdayService.GetConfig(Context.Guild.Id);
@@ -33,6 +35,8 @@ namespace RavenBOT.Modules.Birthday.Modules
         }
 
         [Command("SetChannel")]
+        [RequireUserPermission(Discord.GuildPermission.Administrator)]
+        [RequireContext(ContextType.Guild)]
         public async Task SetChannel()
         {
             var model = BirthdayService.GetConfig(Context.Guild.Id);
@@ -45,6 +49,8 @@ namespace RavenBOT.Modules.Birthday.Modules
 
         [Command("SetRole")]
         [Alias("SetBirthdayRole")]
+        [RequireUserPermission(Discord.GuildPermission.Administrator)]
+        [RequireContext(ContextType.Guild)]
         public async Task SetBirthdayRole(IRole role = null)
         {
             var model = BirthdayService.GetConfig(Context.Guild.Id);

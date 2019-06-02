@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
+using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
 using RavenBOT.Extensions;
@@ -22,18 +23,25 @@ namespace RavenBOT.Modules
         public CommandService CommandService { get; }
         public PrefixService PrefixService { get; }
         public HelpService HelpService { get; }
+        public DiscordShardedClient Client { get; }
         public IServiceProvider Provider { get; }
         public DeveloperSettings DeveloperSettings { get; }
         public HttpClient HttpClient { get; }
 
-        private Info(CommandService commandService, PrefixService prefixService, HelpService helpService, IServiceProvider provider)
+        private Info(CommandService commandService, PrefixService prefixService, HelpService helpService, DiscordShardedClient client, IServiceProvider provider)
         {
             CommandService = commandService;
             PrefixService = prefixService;
             HelpService = helpService;
+            Client = client;
             Provider = provider;
             DeveloperSettings = new DeveloperSettings(provider.GetRequiredService<IDatabase>());
             HttpClient = new HttpClient();
+            Client.ShardReady += ShardReady;
+        }
+
+        public async Task ShardReady(DiscordSocketClient client)
+        {
         }
 
         [Command("Invite")]

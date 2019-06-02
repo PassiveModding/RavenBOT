@@ -5,7 +5,8 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 
-namespace RavenBOT.Modules.Moderator.Modules {
+namespace RavenBOT.Modules.Moderator.Modules 
+{
     public partial class Moderation {
         public List<IMessage> GetmessagesAsync (int count = 100) {
             var msgs = Context.Channel.GetMessagesAsync (count).Flatten ();
