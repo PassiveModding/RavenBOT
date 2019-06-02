@@ -9,13 +9,14 @@ using Discord.WebSocket;
 using Google.Cloud.Translation.V2;
 using RavenBOT.Extensions;
 using RavenBOT.Modules.Translation.Models;
+using RavenBOT.Services;
 using RavenBOT.Services.Database;
 using RavenBOT.Services.Licensing;
 using static RavenBOT.Modules.Translation.Models.LanguageMap;
 
 namespace RavenBOT.Modules.Translation.Methods
 {
-    public partial class TranslateService
+    public partial class TranslateService : IServiceable
     {
         public TranslationClient TranslationClient {get;}
 

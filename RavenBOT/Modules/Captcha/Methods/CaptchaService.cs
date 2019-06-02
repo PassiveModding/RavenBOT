@@ -9,10 +9,11 @@ using System.IO;
 using RavenBOT.Services.Database;
 using System.Collections.Generic;
 using RavenBOT.Modules.Captcha.Models;
+using RavenBOT.Services;
 
 namespace RavenBOT.Modules.Captcha.Methods
 {
-    public partial class CaptchaService
+    public partial class CaptchaService : IServiceable
     {
         private IDatabase Database { get; }
         private DiscordShardedClient Client { get; }

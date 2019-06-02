@@ -10,7 +10,7 @@ using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Statistics.Methods
 {
-    public class GraphManager
+    public class GraphManager : IServiceable
     {
         public GraphManager(IDatabase database, DiscordShardedClient client)
         {

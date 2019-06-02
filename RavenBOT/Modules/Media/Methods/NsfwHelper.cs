@@ -4,10 +4,11 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using RavenBOT.Services;
 
 namespace RavenBOT.Modules.Media.Methods
 {
-    public class NsfwHelper
+    public class NsfwHelper : IServiceable
     {
         private Random Random {get;}
         public HttpClient Client {get;}

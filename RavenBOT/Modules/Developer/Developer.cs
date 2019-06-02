@@ -20,10 +20,10 @@ namespace RavenBOT.Modules.Developer
         public DeveloperSettings DeveloperSettings { get; }
         public IDatabase Database { get; }
 
-        public Developer(LogHandler logger, IDatabase dbService)
+        public Developer(LogHandler logger, IDatabase dbService, DeveloperSettings developerSettings)
         {
             Logger = logger;
-            DeveloperSettings = new DeveloperSettings(dbService);
+            DeveloperSettings = developerSettings;
             Database = dbService;
         }
 

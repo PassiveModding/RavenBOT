@@ -1,9 +1,10 @@
 using RavenBOT.Modules.Games.Models;
+using RavenBOT.Services;
 using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Games.Methods
 {
-    public class GameService
+    public class GameService : IServiceable
     {
         private IDatabase Database {get;}
 

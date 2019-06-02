@@ -1,16 +1,14 @@
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Discord.WebSocket;
-using Microsoft.Extensions.Caching.Memory;
 using RavenBOT.Modules.Automessage.Models;
+using RavenBOT.Services;
 using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Automessage.Methods
 {
-    public class AutomessageHandler
+    public class AutomessageHandler : IServiceable
     {
         public AutomessageHandler(IDatabase database, DiscordShardedClient client)
         {

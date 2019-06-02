@@ -5,11 +5,12 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using RavenBOT.Modules.Media.Models;
+using RavenBOT.Services;
 using RedditSharp;
 
 namespace RavenBOT.Modules.Media.Methods
 {
-    public class MediaHelper
+    public class MediaHelper : IServiceable
     {
         public HttpClient Client {get;}
         public Reddit Reddit {get;}

@@ -8,11 +8,12 @@ using Discord;
 using Discord.WebSocket;
 using RavenBOT.Extensions;
 using RavenBOT.Modules.Events.Models.Events;
+using RavenBOT.Services;
 using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Events.Methods
 {
-    public class EventService
+    public class EventService : IServiceable
     {
         public DiscordShardedClient Client { get; }
         public IDatabase Database { get; }

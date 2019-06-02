@@ -2,11 +2,12 @@ using System.Globalization;
 using System.Threading.Tasks;
 using Discord.WebSocket;
 using RavenBOT.Modules.Greetings.Models;
+using RavenBOT.Services;
 using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Greetings.Methods
 {
-    public class GreetingsService
+    public class GreetingsService : IServiceable
     {
         private IDatabase Database {get;}
         private DiscordShardedClient Client {get;}

@@ -5,6 +5,7 @@ using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.Extensions.DependencyInjection;
 using RavenBOT.Modules.Tickets.Methods;
 using RavenBOT.Services.Database;
 
@@ -14,75 +15,11 @@ namespace RavenBOT.Modules.Tickets.Modules
     [RequireContext(ContextType.Guild)]
     public class Ticket : InteractiveBase<ShardedCommandContext>
     {
-        public DiscordShardedClient Client { get; }
         private TicketService TicketService { get; }
 
-        public Ticket(IDatabase database, DiscordShardedClient client)
+        public Ticket(TicketService ticketService)
         {
-            Client = client;
-            TicketService = new TicketService(database);
-            Client.ReactionAdded += ReactionAdded;
-            Client.ReactionRemoved += ReactionRemoved;
-        }
-
-        private async Task ReactionRemoved(Discord.Cacheable<Discord.IUserMessage, ulong> cache, ISocketMessageChannel channel, SocketReaction reaction)
-        {
-            //Check if live message, update up/downvote count
-            if (reaction.Emote.Name == "👍" || reaction.Emote.Name == "👎")
-            {
-                if (reaction.UserId == Client.CurrentUser.Id)
-                {
-                    //We shouldn't log upvotes from the bot itself as it adds the reactions
-                    return;
-                }
-                var ticket = TicketService.GetTicket(reaction.MessageId);
-                if (ticket != null)
-                {
-                    if (reaction.Emote.Name == "👍")
-                    {
-                        ticket.RemoveUpvote(reaction.UserId);
-                        await TicketService.UpdateLiveMessageAsync((channel as SocketTextChannel).Guild, ticket);
-                        //TicketService.SaveTicket(ticket);
-                    }
-
-                    if (reaction.Emote.Name == "👎")
-                    {
-                        ticket.RemoveDownvote(reaction.UserId);
-                        await TicketService.UpdateLiveMessageAsync((channel as SocketTextChannel).Guild, ticket);
-                        //TicketService.SaveTicket(ticket);
-                    }
-                }
-            }
-        }
-
-        private async Task ReactionAdded(Discord.Cacheable<Discord.IUserMessage, ulong> cache, ISocketMessageChannel channel, SocketReaction reaction)
-        {
-            //Check if live message, update up/downvote count
-            if (reaction.Emote.Name == "👍" || reaction.Emote.Name == "👎")
-            {
-                if (reaction.UserId == Client.CurrentUser.Id)
-                {
-                    //We shouldn't log upvotes from the bot itself as it adds the reactions
-                    return;
-                }
-                var ticket = TicketService.GetTicket(reaction.MessageId);
-                if (ticket != null)
-                {
-                    if (reaction.Emote.Name == "👍")
-                    {
-                        ticket.Upvote(reaction.UserId);
-                        await TicketService.UpdateLiveMessageAsync((channel as SocketTextChannel).Guild, ticket);
-                        //TicketService.SaveTicket(ticket);
-                    }
-
-                    if (reaction.Emote.Name == "👎")
-                    {
-                        ticket.Downvote(reaction.UserId);
-                        await TicketService.UpdateLiveMessageAsync((channel as SocketTextChannel).Guild, ticket);
-                        //TicketService.SaveTicket(ticket);
-                    }
-                }
-            }
+            TicketService = ticketService;
         }
 
         [Command("SetChannel")]        

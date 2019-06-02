@@ -4,7 +4,7 @@ using RavenBOT.Services.Database;
 
 namespace RavenBOT.Models
 {
-    public class DeveloperSettings
+    public class DeveloperSettings : IServiceable
     {
         public IDatabase Store { get; }
 

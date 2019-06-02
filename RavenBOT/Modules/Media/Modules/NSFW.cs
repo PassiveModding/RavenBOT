@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
 using RavenBOT.Modules.Media.Methods;
 
@@ -17,11 +18,11 @@ namespace RavenBOT.Modules.Media.Modules
         public NsfwHelper NsfwHelper { get; }
         public Random Random {get;}
 
-        public NSFW()
+        public NSFW(Random random, MediaHelper mediaHelper, NsfwHelper nsfwHelper)
         {
-            Random = new Random();
-            MediaHelper = new MediaHelper();
-            NsfwHelper = new NsfwHelper(Random);
+            Random = random;
+            MediaHelper = mediaHelper;
+            NsfwHelper = nsfwHelper;
         }
 
         

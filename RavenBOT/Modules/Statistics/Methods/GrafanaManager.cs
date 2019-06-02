@@ -3,11 +3,12 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using RavenBOT.Modules.Statistics.Models;
+using RavenBOT.Services;
 using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Statistics.Methods
 {
-    public class GrafanaManager
+    public class GrafanaManager : IServiceable
     {
         public IDatabase Database { get; }
         public HttpClient Client { get; }

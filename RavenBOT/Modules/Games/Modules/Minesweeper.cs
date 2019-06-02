@@ -11,9 +11,9 @@ namespace RavenBOT.Modules.Games.Modules
     {
         public Random Random {get;}
 
-        public Minesweeper()
+        public Minesweeper(Random random)
         {
-            Random = new Random();
+            Random = random;
         }
 
         [Command("MinesweeperQuick")]

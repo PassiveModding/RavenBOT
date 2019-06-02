@@ -16,9 +16,9 @@ namespace RavenBOT.Modules.Partner.Modules
     [RequireUserPermission(Discord.GuildPermission.Administrator)]
     public class Partner : InteractiveBase<ShardedCommandContext>
     {
-        public Partner(IServiceProvider prov)
+        public Partner(PartnerService partnerService)
         {
-            Manager = prov.GetRequiredService<PartnerService>();
+            Manager = partnerService;
         }
 
         public PartnerService Manager { get; }

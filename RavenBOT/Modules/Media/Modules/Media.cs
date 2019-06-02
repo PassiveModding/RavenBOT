@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using RavenBOT.Extensions;
 using RavenBOT.Modules.Media.Methods;
@@ -17,10 +18,10 @@ namespace RavenBOT.Modules.Media.Modules
         public MediaHelper MediaHelper {get;}
         public Random Random {get;}
 
-        public Media()
+        public Media(Random random, MediaHelper mediaHelper)
         {
-            Random = new Random();
-            MediaHelper = new MediaHelper();
+            Random = random;
+            MediaHelper = mediaHelper;
         }
 
         [Command("RedditPost", RunMode = RunMode.Async)]

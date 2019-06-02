@@ -1,9 +1,11 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.Extensions.DependencyInjection;
 using RavenBOT.Modules.Levels.Methods;
 using RavenBOT.Modules.Levels.Models;
 using RavenBOT.Services.Database;
@@ -14,9 +16,9 @@ namespace RavenBOT.Modules.Levels.Modules
     [RequireContext(ContextType.Guild)]
     public class Level : InteractiveBase<ShardedCommandContext>
     {
-        public Level(IDatabase database, DiscordShardedClient client)
+        public Level(LevelService levelService)
         {
-            LevelService = new LevelService(database, client);
+            LevelService = levelService;
         }
 
         public LevelService LevelService { get; }

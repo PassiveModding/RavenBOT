@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using RavenBOT.Modules.Statistics.Methods;
 using RavenBOT.Modules.Statistics.Models;
@@ -18,10 +19,10 @@ namespace RavenBOT.Modules.Statistics.Modules
     //TODO: Test this module
     public class Statistics : InteractiveBase<ShardedCommandContext>
     {
-        public Statistics(IDatabase database, DiscordShardedClient client)
+        public Statistics(GraphManager graphManager, GrafanaManager grafanaManager)
         {
-            GraphManager = new GraphManager(database, client);
-            GrafanaManager = new GrafanaManager(database);
+            GraphManager = graphManager;
+            GrafanaManager = grafanaManager;
         }
 
         public GraphManager GraphManager { get; }

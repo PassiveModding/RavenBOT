@@ -5,11 +5,12 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 using RavenBOT.Modules.Moderator.Models;
+using RavenBOT.Services;
 using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Moderator.Methods
 {
-    public class ModerationHandler
+    public class ModerationHandler : IServiceable
     {
         public IDatabase Database {get;}
 

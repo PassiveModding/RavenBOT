@@ -1,9 +1,11 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.Extensions.DependencyInjection;
 using RavenBOT.Extensions;
 using RavenBOT.Modules.Translation.Methods;
 using RavenBOT.Modules.Translation.Models;
@@ -16,9 +18,9 @@ namespace RavenBOT.Modules.Translation.Modules
     public class Translation : InteractiveBase<ShardedCommandContext>
     {
         public TranslateService TranslateService {get;}
-        public Translation(IDatabase database, LicenseService license, DiscordShardedClient client)
+        public Translation(TranslateService translateService)
         {
-            TranslateService = new TranslateService(database, license, client);
+            TranslateService = translateService;
         }
 
 

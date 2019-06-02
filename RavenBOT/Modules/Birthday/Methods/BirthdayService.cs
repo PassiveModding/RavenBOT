@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 using RavenBOT.Modules.Birthday.Models;
+using RavenBOT.Services;
 using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Birthday.Methods
 {
-    public class BirthdayService
+    public class BirthdayService : IServiceable
     {
         public BirthdayService (DiscordShardedClient client, IDatabase database, Timer timer)
         {

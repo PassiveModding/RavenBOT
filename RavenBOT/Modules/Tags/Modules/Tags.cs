@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
+using Microsoft.Extensions.DependencyInjection;
 using RavenBOT.Extensions;
 using RavenBOT.Modules.Tags.Methods;
 using RavenBOT.Services.Database;
@@ -14,9 +15,9 @@ namespace RavenBOT.Modules.Tags.Modules
     [RequireContext(ContextType.Guild)]
     public class Tags : InteractiveBase<ShardedCommandContext>
     {
-        public Tags(IDatabase database)
+        public Tags(TagManager tagManager)
         {
-            TagManager = new TagManager(database);
+            TagManager = tagManager;
         }
 
         public TagManager TagManager { get; }

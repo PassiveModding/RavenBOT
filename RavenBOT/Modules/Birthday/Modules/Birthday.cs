@@ -16,9 +16,9 @@ namespace RavenBOT.Modules.Birthday.Modules
     public class Birthday : InteractiveBase<ShardedCommandContext>
     {
         public BirthdayService BirthdayService {get;}
-        public Birthday(DiscordShardedClient client, IDatabase database)
+        public Birthday(BirthdayService birthdayService)
         {
-            BirthdayService = new BirthdayService(client, database);
+            BirthdayService = birthdayService;
         }
 
         [Command("Toggle")]

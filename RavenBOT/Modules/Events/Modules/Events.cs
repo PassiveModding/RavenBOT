@@ -15,9 +15,9 @@ namespace RavenBOT.Modules.Events.Modules
     {
         public EventService EventService { get; }
 
-        public Events(IDatabase database, DiscordShardedClient client)
+        public Events(EventService eventService)
         {
-            EventService = new EventService(client, database);
+            EventService = eventService;
         }
 
         [Command("ToggleLogging")]

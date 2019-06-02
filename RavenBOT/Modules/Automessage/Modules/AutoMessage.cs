@@ -14,9 +14,9 @@ namespace RavenBOT.Modules.Automessage.Modules
     [RequireUserPermission(Discord.GuildPermission.Administrator)]
     public class AutoMessage : InteractiveBase<ShardedCommandContext>
     {
-        public AutoMessage(IDatabase database, DiscordShardedClient client)
+        public AutoMessage(AutomessageHandler automessageHandler)
         {
-            AutomessageHandler = new AutomessageHandler(database, client);
+            AutomessageHandler = automessageHandler;
         }
 
         public AutomessageHandler AutomessageHandler { get; }

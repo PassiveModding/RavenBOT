@@ -4,11 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Discord.WebSocket;
 using RavenBOT.Modules.Levels.Models;
+using RavenBOT.Services;
 using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Levels.Methods
 {
-    public class LevelService
+    public class LevelService : IServiceable
     {
         public LevelService(IDatabase database, DiscordShardedClient client)
         {

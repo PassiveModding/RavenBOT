@@ -22,10 +22,10 @@ namespace RavenBOT.Modules.Games.Modules
         public Random Random {get;}
         public HttpClient HttpClient {get;}
 
-        public Trivia()
+        public Trivia(Random random, HttpClient client)
         {
-            Random = new Random();
-            HttpClient = new HttpClient();
+            Random = random;
+            HttpClient = client;
         }
 
         private readonly List<string> numlist = new List<string>

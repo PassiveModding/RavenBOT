@@ -13,9 +13,9 @@ namespace RavenBOT.Modules.Greetings.Modules
     public class Greetings : InteractiveBase<ShardedCommandContext>
     {
         public GreetingsService GreetingsService {get;}
-        public Greetings(IDatabase database, DiscordShardedClient client)
+        public Greetings(GreetingsService greetingsService)
         {
-            GreetingsService = new GreetingsService(database, client);
+            GreetingsService = greetingsService;
         }
 
         [Command("ToggleWelcome")]

@@ -1,9 +1,10 @@
 using RavenBOT.Modules.Tags.Models;
+using RavenBOT.Services;
 using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Tags.Methods
 {
-    public class TagManager
+    public class TagManager : IServiceable
     {
         public TagManager(IDatabase database)
         {

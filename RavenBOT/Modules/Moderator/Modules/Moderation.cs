@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.Extensions.DependencyInjection;
 using RavenBOT.Extensions;
 using RavenBOT.Modules.Moderator.Methods;
 using RavenBOT.Modules.Moderator.Models;
@@ -19,9 +20,9 @@ namespace RavenBOT.Modules.Moderator.Modules
     {      
         public ModerationHandler ModHandler {get;}
 
-        public Moderation(IDatabase database, DiscordShardedClient client)
+        public Moderation(ModerationHandler modHandler)
         {
-            ModHandler = new ModerationHandler(database, client);
+            ModHandler = modHandler;
         }   
 
         [Command("HackBan")]

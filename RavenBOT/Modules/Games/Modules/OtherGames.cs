@@ -10,9 +10,9 @@ namespace RavenBOT.Modules.Games.Modules
     public class OtherGames : InteractiveBase<ShardedCommandContext>
     {
         public Random Random {get;}
-        public OtherGames()
+        public OtherGames(Random random)
         {
-            Random = new Random();
+            Random = random;
         }
 
         [Command("8ball")]

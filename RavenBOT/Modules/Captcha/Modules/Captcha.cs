@@ -12,9 +12,9 @@ namespace RavenBOT.Modules.Captcha.Modules
     public class Captcha : InteractiveBase<ShardedCommandContext>
     {
         public CaptchaService CaptchaService {get;}
-        public Captcha(IDatabase database, DiscordShardedClient client)
+        public Captcha(CaptchaService captchaService)
         {
-            CaptchaService = new CaptchaService(database, client);
+            CaptchaService = captchaService;
         }
 
         [Command("Verify")]

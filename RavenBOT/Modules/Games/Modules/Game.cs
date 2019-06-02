@@ -18,11 +18,11 @@ namespace RavenBOT.Modules.Games.Modules
         public Random Random {get;}
         public HttpClient HttpClient {get;}
 
-        public Game(IDatabase database)
+        public Game(GameService gameService, Random random, HttpClient client)
         {
-            GameService = new GameService(database);
-            Random = new Random();
-            HttpClient = new HttpClient();
+            GameService = gameService;
+            Random = random;
+            HttpClient = client;
         }
 
         [Command("DailyReward", RunMode = RunMode.Async)]

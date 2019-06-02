@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 using Discord;
@@ -110,14 +111,12 @@ namespace RavenBOT
                     DefaultRunMode = RunMode.Async,
                     LogLevel = LogSeverity.Info
                 }))
-                .AddSingleton(x =>
-                {
-                    return new PrefixService(x.GetRequiredService<IDatabase>(), x.GetRequiredService<BotConfig>().GetPrefix());
-                })
+                .AddSingleton(x =>  new PrefixService(x.GetRequiredService<IDatabase>(), x.GetRequiredService<BotConfig>().GetPrefix()))
                 .AddSingleton<EventHandler>()
                 .AddSingleton(x => new LicenseService(x.GetRequiredService<IDatabase>()))
                 .AddSingleton<InteractiveService>()
-                //.AddSingleton<ModuleService>()
+                .AddSingleton<Random>()
+                .AddSingleton<HttpClient>()
                 .BuildServiceProvider();
 
             try

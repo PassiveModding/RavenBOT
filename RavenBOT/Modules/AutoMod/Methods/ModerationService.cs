@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 using Discord.WebSocket;
 using RavenBOT.Modules.AutoMod.Models;
 using RavenBOT.Modules.AutoMod.Models.Moderation;
+using RavenBOT.Services;
 using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.AutoMod.Methods
 {
-    public partial class ModerationService
+    public partial class ModerationService : IServiceable
     {
         private IDatabase Database { get; }
 

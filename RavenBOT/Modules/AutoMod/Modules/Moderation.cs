@@ -19,9 +19,9 @@ namespace RavenBOT.Modules.AutoMod.Modules
     {
         public ModerationService ModerationService { get; }
 
-        public Moderation(IDatabase database, DiscordShardedClient client)
+        public Moderation(ModerationService moderationService)
         {
-            ModerationService = new ModerationService(database, client);
+            ModerationService = moderationService;
         }
 
         [Command("AutomodExempt")]

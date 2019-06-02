@@ -2,9 +2,8 @@ using System;
 using System.Threading.Tasks;
 using Discord.Addons.Interactive;
 using Discord.Commands;
-using Discord.WebSocket;
+using Microsoft.Extensions.DependencyInjection;
 using RavenBOT.Modules.Reminders.Methods;
-using RavenBOT.Services.Database;
 using RavenBOT.Extensions;
 
 namespace RavenBOT.Modules.Reminders.Modules
@@ -15,9 +14,9 @@ namespace RavenBOT.Modules.Reminders.Modules
     {
         public ReminderHandler ReminderHandler {get;}
 
-        public Reminders(IDatabase database, DiscordShardedClient client)
+        public Reminders(ReminderHandler reminderHandler)
         {
-            ReminderHandler = new ReminderHandler(database, client);
+            ReminderHandler = reminderHandler;
         }
 
         [Command("Remind")]

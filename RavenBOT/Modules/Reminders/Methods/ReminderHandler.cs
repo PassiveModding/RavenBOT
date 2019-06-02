@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 using Discord.WebSocket;
 using RavenBOT.Extensions;
 using RavenBOT.Modules.Reminders.Models;
+using RavenBOT.Services;
 using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Reminders.Methods
 {
-    public class ReminderHandler
+    public class ReminderHandler : IServiceable
     {
         private IDatabase Database {get;}
         private DiscordShardedClient Client {get;}
