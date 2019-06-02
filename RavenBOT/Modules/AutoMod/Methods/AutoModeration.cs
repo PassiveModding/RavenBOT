@@ -81,17 +81,17 @@ namespace RavenBOT.Modules.AutoMod.Methods
                 int count = 0;
                 if (guildSetup.MassMentionsIncludeChannels)
                 {
-                    count += message.MentionedChannels.Count;
+                    count += message.MentionedChannels.Select(x => x.Id).Distinct().Count();
                 }
 
                 if (guildSetup.MassMentionsIncludeRoles)
                 {
-                    count += message.MentionedRoles.Count;
+                    count += message.MentionedRoles.Select(x => x.Id).Distinct().Count();
                 }
 
                 if (guildSetup.MassMentionsIncludeUsers)
                 {
-                    count += message.MentionedUsers.Count;
+                    count += message.MentionedUsers.Select(x => x.Id).Distinct().Count();
                 }
 
                 if (count > guildSetup.MaxMentions)
