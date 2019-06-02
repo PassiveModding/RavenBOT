@@ -209,7 +209,7 @@ namespace RavenBOT.Modules.Translation.Methods
             var config = Database.Load<TranslateGuild>(TranslateGuild.DocumentName(guildId));
             if (config == null)
             {
-                config = new TranslateGuild();
+                config = new TranslateGuild(guildId);
                 Database.Store(config, TranslateGuild.DocumentName(guildId));
             }
 
