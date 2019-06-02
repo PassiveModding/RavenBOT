@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Discord;
 using Discord.WebSocket;
 using RavenBOT.Extensions;
 using RavenBOT.Modules.Reminders.Models;
@@ -91,7 +92,11 @@ namespace RavenBOT.Modules.Reminders.Methods
                             continue;
                         }
 
-                        channel.SendMessageAsync($"{user.Mention}\n{reminder.ReminderMessage}".FixLength(1024)).ConfigureAwait(false);
+                        channel.SendMessageAsync($"{user.Mention}", false, new EmbedBuilder()
+                        {
+                            Description = $"{reminder.ReminderMessage}".FixLength(1024),
+                            Color = Color.Green
+                        }.Build()).ConfigureAwait(false);
                         RemoveReminder(reminder);
                     }
                 }
