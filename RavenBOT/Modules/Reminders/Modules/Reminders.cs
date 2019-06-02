@@ -8,7 +8,6 @@ using RavenBOT.Extensions;
 
 namespace RavenBOT.Modules.Reminders.Modules
 {
-    [Group("Reminder")]
     [RequireContext(ContextType.Guild)]
     public class Reminders : InteractiveBase<ShardedCommandContext>
     {
@@ -21,6 +20,7 @@ namespace RavenBOT.Modules.Reminders.Modules
 
         [Command("Remind")]
         [Alias("RemindMe")]
+        [Summary("Schedules a reminder after the specified amount of time")]
         public async Task Remind(TimeSpan length, [Remainder]string message)
         {
             ReminderHandler.AddReminder(new Models.Reminder(Context.Guild.Id, Context.User.Id, Context.Channel.Id, length, message));

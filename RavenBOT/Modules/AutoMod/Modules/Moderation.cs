@@ -43,6 +43,7 @@ namespace RavenBOT.Modules.AutoMod.Modules
         }
 
         [Command("UseToxicity")]
+        [Summary("Toggles the use of toxic message checking")]
         public async Task ToggleToxicityAsync()
         {
             var config = ModerationService.GetModerationConfig(Context.Guild.Id);
@@ -52,6 +53,7 @@ namespace RavenBOT.Modules.AutoMod.Modules
         }
 
         [Command("SetMaxToxicity")]
+        [Summary("Sets the max toxicity for messages (50-100)")]
         public async Task SetMaxToxicityAsync(int max)
         {
             if (max > 50 && max < 100)
@@ -68,6 +70,7 @@ namespace RavenBOT.Modules.AutoMod.Modules
         }
 
         [Command("BlockMassMentions")]
+        [Summary("Toggles blocking of messages where a large amount of unique users or roles are mentioned")]
         public async Task ToggleMentionsAsync()
         {
             var config = ModerationService.GetModerationConfig(Context.Guild.Id);
@@ -81,6 +84,7 @@ namespace RavenBOT.Modules.AutoMod.Modules
         }
 
         [Command("MassMentionRoles")]
+        [Summary("Toggles whether role mentions count towards mass mentions")]
         public async Task ToggleMentionRolesAsync()
         {
             var config = ModerationService.GetModerationConfig(Context.Guild.Id);
@@ -94,6 +98,7 @@ namespace RavenBOT.Modules.AutoMod.Modules
         }
 
         [Command("MassMentionUsers")]
+        [Summary("Toggles whether user mentions count towards mass mentions")]
         public async Task ToggleMentionUsersAsync()
         {
             var config = ModerationService.GetModerationConfig(Context.Guild.Id);
@@ -107,6 +112,7 @@ namespace RavenBOT.Modules.AutoMod.Modules
         }
 
         [Command("MassMentionChannels")]
+        [Summary("Toggles whether channel mentions count towards mass mentions")]
         public async Task ToggleMentionChannelsAsync()
         {
             var config = ModerationService.GetModerationConfig(Context.Guild.Id);
@@ -120,6 +126,7 @@ namespace RavenBOT.Modules.AutoMod.Modules
         }
 
         [Command("BlockInvites")]
+        [Summary("Toggles whether invites will be auto-deleted from chat")]
         public async Task ToggleInvitesAsync()
         {
             var config = ModerationService.GetModerationConfig(Context.Guild.Id);
@@ -129,6 +136,7 @@ namespace RavenBOT.Modules.AutoMod.Modules
         }
 
         [Command("BlockIps")]
+        [Summary("Toggles whether ip addresses will be auto-deleted from chat")]
         public async Task ToggleIpsAsync()
         {
             var config = ModerationService.GetModerationConfig(Context.Guild.Id);
@@ -138,6 +146,7 @@ namespace RavenBOT.Modules.AutoMod.Modules
         }
 
         [Command("UseBlacklist")]
+        [Summary("Toggles the use of message blacklisting")]
         public async Task ToggleBlacklistAsync()
         {
             var config = ModerationService.GetModerationConfig(Context.Guild.Id);
@@ -162,6 +171,7 @@ namespace RavenBOT.Modules.AutoMod.Modules
         }
 
         [Command("Blacklist Remove")]
+        [Summary("Removes a message or regex from the blacklist")]
         public async Task BlacklistRemove([Remainder]string message)
         {
             var config = ModerationService.GetModerationConfig(Context.Guild.Id);
@@ -188,6 +198,7 @@ namespace RavenBOT.Modules.AutoMod.Modules
 
         
         [Command("Blacklist Username Remove")]
+        [Summary("Removes a message from the username blacklist")]
         public async Task BlacklistUsernameRemove([Remainder]string name)
         {
             var config = ModerationService.GetModerationConfig(Context.Guild.Id);
@@ -197,6 +208,7 @@ namespace RavenBOT.Modules.AutoMod.Modules
         }
 
         [Command("Blacklist Username Add")]
+        [Summary("Adds a username to the blacklist")]
         public async Task BlacklistUsernameAdd([Remainder]string name)
         {
             var config = ModerationService.GetModerationConfig(Context.Guild.Id);
@@ -210,6 +222,7 @@ namespace RavenBOT.Modules.AutoMod.Modules
         }
 
         [Command("Blacklist Username Regex Add")]
+        [Summary("Adds a regex check to the username blacklist")]
         public async Task BlacklistUsernameRegexAdd([Remainder]string name)
         {
             var config = ModerationService.GetModerationConfig(Context.Guild.Id);
@@ -223,6 +236,8 @@ namespace RavenBOT.Modules.AutoMod.Modules
         }
 
         [Command("SetToxicityToken")]
+        [RequireOwner]
+        [Summary("DEV: Sets the perspective.api token")]
         public Task ToxicityToken(string token = null)
         {
             var setup = ModerationService.GetSetup();
@@ -232,6 +247,7 @@ namespace RavenBOT.Modules.AutoMod.Modules
         }
 
         [Command("ShowSettings")]
+        [Summary("Shows the auto-mod settings")]
         public async Task ShowSettings()
         {
             var config = ModerationService.GetModerationConfig(Context.Guild.Id);

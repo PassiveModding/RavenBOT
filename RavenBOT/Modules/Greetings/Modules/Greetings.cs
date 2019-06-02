@@ -19,6 +19,7 @@ namespace RavenBOT.Modules.Greetings.Modules
         }
 
         [Command("ToggleWelcome")]
+        [Summary("Toggles the use of welcome messages")]
         public async Task ToggleWelcome()
         {
             var config = GreetingsService.GetWelcomeConfig(Context.Guild.Id);
@@ -28,6 +29,7 @@ namespace RavenBOT.Modules.Greetings.Modules
         }
 
         [Command("ToggleGoodbye")]
+        [Summary("Toggles the use of goodbye messages")]
         public async Task ToggleGoodbye()
         {
             var config = GreetingsService.GetGoodbyeConfig(Context.Guild.Id);
@@ -37,6 +39,7 @@ namespace RavenBOT.Modules.Greetings.Modules
         }
 
         [Command("SetWelcomeChannel")]
+        [Summary("Sets the current channel for welcome messages")]
         public async Task SetWelcomeChannel()
         {
             var config = GreetingsService.GetWelcomeConfig(Context.Guild.Id);
@@ -47,6 +50,7 @@ namespace RavenBOT.Modules.Greetings.Modules
         }
 
         [Command("SetGoodbyeChannel")]
+        [Summary("Sets the current channel for goodbye messages")]
         public async Task SetGoodbyeChannel()
         {
             var config = GreetingsService.GetGoodbyeConfig(Context.Guild.Id);
@@ -57,6 +61,7 @@ namespace RavenBOT.Modules.Greetings.Modules
         }
 
         [Command("ToggleWelcomeDms")]
+        [Summary("Toggles the use of welcome messages in dms")]
         public async Task ToggleWelcomeDms()
         {
             var config = GreetingsService.GetWelcomeConfig(Context.Guild.Id);
@@ -67,6 +72,7 @@ namespace RavenBOT.Modules.Greetings.Modules
         }
 
         [Command("ToggleGoodbyeDms")]
+        [Summary("Toggles the use of goodbye messages in dms")]
         public async Task ToggleGoodbyeDms()
         {
             var config = GreetingsService.GetGoodbyeConfig(Context.Guild.Id);
@@ -77,6 +83,7 @@ namespace RavenBOT.Modules.Greetings.Modules
         }
 
         [Command("SetWelcomeMessage")]
+        [Summary("Sets the welcome message")]
         public async Task SetWelcomeMessage([Remainder]string message = null)
         {
             var config = GreetingsService.GetWelcomeConfig(Context.Guild.Id);
@@ -88,6 +95,7 @@ namespace RavenBOT.Modules.Greetings.Modules
         }
 
         [Command("SetGoodbyeMessage")]
+        [Summary("Sets the goodbye message")]
         public async Task SetGoodbyeMessage([Remainder]string message = null)
         {
             var config = GreetingsService.GetGoodbyeConfig(Context.Guild.Id);
@@ -99,6 +107,7 @@ namespace RavenBOT.Modules.Greetings.Modules
         }
 
         [Command("MessageReplacements")]
+        [Summary("Shows custom replacements to add more context to messages")]
         public async Task ShowMessageReplacements()
         {
             await ReplyAsync($"The following text snippets will be replaced in welcome and goodbye messages with their contextual counterparts\n" +

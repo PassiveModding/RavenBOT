@@ -21,8 +21,7 @@ namespace RavenBOT.Modules.Games.Modules
         };
 
         [Command("Slots", RunMode = RunMode.Async)]
-        [Summary("Slots <bet>")]
-        [Remarks("Play Slots")]
+        [Summary("Play Slots")]
         public async Task Slots(int bet = 0)
         {
             var guildobj = GameService.GetGameServer(Context.Guild.Id);

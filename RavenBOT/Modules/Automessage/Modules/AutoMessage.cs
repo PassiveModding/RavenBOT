@@ -22,7 +22,8 @@ namespace RavenBOT.Modules.Automessage.Modules
         public AutomessageHandler AutomessageHandler { get; }
 
         [Command("AddChannel")]
-        public async Task AddAutoMessageChannelAsync(int messageCount, [Remainder]string message)
+        [Summary("Adds the current channel as an auto-message chanel")]
+        public async Task AddAutoMessageChannelAsync([Summary("The amount of messages between each auto-message")]int messageCount, [Remainder]string message)
         {
             var config = AutomessageHandler.GetAutomessageChannel(Context.Channel.Id);
 
@@ -43,6 +44,7 @@ namespace RavenBOT.Modules.Automessage.Modules
         }
 
         [Command("RemoveChannel")]
+        [Summary("Removes the current channel from auto-messages")]
         public async Task RemoveAutoMessageChannelAsync()
         {
             if (AutomessageHandler.Cache.TryGetValue(Context.Channel.Id, out var config))

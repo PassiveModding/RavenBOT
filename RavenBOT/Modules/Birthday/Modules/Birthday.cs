@@ -22,6 +22,7 @@ namespace RavenBOT.Modules.Birthday.Modules
         }
 
         [Command("Toggle")]
+        [Summary("Toggles the use of birthday announcements in the server")]
         [RequireUserPermission(Discord.GuildPermission.Administrator)]
         [RequireContext(ContextType.Guild)]
         public async Task ToggleEnabled()
@@ -35,6 +36,7 @@ namespace RavenBOT.Modules.Birthday.Modules
         }
 
         [Command("SetChannel")]
+        [Summary("Sets the current channel as the birthday announcement channel")]
         [RequireUserPermission(Discord.GuildPermission.Administrator)]
         [RequireContext(ContextType.Guild)]
         public async Task SetChannel()
@@ -49,6 +51,7 @@ namespace RavenBOT.Modules.Birthday.Modules
 
         [Command("SetRole")]
         [Alias("SetBirthdayRole")]
+        [Summary("Sets (or removes) the role users can receive when it is their birthday")]
         [RequireUserPermission(Discord.GuildPermission.Administrator)]
         [RequireContext(ContextType.Guild)]
         public async Task SetBirthdayRole(IRole role = null)
@@ -62,6 +65,7 @@ namespace RavenBOT.Modules.Birthday.Modules
         }
 
         [Command("SetUTCOffset")]
+        [Summary("Sets the timezone for the current user")]
         public async Task SetTimeZone(double offset = 0)
         {
             var user = BirthdayService.GetUser(Context.User.Id);
@@ -84,6 +88,7 @@ namespace RavenBOT.Modules.Birthday.Modules
 
         [Command("SetBirthday")]
         [Alias("Set Birthday")]
+        [Summary("Sets your birthday (MAX 3 Sets per user)")]
         public async Task SetBirthday([Remainder]string dateTime = null)
         {
             var user = BirthdayService.GetUser(Context.User.Id);

@@ -45,6 +45,7 @@ namespace RavenBOT.Modules
         }
 
         [Command("Invite")]
+        [Summary("Returns the bot invite")]
         public async Task InviteAsync()
         {
             await ReplyAsync($"Invite: https://discordapp.com/oauth2/authorize?client_id={Context.Client.CurrentUser.Id}&scope=bot&permissions=2146958591");
@@ -53,6 +54,7 @@ namespace RavenBOT.Modules
 
 
         [Command("Help")]
+        [Summary("Shows available commands based on the current user permissions")]
         public async Task HelpAsync()
         {
             await GenerateHelpAsync();
@@ -113,6 +115,7 @@ namespace RavenBOT.Modules
         }
 
         [Command("FullHelp")]
+        [Summary("Displays all commands without checking permissions")]
         public async Task FullHelpAsync()
         {
             await GenerateHelpAsync(false);

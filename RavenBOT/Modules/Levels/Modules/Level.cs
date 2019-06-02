@@ -24,6 +24,7 @@ namespace RavenBOT.Modules.Levels.Modules
         public LevelService LevelService { get; }
 
         [Command("Toggle")]
+        [Summary("Toggles levelling in the server")]
         [RequireUserPermission(Discord.GuildPermission.Administrator)]
         public async Task ToggleLevelingAsync()
         {
@@ -34,6 +35,7 @@ namespace RavenBOT.Modules.Levels.Modules
         }
 
         [Command("SetLogChannel")]
+        [Summary("Sets the channel for level logging")]
         [RequireUserPermission(Discord.GuildPermission.Administrator)]
         public async Task Enable()
         {
@@ -49,7 +51,8 @@ namespace RavenBOT.Modules.Levels.Modules
             await ReplyAsync($"Level up events will be logged to: {Context.Channel.Name}");            
         }
 
-        [Command("DisableLogChannel")]        
+        [Command("DisableLogChannel")]   
+        [Summary("Disables the level log channel")]     
         [RequireUserPermission(Discord.GuildPermission.Administrator)]
         public async Task DisableLogChannel()
         {
@@ -65,7 +68,8 @@ namespace RavenBOT.Modules.Levels.Modules
             await ReplyAsync("Log channel disabled.");
         }
 
-        [Command("ToggleMessages")]        
+        [Command("ToggleMessages")]  
+        [Summary("Toggles the use of level up messages")]      
         [RequireUserPermission(Discord.GuildPermission.Administrator)]
         public async Task ToggleLevelUpNotifications()
         {
@@ -82,7 +86,8 @@ namespace RavenBOT.Modules.Levels.Modules
         }
 
         
-        [Command("ToggleMultiRole")]        
+        [Command("ToggleMultiRole")]  
+        [Summary("Toggles whether users keep all level roles or just the highest")]      
         [RequireUserPermission(Discord.GuildPermission.Administrator)]
         public async Task ToggleMultiRole()
         {
@@ -98,7 +103,8 @@ namespace RavenBOT.Modules.Levels.Modules
             await ReplyAsync($"Multiple role rewards: {config.MultiRole}");
         }
 
-        [Command("AddRoleReward")]        
+        [Command("AddRoleReward")] 
+        [Summary("Adds a role for a user to earn")]       
         [RequireUserPermission(Discord.GuildPermission.Administrator)]
         public async Task AddRole(IRole role, int level)
         {
@@ -135,7 +141,8 @@ namespace RavenBOT.Modules.Levels.Modules
             await RemoveRole(role.Id);
         }  
 
-        [Command("RemoveRoleReward")]        
+        [Command("RemoveRoleReward")]  
+        [Summary("Removes a role from the role rewards")]      
         [RequireUserPermission(Discord.GuildPermission.Administrator)]
         public async Task RemoveRole(ulong roleId)
         {

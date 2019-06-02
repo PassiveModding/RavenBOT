@@ -28,6 +28,7 @@ namespace RavenBOT.Modules.Moderator.Modules
         [Command("HackBan")]
         [RequireBotPermission(Discord.GuildPermission.BanMembers)]
         [RequireUserPermission(Discord.GuildPermission.BanMembers)]
+        [Summary("Bans a user based on their user ID")]
         public async Task MaxWarnings(ulong userId, [Remainder]string reason = null)
         {
             var config = ModHandler.GetActionConfig(Context.Guild.Id);
@@ -42,6 +43,7 @@ namespace RavenBOT.Modules.Moderator.Modules
         }
 
         [Command("SetMaxWarnings")]
+        [Summary("Sets the most warnings a user can receive before an action is taken")]
         public async Task MaxWarnings(int max)
         {
             var config = ModHandler.GetActionConfig(Context.Guild.Id);
@@ -51,6 +53,7 @@ namespace RavenBOT.Modules.Moderator.Modules
         }
 
         [Command("MaxWarningsAction")]
+        [Summary("Sets the action to take on users who receive too many warnings")]
         public async Task MaxWarningsAction(ActionConfig.Action action)
         {
             var config = ModHandler.GetActionConfig(Context.Guild.Id);
@@ -60,6 +63,7 @@ namespace RavenBOT.Modules.Moderator.Modules
         }
 
         [Command("SetDefaultSoftBanTime")]
+        [Summary("Sets the default amount of time for a softban")]
         public async Task DefaultSoftBanTime(TimeSpan time)
         {
             var config = ModHandler.GetActionConfig(Context.Guild.Id);
@@ -69,6 +73,7 @@ namespace RavenBOT.Modules.Moderator.Modules
         }
 
         [Command("SetDefaultMuteTime")]
+        [Summary("Sets the default amount of time for mutes")]
         public async Task DefaultMuteTime(TimeSpan time)
         {
             var config = ModHandler.GetActionConfig(Context.Guild.Id);
@@ -78,6 +83,7 @@ namespace RavenBOT.Modules.Moderator.Modules
         }
 
         [Command("SetReason")]
+        [Summary("Sets the reason for a specific moderation case")]
         public async Task SetReason(int caseId, [Remainder]string reason)
         {
             var config = ModHandler.GetActionConfig(Context.Guild.Id);
@@ -106,6 +112,7 @@ namespace RavenBOT.Modules.Moderator.Modules
         }
 
         [Command("ban")]
+        [Summary("Bans a user")]
         [RequireBotPermission(Discord.GuildPermission.BanMembers)]
         [RequireUserPermission(Discord.GuildPermission.BanMembers)]
         public async Task BanUser(SocketGuildUser user, [Remainder]string reason = null)
@@ -120,7 +127,8 @@ namespace RavenBOT.Modules.Moderator.Modules
             ModHandler.Save(config, ActionConfig.DocumentName(Context.Guild.Id));
         }
 
-        [Command("kick")]
+        [Command("kick")]        
+        [Summary("Kicks a user from the server")]
         [RequireBotPermission(Discord.GuildPermission.KickMembers)]
         [RequireUserPermission(Discord.GuildPermission.KickMembers)]
         public async Task KickUser(SocketGuildUser user, [Remainder]string reason = null)
@@ -135,6 +143,7 @@ namespace RavenBOT.Modules.Moderator.Modules
         }
 
         [Command("warn")]
+        [Summary("Warns a user")]
         [RequireBotPermission(Discord.GuildPermission.BanMembers)]
         [RequireBotPermission(Discord.GuildPermission.KickMembers)]
         //TODO: check user permission level
@@ -168,6 +177,7 @@ namespace RavenBOT.Modules.Moderator.Modules
         }
 
         [Command("mute")]
+        [Summary("Stops a user from being able to talk")]
         //TODO: Mod permissions
         public async Task MuteUser(SocketGuildUser user, [Remainder]string reason = null)
         {
@@ -175,6 +185,7 @@ namespace RavenBOT.Modules.Moderator.Modules
         }
 
         [Command("mute")]
+        [Summary("Stops a user from being able to talk for the specified amount of time")]
         //TODO: Mod permissions
         public async Task MuteUser(SocketGuildUser user, TimeSpan? time = null, [Remainder]string reason = null)
         {
@@ -201,6 +212,7 @@ namespace RavenBOT.Modules.Moderator.Modules
         }
 
         [Command("softban")]
+        [Summary("Bans a user from the server temporarily")]
         [RequireBotPermission(Discord.GuildPermission.BanMembers)]
         [RequireUserPermission(Discord.GuildPermission.BanMembers)]
         //TODO: Mod permissions
@@ -210,6 +222,7 @@ namespace RavenBOT.Modules.Moderator.Modules
         }
 
         [Command("softban")]
+        [Summary("Bans a user from the server for the specified amount of time")]
         [RequireBotPermission(Discord.GuildPermission.BanMembers)]
         [RequireUserPermission(Discord.GuildPermission.BanMembers)]
         //TODO: Mod permissions

@@ -22,7 +22,8 @@ namespace RavenBOT.Modules.Tickets.Modules
             TicketService = ticketService;
         }
 
-        [Command("SetChannel")]        
+        [Command("SetChannel")]          
+        [Summary("Sets the current channel for ticket updates")]      
         [RequireUserPermission(Discord.GuildPermission.Administrator)]
         public async Task SetChannel()
         {
@@ -47,6 +48,7 @@ namespace RavenBOT.Modules.Tickets.Modules
         }
 
         [Command("Open")]
+        [Summary("Opens a new ticket with the given message")]
         public async Task OpenTicket([Remainder]string message)
         {
             try
@@ -63,6 +65,7 @@ namespace RavenBOT.Modules.Tickets.Modules
         }
 
         [Command("Re-Open")]
+        [Summary("Re-opens a closed ticket")]
         public async Task ReOpenTicket(int ticketId, [Remainder]string reason = null)
         {
             var ticket = TicketService.GetTicket(Context, ticketId);
@@ -92,7 +95,8 @@ namespace RavenBOT.Modules.Tickets.Modules
         }
 
         
-        [Command("Delete")]        
+        [Command("Delete")] 
+        [Summary("Deletes a ticket from the database")]       
         public async Task DeleteTicket(int ticketId)
         {
             var ticket = TicketService.GetTicket(Context, ticketId);
@@ -118,6 +122,7 @@ namespace RavenBOT.Modules.Tickets.Modules
         }
 
         [Command("Close")]
+        [Summary("Closes a ticket with the specified reason")]
         public async Task CloseTicket(int ticketId, [Remainder]string reason = null)
         {
             var ticket = TicketService.GetTicket(Context, ticketId);
@@ -147,6 +152,7 @@ namespace RavenBOT.Modules.Tickets.Modules
         }
 
         [Command("Solve")]
+        [Summary("Marks a ticket as solved")]
         public async Task SolveTicket(int ticketId, [Remainder]string reason = null)
         {
             var ticket = TicketService.GetTicket(Context, ticketId);
@@ -176,6 +182,7 @@ namespace RavenBOT.Modules.Tickets.Modules
         }
 
         [Command("Hold")]
+        [Summary("Marks a ticket as on hold")]
         [RequireUserPermission(GuildPermission.Administrator)]
         public async Task HoldTicket(int ticketId, [Remainder]string reason = null)
         {
@@ -192,6 +199,7 @@ namespace RavenBOT.Modules.Tickets.Modules
         }
 
         [Command("View")]
+        [Summary("Displays the specified ticket")]
         public async Task ViewTicket(int ticketId)
         {
             var ticket = TicketService.GetTicket(Context, ticketId);

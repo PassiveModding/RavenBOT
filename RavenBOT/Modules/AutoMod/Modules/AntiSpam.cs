@@ -7,6 +7,7 @@ namespace RavenBOT.Modules.AutoMod.Modules
     public partial class Moderation
     {
         [Command("UseAntiSpam")]
+        [Summary("Toggles the use of anti-spam methods")]
         public async Task ToggleAntiSpam()
         {
             var config = ModerationService.GetModerationConfig(Context.Guild.Id);
@@ -20,6 +21,7 @@ namespace RavenBOT.Modules.AutoMod.Modules
         }
 
         [Command("SetAntiSpamCacheSize")]
+        [Summary("Sets the amount of messages to be checked against when using max repetitions")]
         public async Task SetCacheSize(int size)
         {
             var config = ModerationService.GetModerationConfig(Context.Guild.Id);
@@ -39,6 +41,7 @@ namespace RavenBOT.Modules.AutoMod.Modules
         }
 
         [Command("SetMaxRepititions")]
+        [Summary("Sets the maximum amount of identical messages before a user is marked for spam")]
         public async Task SetMaxRepititions(int count)
         {
             var config = ModerationService.GetModerationConfig(Context.Guild.Id);
@@ -56,6 +59,7 @@ namespace RavenBOT.Modules.AutoMod.Modules
         }
 
         [Command("SetMessagesPerTime")]
+        [Summary("Sets the amount of messages a user can say in a limited amount of time")]
         public async Task SetMessagesPerTime(int count)
         {
             var config = ModerationService.GetModerationConfig(Context.Guild.Id);
@@ -73,6 +77,7 @@ namespace RavenBOT.Modules.AutoMod.Modules
         }
 
         [Command("SetTimeLimit")]
+        [Summary("Sets the amount of time the amount of messages set by `SetMessagesPerTime` will check against")]
         public async Task SetTimeLimit(int seconds)
         {
             var config = ModerationService.GetModerationConfig(Context.Guild.Id);

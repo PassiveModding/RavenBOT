@@ -24,6 +24,7 @@ namespace RavenBOT.Modules.Partner.Modules
         public PartnerService Manager { get; }
 
         [Command("Toggle")]
+        [Summary("Toggles the user of partner messages")]
         public async Task TogglePartnerAsync()
         {
             var config = Manager.GetOrCreatePartnerConfig(Context.Guild.Id);
@@ -33,6 +34,7 @@ namespace RavenBOT.Modules.Partner.Modules
         }
 
         [Command("SetChannel")]
+        [Summary("Sets the channel to receive partner messages in")]
         public async Task SetChannelAsync()
         {
             var config = Manager.GetOrCreatePartnerConfig(Context.Guild.Id);
@@ -42,6 +44,7 @@ namespace RavenBOT.Modules.Partner.Modules
         }
 
         [Command("SetImage")]
+        [Summary("Sets the partner image")]
         public async Task SetImageAsync([Remainder]string url = null)
         {
             var config = Manager.GetOrCreatePartnerConfig(Context.Guild.Id);
@@ -52,6 +55,7 @@ namespace RavenBOT.Modules.Partner.Modules
         }
 
         [Command("ToggleThumbnail")]
+        [Summary("Toggles the display of the server icon in partner messages")]
         public async Task ToggleThumbnailAsync()
         {
             var config = Manager.GetOrCreatePartnerConfig(Context.Guild.Id);
@@ -63,6 +67,7 @@ namespace RavenBOT.Modules.Partner.Modules
 
         [Command("SetColor")]
         [Alias("SetColour")]
+        [Summary("Sets the color of your partner message")]
         public async Task SetColorAsync(int r, int g, int b)
         {
             if (r < 0 || r > 254 || g < 0 || g > 254 || b < 0 || b > 254)
@@ -79,6 +84,7 @@ namespace RavenBOT.Modules.Partner.Modules
         }
 
         [Command("SetMessage")]
+        [Summary("Sets the servers partner message")]
         public async Task SetMessageAsync([Remainder]string message)
         {
             if (message.Length > 512)
@@ -107,7 +113,8 @@ namespace RavenBOT.Modules.Partner.Modules
         }
 
         [Command("Trigger")]
-        [RequireOwner]
+        [RequireOwner]        
+        [Summary("DEV: Triggers a partner event")]
         public async Task TriggerEvent()
         {
             await Manager.PartnerEvent();

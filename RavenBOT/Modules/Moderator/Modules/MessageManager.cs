@@ -15,8 +15,7 @@ namespace RavenBOT.Modules.Moderator.Modules
 
         [Command ("prune")]
         [Alias ("purge", "clear")]
-        [Summary ("Mod Prune <no. of messages>")]
-        [Remarks ("removes specified amount of messages")]
+        [Summary ("removes specified amount of messages")]
         public async Task Prune (int count = 100) 
         {
             if (count < 1) 
@@ -45,8 +44,7 @@ namespace RavenBOT.Modules.Moderator.Modules
 
         [Command ("prune")]
         [Alias ("purge", "pruneuser", "clear")]
-        [Summary ("Mod Prune <user>")]
-        [Remarks ("removes messages from a user in the last 100 messages")]
+        [Summary ("removes messages from a user in the last 100 messages")]
         public async Task Prune (IUser user) 
         {
             await Context.Message.DeleteAsync ().ConfigureAwait (false);
@@ -65,8 +63,7 @@ namespace RavenBOT.Modules.Moderator.Modules
         }
 
         [Command ("pruneID")]
-        [Summary ("pruneID <userID>")]
-        [Remarks ("removes messages from a user ID in the last 100 messages")]
+        [Summary ("removes messages from a user ID in the last 100 messages")]
         public async Task Prune (ulong userID) 
         {
             await Context.Message.DeleteAsync ().ConfigureAwait (false);
@@ -85,8 +82,7 @@ namespace RavenBOT.Modules.Moderator.Modules
 
         [Command ("prune")]
         [Alias ("purge", "prunerole", "clear")]
-        [Summary ("Prune <@role>")]
-        [Remarks ("removes messages from a role in the last 100 messages")]
+        [Summary ("removes messages from a role in the last 100 messages")]
         public async Task Prune (IRole role) 
         {
             await Context.Message.DeleteAsync ().ConfigureAwait (false);

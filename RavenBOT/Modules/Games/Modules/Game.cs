@@ -26,8 +26,7 @@ namespace RavenBOT.Modules.Games.Modules
         }
 
         [Command("DailyReward", RunMode = RunMode.Async)]
-        [Summary("DailyReward")]
-        [Remarks("Get 200 free coins")]
+        [Summary("Get 200 free coins")]
         [RateLimit(1, 1, Measure.Days)]
         public async Task DailyRewardAsync()
         {
@@ -51,8 +50,7 @@ namespace RavenBOT.Modules.Games.Modules
         }
 
         [Command("GameStats", RunMode = RunMode.Async)]
-        [Summary("GameStats")]
-        [Remarks("Get a user's game stats")]
+        [Summary("Get a user's game stats")]
         public async Task GambleStatsAsync(IUser user = null)
         {
             var guildobj = GameService.GetGameServer(Context.Guild.Id);

@@ -16,8 +16,7 @@ namespace RavenBOT.Modules.Games.Modules
         }
 
         [Command("8ball")]
-        [Summary("8ball <question?>")]
-        [Remarks("ask me anything")]
+        [Summary("Ask the 8Ball a question")]
         public async Task Ball([Remainder]string input = null)
         {
             if (input == null)
@@ -36,8 +35,7 @@ namespace RavenBOT.Modules.Games.Modules
         }
 
         [Command("Fortune")]
-        [Summary("fortune")]
-        [Remarks("open a fortune cookie")]
+        [Summary("open a fortune cookie")]
         public async Task FortuneAsync()
         {
             var embed = new EmbedBuilder
@@ -48,8 +46,8 @@ namespace RavenBOT.Modules.Games.Modules
         }
 
         [Command("rps")]
-        [Summary("rps <r, p or s>")]
-        [Remarks("rock paper scissors!")]
+        [Summary("play a game of rock paper scissors against the bot")]
+        [Remarks("rps <r, p or s>")]
         public async Task Rps(string input = null)
         {
             if (input == null)
@@ -119,8 +117,7 @@ namespace RavenBOT.Modules.Games.Modules
         }
 
         [Command("coin")]
-        [Summary("coin")]
-        [Remarks("Flips a coin")]
+        [Summary("Flips a coin")]
         public async Task Coin()
         {
             var val = Random.Next(0, 100);
@@ -148,9 +145,8 @@ namespace RavenBOT.Modules.Games.Modules
         }
 
         [Command("dice")]
-        [Summary("dice")]
         [Alias("roll")]
-        [Remarks("roll a dice")]
+        [Summary("roll a dice")]
         public async Task RollDice()
         {
             var embed = new EmbedBuilder

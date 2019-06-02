@@ -88,6 +88,7 @@ namespace RavenBOT.Modules.Translation.Modules
         [RequireContext(ContextType.Guild)]
         [RequireUserPermission(GuildPermission.Administrator)]
         [Command("Redeem")]
+        [Summary("Redeems a translation license")]
         public async Task RedeemUses([Remainder] string key = "")
         {
             if (string.IsNullOrWhiteSpace(key))
@@ -115,6 +116,7 @@ namespace RavenBOT.Modules.Translation.Modules
 
         [RequireContext(ContextType.Guild)]
         [Command("Remaining Characters")]
+        [Summary("Shows the amount of remaining characters for translation")]
         public async Task CheckBalance()
         {
             var profile = TranslateService.License.GetQuantifiableUser(TranslateService.TranslateType, Context.Guild.Id);
@@ -124,6 +126,7 @@ namespace RavenBOT.Modules.Translation.Modules
         [RequireContext(ContextType.Guild)]
         [RequireUserPermission(GuildPermission.Administrator)]
         [Command("History")]
+        [Summary("Shows translation history")]
         public async Task ServerHistory()
         {
             var profile = TranslateService.License.GetQuantifiableUser(TranslateService.TranslateType, Context.Guild.Id);
@@ -159,6 +162,7 @@ namespace RavenBOT.Modules.Translation.Modules
 
         [RequireOwner]
         [Command("ToggleTranslation")]
+        [Summary("DEV: Toggles translation services for all services")]
         public async Task ToggleTranslation()
         {
             var config = TranslateService.GetTranslateConfig();

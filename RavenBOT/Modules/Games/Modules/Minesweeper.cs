@@ -17,8 +17,7 @@ namespace RavenBOT.Modules.Games.Modules
         }
 
         [Command("MinesweeperQuick")]
-        [Summary("MinesweeperQuick")]
-        [Remarks("Generates a minesweeper game with revealed blanks")]
+        [Summary("Generates a minesweeper game with revealed blanks")]
         public Task MineSweeperQuickAsync(int width = 10, int height = 10, int mine_count = 10)
         {
             return MinefieldGameAsync(width, height, mine_count, true);
@@ -127,8 +126,7 @@ namespace RavenBOT.Modules.Games.Modules
         }
 
         [Command("Minesweeper")]
-        [Summary("Minesweeper")]
-        [Remarks("Generates a minesweeper game")]
+        [Summary("Generates a minesweeper game")]
         public Task MineSweeperAsync(int width = 10, int height = 10, int mine_count = 10)
         {
             return MinefieldGameAsync(width, height, mine_count, false);

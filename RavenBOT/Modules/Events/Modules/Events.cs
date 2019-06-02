@@ -21,6 +21,7 @@ namespace RavenBOT.Modules.Events.Modules
         }
 
         [Command("ToggleLogging")]
+        [Summary("Toggles the logging of events in the current server")]
         public async Task ToggleLoggingAsync()
         {
             var config = EventService.GetConfig(Context.Guild.Id);
@@ -30,6 +31,7 @@ namespace RavenBOT.Modules.Events.Modules
         }
 
         [Command("ChannelCreated")]
+        [Summary("Toggles logging of channel creations")]
         public async Task ChannelCreatedAsync()
         {
             var config = EventService.GetConfig(Context.Guild.Id);
@@ -40,6 +42,7 @@ namespace RavenBOT.Modules.Events.Modules
         
                 
         [Command("ChannelDeleted")]
+        [Summary("Toggles logging of channel deletions")]
         public async Task ChannelDeletedAsync()
         {
             var config = EventService.GetConfig(Context.Guild.Id);
@@ -49,6 +52,7 @@ namespace RavenBOT.Modules.Events.Modules
         }
 
         [Command("ChannelUpdated")]
+        [Summary("Toggles logging of channel updates")]
         public async Task ChannelUpdatedAsync()
         {
             var config = EventService.GetConfig(Context.Guild.Id);
@@ -58,6 +62,7 @@ namespace RavenBOT.Modules.Events.Modules
         }
 
         [Command("UserUpdated")]
+        [Summary("Toggles logging of user updates")]
         public async Task UserUpdatedAsync()
         {
             var config = EventService.GetConfig(Context.Guild.Id);
@@ -67,6 +72,7 @@ namespace RavenBOT.Modules.Events.Modules
         }
 
         [Command("UserJoined")]
+        [Summary("Toggles logging of user joins")]
         public async Task UserJoinedAsync()
         {
             var config = EventService.GetConfig(Context.Guild.Id);
@@ -76,6 +82,7 @@ namespace RavenBOT.Modules.Events.Modules
         }
         
         [Command("UserLeft")]
+        [Summary("Toggles logging of user leaves")]
         public async Task UserLeftAsync()
         {
             var config = EventService.GetConfig(Context.Guild.Id);
@@ -84,7 +91,8 @@ namespace RavenBOT.Modules.Events.Modules
             await ReplyAsync($"Log User Leaves: {config.UserLeft}");
         }  
         
-        [Command("MessageUpdated")]
+        [Command("MessageUpdated")]        
+        [Summary("Toggles logging of message updates")]
         public async Task MessageUpdatedAsync()
         {
             var config = EventService.GetConfig(Context.Guild.Id);
@@ -94,6 +102,7 @@ namespace RavenBOT.Modules.Events.Modules
         }
 
         [Command("MessageDeleted")]
+        [Summary("Toggles logging of message deletions")]
         public async Task MessageDeletedAsync()
         {
             var config = EventService.GetConfig(Context.Guild.Id);
@@ -103,6 +112,7 @@ namespace RavenBOT.Modules.Events.Modules
         }
 
         [Command("ShowSettings")]
+        [Summary("Shows event log settings")]
         public async Task ShowSettingsAsync()
         {
             var config = EventService.GetConfig(Context.Guild.Id);

@@ -43,6 +43,7 @@ namespace RavenBOT.Modules.Games.Modules
                                                 };
 
         [Command("TriviaSettings", RunMode = RunMode.Async)]
+        [Summary("Displays possible trivia settings and categories")]
         public async Task TriviaSettingsAsync()
         {
             if (categories == null)
@@ -63,6 +64,7 @@ namespace RavenBOT.Modules.Games.Modules
         }
 
         [Command("Trivia", RunMode = RunMode.Async)]
+        [Summary("Play a game of trivia")]
         [RequireContext(ContextType.Guild)]
         public async Task TriviaAsync(int questions = 10, string categoryName = null, TriviaDifficulty difficulty = TriviaDifficulty.none, TriviaType type = TriviaType.none)
         {

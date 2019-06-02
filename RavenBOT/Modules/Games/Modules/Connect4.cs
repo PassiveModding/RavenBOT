@@ -33,8 +33,7 @@ namespace RavenBOT.Modules.Games.Modules
         private string red = ":red_circle:";
         
         [Command("Connect4", RunMode = RunMode.Async)]
-        [Summary("Connect4 <bet>")]
-        [Remarks("Play connect 4 with another person")]
+        [Summary("Play connect 4 with another person")]
         public async Task Connect4Async(int bet = 0)
         {
             // I am wrapping this in a try catch until I finish finding all the bugs n shit.
@@ -49,8 +48,7 @@ namespace RavenBOT.Modules.Games.Modules
         }
 
         [Command("Connect4 Accept", RunMode = RunMode.Async)]
-        [Summary("Connect4 Accept")]
-        [Remarks("Accepts a connect 4 game")]
+        [Summary("Accepts a connect 4 game")]
         public Task Connect4AcceptAsync()
         {
             return ReplyAsync("When accepting a connect4 game please do not use command prefixes. You only need to type `connect4 accept`");
