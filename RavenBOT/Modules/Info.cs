@@ -17,7 +17,6 @@ using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules
 {
-    [Group("info.")]
     public class Info : InteractiveBase<ShardedCommandContext>
     {
         public CommandService CommandService { get; }
@@ -42,7 +41,7 @@ namespace RavenBOT.Modules
 
         public async Task ShardReady(DiscordSocketClient client)
         {
-            await client.SetActivityAsync(new Game($"{PrefixService.GetPrefix(0)}info.help"));
+            await client.SetActivityAsync(new Game($"{PrefixService.GetPrefix(0)}help"));
         }
 
         [Command("Invite")]
