@@ -76,24 +76,9 @@ namespace RavenBOT
                         Console.WriteLine("Input a bot name (this will be used for certain database tasks)");
                         var name = Console.ReadLine();
 
-                        Console.WriteLine("Would you like to use a bot prefix or a module prefix? (Y for Bot Prefix, N for Module prefix)");
-                        var choice = Console.ReadLine();
-                        while (!choice.Equals("Y", StringComparison.InvariantCultureIgnoreCase) && !choice.Equals("N", StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            Console.WriteLine("Invalid choice.");
-                            choice = Console.ReadLine();
-                        }
-
-                        if (choice.Equals("Y", StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            Console.WriteLine("Input a bot prefix (this will be used to run commands, ie. prefix = f. command will be f.command)");
-                            var prefix = Console.ReadLine();
-                            config = new BotConfig(token, prefix, name);
-                        }
-                        else
-                        {
-                            config = new BotConfig(token, name);
-                        }
+                        Console.WriteLine("Input a bot prefix (this will be used to run commands, ie. prefix = f. command will be f.command)");
+                        var prefix = Console.ReadLine();
+                        config = new BotConfig(token, prefix, name);
                         
                         x.GetRequiredService<IDatabase>().Store(config, "BotConfig");
                     }
@@ -111,7 +96,7 @@ namespace RavenBOT
                     DefaultRunMode = RunMode.Async,
                     LogLevel = LogSeverity.Info
                 }))
-                .AddSingleton(x =>  new PrefixService(x.GetRequiredService<IDatabase>(), x.GetRequiredService<BotConfig>().GetPrefix()))
+                .AddSingleton(x =>  new PrefixService(x.GetRequiredService<IDatabase>(), x.GetRequiredService<BotConfig>().Prefix))
                 .AddSingleton<EventHandler>()
                 .AddSingleton(x => new LicenseService(x.GetRequiredService<IDatabase>()))
                 .AddSingleton<InteractiveService>()

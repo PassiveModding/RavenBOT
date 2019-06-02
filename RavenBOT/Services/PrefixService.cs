@@ -9,15 +9,18 @@ namespace RavenBOT.Services
         private PrefixInfo Info { get; }
         private string DocumentName { get; }
 
+        public string DefaultPrefix {get;}
+
         public PrefixService(IDatabase store, string defaultPrefix)
         {
             DocumentName = "PrefixSetup";
             Store = store;
+            DefaultPrefix = defaultPrefix;
 
             var doc = Store.Load<PrefixInfo>(DocumentName);
             if (doc == null)
             {
-                doc = new PrefixInfo(defaultPrefix);
+                doc = new PrefixInfo();
                 store.Store(doc, DocumentName);
             }
 
@@ -26,7 +29,7 @@ namespace RavenBOT.Services
 
         public string GetPrefix(ulong guildId)
         {
-            return Info.GetPrefix(guildId);
+            return Info.GetPrefix(guildId) ?? DefaultPrefix;
         }
 
         public void SetPrefix(ulong guildId, string prefix)
@@ -38,17 +41,9 @@ namespace RavenBOT.Services
         public class PrefixInfo
         {
             private Dictionary<ulong, string> Prefixes { get; } = new Dictionary<ulong, string>();
-            private string DefaultPrefix { get; }
-
-            public PrefixInfo(string defaultPrefix)
-            {
-                DefaultPrefix = defaultPrefix;
-            }
 
             public void SetPrefix(ulong guildId, string prefix)
-            {
-                
-
+            { 
                 if (Prefixes.ContainsKey(guildId))
                 {
                     if (prefix == null)
@@ -70,10 +65,10 @@ namespace RavenBOT.Services
             {
                 if (Prefixes.ContainsKey(guildId))
                 {
-                    return Prefixes[guildId] ?? DefaultPrefix;
+                    return Prefixes[guildId];
                 }
 
-                return DefaultPrefix;
+                return null;
             }
         }
     }

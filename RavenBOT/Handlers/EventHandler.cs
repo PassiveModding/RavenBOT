@@ -79,15 +79,7 @@ namespace RavenBOT.Handlers
             await Client.LoginAsync(TokenType.Bot, BotConfig.Token);
             await Client.StartAsync();
             await RegisterModulesAsync();
-            if (!BotConfig.UsePrefixSystem)
-            {
-                if (CommandService.Modules.Any(x => string.IsNullOrWhiteSpace(x.Group)))
-                {
-                    Logger.Log("Some modules do not have groups assigned, this can cause unintended issues if you are not using a default prefix for the bot.", LogSeverity.Warning);
-                }
-                
-                ModulePrefixes = CommandService.Modules.Select(x => x.Group ?? "").Distinct().ToList();
-            }
+            ModulePrefixes = CommandService.Modules.Select(x => x.Group ?? "").Distinct().ToList();
         }
 
         public Task RegisterModulesAsync() => CommandService.AddModulesAsync(Assembly.GetCallingAssembly(), Provider);

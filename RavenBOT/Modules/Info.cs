@@ -28,20 +28,21 @@ namespace RavenBOT.Modules
         public DeveloperSettings DeveloperSettings { get; }
         public HttpClient HttpClient { get; }
 
-        private Info(CommandService commandService, PrefixService prefixService, HelpService helpService, DiscordShardedClient client, IServiceProvider provider)
+        private Info(CommandService commandService, HttpClient http, PrefixService prefixService, DeveloperSettings devSettings, HelpService helpService, DiscordShardedClient client, IServiceProvider provider)
         {
             CommandService = commandService;
             PrefixService = prefixService;
             HelpService = helpService;
             Client = client;
             Provider = provider;
-            DeveloperSettings = new DeveloperSettings(provider.GetRequiredService<IDatabase>());
-            HttpClient = new HttpClient();
+            DeveloperSettings = devSettings;
+            HttpClient = http;
             Client.ShardReady += ShardReady;
         }
 
         public async Task ShardReady(DiscordSocketClient client)
         {
+            await client.SetActivityAsync(new Game($"{PrefixService.GetPrefix(0)}info.help"));
         }
 
         [Command("Invite")]
