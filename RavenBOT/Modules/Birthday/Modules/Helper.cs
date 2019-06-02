@@ -23,7 +23,7 @@ namespace RavenBOT.Modules.Birthday.Modules
         {
             var res = await HelpService.PagedHelpAsync(Context, true, new List<string>
             {
-                "birthday."
+                "birthday"
             });
 
             if (res != null)
