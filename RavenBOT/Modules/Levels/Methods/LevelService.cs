@@ -119,7 +119,7 @@ namespace RavenBOT.Modules.Levels.Methods
                             await gUser?.AddRolesAsync(roles);
                         }
 
-                        var messageContent = $"**{message.Author.Mention} Levelled up** Level: {user.UserLevel} XP: {user.UserXP} Next Level At {RequiredExp(user.UserLevel)} XP";
+                        var messageContent = $"**{message.Author.Mention} is now level {user.UserLevel}** XP: {user.UserXP} Next Level At {RequiredExp(user.UserLevel)} XP";
                         if (guild.ReplyLevelUps)
                         {
                             await tChannel.SendMessageAsync(messageContent);
