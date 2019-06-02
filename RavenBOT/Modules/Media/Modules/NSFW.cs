@@ -10,7 +10,7 @@ using RavenBOT.Modules.Media.Methods;
 
 namespace RavenBOT.Modules.Media.Modules
 {
-    [Group("nsfw.")]
+    [Group("nsfw")]
     [RequireNsfw]
     public class NSFW : InteractiveBase<ShardedCommandContext>
     {

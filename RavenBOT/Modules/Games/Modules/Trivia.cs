@@ -16,7 +16,7 @@ using RavenBOT.Extensions;
 
 namespace RavenBOT.Modules.Games.Modules
 {
-    [Group("Games.")]
+    [Group("Games")]
     public class Trivia : InteractiveBase<ShardedCommandContext>
     {
         public Random Random {get;}

@@ -8,7 +8,7 @@ using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Games.Modules
 {
-    [Group("Games.")]
+    [Group("Games")]
     public class Helper : InteractiveBase<ShardedCommandContext>
     {
         private HelpService HelpService { get; }
@@ -23,7 +23,7 @@ namespace RavenBOT.Modules.Games.Modules
         {
             var res = await HelpService.PagedHelpAsync(Context, true, new List<string>
             {
-                "games."
+                "games"
             });
 
             if (res != null)

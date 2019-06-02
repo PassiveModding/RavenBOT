@@ -11,7 +11,7 @@ using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Tags.Modules
 {
-    [Group("Tags.")]
+    [Group("Tags")]
     [RequireContext(ContextType.Guild)]
     public class Tags : InteractiveBase<ShardedCommandContext>
     {

@@ -14,7 +14,7 @@ using RavenBOT.Services.Licensing;
 
 namespace RavenBOT.Modules.Translation.Modules
 {
-    [Group("Translation.")]
+    [Group("Translation")]
     public class Translation : InteractiveBase<ShardedCommandContext>
     {
         public TranslateService TranslateService {get;}

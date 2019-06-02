@@ -9,7 +9,7 @@ namespace RavenBOT.Modules.Developer
 {
     //Example usage of timed license methods
     [RequireOwner]
-    [Group("Developer.Licensing.Timed.")]
+    [Group("Developer Licensing Timed")]
     public class TimedLicensing : ModuleBase
     {
         public LicenseService LicenseService { get; }

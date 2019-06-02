@@ -12,7 +12,7 @@ using RavenBOT.Modules.Media.Models;
 
 namespace RavenBOT.Modules.Media.Modules
 {
-    [Group("Media.")]
+    [Group("Media")]
     public class Media : InteractiveBase<ShardedCommandContext>
     {
         public MediaHelper MediaHelper {get;}

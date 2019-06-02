@@ -11,7 +11,7 @@ using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Partner.Modules
 {
-    [Group("Partner.")]
+    [Group("Partner")]
     [RequireContext(ContextType.Guild)]
     [RequireUserPermission(Discord.GuildPermission.Administrator)]
     public class Partner : InteractiveBase<ShardedCommandContext>

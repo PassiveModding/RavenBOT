@@ -11,7 +11,7 @@ using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Tickets.Modules
 {
-    [Group("ticket.")]
+    [Group("ticket")]
     [RequireContext(ContextType.Guild)]
     public class Ticket : InteractiveBase<ShardedCommandContext>
     {

@@ -8,7 +8,7 @@ using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Captcha.Modules
 {
-    [Group("captcha.")]
+    [Group("captcha")]
     public class Captcha : InteractiveBase<ShardedCommandContext>
     {
         public CaptchaService CaptchaService {get;}

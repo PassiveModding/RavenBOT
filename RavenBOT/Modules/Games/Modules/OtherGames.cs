@@ -6,7 +6,7 @@ using Discord.Commands;
 
 namespace RavenBOT.Modules.Games.Modules
 {
-    [Group("Games.")]
+    [Group("Games")]
     public class OtherGames : InteractiveBase<ShardedCommandContext>
     {
         public Random Random {get;}

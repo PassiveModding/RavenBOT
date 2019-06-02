@@ -8,7 +8,7 @@ using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.AutoMod.Modules
 {
-    [Group("automod.")]
+    [Group("automod")]
     public class Helper : InteractiveBase<ShardedCommandContext>
     {
         private HelpService HelpService { get; }
@@ -23,7 +23,7 @@ namespace RavenBOT.Modules.AutoMod.Modules
         {
             var res = await HelpService.PagedHelpAsync(Context, true, new List<string>
             {
-                "automod."
+                "automod"
             });
 
             if (res != null)

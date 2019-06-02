@@ -11,7 +11,7 @@ using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Games.Modules
 {
-    [Group("Games.")]
+    [Group("Games")]
         public partial class Game : InteractiveBase<ShardedCommandContext>
     {
         public GameService GameService {get;}

@@ -8,7 +8,7 @@ using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Automessage.Modules
 {
-    [Group("Automessage.")]
+    [Group("Automessage")]
     public class Helper : InteractiveBase<ShardedCommandContext>
     {
         private HelpService HelpService { get; }
@@ -23,7 +23,7 @@ namespace RavenBOT.Modules.Automessage.Modules
         {
             var res = await HelpService.PagedHelpAsync(Context, true, new List<string>
             {
-                "Automessage."
+                "Automessage"
             });
 
             if (res != null)

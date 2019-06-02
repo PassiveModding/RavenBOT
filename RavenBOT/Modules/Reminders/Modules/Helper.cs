@@ -8,7 +8,7 @@ using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Reminders.Modules
 {
-    [Group("Reminder.")]
+    [Group("Reminder")]
     public class Helper : InteractiveBase<ShardedCommandContext>
     {
         private HelpService HelpService { get; }
@@ -23,7 +23,7 @@ namespace RavenBOT.Modules.Reminders.Modules
         {
             var res = await HelpService.PagedHelpAsync(Context, true, new List<string>
             {
-                "reminder."
+                "reminder"
             });
 
             if (res != null)

@@ -9,7 +9,7 @@ using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Automessage.Modules
 {
-    [Group("Automessage.")]
+    [Group("Automessage")]
     [RequireContext(ContextType.Guild)]
     [RequireUserPermission(Discord.GuildPermission.Administrator)]
     public class AutoMessage : InteractiveBase<ShardedCommandContext>

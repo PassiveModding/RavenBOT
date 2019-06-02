@@ -12,7 +12,7 @@ using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Birthday.Modules
 {
-    [Group("Birthday.")]
+    [Group("Birthday")]
     public class Birthday : InteractiveBase<ShardedCommandContext>
     {
         public BirthdayService BirthdayService {get;}

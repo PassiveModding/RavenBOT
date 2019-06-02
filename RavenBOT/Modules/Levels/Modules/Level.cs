@@ -12,7 +12,7 @@ using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Levels.Modules
 {
-    [Group("Level.")]
+    [Group("Level")]
     [RequireContext(ContextType.Guild)]
     public class Level : InteractiveBase<ShardedCommandContext>
     {

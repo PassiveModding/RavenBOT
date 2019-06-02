@@ -8,7 +8,7 @@ using RavenBOT.Extensions;
 
 namespace RavenBOT.Modules.Reminders.Modules
 {
-    [Group("Reminder.")]
+    [Group("Reminder")]
     [RequireContext(ContextType.Guild)]
     public class Reminders : InteractiveBase<ShardedCommandContext>
     {

@@ -8,7 +8,7 @@ using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Events.Modules
 {
-    [Group("events.")]
+    [Group("events")]
     [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     public class Events : InteractiveBase<ShardedCommandContext>

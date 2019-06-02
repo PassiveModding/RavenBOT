@@ -6,9 +6,9 @@ using Discord.WebSocket;
 using RavenBOT.Services;
 using RavenBOT.Services.Database;
 
-namespace RavenBOT.Modules.Partner.Modules
+namespace RavenBOT.Modules.Levels.Modules
 {
-    [Group("Partner")]
+    [Group("Level")]
     public class Helper : InteractiveBase<ShardedCommandContext>
     {
         private HelpService HelpService { get; }
@@ -23,7 +23,7 @@ namespace RavenBOT.Modules.Partner.Modules
         {
             var res = await HelpService.PagedHelpAsync(Context, true, new List<string>
             {
-                "Partner"
+                "Level"
             });
 
             if (res != null)

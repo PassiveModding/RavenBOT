@@ -13,7 +13,7 @@ using RavenBOT.Services.Database;
 namespace RavenBOT.Modules.Developer
 {
     [RequireOwner]
-    [Group("Developer.")]
+    [Group("Developer")]
     public class Developer : ModuleBase<SocketCommandContext>
     {
         public LogHandler Logger { get; }

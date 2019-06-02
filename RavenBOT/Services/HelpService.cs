@@ -156,7 +156,7 @@ namespace RavenBOT.Services
                     {
                         commandContent.AppendLine($"[Aliases]{string.Join(",", command.Aliases)}");
                     }
-                    commandContent.AppendLine($"`{command.Aliases.First().Replace($"{moduleName} ", moduleName)} {string.Join(" ", command.Parameters.Select(ParameterInformation))}`");
+                    commandContent.AppendLine($"`{command.Aliases.First()} {string.Join(" ", command.Parameters.Select(ParameterInformation))}`");
                 
                     if (pageContent.Length + commandContent.Length > 2047)
                     {
