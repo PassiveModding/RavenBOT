@@ -27,7 +27,7 @@ namespace RavenBOT.Modules.Games.Modules
 
         [Command("DailyReward", RunMode = RunMode.Async)]
         [Summary("Get 200 free coins")]
-        [RateLimit(1, 1, Measure.Days)]
+        [RateLimit(2, 23, Measure.Hours)]
         public async Task DailyRewardAsync()
         {
             var guildobj = GameService.GetGameServer(Context.Guild.Id);

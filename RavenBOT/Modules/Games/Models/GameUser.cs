@@ -10,6 +10,7 @@ namespace RavenBOT.Modules.Games.Models
         {
             UserId = userId;
             GuildId = guildId;
+            Points = 200;
         }
 
         public GameUser(){}

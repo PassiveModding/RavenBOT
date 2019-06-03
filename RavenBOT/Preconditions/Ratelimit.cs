@@ -51,34 +51,16 @@ namespace RavenBOT.Preconditions
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, Inherited = false)]
     public sealed class RateLimitAttribute : PreconditionAttribute
     {
-        /// <summary>
-        ///     The _apply per guild.
-        /// </summary>
         private readonly bool applyPerGuild;
 
-        /// <summary>
-        ///     The _invoke limit.
-        /// </summary>
         private readonly uint invokeLimit;
 
-        /// <summary>
-        ///     The _invoke limit period.
-        /// </summary>
         private readonly TimeSpan invokeLimitPeriod;
 
-        /// <summary>
-        ///     The _invoke tracker.
-        /// </summary>
         private readonly Dictionary<(ulong, ulong?), CommandTimeout> invokeTracker = new Dictionary<(ulong, ulong?), CommandTimeout>();
 
-        /// <summary>
-        ///     The _no limit for admins.
-        /// </summary>
         private readonly bool noLimitForAdmins;
 
-        /// <summary>
-        ///     The _no limit in d ms.
-        /// </summary>
         private readonly bool noLimitInDMs;
 
         /// <summary>
