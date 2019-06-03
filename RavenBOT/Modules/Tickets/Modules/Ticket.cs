@@ -90,7 +90,8 @@ namespace RavenBOT.Modules.Tickets.Modules
                 return;
             }
 
-            if (!TicketService.IsManager(TicketService.GetTicketGuild(Context.Guild.Id), Context.User as IGuildUser, ticket))
+            var tGuild = TicketService.GetTicketGuild(Context.Guild.Id);
+            if (!TicketService.IsManager(tGuild, Context.User as IGuildUser, ticket))
             {
                 await ReplyAsync("You don't have enough permissions to modify that ticket.");
                 return;
@@ -100,14 +101,14 @@ namespace RavenBOT.Modules.Tickets.Modules
             {
                 ticket.SetState(Models.Ticket.TicketState.open, reason ?? "Re-opened by creator.");
                 TicketService.SaveTicket(ticket);
-                await TicketService.UpdateLiveMessageAsync(Context.Guild, ticket);
+                await TicketService.UpdateLiveMessageAsync(Context.Guild, tGuild, ticket);
                 await ReplyAsync("Re-opened.");
             }
             else if (Context.User is SocketGuildUser g && g.GuildPermissions.Administrator)
             {
                 ticket.SetState(Models.Ticket.TicketState.open, reason ?? "Re-opened by administrator.");
                 TicketService.SaveTicket(ticket);
-                await TicketService.UpdateLiveMessageAsync(Context.Guild, ticket);
+                await TicketService.UpdateLiveMessageAsync(Context.Guild, tGuild, ticket);
                 await ReplyAsync("Re-opened. (as admin)");
             }
             else
@@ -161,7 +162,8 @@ namespace RavenBOT.Modules.Tickets.Modules
                 return;
             }
 
-            if (!TicketService.IsManager(TicketService.GetTicketGuild(Context.Guild.Id), Context.User as IGuildUser, ticket))
+            var tGuild = TicketService.GetTicketGuild(Context.Guild.Id);
+            if (!TicketService.IsManager(tGuild, Context.User as IGuildUser, ticket))
             {
                 await ReplyAsync("You don't have enough permissions to modify that ticket.");
                 return;
@@ -171,14 +173,14 @@ namespace RavenBOT.Modules.Tickets.Modules
             {
                 ticket.SetState(Models.Ticket.TicketState.close, reason ?? "Closed by creator.");
                 TicketService.SaveTicket(ticket);
-                await TicketService.UpdateLiveMessageAsync(Context.Guild, ticket);
+                await TicketService.UpdateLiveMessageAsync(Context.Guild, tGuild, ticket);
                 await ReplyAsync("Closed.");
             }
             else if (Context.User is SocketGuildUser g && g.GuildPermissions.Administrator)
             {
                 ticket.SetState(Models.Ticket.TicketState.close, reason ?? "Closed by administrator.");
                 TicketService.SaveTicket(ticket);
-                await TicketService.UpdateLiveMessageAsync(Context.Guild, ticket);
+                await TicketService.UpdateLiveMessageAsync(Context.Guild, tGuild, ticket);
                 await ReplyAsync("Closed. (as admin)");
             }
             else
@@ -198,7 +200,8 @@ namespace RavenBOT.Modules.Tickets.Modules
                 return;
             }
 
-            if (!TicketService.IsManager(TicketService.GetTicketGuild(Context.Guild.Id), Context.User as IGuildUser, ticket))
+            var tGuild = TicketService.GetTicketGuild(Context.Guild.Id);
+            if (!TicketService.IsManager(tGuild, Context.User as IGuildUser, ticket))
             {
                 await ReplyAsync("You don't have enough permissions to modify that ticket.");
                 return;
@@ -208,14 +211,14 @@ namespace RavenBOT.Modules.Tickets.Modules
             {
                 ticket.SetState(Models.Ticket.TicketState.solved, reason ?? "Set solved by creator.");
                 TicketService.SaveTicket(ticket);
-                await TicketService.UpdateLiveMessageAsync(Context.Guild, ticket);
+                await TicketService.UpdateLiveMessageAsync(Context.Guild, tGuild, ticket);
                 await ReplyAsync("Solved.");
             }
             else if (Context.User is SocketGuildUser g && g.GuildPermissions.Administrator)
             {
                 ticket.SetState(Models.Ticket.TicketState.solved, reason ?? "Set solved by administrator.");
                 TicketService.SaveTicket(ticket);
-                await TicketService.UpdateLiveMessageAsync(Context.Guild, ticket);
+                await TicketService.UpdateLiveMessageAsync(Context.Guild, tGuild, ticket);
                 await ReplyAsync("Solved. (as admin)");
             }
             else
@@ -235,7 +238,8 @@ namespace RavenBOT.Modules.Tickets.Modules
                 return;
             }
 
-            if (!TicketService.IsManager(TicketService.GetTicketGuild(Context.Guild.Id), Context.User as IGuildUser, ticket))
+            var tGuild = TicketService.GetTicketGuild(Context.Guild.Id);
+            if (!TicketService.IsManager(tGuild, Context.User as IGuildUser, ticket))
             {
                 await ReplyAsync("You don't have enough permissions to modify that ticket.");
                 return;
@@ -243,7 +247,7 @@ namespace RavenBOT.Modules.Tickets.Modules
 
             ticket.SetState(Models.Ticket.TicketState.on_hold, reason ?? "Set on hold by administrator.");
             TicketService.SaveTicket(ticket);
-            await TicketService.UpdateLiveMessageAsync(Context.Guild, ticket);
+            await TicketService.UpdateLiveMessageAsync(Context.Guild, tGuild, ticket);
             await ReplyAsync("Set on hold.");
         }
 

@@ -38,17 +38,24 @@ namespace RavenBOT.Modules.Tickets.Methods
                 var ticket = GetTicket(reaction.MessageId);
                 if (ticket != null)
                 {
+                    var tGuild = GetTicketGuild(ticket.GuildId);
+                    if (!tGuild.UseVoting)
+                    {
+                        return;
+                    }
+
+
                     if (reaction.Emote.Name == "👍")
                     {
                         ticket.RemoveUpvote(reaction.UserId);
-                        await UpdateLiveMessageAsync((channel as SocketTextChannel).Guild, ticket);
+                        await UpdateLiveMessageAsync((channel as SocketTextChannel).Guild, tGuild, ticket);
                         //TicketService.SaveTicket(ticket);
                     }
 
                     if (reaction.Emote.Name == "👎")
                     {
                         ticket.RemoveDownvote(reaction.UserId);
-                        await UpdateLiveMessageAsync((channel as SocketTextChannel).Guild, ticket);
+                        await UpdateLiveMessageAsync((channel as SocketTextChannel).Guild, tGuild, ticket);
                         //TicketService.SaveTicket(ticket);
                     }
                 }
@@ -120,17 +127,23 @@ namespace RavenBOT.Modules.Tickets.Methods
                 var ticket = GetTicket(reaction.MessageId);
                 if (ticket != null)
                 {
+                    var tGuild = GetTicketGuild(ticket.GuildId);
+                    if (!tGuild.UseVoting)
+                    {
+                        return;
+                    }
+
                     if (reaction.Emote.Name == "👍")
                     {
                         ticket.Upvote(reaction.UserId);
-                        await UpdateLiveMessageAsync((channel as SocketTextChannel).Guild, ticket);
+                        await UpdateLiveMessageAsync((channel as SocketTextChannel).Guild, tGuild, ticket);
                         //TicketService.SaveTicket(ticket);
                     }
 
                     if (reaction.Emote.Name == "👎")
                     {
                         ticket.Downvote(reaction.UserId);
-                        await UpdateLiveMessageAsync((channel as SocketTextChannel).Guild, ticket);
+                        await UpdateLiveMessageAsync((channel as SocketTextChannel).Guild, tGuild, ticket);
                         //TicketService.SaveTicket(ticket);
                     }
                 }
@@ -166,9 +179,8 @@ namespace RavenBOT.Modules.Tickets.Methods
 
         //Sets or updates the live message
         //TODO: Schedule message updates to reduce ratelimit issues in larger servers causing the bot to be laggy or display incorrect vote count
-        public async Task<IUserMessage> UpdateLiveMessageAsync(SocketGuild guild, Ticket ticket)
+        public async Task<IUserMessage> UpdateLiveMessageAsync(SocketGuild guild, TicketGuild tGuild, Ticket ticket)
         {
-            var tGuild = GetTicketGuild(ticket.GuildId);
             if (tGuild.TicketChannelId != 0)
             {
                 var channel = guild.GetTextChannel(tGuild.TicketChannelId);
