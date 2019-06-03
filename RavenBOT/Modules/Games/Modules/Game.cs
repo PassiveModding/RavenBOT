@@ -33,7 +33,7 @@ namespace RavenBOT.Modules.Games.Modules
             var guildobj = GameService.GetGameServer(Context.Guild.Id);
             var guser = GameService.GetGameUser(Context.User.Id, Context.Guild.Id);
             guser.Points = guser.Points + 200;
-
+            GameService.SaveGameUser(guser);
             var embed = new EmbedBuilder
             {
                 Title = $"Success, you have received 200 Points",
