@@ -7,12 +7,16 @@ namespace RavenBOT.Services
 {
     public class ModuleManagementService
     {
-        public ModuleManagementService(IDatabase database)
+        public ModuleManagementService(IDatabase database, PrefixService prefixService, bool dev)
         {
             Database = database;
+            PrefixService = prefixService;
+            Developer = dev;
         }
 
         public IDatabase Database { get; }
+        public PrefixService PrefixService { get; }
+        public bool Developer { get; }
 
         public class ModuleConfig
         {
@@ -56,7 +60,9 @@ namespace RavenBOT.Services
                 return true;
             }
 
-            if (config.Blacklist.Any(x => command.StartsWith(x, true, CultureInfo.InvariantCulture)))
+            var prefix = Developer ? PrefixService.DefaultPrefix : PrefixService.GetPrefix(guildId);
+
+            if (config.Blacklist.Any(x => command.StartsWith(x, true, CultureInfo.InvariantCulture) || command.StartsWith($"{prefix} {x}", true, CultureInfo.InvariantCulture) || command.StartsWith($"{prefix}{x}", true, CultureInfo.InvariantCulture)))
             {
                 return false;
             }
