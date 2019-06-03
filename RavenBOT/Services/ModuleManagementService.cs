@@ -49,17 +49,20 @@ namespace RavenBOT.Services
 
         public bool IsAllowed(ulong guildId, string command)
         {
+            //ignores blacklist if there is a non valid guild id
             if (guildId <= 0)
             {
                 return true;
             }
 
             var config = GetModuleConfig(guildId);
+            //Return if there is nothing in the blacklist
             if (!config.Blacklist.Any())
             {
                 return true;
             }
 
+            //Override prefix if the bot is in developer mode
             var prefix = Developer ? PrefixService.DefaultPrefix : PrefixService.GetPrefix(guildId);
 
             if (config.Blacklist.Any(x => command.StartsWith(x, true, CultureInfo.InvariantCulture) || command.StartsWith($"{prefix} {x}", true, CultureInfo.InvariantCulture) || command.StartsWith($"{prefix}{x}", true, CultureInfo.InvariantCulture)))
