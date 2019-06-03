@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Discord.WebSocket;
 using RavenBOT.Modules.Levels.Models;
@@ -15,12 +17,18 @@ namespace RavenBOT.Modules.Levels.Methods
         {
             Database = database;
             Client = client;
-
+            Timer = new Timer(TimerEvent, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
             Client.MessageReceived += LevelEvent;
         }
 
         public IDatabase Database { get; }
         public DiscordShardedClient Client { get; }
+        public Timer Timer { get; }
+
+        public void TimerEvent(object _)
+        {
+            UsersUpdated.Clear();
+        }
 
         public Tuple<LevelUser, LevelConfig> GetLevelUser(ulong guildId, ulong userId)
         {
@@ -62,7 +70,7 @@ namespace RavenBOT.Modules.Levels.Methods
             return config;
         }
 
-        public List<ulong> CurrentlyUpdating = new List<ulong>();
+        public ConcurrentDictionary<ulong, List<ulong>> UsersUpdated = new ConcurrentDictionary<ulong, List<ulong>>();
 
         public async Task LevelEvent(SocketMessage msg)
         {
@@ -72,11 +80,6 @@ namespace RavenBOT.Modules.Levels.Methods
             }
 
             if (message.Author.IsBot || message.Author.IsWebhook)
-            {
-                return;
-            }
-
-            if (CurrentlyUpdating.Contains(message.Author.Id))
             {
                 return;
             }
@@ -91,7 +94,24 @@ namespace RavenBOT.Modules.Levels.Methods
                 return;
             }
         
-            CurrentlyUpdating.Add(message.Author.Id);
+            if (UsersUpdated.TryGetValue(tChannel.Guild.Id, out var userList))
+            {
+                if (userList.Contains(message.Author.Id))
+                {
+                    return;
+                }
+                else
+                {
+                    userList.Add(message.Author.Id);
+                }
+            }
+            else
+            {
+                UsersUpdated.TryAdd(tChannel.Guild.Id, new List<ulong>
+                {
+                    message.Author.Id
+                });
+            }
             var _ = Task.Run(async () =>
             {
                 try
@@ -139,9 +159,9 @@ namespace RavenBOT.Modules.Levels.Methods
                         Database.Store(user, LevelUser.DocumentName(user.UserId, user.GuildId));
                     }
                 }
-                finally
+                catch (Exception e)
                 {
-                    CurrentlyUpdating.Remove(message.Author.Id);
+                    //
                 }
             });
 
