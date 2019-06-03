@@ -54,6 +54,58 @@ namespace RavenBOT.Modules.Tickets.Methods
             }
         }
 
+        public bool CanCreate(TicketGuild guild, IGuildUser user)
+        {
+            //Allow all roles if the creator whitelist is empty
+            if (!guild.TicketCreatorWhitelist.Any())
+            {
+                return true;
+            }
+
+            //Allow admins and the server owner always
+            if (user.GuildPermissions.Administrator || user.Guild.OwnerId == user.Id)
+            {
+                return true;
+            }
+
+            //Allow anyone who is given a ticket manager role
+            if (user.RoleIds.Any(x => guild.TicketManagers.Contains(x)))
+            {
+                return true;
+            }
+
+            //Allow anyone who is given a ticket creator role
+            if (user.RoleIds.Any(x => guild.TicketCreatorWhitelist.Contains(x)))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool IsManager(TicketGuild guild, IGuildUser user, Ticket ticket = null)
+        {
+            //Allow admins and the server owner always
+            if (user.GuildPermissions.Administrator || user.Guild.OwnerId == user.Id)
+            {
+                return true;
+            }
+
+            //Allow anyone who is given a ticket manager role
+            if (user.RoleIds.Any(x => guild.TicketManagers.Contains(x)))
+            {
+                return true;
+            }
+
+            //Allow the creator of the ticket to manage it
+            if (ticket != null && ticket.AuthorId == user.Id)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         private async Task ReactionAdded(Discord.Cacheable<Discord.IUserMessage, ulong> cache, ISocketMessageChannel channel, SocketReaction reaction)
         {
             //Check if live message, update up/downvote count

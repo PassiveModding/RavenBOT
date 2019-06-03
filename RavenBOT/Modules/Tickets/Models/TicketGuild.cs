@@ -22,6 +22,12 @@ namespace RavenBOT.Modules.Tickets.Models
 
         public ulong GuildId { get; set; }
 
+        //Role ids that are allowed to manage tickets like admins
+        public List<ulong> TicketManagers {get;set;} = new List<ulong>();
+
+        //List of role ids that are allowed to create tickets (by default all roles are allowed)
+        public List<ulong> TicketCreatorWhitelist {get;set;} = new List<ulong>();
+
         public ulong TicketChannelId { get; set; }
 
         //TODO: Required permissions to create tickets?
