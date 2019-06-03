@@ -41,7 +41,7 @@ namespace RavenBOT.Services
             //Use filter out any modules that are not chosen in the filter.
             if (moduleFilter != null && moduleFilter.Any())
             {
-                modules = modules.Where(x => moduleFilter.Any(f => x.Item1.Contains(f))).ToList();
+                modules = modules.Where(x => moduleFilter.Any(f => x.Item1.Contains(f, StringComparison.InvariantCultureIgnoreCase))).ToList();
             }
 
             //Skip blacklisted modules
