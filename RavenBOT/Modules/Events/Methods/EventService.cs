@@ -587,6 +587,7 @@ namespace RavenBOT.Modules.Events.Methods
 
         public Dictionary<ulong, EventConfig> Configs { get; set; }
 
+        //TODO: Split into tryget and getorcreate
         public EventConfig GetConfig(ulong guildId)
         {
             if (Configs.TryGetValue(guildId, out EventConfig config))
