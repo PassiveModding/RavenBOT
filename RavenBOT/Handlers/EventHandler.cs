@@ -48,14 +48,6 @@ namespace RavenBOT.Handlers
 
         private async Task CommandExecutedAsync(Optional<CommandInfo> commandInfo, ICommandContext context, IResult result)
         {
-            if (commandInfo.IsSpecified)
-            {
-                if (commandInfo.Value.RunMode == RunMode.Sync)
-                {
-                    return;
-                }
-            }
-
             if (result.IsSuccess)
             {
                 Logger.Log(context.Message.Content, new LogContext(context));
