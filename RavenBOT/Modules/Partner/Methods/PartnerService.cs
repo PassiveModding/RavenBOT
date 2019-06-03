@@ -68,8 +68,6 @@ namespace RavenBOT.Modules.Partner.Methods
                 .ToList();
             var randomised = sorted.OrderBy(x => Random.Next()).ToList();
 
-            Console.WriteLine("Partner Event");
-
             foreach (var group in randomised)
             {
                 var embedToSend = await group.Config.GetEmbedAsync(group.Guild);
@@ -91,9 +89,9 @@ namespace RavenBOT.Modules.Partner.Methods
                 try
                 {
                     await receiverChannel.SendMessageAsync("", false, embedToSend.Build());
-                    //group.Config.ServerCount++;
-                    //group.Config.UserCount += receiver.Guild.MemberCount;
-                    //Database.Store(group.Config, PartnerConfig.DocumentName(group.Config.GuildId));
+                    group.Config.ServerCount++;
+                    group.Config.UserCount += receiver.Guild.MemberCount;
+                    Database.Store(group.Config, PartnerConfig.DocumentName(group.Config.GuildId));
                 }
                 catch (Exception e)
                 {
