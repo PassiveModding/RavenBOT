@@ -20,6 +20,7 @@ namespace RavenBOT.Modules.Tickets.Methods
         {
             Database = database;
             Client = client;
+            //TODO: Do not count votes while a ticket is solved or closed
             Client.ReactionAdded += ReactionAdded;
             Client.ReactionRemoved += ReactionRemoved;
         }
@@ -164,6 +165,7 @@ namespace RavenBOT.Modules.Tickets.Methods
         }
 
         //Sets or updates the live message
+        //TODO: Schedule message updates to reduce ratelimit issues in larger servers causing the bot to be laggy or display incorrect vote count
         public async Task<IUserMessage> UpdateLiveMessageAsync(SocketGuild guild, Ticket ticket)
         {
             var tGuild = GetTicketGuild(ticket.GuildId);
@@ -174,7 +176,7 @@ namespace RavenBOT.Modules.Tickets.Methods
                 {
                     if (ticket.LiveMessageId == 0)
                     {
-                        var msg = await channel.SendMessageAsync("", false, ticket.GenerateEmbed(guild).Build());
+                        var msg = await channel.SendMessageAsync("", false, ticket.GenerateEmbed(guild, tGuild.UseVoting).Build());
                         ticket.LiveMessageId = msg.Id;
                         SaveTicket(ticket);
                         return msg;
@@ -186,14 +188,14 @@ namespace RavenBOT.Modules.Tickets.Methods
                     {
                         if (message is IUserMessage msg)
                         {
-                            await msg.ModifyAsync(x => x.Embed = ticket.GenerateEmbed(guild).Build());
+                            await msg.ModifyAsync(x => x.Embed = ticket.GenerateEmbed(guild, tGuild.UseVoting).Build());
                             SaveTicket(ticket);
                             return msg;
                         }
                     }
                     else
                     {
-                        var msg = await channel.SendMessageAsync("", false, ticket.GenerateEmbed(guild).Build());
+                        var msg = await channel.SendMessageAsync("", false, ticket.GenerateEmbed(guild, tGuild.UseVoting).Build());
                         ticket.LiveMessageId = msg.Id;
                         SaveTicket(ticket);
                         return msg;

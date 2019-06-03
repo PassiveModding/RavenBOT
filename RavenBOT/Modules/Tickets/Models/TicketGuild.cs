@@ -30,6 +30,6 @@ namespace RavenBOT.Modules.Tickets.Models
 
         public ulong TicketChannelId { get; set; }
 
-        //TODO: Required permissions to create tickets?
+        public bool UseVoting {get;set;} = true;
     }
 }

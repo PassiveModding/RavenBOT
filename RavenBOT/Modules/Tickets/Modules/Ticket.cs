@@ -40,7 +40,7 @@ namespace RavenBOT.Modules.Tickets.Modules
             
             foreach (var ticket in TicketService.GetTickets(Context.Guild.Id).OrderBy(x => x.TicketNumber).ToList())
             {
-                var message = await Context.Channel.SendMessageAsync("", false, ticket.GenerateEmbed(Context.Guild).Build());
+                var message = await Context.Channel.SendMessageAsync("", false, ticket.GenerateEmbed(Context.Guild, guild.UseVoting).Build());
                 ticket.LiveMessageId = message.Id;
                 TicketService.SaveTicket(ticket);
             }
@@ -49,18 +49,33 @@ namespace RavenBOT.Modules.Tickets.Modules
             await ReplyAsync("Channel has been set.");
         }
 
+        [Command("ToggleVoting")]
+        [Summary("Toggle the ability for users to vote on tickets")]
+        [RequireUserPermission(GuildPermission.Administrator)]
+        public async Task ToggleVotingAsync()
+        {
+            var guild = TicketService.GetTicketGuild(Context.Guild.Id);
+            guild.UseVoting = !guild.UseVoting;
+            TicketService.SaveGuild(guild);
+            await ReplyAsync($"Ticket voting: {guild.UseVoting}");
+        }
+
         [Command("Open")]
         [Summary("Opens a new ticket with the given message")]
         public async Task OpenTicket([Remainder]string message)
         {
-            if (!TicketService.CanCreate(TicketService.GetTicketGuild(Context.Guild.Id), Context.User as IGuildUser))
+            var guild = TicketService.GetTicketGuild(Context.Guild.Id);
+            if (!TicketService.CanCreate(guild, Context.User as IGuildUser))
             {
                 await ReplyAsync("You don't have permissions to create a ticket.");
                 return;
             }
 
             var ticket = await TicketService.NewTicket(Context, message);
-            ticket.Item2?.AddReactionsAsync(new IEmote[]{new Emoji("👍"), new Emoji("👎")});
+            if (guild.UseVoting)
+            {
+                ticket.Item2?.AddReactionsAsync(new IEmote[]{new Emoji("👍"), new Emoji("👎")});
+            }
             await ReplyAsync($"Ticket #{ticket.Item1.TicketNumber} has been created. {(ticket.Item2 == null ? "" : $"\nhttps://discordapp.com/channels/{Context.Guild.Id}/{ticket.Item2.Channel.Id}/{ticket.Item2.Id}")}");
         }
 
@@ -242,7 +257,7 @@ namespace RavenBOT.Modules.Tickets.Modules
                 await ReplyAsync("No ticket found with that id.");
                 return;
             }
-            await ReplyAsync("", false, ticket.GenerateEmbed(Context.Guild).Build());
+            await ReplyAsync("", false, ticket.GenerateEmbed(Context.Guild, TicketService.GetTicketGuild(Context.Guild.Id).UseVoting).Build());
         }
 
         [Command("AddCreatorRole")]

@@ -44,16 +44,20 @@ namespace RavenBOT.Modules.Tickets.Models
         private List<ulong> Upvoters { get; set; } = new List<ulong>();
         private List<ulong> Downvoters { get; set; } = new List<ulong>();
 
-        public EmbedBuilder GenerateEmbed(SocketGuild guild)
+        public EmbedBuilder GenerateEmbed(SocketGuild guild, bool useVoting)
         {
             var builder = new EmbedBuilder
             {
                 Title = $"Ticket #{TicketNumber}",
                 Color = GetTicketColor(),
                 Description = Message?.FixLength(512),
-                Author = GetAuthorBuilder(guild),
-                Footer = GetFooterBuilder()
+                Author = GetAuthorBuilder(guild)
             };
+
+            if (useVoting)
+            {
+                builder.Footer = GetFooterBuilder();
+            }
 
             if (StateMessage != null)
             {
