@@ -45,7 +45,8 @@ namespace RavenBOT.Handlers
             }
 
             var result = await CommandService.ExecuteAsync(context, argPos, Provider);
-                
+
+            /* 
             if (!result.IsSuccess)
             {
                 Logger.Log(context.Message.Content + "\n" + result.ErrorReason, new LogContext(context), LogSeverity.Error);
@@ -54,6 +55,7 @@ namespace RavenBOT.Handlers
             {
                 Logger.Log(context.Message.Content, new LogContext(context));
             }
+            */
         }
     }
 }
