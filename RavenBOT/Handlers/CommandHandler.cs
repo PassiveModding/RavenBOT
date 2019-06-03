@@ -26,8 +26,14 @@ namespace RavenBOT.Handlers
                 return;
             }
 
+            ulong guildId = 0;
+            if (message.Channel is IGuildChannel gChannel)
+            {
+                guildId = gChannel.GuildId;
+            }
+
             var argPos = 0;
-            if (!message.HasStringPrefix(Local.Developer ? Local.DeveloperPrefix : BotConfig.Prefix, ref argPos, System.StringComparison.InvariantCultureIgnoreCase) && !message.HasMentionPrefix(Client.CurrentUser, ref argPos))
+            if (!message.HasStringPrefix(Local.Developer ? Local.DeveloperPrefix : PrefixService.GetPrefix(guildId), ref argPos, System.StringComparison.InvariantCultureIgnoreCase) && !message.HasMentionPrefix(Client.CurrentUser, ref argPos))
             {
                 return;
             }
