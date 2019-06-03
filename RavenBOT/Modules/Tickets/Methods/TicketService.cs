@@ -244,9 +244,10 @@ namespace RavenBOT.Modules.Tickets.Methods
         }
         public async Task<Tuple<Ticket, IUserMessage>> NewTicket(ShardedCommandContext context, string message)
         {
+            var tGuild = GetTicketGuild(context.Guild.Id);
             var ticket = new Ticket(context.Guild.Id, context.User.Id, TicketCount(context.Guild)+1, message);
             SaveTicket(ticket);
-            var msg = await UpdateLiveMessageAsync(context.Guild, ticket);
+            var msg = await UpdateLiveMessageAsync(context.Guild, tGuild, ticket);
             return new Tuple<Ticket, IUserMessage>(ticket, msg);
         }
 
