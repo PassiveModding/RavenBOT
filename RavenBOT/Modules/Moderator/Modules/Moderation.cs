@@ -12,7 +12,7 @@ using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Moderator.Modules
 {
-    [Group("moderator")]
+    [Group("mod")]
     [RequireUserPermission(Discord.GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     //TODO: Custom precondition that allows for commands to work based off 'moderator' list in modconfig
