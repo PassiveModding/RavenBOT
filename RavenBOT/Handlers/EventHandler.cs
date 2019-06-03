@@ -55,6 +55,36 @@ namespace RavenBOT.Handlers
             else
             {
                 Logger.Log($"{context.Message.Content}\n{result.Error}\n{result.ErrorReason}", new LogContext(context), LogSeverity.Error);
+
+                if (result.Error.Value == CommandError.UnknownCommand)
+                {
+                    var prefix = Local.Developer ? Local.DeveloperPrefix : PrefixService.GetPrefix(context.Guild?.Id ?? 0);
+                    var stripped = context.Message.Content.Substring(prefix.Length);
+                    var dlDistances = new List<Tuple<int, string>>();
+                    foreach (var command in CommandService.Commands)
+                    {
+                        foreach (var alias in command.Aliases)
+                        {
+                            var distance = stripped.DamerauLavenshteinDistance(alias);
+                            if (distance == stripped.Length || distance == alias.Length)
+                            {
+                                continue;
+                            }
+
+                            dlDistances.Add(new Tuple<int, string>(distance, alias));
+                        }
+                    }
+
+                    var similar = dlDistances.OrderBy(x => x.Item1).Take(5).Select(x => prefix + x.Item2).ToList();
+                    await context.Channel.SendMessageAsync("", false, new EmbedBuilder()
+                    {
+                        Title = $"Unknown Command",
+                        Description = $"Message: {context.Message.Content.FixLength(512)}\n" +
+                                        $"Similar commands: \n{string.Join("\n", similar)}"
+                    }.Build());
+                    return;
+                }
+
                 await context.Channel.SendMessageAsync("", false, new EmbedBuilder
                 {
                     Title = $"Command Error{(result.Error.HasValue ? $": {result.Error.Value}" : "")}",
