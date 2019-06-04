@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
@@ -6,6 +7,7 @@ using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
+using RavenBOT.Extensions;
 using RavenBOT.Modules.Levels.Methods;
 using RavenBOT.Modules.Levels.Models;
 using RavenBOT.Services.Database;
@@ -176,5 +178,97 @@ namespace RavenBOT.Modules.Levels.Modules
 
             //TODO: Rank
         }    
+
+        
+        [Command("Rewards")]        
+        public async Task Rewards()
+        {
+            var config = LevelService.TryGetLevelConfig(Context.Guild.Id);   
+            if (config == null || !config.Enabled)
+            {
+                await ReplyAsync("Leveling is not enabled in this server.");
+                return;
+            }
+
+            if (!config.RewardRoles.Any())
+            {
+                await ReplyAsync("There are no reward roles configured for this server.");
+                return;
+            }
+
+            var responses = config.RewardRoles.OrderByDescending(x => x.LevelRequirement).Select(x => 
+            {
+                var role = Context.Guild.GetRole(x.RoleId);
+                if (role == null)
+                {
+                    return null;
+                }
+
+                return $"{x.LevelRequirement} | {role.Mention}";
+            }).Where(x => x != null).ToList();
+
+            if (!responses.Any())
+            {
+                await ReplyAsync("There are no reward roles configured for this server.");
+                return;
+            }
+
+            await ReplyAsync($"", false, new EmbedBuilder()
+            {
+                Title = "Role Rewards",
+                Description = string.Join("\n", responses).FixLength(2047),
+                Color = Color.Blue
+            }.Build());
+
+            //TODO: Rank
+        }
+
+        [Command("Leaderboard")]
+        public async Task ShowLeaderboard()
+        {
+            var users = LevelService.Database.Query<LevelUser>().Where(x => x.GuildId == Context.Guild.Id).OrderByDescending(x => x.UserXP).ToList();
+            if (!users.Any())
+            {
+                await ReplyAsync("There are no users with levelling in this server.");
+                return;
+            }
+            
+            await Context.Guild.DownloadUsersAsync();
+
+            var pages = new List<PaginatedMessage.Page>();
+            int position = 0;
+            foreach (var userGroup in users.SplitList(15))
+            {
+                var page = new PaginatedMessage.Page();
+                var userText = userGroup.Select(x => 
+                {
+                    var user = Context.Guild.GetUser(x.UserId);
+                    if (user == null)
+                    {
+                        return null;
+                    }
+                    position++;
+                    return $"#{position} | {user.Mention} XP:{x.UserXP} LV:{x.UserLevel}";
+                }).Where(x => x != null);
+                page.Description = string.Join("\n", userText);
+                pages.Add(page);
+            }
+
+            var pager = new PaginatedMessage
+            {
+                Title = "Leaderboard",
+                Pages = pages,
+                Color = Color.Blue
+            };
+
+            await PagedReplyAsync(pager, new ReactionList
+            {
+                Forward = true,
+                Backward = true,
+                Jump = true,
+                First = true,
+                Last = true
+            });
+        }
     }
 }
