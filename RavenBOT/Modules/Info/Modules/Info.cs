@@ -12,6 +12,7 @@ namespace RavenBOT.Modules.Info.Modules
     public class Info : InteractiveBase<ShardedCommandContext>
     {
         [Command("RoleMembers")]
+        [Summary("Displays all members in a specific role")]
         public async Task RoleMembersAsync(SocketRole role)
         {
             await Context.Guild.DownloadUsersAsync();
