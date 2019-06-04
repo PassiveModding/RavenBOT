@@ -85,6 +85,12 @@ namespace RavenBOT.Modules.Developer
                              $"{string.Join("\n", settings.SkippableHelpPreconditions)}");
         }
 
+        [Command("SetGame")]
+        public async Task SetGame([Remainder]string game)
+        {
+            await Context.Client.SetActivityAsync(new Game(game));
+        }
+
         [Command("SetLoggerChannel")]
         [RequireContext(ContextType.Guild)]
         [RequireBotPermission(ChannelPermission.SendMessages)]
