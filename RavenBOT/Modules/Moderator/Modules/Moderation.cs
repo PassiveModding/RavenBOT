@@ -25,12 +25,37 @@ namespace RavenBOT.Modules.Moderator.Modules
             ModHandler = modHandler;
         }   
 
+        public async Task<bool> IsActionable(SocketGuildUser target, SocketGuildUser currentUser)
+        {
+            if (target.GuildPermissions.Administrator || target.GuildPermissions.BanMembers)
+            {
+                await ReplyAsync("You cannot perform actions on admins or users with ban permissions");
+                return false;
+            }
+            else if (target.Hierarchy >= currentUser.Hierarchy)
+            {
+                await ReplyAsync("You cannot perform actions on users with an equal or higher position than you.");
+                return false;
+            }
+
+            return true;
+        }
+
         [Command("HackBan")]
         [RequireBotPermission(Discord.GuildPermission.BanMembers)]
         [RequireUserPermission(Discord.GuildPermission.BanMembers)]
         [Summary("Bans a user based on their user ID")]
         public async Task MaxWarnings(ulong userId, [Remainder]string reason = null)
         {
+            var gUser = Context.Guild.GetUser(userId);
+            if (gUser != null)
+            {
+                if (!await IsActionable(gUser, Context.User as SocketGuildUser))
+                {
+                    return;
+                }
+            }
+
             var config = ModHandler.GetActionConfig(Context.Guild.Id);
 
             var caseId = config.AddLogAction(userId, Context.User.Id, ActionConfig.Log.LogAction.Ban, reason);
@@ -117,6 +142,11 @@ namespace RavenBOT.Modules.Moderator.Modules
         [RequireUserPermission(Discord.GuildPermission.BanMembers)]
         public async Task BanUser(SocketGuildUser user, [Remainder]string reason = null)
         {
+            if (!await IsActionable(user, Context.User as SocketGuildUser))
+            {
+                return;
+            }
+
             //Setting for prune days is needed
             //Log this to some config file?
             await user.Guild.AddBanAsync(user, 0, reason);
@@ -133,6 +163,11 @@ namespace RavenBOT.Modules.Moderator.Modules
         [RequireUserPermission(Discord.GuildPermission.KickMembers)]
         public async Task KickUser(SocketGuildUser user, [Remainder]string reason = null)
         {
+            if (!await IsActionable(user, Context.User as SocketGuildUser))
+            {
+                return;
+            }
+
             //Log this to some config file?
             await user.KickAsync(reason);
             var config = ModHandler.GetActionConfig(Context.Guild.Id);
@@ -189,6 +224,11 @@ namespace RavenBOT.Modules.Moderator.Modules
         //TODO: Mod permissions
         public async Task MuteUser(SocketGuildUser user, TimeSpan? time = null, [Remainder]string reason = null)
         {
+            if (!await IsActionable(user, Context.User as SocketGuildUser))
+            {
+                return;
+            }
+
             //TODO: accept time for user to be muted or get default from config
             //Log this to some config file?
             var config = ModHandler.GetActionConfig(Context.Guild.Id);
@@ -228,6 +268,11 @@ namespace RavenBOT.Modules.Moderator.Modules
         //TODO: Mod permissions
         public async Task SoftBanUser(SocketGuildUser user, TimeSpan? time = null, [Remainder]string reason = null)
         {
+            if (!await IsActionable(user, Context.User as SocketGuildUser))
+            {
+                return;
+            }
+            
             var config = ModHandler.GetActionConfig(Context.Guild.Id);
             await Context.Guild.AddBanAsync(user, 0, reason);
 

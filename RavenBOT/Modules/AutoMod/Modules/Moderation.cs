@@ -159,6 +159,12 @@ namespace RavenBOT.Modules.AutoMod.Modules
         [Summary("Adds a word or message to the blacklist")]
         public async Task BlacklistAdd([Remainder]string message)
         {
+            if (message.Length < 3)
+            {
+                await ReplyAsync("It's not a good idea to add such short items to the blacklist.");
+                return;
+            }
+
             var config = ModerationService.GetModerationConfig(Context.Guild.Id);
             config.BlacklistSimple.Add(new BlacklistSet.BlacklistMessage
             {
