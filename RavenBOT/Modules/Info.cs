@@ -17,7 +17,7 @@ using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules
 {
-    public class Info : InteractiveBase<ShardedCommandContext>
+    public class Main : InteractiveBase<ShardedCommandContext>
     {
         public CommandService CommandService { get; }
         public PrefixService PrefixService { get; }
@@ -27,7 +27,7 @@ namespace RavenBOT.Modules
         public DeveloperSettings DeveloperSettings { get; }
         public HttpClient HttpClient { get; }
 
-        private Info(CommandService commandService, HttpClient http, PrefixService prefixService, DeveloperSettings devSettings, HelpService helpService, DiscordShardedClient client, IServiceProvider provider)
+        private Main(CommandService commandService, HttpClient http, PrefixService prefixService, DeveloperSettings devSettings, HelpService helpService, DiscordShardedClient client, IServiceProvider provider)
         {
             CommandService = commandService;
             PrefixService = prefixService;
