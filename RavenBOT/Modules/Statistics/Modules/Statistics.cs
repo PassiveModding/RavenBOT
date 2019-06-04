@@ -19,13 +19,15 @@ namespace RavenBOT.Modules.Statistics.Modules
     //TODO: Test this module
     public class Statistics : InteractiveBase<ShardedCommandContext>
     {
-        public Statistics(GraphManager graphManager, GrafanaManager grafanaManager)
+        public Statistics(GraphManager graphManager, DBLManager dblManager, GrafanaManager grafanaManager)
         {
             GraphManager = graphManager;
+            DblManager = dblManager;
             GrafanaManager = grafanaManager;
         }
 
         public GraphManager GraphManager { get; }
+        public DBLManager DblManager { get; }
         public GrafanaManager GrafanaManager { get; }
 
         [Command("SetGraphiteUrl")]
@@ -35,6 +37,15 @@ namespace RavenBOT.Modules.Statistics.Modules
             config.GraphiteUrl = url;
             GraphManager.SaveConfig(config);
             await ReplyAsync("Url set, settings will apply after the next restart.");
+        }
+
+        [Command("SetDBLApiKey")]
+        public async Task SetDBLAPIKey([Remainder]string key = null)
+        {
+            var config = DblManager.GetOrCreateConfig();
+            config.APIKey = key;
+            DblManager.SaveConfig(config);
+            await ReplyAsync("API Key set.");
         }
 
         [Command("SetGrafanaUrl")]
