@@ -24,7 +24,7 @@ namespace RavenBOT.Modules.Levels.Modules
         public LevelService LevelService { get; }
 
         [Command("Toggle")]
-        [Summary("Toggles levelling in the server")]
+        [Summary("Toggles leveling in the server")]
         [RequireUserPermission(Discord.GuildPermission.Administrator)]
         public async Task ToggleLevelingAsync()
         {
