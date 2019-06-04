@@ -42,8 +42,34 @@ namespace RavenBOT.Handlers
             client.ShardConnected += ShardConnectedAsync;
             client.MessageReceived += MessageReceivedAsync;
             commandService.CommandExecuted += CommandExecutedAsync;
+            client.JoinedGuild += JoinedGuildAsync;
             ModulePrefixes = new List<string>();
             //commandService.CommandExecuted += async (cI, c, r) => await CommandExecutedAsync(cI, c, r);
+        }
+
+        private async Task JoinedGuildAsync(SocketGuild guild)
+        {
+            var user = guild.GetUser(Client.CurrentUser.Id);
+            if (user == null)
+            {
+                await guild.DownloadUsersAsync();
+                user = guild.GetUser(Client.CurrentUser.Id);
+            }
+
+            var firstChannel = guild.TextChannels.Where(x => 
+            {
+                var permissions = user?.GetPermissions(x);
+                return permissions.HasValue ? permissions.Value.ViewChannel && permissions.Value.SendMessages : false;
+            }).OrderBy(c => c.Position).FirstOrDefault();
+
+            var prefix = Local.Developer ? Local.DeveloperPrefix : PrefixService.GetPrefix(guild.Id);
+
+            await firstChannel?.SendMessageAsync("", false, new EmbedBuilder()
+            {
+                Title = $"{Client.CurrentUser.Username}",
+                Description = $"Get started by using the help command: `{prefix}help`",
+                Color = Color.Green
+            }.Build());
         }
 
         private async Task CommandExecutedAsync(Optional<CommandInfo> commandInfo, ICommandContext context, IResult result)
