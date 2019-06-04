@@ -4,6 +4,7 @@ using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
+using RavenBOT.Extensions;
 
 namespace RavenBOT.Modules.Info.Modules
 {
@@ -17,7 +18,7 @@ namespace RavenBOT.Modules.Info.Modules
             await ReplyAsync("", false, new EmbedBuilder()
             {
                 Title = $"{role.Name} Members",
-                Description = $"{string.Join(", ", role.Members.Select(x => x.Mention))}"
+                Description = $"{string.Join(", ", role.Members.Select(x => x.Mention))}".FixLength(2047)
             }.Build());
         }
     }
