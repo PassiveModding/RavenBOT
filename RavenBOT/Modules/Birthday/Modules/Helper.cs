@@ -18,6 +18,7 @@ namespace RavenBOT.Modules.Birthday.Modules
             HelpService = helpService;
         }
 
+        [Priority(100)]
         [Command("Help")]
         public async Task HelpAsync()
         {
