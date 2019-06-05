@@ -62,13 +62,14 @@ namespace RavenBOT.Services
 
                 //TODO: Test efficiency of this versus the other one, including precondition skips
                 var newModules = new List<Tuple<string, List<CommandInfo>>>();
+                var devSettings = DeveloperSettings.GetDeveloperSettings();
                 for (int i = 0; i < modules.Count; i++)
                 {
                     var module = modules[i];
                     var commands = new List<CommandInfo>();
                     foreach (var command in module.Item2)
                     {
-                        if (await CheckPreconditionsAsync(context, command).ConfigureAwait(false))
+                        if (await CheckPreconditionsAsync(context, command, devSettings).ConfigureAwait(false))
                         {
                             commands.Add(command);
                         }                        
@@ -249,13 +250,11 @@ namespace RavenBOT.Services
 
 
 
-        public async Task<bool> CheckPreconditionsAsync(ShardedCommandContext context, CommandInfo command)
+        public async Task<bool> CheckPreconditionsAsync(ShardedCommandContext context, CommandInfo command, DeveloperSettings.Settings settings)
         {
-            var devSettings = DeveloperSettings.GetDeveloperSettings();
-
             foreach (var preconditon in command.Preconditions)
             {
-                if (devSettings.SkippableHelpPreconditions.Contains(preconditon.GetType().Name, StringComparer.InvariantCultureIgnoreCase))
+                if (settings.SkippableHelpPreconditions.Contains(preconditon.GetType().Name, StringComparer.InvariantCultureIgnoreCase))
                 {
                     continue;
                 }
