@@ -167,7 +167,8 @@ namespace RavenBOT.Modules.Levels.Modules
             await ReplyAsync($"Role Removed\nNOTE: Users who have this role will still keep it.");
         }    
 
-        [Command("Rank")]    
+        [Command("Rank")]   
+        [Alias("Level")] 
         [Summary("Displays the current (or specified) user's level")]    
         public async Task Rank(SocketGuildUser user = null)
         {
