@@ -167,7 +167,8 @@ namespace RavenBOT.Modules.Levels.Modules
             await ReplyAsync($"Role Removed\nNOTE: Users who have this role will still keep it.");
         }    
 
-        [Command("Rank")]        
+        [Command("Rank")]    
+        [Summary("Displays the current (or specified) user's level")]    
         public async Task Rank(SocketGuildUser user = null)
         {
             var config = LevelService.GetLevelUser(Context.Guild.Id, user?.Id ?? Context.User.Id);   
@@ -186,7 +187,8 @@ namespace RavenBOT.Modules.Levels.Modules
         }    
 
         
-        [Command("Rewards")]        
+        [Command("Rewards")]  
+        [Summary("Shows role rewards for reaching a specific level.")]      
         public async Task Rewards()
         {
             var config = LevelService.TryGetLevelConfig(Context.Guild.Id);   
@@ -230,6 +232,7 @@ namespace RavenBOT.Modules.Levels.Modules
         }
 
         [Command("Leaderboard")]
+        [Summary("Displays users ranked from highest xp to lowest")]
         public async Task ShowLeaderboard()
         {
             var users = LevelService.Database.Query<LevelUser>().Where(x => x.GuildId == Context.Guild.Id).OrderByDescending(x => x.UserXP).ToList();
@@ -278,6 +281,7 @@ namespace RavenBOT.Modules.Levels.Modules
         }
         
         [Command("ResetUser")]
+        [Summary("Resets the specified user's level stats")]
         [RequireUserPermission(GuildPermission.Administrator)]
         public async Task ResetLeaderboard(SocketGuildUser user)
         {
@@ -306,6 +310,7 @@ namespace RavenBOT.Modules.Levels.Modules
         }
 
         [Command("ResetLeaderboard")]
+        [Summary("Resets all level stats for users in the server")]
         [RequireUserPermission(GuildPermission.Administrator)]
         public async Task ResetLeaderboard(string confirm = null)
         {
@@ -327,6 +332,7 @@ namespace RavenBOT.Modules.Levels.Modules
         }
 
         [Command("RebaseXPViaRewards")]
+        [Summary("Sets user xp based on the current level role they have.")]
         [RequireUserPermission(GuildPermission.Administrator)]
         public async Task RebaseXp()
         {
