@@ -18,6 +18,7 @@ namespace RavenBOT.Modules.Tags.Modules
             HelpService = helpService;
         }
 
+        [Priority(100)]
         [Command("Help")]
         public async Task HelpAsync()
         {
