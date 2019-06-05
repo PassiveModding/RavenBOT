@@ -60,7 +60,6 @@ namespace RavenBOT.Services
                                                             "If you want to see every command, use the fullhelp command instead.");
                 }
 
-                //TODO: Test efficiency of this versus the other one, including precondition skips
                 var newModules = new List<Tuple<string, List<CommandInfo>>>();
                 var devSettings = DeveloperSettings.GetDeveloperSettings();
                 for (int i = 0; i < modules.Count; i++)
@@ -69,15 +68,14 @@ namespace RavenBOT.Services
                     var commands = new List<CommandInfo>();
                     foreach (var command in module.Item2)
                     {
-                        if (await CheckPreconditionsAsync(context, command, devSettings).ConfigureAwait(false))
+                        if (await CheckPreconditionsAsync(context, command, devSettings))
                         {
                             commands.Add(command);
                         }                        
                     }
                     
                     if (commands.Any())
-                    {
-                        
+                    {                        
                         newModules.Add(new Tuple<string, List<CommandInfo>>(module.Item1, commands));
                     }
                 }
@@ -248,19 +246,23 @@ namespace RavenBOT.Services
             return initial;
         }
 
-
-
         public async Task<bool> CheckPreconditionsAsync(ShardedCommandContext context, CommandInfo command, DeveloperSettings.Settings settings)
         {
-            foreach (var preconditon in command.Preconditions)
+            var preconditions = new List<PreconditionAttribute>();
+            preconditions.AddRange(command.Preconditions);
+            preconditions.AddRange(command.Module.Preconditions);
+            foreach (var precondition in preconditions)
             {
-                if (settings.SkippableHelpPreconditions.Contains(preconditon.GetType().Name, StringComparer.InvariantCultureIgnoreCase))
+                if (settings.SkippableHelpPreconditions.Contains(precondition.GetType().Name, StringComparer.InvariantCultureIgnoreCase))
                 {
                     continue;
                 }
 
-                var result = await preconditon.CheckPermissionsAsync(context, command, Provider).ConfigureAwait(false);
-                if (result.IsSuccess) continue;
+                var result = await precondition.CheckPermissionsAsync(context, command, Provider);
+                if (result.IsSuccess)
+                {
+                    continue;
+                }
 
                 return false;
             }
