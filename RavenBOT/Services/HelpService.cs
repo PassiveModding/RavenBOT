@@ -105,7 +105,7 @@ namespace RavenBOT.Services
 
                 //This will be added to the 'overview' for each module
                 var moduleContent = new StringBuilder();
-                moduleContent.AppendJoin(", ", commands.Select(x => x.Name));
+                moduleContent.AppendJoin(", ", commands.GroupBy(x => x.Name).Select(x => x.First().Name));
 
                 //Handle modules with the same name and group them.
                 var duplicateModule = overviewFields.FirstOrDefault(x => x.Name.Equals(moduleName, StringComparison.InvariantCultureIgnoreCase));
