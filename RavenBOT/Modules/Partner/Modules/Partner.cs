@@ -112,6 +112,19 @@ namespace RavenBOT.Modules.Partner.Modules
             await ReplyAsync("Message Set", false, embed.Build());
         }
 
+        [Command("Settings")]
+        public async Task ShowSettings()
+        {
+            var config = Manager.GetOrCreatePartnerConfig(Context.Guild.Id);
+            var embed = await config.GetEmbedAsync(Context.Guild);
+            await ReplyAsync($"Enabled: {config.Enabled}\n" +
+                             $"Show Thumbnail: {config.UseThumb}\n"+
+                             $"Color: R-{config.Color?.R} G-{config.Color?.G} B-{config.Color?.B}\n" +
+                             $"Receiver Channel: {Context.Guild.GetChannel(config.ReceiverChannelId)?.Name ?? "N/A"}" +
+                             $"Image Url: {config.ImageUrl ?? "N/A"}\n"+
+                             $"Message: \n{config.Message}");
+        }
+
         [Command("Trigger")]
         [RequireOwner]        
         [Summary("DEV: Triggers a partner event")]
