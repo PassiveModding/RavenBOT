@@ -6,6 +6,7 @@ using Discord.Addons.Interactive;
 using Discord.Commands;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
+using RavenBOT.Extensions;
 using RavenBOT.Modules.Media.Methods;
 
 namespace RavenBOT.Modules.Media.Modules
@@ -47,10 +48,14 @@ namespace RavenBOT.Modules.Media.Modules
                 return;
             }
 
-            await ReplyAsync($"{selectedPost.Title}\nhttps://reddit.com{selectedPost.Permalink}");
+            await ReplyAsync($"{selectedPost.Title}\nhttps://reddit.com{selectedPost.Permalink}", false, new EmbedBuilder()
+            {
+                ImageUrl = selectedPost.Url.ToString().FixGfycatUrl()
+            }.Build());
         }
 
-        [Command("nsfw", RunMode = RunMode.Async)]
+        [Command(RunMode = RunMode.Async)]
+        [Alias("nsfw")]
         [Summary("Shorthand for redditpost nsfw")]
         public async Task NsfwPost()
         {
@@ -58,6 +63,7 @@ namespace RavenBOT.Modules.Media.Modules
         }
 
         [Command("NsfwGif", RunMode = RunMode.Async)]        
+        [Alias("gif")]
         [Summary("Shorthand for redditpost with various nsfw gif subreddits")]
         public Task NsfwGifAsync()
         {
