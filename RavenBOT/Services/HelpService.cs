@@ -104,7 +104,7 @@ namespace RavenBOT.Services
 
                 //This will be added to the 'overview' for each module
                 var moduleContent = new StringBuilder();
-                moduleContent.AppendJoin(", ", commands.GroupBy(x => x.Name).Select(x => x.First().Name));
+                moduleContent.AppendJoin(", ", commands.GroupBy(x => x.Name).Select(x => x.First().Aliases.First()));
 
                 //Handle modules with the same name and group them.
                 var duplicateModule = overviewFields.FirstOrDefault(x => x.Name.Equals(moduleName, StringComparison.InvariantCultureIgnoreCase));
@@ -138,7 +138,7 @@ namespace RavenBOT.Services
                 var commandContent = new StringBuilder();
                 foreach (var command in commands)
                 {
-                    commandContent.AppendLine($"**{command.Name}**");
+                    commandContent.AppendLine($"**{command.Name ?? command.Module.Aliases.FirstOrDefault()}**");
                     if (command.Summary != null)
                     {
                         commandContent.AppendLine($"[Summary]{command.Summary}");
@@ -155,7 +155,7 @@ namespace RavenBOT.Services
                     {
                         commandContent.AppendLine($"[Aliases]{string.Join(",", command.Aliases)}");
                     }
-                    commandContent.AppendLine($"`{command.Aliases.First()} {string.Join(" ", command.Parameters.Select(ParameterInformation))}`");
+                    commandContent.AppendLine($"`{command.Aliases.First() ?? command.Module.Aliases.FirstOrDefault()} {string.Join(" ", command.Parameters.Select(ParameterInformation))}`");
                 
                     if (pageContent.Length + commandContent.Length > 2047)
                     {
