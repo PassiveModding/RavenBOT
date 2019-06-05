@@ -171,17 +171,36 @@ namespace RavenBOT.Modules.Levels.Modules
         [Summary("Displays the current (or specified) user's level")]    
         public async Task Rank(SocketGuildUser user = null)
         {
-            var config = LevelService.GetLevelUser(Context.Guild.Id, user?.Id ?? Context.User.Id);   
+            if (user == null)
+            {
+                user = Context.User as SocketGuildUser;
+            }
+            var config = LevelService.GetLevelUser(Context.Guild.Id, user.Id);   
+
             if (config == null || config.Item2 == null || !config.Item2.Enabled)
             {
                 await ReplyAsync("Leveling is not enabled in this server.");
                 return;
             }
 
+            var users = LevelService.Database.Query<LevelUser>().Where(x => x.GuildId == Context.Guild.Id).OrderByDescending(x => x.UserXP).ToList();
+            int rank = users.IndexOf(users.Where(x => x.UserId == user.Id).FirstOrDefault()) + 1;
 
-            await ReplyAsync($"Current Level: {config.Item1.UserLevel}\n" +
-                            $"Current XP: {config.Item1.UserXP}\n" +
-                            $"XP To Next Level: {LevelService.RequiredExp(config.Item1.UserLevel + 1) - config.Item1.UserXP}\n");
+            var embed = new EmbedBuilder()
+            {
+                Title = "Level Info",
+                Author = new EmbedAuthorBuilder()
+                {
+                    IconUrl = user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl(),
+                    Name = user.ToString()
+                },
+                Description = $"**Current Level:** {config.Item1.UserLevel}\n" +
+                            $"**Current XP:** {config.Item1.UserXP}\n" +
+                            $"**XP To Next Level:** {LevelService.RequiredExp(config.Item1.UserLevel + 1) - config.Item1.UserXP}\n" +
+                            $"**Rank:** {rank}/{users.Count}"
+            };
+
+            await ReplyAsync("", false, embed.Build());
 
             //TODO: Rank
         }    
