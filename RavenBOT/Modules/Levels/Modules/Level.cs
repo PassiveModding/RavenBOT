@@ -120,6 +120,12 @@ namespace RavenBOT.Modules.Levels.Modules
             //Remove the role if it already exists in the rewards
             config.RewardRoles = config.RewardRoles.Where(x => x.RoleId != role.Id).ToList();
 
+            if (config.RewardRoles.Any(x => x.LevelRequirement == level))
+            {
+                await ReplyAsync("There can only be one role per level.");
+                return;
+            }
+
             config.RewardRoles.Add(new LevelConfig.LevelReward
             {
                 RoleId = role.Id,
@@ -269,6 +275,104 @@ namespace RavenBOT.Modules.Levels.Modules
                 First = true,
                 Last = true
             });
+        }
+        
+        [Command("ResetUser")]
+        [RequireUserPermission(GuildPermission.Administrator)]
+        public async Task ResetLeaderboard(SocketGuildUser user)
+        {
+            if (user.Hierarchy >= (Context.User as SocketGuildUser).Hierarchy)
+            {
+                if (user.Id != Context.User.Id)
+                {
+                    await ReplyAsync("You cannot reset the level of a user with higher permissions than you.");
+                    return;
+                }
+            }
+
+            var levelUser = LevelService.GetLevelUser(Context.Guild.Id, user.Id);
+            if (levelUser.Item1 != null)
+            {
+                var profile = levelUser.Item1;
+                profile.UserLevel = 0;
+                profile.UserXP = 0;
+                LevelService.Database.Store(profile, LevelUser.DocumentName(profile.UserId, profile.GuildId));
+                await ReplyAsync("User has been reset.");
+            }
+            else
+            {
+                await ReplyAsync("User does not exist in the level database.");
+            }
+        }
+
+        [Command("ResetLeaderboard")]
+        [RequireUserPermission(GuildPermission.Administrator)]
+        public async Task ResetLeaderboard(string confirm = null)
+        {
+            if (confirm == null)
+            {
+                await ReplyAsync("Run this command again with the confirmation code `cop432ih`\n" +
+                "This will remove all earned xp from users and **CANNOT** be undone\n" +
+                "NOTE: It will not remove earned roles from users.");
+                return;
+            }
+            else if (!confirm.Equals("cop432ih"))
+            {
+                await ReplyAsync("Invalid confirmation code.");
+                return;
+            }
+            var users = LevelService.Database.Query<LevelUser>().Where(x => x.GuildId == Context.Guild.Id).ToList();
+            LevelService.Database.RemoveMany<LevelUser>(users.Select(x => LevelUser.DocumentName(x.UserId, x.GuildId)).ToList());
+            await ReplyAsync("Leaderboard has been reset.");
+        }
+
+        [Command("RebaseXPViaRewards")]
+        [RequireUserPermission(GuildPermission.Administrator)]
+        public async Task RebaseXp()
+        {
+            var users = LevelService.Database.Query<LevelUser>().Where(x => x.GuildId == Context.Guild.Id).ToList();
+            var config = LevelService.TryGetLevelConfig(Context.Guild.Id);
+            if (config == null)
+            {
+                await ReplyAsync("There are no configured roles.");
+                return;
+            }
+
+            await Context.Guild.DownloadUsersAsync();
+
+            var updatedUsers = new List<LevelUser>();
+
+            foreach (var role in config.RewardRoles.OrderByDescending(x => x.LevelRequirement))
+            {
+                var serverRole = Context.Guild.GetRole(role.RoleId);
+                if (serverRole == null)
+                {
+                    continue;
+                }
+
+                foreach (var user in serverRole.Members)
+                {
+                    if (updatedUsers.Any(x => x.UserId == user.Id))
+                    {
+                        //Skip users who were already modified because we are working from highest to lowest.
+                        continue;
+                    }
+
+                    var leveluser = users.FirstOrDefault(x => x.UserId == user.Id);
+                    if (leveluser == null)
+                    {
+                        leveluser = new LevelUser(user.Id, Context.Guild.Id);
+                    }
+
+                    leveluser.UserLevel = role.LevelRequirement;
+                    leveluser.UserXP = LevelService.RequiredExp(role.LevelRequirement);
+
+                    updatedUsers.Add(leveluser);
+                }
+            }
+            LevelService.Database.StoreMany(updatedUsers, x => LevelUser.DocumentName(x.UserId, x.GuildId));
+
+            await ReplyAsync($"{updatedUsers.Count} users have been updated");
         }
     }
 }
