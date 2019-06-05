@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
@@ -76,6 +77,102 @@ namespace RavenBOT.Modules.Translation.Modules
             embed2.AddField("Z", "`zu` - Zulu\n");
             await Context.User.SendMessageAsync("", false, embed2.Build());
             await ReplyAsync("DM Sent.");
+        }
+
+        [Priority(100)]
+        [RequireContext(ContextType.Guild)]
+        [Command("Toggle Reactions")]
+        [Summary("Toggles Translate Reactions in the server")]
+        [RequireUserPermission(GuildPermission.Administrator)]
+        public async Task ToggleReactions()
+        {
+            var config = TranslateService.GetTranslateGuild(Context.Guild.Id);
+            config.ReactionTranslations = !config.ReactionTranslations;
+            TranslateService.SaveTranslateGuild(config);
+            await ReplyAsync($"Translation Reactions Enabled: {config.ReactionTranslations}");
+        }
+        
+        
+        [Priority(100)]
+        [RequireContext(ContextType.Guild)]
+        [Command("RemoveEmote")]
+        [RequireUserPermission(GuildPermission.Administrator)]
+        public async Task AddPair(Emoji emote)
+        {
+            var config = TranslateService.GetTranslateGuild(Context.Guild.Id);
+            
+            foreach (var pair in config.CustomPairs)
+            {
+                pair.EmoteMatches.Remove(emote.Name);
+            }
+
+            await ReplyAsync("Reaction removed.");
+            TranslateService.SaveTranslateGuild(config);
+        }
+        
+        [Priority(100)]
+        [RequireContext(ContextType.Guild)]
+        [Command("AddPair")]
+        [Summary("Adds a pair for reaction translations")]
+        [RequireUserPermission(GuildPermission.Administrator)]
+        public async Task AddPair(LanguageMap.LanguageCode code, Emoji emote)
+        {
+            await AddPair(emote, code);
+        }
+
+        [Priority(100)]
+        [RequireContext(ContextType.Guild)]
+        [Command("List")]
+        [Summary("List paired languages")]
+        public Task ListAsync()
+        {
+            var config = TranslateService.GetTranslateGuild(Context.Guild.Id);
+            var fields = config.CustomPairs.Select(x => new EmbedFieldBuilder { Name = x.Language.ToString(), Value = string.Join("\n", x.EmoteMatches), IsInline = true }).ToList();
+            var embed = new EmbedBuilder { Fields = fields };
+            return ReplyAsync("", false, embed.Build());
+        }
+
+        [Priority(100)]
+        [Command("Defaults")]
+        [Summary("List Default paired languages")]
+        public Task ListDefaultAsync()
+        {
+            var fields = LanguageMap.DefaultMap.OrderByDescending(x => x.EmoteMatches.Count).Select(x => new EmbedFieldBuilder { Name = x.Language.ToString(), Value = string.Join("\n", x.EmoteMatches), IsInline = true }).ToList();
+            var embed = new EmbedBuilder { Fields = fields };
+            return ReplyAsync("", false, embed.Build());
+        }
+
+        [Priority(100)]
+        [RequireContext(ContextType.Guild)]
+        [Command("AddPair")]
+        [Summary("Adds a pair for reaction translations")]
+        [RequireUserPermission(GuildPermission.Administrator)]
+        public async Task AddPair(Emoji emote, LanguageMap.LanguageCode code)
+        {
+            var config = TranslateService.GetTranslateGuild(Context.Guild.Id);
+            var match = config.CustomPairs.FirstOrDefault(x => x.Language == code);
+            
+            if (match != null)
+            {
+                if (match.EmoteMatches.Any(x => x == emote.Name))
+                {
+                    await ReplyAsync("This emote is already configured to work with this language.");
+                    return;
+                }
+
+                match.EmoteMatches.Add(emote.Name);
+            }
+            else
+            {
+                config.CustomPairs.Add(new LanguageMap.TranslationSet()
+                {
+                    EmoteMatches = new List<string>{emote.Name},
+                    Language = code
+                });
+            }
+
+            TranslateService.SaveTranslateGuild(config);
+            await ReplyAsync($"{emote.Name} reactions will now translate messages to {code}");
         }
 
         [Priority(100)]

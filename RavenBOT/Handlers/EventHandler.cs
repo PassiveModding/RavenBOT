@@ -9,6 +9,7 @@ using Discord.WebSocket;
 using RavenBOT.Extensions;
 using RavenBOT.Models;
 using RavenBOT.Services;
+using RavenBOT.TypeReaders.EmojiReader;
 
 namespace RavenBOT.Handlers
 {
@@ -124,6 +125,8 @@ namespace RavenBOT.Handlers
 
         public async Task InitializeAsync()
         {
+            CommandService.AddTypeReader(typeof(Emoji), new EmojiTypeReader());
+
             await Client.LoginAsync(TokenType.Bot, BotConfig.Token);
             await Client.StartAsync();
             await RegisterModulesAsync();
