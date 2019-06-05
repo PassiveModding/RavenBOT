@@ -14,7 +14,7 @@ using RavenBOT.Services.Licensing;
 
 namespace RavenBOT.Modules.Translation.Modules
 {
-    [Group("Translation")]
+    [Group("Translate")]
     public class Translation : InteractiveBase<ShardedCommandContext>
     {
         public TranslateService TranslateService {get;}
@@ -25,7 +25,8 @@ namespace RavenBOT.Modules.Translation.Modules
 
 
         [RequireContext(ContextType.Guild)]
-        [Command("Translate", RunMode = RunMode.Async)]
+        [Command(RunMode = RunMode.Async)]
+        [Alias("Translate")]
         [Summary("Translate from one language to another")]
         public async Task Translate(LanguageMap.LanguageCode languageCode, [Remainder] string message)
         {
@@ -42,6 +43,7 @@ namespace RavenBOT.Modules.Translation.Modules
             await ReplyAsync("", false, embed.Build());
         }
 
+        [Priority(100)]
         [Command("languages", RunMode = RunMode.Async)]
         [Summary("A list of available languages codes to convert between")]
         public async Task TranslateListAsync()
@@ -76,6 +78,7 @@ namespace RavenBOT.Modules.Translation.Modules
             await ReplyAsync("DM Sent.");
         }
 
+        [Priority(100)]
         [RequireContext(ContextType.Guild)]
         [Command("Info")]
         [Summary("Translate Stats for the current guild")]
@@ -85,6 +88,7 @@ namespace RavenBOT.Modules.Translation.Modules
             await ReplyAsync($"Remaining characters: {license.RemainingUses()} \nTotal used: {license.TotalUsed}");
         }
 
+        [Priority(100)]
         [RequireContext(ContextType.Guild)]
         [RequireUserPermission(GuildPermission.Administrator)]
         [Command("Redeem")]
@@ -114,6 +118,7 @@ namespace RavenBOT.Modules.Translation.Modules
             }
         }
 
+        [Priority(100)]
         [RequireContext(ContextType.Guild)]
         [Command("Remaining Characters")]
         [Summary("Shows the amount of remaining characters for translation")]
@@ -123,6 +128,7 @@ namespace RavenBOT.Modules.Translation.Modules
             await ReplyAsync($"Remaining characters: {profile.RemainingUses()}");
         }
 
+        [Priority(100)]
         [RequireContext(ContextType.Guild)]
         [RequireUserPermission(GuildPermission.Administrator)]
         [Command("History")]
@@ -139,6 +145,7 @@ namespace RavenBOT.Modules.Translation.Modules
             await ReplyAsync(history.FixLength());
         }
 
+        [Priority(100)]
         [RequireOwner]
         [Command("GenerateLicenses")]
         public async Task GenerateLicenses(int quantity, int uses)
@@ -150,6 +157,7 @@ namespace RavenBOT.Modules.Translation.Modules
                              "```");
         }
 
+        [Priority(100)]
         [RequireOwner]
         [Command("SetApiKey")]
         public async Task SetApiKey(string apiKey = null)
@@ -160,6 +168,7 @@ namespace RavenBOT.Modules.Translation.Modules
             TranslateService.SaveTranslateConfig(config);
         }
 
+        [Priority(100)]
         [RequireOwner]
         [Command("ToggleTranslation")]
         [Summary("DEV: Toggles translation services for all services")]
@@ -171,6 +180,7 @@ namespace RavenBOT.Modules.Translation.Modules
             TranslateService.SaveTranslateConfig(config);
         }
 
+        [Priority(100)]
         [RequireOwner]
         [Command("SetStoreUrl")]
         public async Task SetStoreUrl(string storeUrl = null)

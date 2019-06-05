@@ -8,7 +8,7 @@ using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Translation.Modules
 {
-    [Group("Translation")]
+    [Group("Translate")]
     public class Helper : InteractiveBase<ShardedCommandContext>
     {
         private HelpService HelpService { get; }
@@ -18,12 +18,13 @@ namespace RavenBOT.Modules.Translation.Modules
             HelpService = helpService;
         }
 
+        [Priority(100)]
         [Command("Help")]
         public async Task HelpAsync()
         {
             var res = await HelpService.PagedHelpAsync(Context, true, new List<string>
             {
-                "translation"
+                "translate"
             });
 
             if (res != null)
