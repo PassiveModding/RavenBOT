@@ -44,7 +44,7 @@ namespace RavenBOT.Modules.Levels.Methods
                 if (user == null)
                 {
                     user = new LevelUser(userId, guildId);
-                    Database.Store(user);
+                    Database.Store(user, LevelUser.DocumentName(userId, guildId));
                 }
 
                 return new Tuple<LevelUser, LevelConfig>(user, config);
