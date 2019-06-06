@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -78,6 +79,23 @@ namespace RavenBOT.Services
             public bool Developer { get; set; } = false;
 
             public string DeveloperPrefix { get; set; } = "dev.";
+
+            //Used for whitelisting commands/events while in dev mode.
+            public List<ulong> WhitelistedGuilds {get;set;} = new List<ulong>();
+            public bool IsAcceptable(ulong guildId)
+            {
+                if (Developer)
+                {
+                    if (WhitelistedGuilds.Any())
+                    {
+                        return WhitelistedGuilds.Contains(guildId);
+                    }
+
+                    return true;
+                }
+
+                return true;
+            }
 
             [JsonConverter(typeof(StringEnumConverter))]
             public DatabaseSelection DatabaseChoice {get;set;} = DatabaseSelection.LiteDatabase;
