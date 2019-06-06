@@ -155,7 +155,7 @@ namespace RavenBOT.Services
                     {
                         commandContent.AppendLine($"[Aliases]{string.Join(",", command.Aliases)}");
                     }
-                    commandContent.AppendLine($"`{command.Aliases.First() ?? command.Module.Aliases.FirstOrDefault()} {string.Join(" ", command.Parameters.Select(ParameterInformation))}`");
+                    commandContent.AppendLine($"`{command.Aliases.First() ?? command.Module.Aliases.FirstOrDefault()} {string.Join(" ", command.Parameters.Select(x => x.ParameterInformation()))}`");
                 
                     if (pageContent.Length + commandContent.Length > 2047)
                     {
@@ -213,37 +213,6 @@ namespace RavenBOT.Services
             pager.Pages = overviewPages;
 
             return pager;
-        }
-
-        
-        public string ParameterInformation(ParameterInfo parameter)
-        {
-            var initial = parameter.Name + (parameter.Summary == null ? "" : $"({parameter.Summary})");
-            var isAttributed = false;
-            if (parameter.IsOptional)
-            {
-                initial = $"[{initial} = {parameter.DefaultValue ?? "null"}]";
-                isAttributed = true;
-            }
-
-            if (parameter.IsMultiple)
-            {
-                initial = $"|{initial}|";
-                isAttributed = true;
-            }
-
-            if (parameter.IsRemainder)
-            {
-                initial = $"...{initial}";
-                isAttributed = true;
-            }
-
-            if (!isAttributed)
-            {
-                initial = $"<{initial}>";
-            }
-
-            return initial;
         }
 
         public async Task<bool> CheckPreconditionsAsync(ShardedCommandContext context, CommandInfo command, DeveloperSettings.Settings settings)
