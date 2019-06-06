@@ -1,15 +1,12 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
-using Microsoft.Extensions.DependencyInjection;
 using RavenBOT.Extensions;
 using RavenBOT.Modules.Tickets.Methods;
 using RavenBOT.Modules.Tickets.Models;
-using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Tickets.Modules
 {
