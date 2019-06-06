@@ -31,5 +31,8 @@ namespace RavenBOT.Modules.Tickets.Models
         public ulong TicketChannelId { get; set; }
 
         public bool UseVoting {get;set;} = true;
+
+        //Indicates whether to nofity the creator of a ticket when it's state is changed.
+        public bool NotifyCreatorOnStateChange {get;set;} = true;
     }
 }

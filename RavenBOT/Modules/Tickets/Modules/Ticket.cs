@@ -8,6 +8,7 @@ using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using RavenBOT.Extensions;
 using RavenBOT.Modules.Tickets.Methods;
+using RavenBOT.Modules.Tickets.Models;
 using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Tickets.Modules
@@ -97,24 +98,11 @@ namespace RavenBOT.Modules.Tickets.Modules
                 return;
             }
 
-            if (ticket.AuthorId == Context.User.Id)
-            {
-                ticket.SetState(Models.Ticket.TicketState.open, reason ?? "Re-opened by creator.");
-                TicketService.SaveTicket(ticket);
-                await TicketService.UpdateLiveMessageAsync(Context.Guild, tGuild, ticket);
-                await ReplyAsync("Re-opened.");
-            }
-            else if (Context.User is SocketGuildUser g && g.GuildPermissions.Administrator)
-            {
-                ticket.SetState(Models.Ticket.TicketState.open, reason ?? "Re-opened by administrator.");
-                TicketService.SaveTicket(ticket);
-                await TicketService.UpdateLiveMessageAsync(Context.Guild, tGuild, ticket);
-                await ReplyAsync("Re-opened. (as admin)");
-            }
-            else
-            {
-                await ReplyAsync("You do not have permissions to re-open that ticket.");
-            }
+            ticket.SetState(Models.Ticket.TicketState.open, reason ?? $"Re-opened by {Context.User.Mention}");
+            TicketService.SaveTicket(ticket);
+            await TicketService.UpdateLiveMessageAsync(Context.Guild, tGuild, ticket);
+            await TryNotifyTicketCreator(tGuild, ticket);
+            await ReplyAsync("Re-opened.");
         }
 
         
@@ -147,7 +135,7 @@ namespace RavenBOT.Modules.Tickets.Modules
             }
             else
             {
-                await ReplyAsync("You do not have permissions to delete that ticket.");
+                await ReplyAsync("You do not have permissions to delete that ticket. NOTE: Deleting tickets is only applicable to admins and the ticket creator.");
             }
         }
 
@@ -169,24 +157,11 @@ namespace RavenBOT.Modules.Tickets.Modules
                 return;
             }
 
-            if (ticket.AuthorId == Context.User.Id)
-            {
-                ticket.SetState(Models.Ticket.TicketState.close, reason ?? "Closed by creator.");
-                TicketService.SaveTicket(ticket);
-                await TicketService.UpdateLiveMessageAsync(Context.Guild, tGuild, ticket);
-                await ReplyAsync("Closed.");
-            }
-            else if (Context.User is SocketGuildUser g && g.GuildPermissions.Administrator)
-            {
-                ticket.SetState(Models.Ticket.TicketState.close, reason ?? "Closed by administrator.");
-                TicketService.SaveTicket(ticket);
-                await TicketService.UpdateLiveMessageAsync(Context.Guild, tGuild, ticket);
-                await ReplyAsync("Closed. (as admin)");
-            }
-            else
-            {
-                await ReplyAsync("You do not have permissions to close that ticket.");
-            }
+            ticket.SetState(Models.Ticket.TicketState.close, reason ?? $"Closed by {Context.User.Mention}");
+            TicketService.SaveTicket(ticket);
+            await TicketService.UpdateLiveMessageAsync(Context.Guild, tGuild, ticket);
+            await TryNotifyTicketCreator(tGuild, ticket);
+            await ReplyAsync("Closed.");
         }
 
         [Command("Solve")]
@@ -207,24 +182,12 @@ namespace RavenBOT.Modules.Tickets.Modules
                 return;
             }
 
-            if (ticket.AuthorId == Context.User.Id)
-            {
-                ticket.SetState(Models.Ticket.TicketState.solved, reason ?? "Set solved by creator.");
-                TicketService.SaveTicket(ticket);
-                await TicketService.UpdateLiveMessageAsync(Context.Guild, tGuild, ticket);
-                await ReplyAsync("Solved.");
-            }
-            else if (Context.User is SocketGuildUser g && g.GuildPermissions.Administrator)
-            {
-                ticket.SetState(Models.Ticket.TicketState.solved, reason ?? "Set solved by administrator.");
-                TicketService.SaveTicket(ticket);
-                await TicketService.UpdateLiveMessageAsync(Context.Guild, tGuild, ticket);
-                await ReplyAsync("Solved. (as admin)");
-            }
-            else
-            {
-                await ReplyAsync("You must be an admin or the creator of the ticket in order to solve it.");
-            }
+
+            ticket.SetState(Models.Ticket.TicketState.solved, reason ?? $"Solved by {Context.User.Mention}");
+            TicketService.SaveTicket(ticket);
+            await TicketService.UpdateLiveMessageAsync(Context.Guild, tGuild, ticket);
+            await TryNotifyTicketCreator(tGuild, ticket);
+            await ReplyAsync("Solved.");
         }
 
         [Command("Hold")]
@@ -248,6 +211,7 @@ namespace RavenBOT.Modules.Tickets.Modules
             ticket.SetState(Models.Ticket.TicketState.on_hold, reason ?? "Set on hold by administrator.");
             TicketService.SaveTicket(ticket);
             await TicketService.UpdateLiveMessageAsync(Context.Guild, tGuild, ticket);
+            await TryNotifyTicketCreator(tGuild, ticket);
             await ReplyAsync("Set on hold.");
         }
 
@@ -263,6 +227,18 @@ namespace RavenBOT.Modules.Tickets.Modules
             }
             await ReplyAsync("", false, ticket.GenerateEmbed(Context.Guild, TicketService.GetTicketGuild(Context.Guild.Id).UseVoting).Build());
         }
+
+        [Command("ToggleStateNotifications")]
+        [Summary("Toggles the notification of users when a ticket's state is changed")]
+        [RequireUserPermission(GuildPermission.Administrator)]
+        public async Task ToggleStateNotifications()
+        {
+            var guild = TicketService.GetTicketGuild(Context.Guild.Id);
+            guild.NotifyCreatorOnStateChange = !guild.NotifyCreatorOnStateChange;
+            TicketService.SaveGuild(guild);
+
+            await ReplyAsync($"Notify ticket creator on state change: {guild.NotifyCreatorOnStateChange}");
+        }   
 
         [Command("AddCreatorRole")]
         [Summary("Adds a creator role to the ticket config")]
@@ -376,6 +352,33 @@ namespace RavenBOT.Modules.Tickets.Modules
                 Title = "Ticket Manager Roles",
                 Description = mentionlist.FixLength()
             }.Build());
+        }
+
+        public async Task TryNotifyTicketCreator(TicketGuild config, Models.Ticket ticket)
+        {
+            //No need to notify the user if they're the one making changes
+            if (Context.User.Id == ticket.AuthorId)
+            {
+                //return;
+            }
+
+            if (config.NotifyCreatorOnStateChange)
+            {
+                await Context.Guild.DownloadUsersAsync();
+                var target = Context.Guild.GetUser(ticket.AuthorId);
+                if (target != null)
+                {
+                    try
+                    {
+                        await target.SendMessageAsync($"A ticket you created in {Context.Guild.Name} has been updated.\n" +
+                                                    $"https://discordapp.com/channels/{Context.Guild.Id}/{config.TicketChannelId}");
+                    }
+                    catch
+                    {
+                        //
+                    }
+                }
+            }   
         }
     }
 }
