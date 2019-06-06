@@ -43,6 +43,22 @@ namespace RavenBOT.Modules.Translation.Methods
         //Contains the message IDs of translated messages.
         private readonly Dictionary<ulong, List<LanguageCode>> Translated = new Dictionary<ulong, List<LanguageCode>>();
 
+        public TranslationSet GetCode(TranslateGuild config, SocketReaction reaction)
+        {
+            var languageType = config.CustomPairs.FirstOrDefault(x => x.EmoteMatches.Any(val => val == reaction.Emote.Name));
+
+            if (languageType == null)
+            {
+                languageType = LanguageMap.DefaultMap.FirstOrDefault(x => x.EmoteMatches.Any(val => val == reaction.Emote.Name));
+                if (languageType == null)
+                {
+                    return null;
+                }
+            }
+
+            return languageType;
+        }
+
         public async Task ReactionAdded(Cacheable<IUserMessage, ulong> messageCacheable, ISocketMessageChannel mChannel, SocketReaction reaction)
         {
             if (!(mChannel is ITextChannel channel) || !reaction.User.IsSpecified)
@@ -51,7 +67,16 @@ namespace RavenBOT.Modules.Translation.Methods
             }
 
             var message = await TryGetMessage(messageCacheable, channel, reaction);
-            if (message == null || string.IsNullOrWhiteSpace(message.Content))
+            if (message == null)
+            {
+                return;
+            }
+            else if (string.IsNullOrWhiteSpace(message.Content) && message.Embeds.All(x => x.Type != EmbedType.Rich))
+            {
+                return;
+            }
+
+            if (reaction.User.Value.IsBot || reaction.User.Value.IsWebhook)
             {
                 return;
             }
@@ -62,15 +87,10 @@ namespace RavenBOT.Modules.Translation.Methods
                 return;
             }
 
-            var languageType = config.CustomPairs.FirstOrDefault(x => x.EmoteMatches.Any(val => val == reaction.Emote.Name));
-
+            var languageType = GetCode(config, reaction);
             if (languageType == null)
             {
-                languageType = LanguageMap.DefaultMap.FirstOrDefault(x => x.EmoteMatches.Any(val => val == reaction.Emote.Name));
-                if (languageType == null)
-                {
-                    return;
-                }
+                return;
             }
 
             if (Translated.ContainsKey(message.Id) && Translated[message.Id].Contains(languageType.Language))
@@ -79,7 +99,16 @@ namespace RavenBOT.Modules.Translation.Methods
             }
 
             var response = Translate(channel.GuildId, message.Content, languageType.Language);
-            if (response.ResponseResult != TranslateResponse.Result.Success)
+
+            var embed = message.Embeds.FirstOrDefault(x => x.Type == EmbedType.Rich);
+            EmbedBuilder translatedEmbed = null;
+            if (embed != null)
+            {
+                var embedResponse = TranslateEmbed(channel.GuildId, embed, languageType.Language);
+                translatedEmbed = embedResponse;
+            }
+
+            if (response.ResponseResult != TranslateResponse.Result.Success && translatedEmbed == null)
             {
                 return;
             }
@@ -93,21 +122,29 @@ namespace RavenBOT.Modules.Translation.Methods
                 Translated.Add(message.Id, new List<LanguageCode>() {languageType.Language});
             }
 
-            var translateEmbed = GetTranslationEmbed(response);
-            if (translateEmbed == null)
-            {
-                return;
-            }
-
             if (config.DirectMessageTranslations)
             {
                 var user = message.Author;
                 var dmChannel = await user.GetOrCreateDMChannelAsync();
-                await dmChannel.SendMessageAsync("", false, translateEmbed.Build()).ConfigureAwait(false);
+                if (translatedEmbed != null)
+                {
+                    await dmChannel.SendMessageAsync(response?.TranslateResult?.TranslatedText ?? "", false, translatedEmbed?.Build()).ConfigureAwait(false);
+                }
+                else
+                {
+                    await dmChannel.SendMessageAsync("", false, GetTranslationEmbed(response).Build()).ConfigureAwait(false);
+                }
             }
             else
             {
-                await channel.SendMessageAsync("", false, translateEmbed.Build()).ConfigureAwait(false);
+                if (translatedEmbed != null)
+                {
+                    await channel.SendMessageAsync(response?.TranslateResult?.TranslatedText ?? "", false, translatedEmbed?.Build()).ConfigureAwait(false);
+                }
+                else
+                {
+                    await channel.SendMessageAsync("", false, GetTranslationEmbed(response).Build()).ConfigureAwait(false);
+                }
             }
     }   
 
