@@ -91,6 +91,19 @@ namespace RavenBOT.Modules.Translation.Modules
             TranslateService.SaveTranslateGuild(config);
             await ReplyAsync($"Translation Reactions Enabled: {config.ReactionTranslations}");
         }
+
+        [Priority(100)]
+        [RequireContext(ContextType.Guild)]
+        [Command("Toggle DM Translations")]
+        [Summary("Toggles wether to direct message users translations rather then sending them to the channel")]
+        [RequireUserPermission(GuildPermission.Administrator)]
+        public async Task ToggleDmReactions()
+        {
+            var config = TranslateService.GetTranslateGuild(Context.Guild.Id);
+            config.DirectMessageTranslations = !config.DirectMessageTranslations;
+            TranslateService.SaveTranslateGuild(config);
+            await ReplyAsync($"DM Users Translations: {config.DirectMessageTranslations}");
+        }
         
         
         [Priority(100)]
