@@ -54,5 +54,19 @@ namespace RavenBOT.Modules.Conversation.Modules
 
             await ReplyAsync($"Enabled: {Service.IsEnabled()}");
         }
+
+        [Command("ShowFunctions")]
+        [Summary("Displays custom functions invokable by dialogflow responses")]
+        public async Task ShowFunctions()
+        {
+            var fn = new ConversationFunctions();
+            await ReplyAsync(string.Join("\n", fn.GetFunctions()));
+
+            ConversationFunctions.ConversationResponse response = null;
+            if (fn.TryInvoke("GetWeather", ref response))
+            {
+                await ReplyAsync(response.Value);
+            }
+        }
     }
 }

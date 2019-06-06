@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -14,18 +15,19 @@ namespace RavenBOT.Modules.Conversation.Methods
 {
     public class ConversationService : IServiceable
     {
-        public ConversationService (IDatabase database, DiscordShardedClient client, LogHandler logger)
+        public ConversationService(IDatabase database, DiscordShardedClient client, LogHandler logger)
         {
             Database = database;
             Client = client;
             Logger = logger;
-            SetAgent ();
+            SetAgent();
             Client.MessageReceived += MessageReceived;
+            ConversationFunctions = new ConversationFunctions();
         }
 
-        public void SetAgent ()
+        public void SetAgent()
         {
-            var config = Database.Load<ConversationConfig> (ConversationConfig.DocumentName ());
+            var config = Database.Load<ConversationConfig>(ConversationConfig.DocumentName ());
             if (config == null)
             {
                 Agent = null;
@@ -34,9 +36,9 @@ namespace RavenBOT.Modules.Conversation.Methods
             }
 
             Config = config;
-            var credentials = GoogleCredential.FromJson (config.ApiJson);
-            var channel = new Grpc.Core.Channel (SessionsClient.DefaultEndpoint.Host, credentials.ToChannelCredentials ());
-            Agent = SessionsClient.Create (channel);
+            var credentials = GoogleCredential.FromJson(config.ApiJson);
+            var channel = new Grpc.Core.Channel(SessionsClient.DefaultEndpoint.Host, credentials.ToChannelCredentials ());
+            Agent = SessionsClient.Create(channel);
         }
 
         public ConversationConfig Config { get; set; }
@@ -46,15 +48,16 @@ namespace RavenBOT.Modules.Conversation.Methods
         public IDatabase Database { get; }
         public DiscordShardedClient Client { get; }
         public LogHandler Logger { get; }
+        public ConversationFunctions ConversationFunctions { get; }
 
-        public bool IsEnabled ()
+        public bool IsEnabled()
         {
             return Agent != null && Config != null;
         }
 
-        public async Task MessageReceived (SocketMessage msg)
+        public async Task MessageReceived(SocketMessage msg)
         {
-            if (!IsEnabled ())
+            if (!IsEnabled())
             {
                 return;
             }
@@ -70,7 +73,7 @@ namespace RavenBOT.Modules.Conversation.Methods
             }
 
             int argPos = 0;
-            if (!message.HasMentionPrefix (Client.CurrentUser, ref argPos))
+            if (!message.HasMentionPrefix(Client.CurrentUser, ref argPos))
             {
                 return;
             }
@@ -78,30 +81,57 @@ namespace RavenBOT.Modules.Conversation.Methods
             var messageContent = message.Content;
             foreach (var usermention in message.MentionedUsers)
             {
-                messageContent = messageContent.Replace (usermention.Mention, usermention.Username);
+                messageContent = messageContent.Replace(usermention.Mention, usermention.Username);
             }
             foreach (var rolemention in message.MentionedRoles)
             {
-                messageContent = messageContent.Replace (rolemention.Mention, rolemention.Name);
+                messageContent = messageContent.Replace(rolemention.Mention, rolemention.Name);
             }
             foreach (var channelmention in message.MentionedChannels)
             {
-                messageContent = messageContent.Replace ($"<#{channelmention.Id}>", channelmention.Name);
+                messageContent = messageContent.Replace($"<#{channelmention.Id}>", channelmention.Name);
             }
+
+            messageContent = message.Content.Substring(argPos);
 
             var query = new QueryInput
             {
                 Text = new TextInput
                 {
-                Text = message.Content.Substring (argPos),
-                LanguageCode = "en-us"
+                    Text = messageContent,
+                    LanguageCode = "en-us"
                 }
             };
 
-            var session = new SessionName (Config.Certificate.project_id, $"{message.Author.Id}{message.Channel.Id}");
-            var dialogResponse = Agent.DetectIntent (session, query);
-            await message.Channel.SendMessageAsync (dialogResponse.QueryResult.FulfillmentText);
-            Logger.Log($"Handled Conversation, IN: {messageContent} => OUT: {dialogResponse.QueryResult.FulfillmentText}");
+            var session = new SessionName(Config.Certificate.project_id, $"{message.Author.Id}{message.Channel.Id}");
+            var dialogResponse = Agent.DetectIntent(session, query);
+
+            //If the response has a display name that is the same as one of the functions defined in conversationfunctions
+            //Run that function with the fulfillment test as a parameter
+            if (ConversationFunctions.GetFunctions().Contains(dialogResponse.QueryResult.Intent.DisplayName))
+            {
+                ConversationFunctions.ConversationResponse response = null;
+                //NOTE: If the fulfillment text is json the external braces must be doubled.
+                if (ConversationFunctions.TryInvoke(dialogResponse.QueryResult.Intent.DisplayName, ref response, dialogResponse.QueryResult.FulfillmentText))
+                {
+                    if (response == null)
+                    {
+                        return;
+                    }
+                    await message.Channel.SendMessageAsync(response.Value);
+                    Logger.Log($"Handled Rich Conversation, IN: {messageContent} => OUT: {dialogResponse.QueryResult.FulfillmentText}");  
+
+                    //Return to discard regular response types
+                    return;
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(dialogResponse.QueryResult.FulfillmentText))
+            {
+                await message.Channel.SendMessageAsync(dialogResponse.QueryResult.FulfillmentText);
+                Logger.Log($"Handled Conversation, IN: {messageContent} => OUT: {dialogResponse.QueryResult.FulfillmentText}");                
+            }
+
         }
 
     }
