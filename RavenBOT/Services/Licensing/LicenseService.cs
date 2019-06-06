@@ -223,6 +223,22 @@ namespace RavenBOT.Services.Licensing
                 return true;
             }
 
+            public bool UseNoLog(int amount = 1)
+            {
+                //Ensure that an invalid amount isn't supplied
+                if (amount <= 0)
+                {
+                    return false;
+                }
+
+                //Check to see if the amount can be deducted from the remaining uses
+                if (RemainingUses() - amount < 0) return false;
+
+                //Increment the amount used
+                TotalUsed += amount;
+                return true;
+            }
+
             //NOTE: This should only ever be used by the QuantifiableLicenseService class.
             public bool RedeemLicense(QuantifiableLicense quantifiableLicense)
             {
