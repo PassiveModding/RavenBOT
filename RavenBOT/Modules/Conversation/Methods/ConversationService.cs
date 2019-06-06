@@ -5,6 +5,7 @@ using Discord.WebSocket;
 using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Dialogflow.V2;
 using Grpc.Auth;
+using RavenBOT.Handlers;
 using RavenBOT.Modules.Conversation.Models;
 using RavenBOT.Services;
 using RavenBOT.Services.Database;
@@ -13,10 +14,11 @@ namespace RavenBOT.Modules.Conversation.Methods
 {
     public class ConversationService : IServiceable
     {
-        public ConversationService (IDatabase database, DiscordShardedClient client)
+        public ConversationService (IDatabase database, DiscordShardedClient client, LogHandler logger)
         {
             Database = database;
             Client = client;
+            Logger = logger;
             SetAgent ();
             Client.MessageReceived += MessageReceived;
         }
@@ -43,6 +45,7 @@ namespace RavenBOT.Modules.Conversation.Methods
 
         public IDatabase Database { get; }
         public DiscordShardedClient Client { get; }
+        public LogHandler Logger { get; }
 
         public bool IsEnabled ()
         {
@@ -98,6 +101,7 @@ namespace RavenBOT.Modules.Conversation.Methods
             var session = new SessionName (Config.Certificate.project_id, $"{message.Author.Id}{message.Channel.Id}");
             var dialogResponse = Agent.DetectIntent (session, query);
             await message.Channel.SendMessageAsync (dialogResponse.QueryResult.FulfillmentText);
+            Logger.Log($"Handled Conversation, IN: {messageContent} => OUT: {dialogResponse.QueryResult.FulfillmentText}");
         }
 
     }
