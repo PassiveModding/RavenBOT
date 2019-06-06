@@ -8,11 +8,11 @@ using Discord;
 using Discord.WebSocket;
 using Google.Cloud.Translation.V2;
 using RavenBOT.Extensions;
+using RavenBOT.Handlers;
 using RavenBOT.Modules.Translation.Models;
 using RavenBOT.Services;
 using RavenBOT.Services.Database;
 using RavenBOT.Services.Licensing;
-using static RavenBOT.Modules.Translation.Models.LanguageMap;
 
 namespace RavenBOT.Modules.Translation.Methods
 {
@@ -22,12 +22,14 @@ namespace RavenBOT.Modules.Translation.Methods
 
         public IDatabase Database {get;}
         public LicenseService License { get; }
+        public LogHandler Logger { get; }
         public DiscordShardedClient Client { get; }
 
-        public TranslateService(IDatabase database, LicenseService license, DiscordShardedClient client)
+        public TranslateService(IDatabase database, LicenseService license, LogHandler logger, DiscordShardedClient client)
         {
             Database = database;
             License = license;
+            Logger = logger;
             Client = client;
             
             var config = GetTranslateConfig();
@@ -41,9 +43,9 @@ namespace RavenBOT.Modules.Translation.Methods
         }
 
         //Contains the message IDs of translated messages.
-        private readonly Dictionary<ulong, List<LanguageCode>> Translated = new Dictionary<ulong, List<LanguageCode>>();
+        private readonly Dictionary<ulong, List<LanguageMap.LanguageCode>> Translated = new Dictionary<ulong, List<LanguageMap.LanguageCode>>();
 
-        public TranslationSet GetCode(TranslateGuild config, SocketReaction reaction)
+        public LanguageMap.TranslationSet GetCode(TranslateGuild config, SocketReaction reaction)
         {
             var languageType = config.CustomPairs.FirstOrDefault(x => x.EmoteMatches.Any(val => val == reaction.Emote.Name));
 
@@ -119,7 +121,7 @@ namespace RavenBOT.Modules.Translation.Methods
             }
             else
             {
-                Translated.Add(message.Id, new List<LanguageCode>() {languageType.Language});
+                Translated.Add(message.Id, new List<LanguageMap.LanguageCode>() {languageType.Language});
             }
 
             if (config.DirectMessageTranslations)
@@ -146,6 +148,8 @@ namespace RavenBOT.Modules.Translation.Methods
                     await channel.SendMessageAsync("", false, GetTranslationEmbed(response).Build()).ConfigureAwait(false);
                 }
             }
+
+            Logger.Log($"Translated {response.TranslateResult.DetectedSourceLanguage}=>{response.TranslateResult.TargetLanguage}\n{response?.TranslateResult?.OriginalText} \nto\n {response?.TranslateResult?.TranslatedText}");
     }   
 
         public EmbedBuilder GetTranslationEmbed(TranslateResponse result)
