@@ -216,10 +216,10 @@ namespace RavenBOT.Modules.Translation.Methods
             {
                 message = messageCacheable.Value;
             }
-            else if (reaction.Message.IsSpecified)
+            /*else if (reaction.Message.IsSpecified)
             {
                 message = reaction.Message.Value;
-            }
+            }*/
             else
             {
                 var iMessage = await channel.GetMessageAsync(messageCacheable.Id);
