@@ -31,6 +31,18 @@ namespace RavenBOT.Modules.Translation.Modules
         [Summary("Translate from one language to another")]
         public async Task Translate(LanguageMap.LanguageCode languageCode, [Remainder] string message)
         {
+            var config = TranslateService.GetTranslateGuild(Context.Guild.Id);
+            //Ensure whitelist isn't enforced unless the list is populated
+            if (config.WhitelistRoles.Any())
+            {
+                //Check to see if the user has a whitelisted role
+                if (!config.WhitelistRoles.Any(x => (Context.User as IGuildUser)?.RoleIds.Contains(x) == true))
+                {
+                    await ReplyAsync("You do not have enough permissions to run translations.");
+                    return;
+                }
+            }
+
             var response = TranslateService.Translate(Context.Guild.Id, message, languageCode);
             if (response.ResponseResult != TranslateService.TranslateResponse.Result.Success)
             {
@@ -77,6 +89,66 @@ namespace RavenBOT.Modules.Translation.Modules
             embed2.AddField("Z", "`zu` - Zulu\n");
             await Context.User.SendMessageAsync("", false, embed2.Build());
             await ReplyAsync("DM Sent.");
+        }
+
+        [Priority(100)]
+        [RequireContext(ContextType.Guild)]
+        [Command("Role Whitelist")]
+        [Summary("Displays the role whitelist for translations")]
+        [RequireUserPermission(GuildPermission.Administrator)]
+        public async Task ShowWhitelist()
+        {
+            var config = TranslateService.GetTranslateGuild(Context.Guild.Id);
+            if (!config.WhitelistRoles.Any())
+            {
+                await ReplyAsync("There are no whitelisted roles. ie. all users can translate messages.");
+                return;
+            }
+
+            var roles = config.WhitelistRoles.Select(x => Context.Guild.GetRole(x)?.Mention ?? $"Deleted Role: [{x}]").ToList();
+
+            await ReplyAsync("", false, new EmbedBuilder()
+            {
+                Description = string.Join("\n", roles),
+                Title = "Role whitelist"
+            }.Build());
+        }
+
+        [Priority(100)]
+        [RequireContext(ContextType.Guild)]
+        [Command("Whitelist Role")]
+        [Summary("adds a role to the translation whitelist.")]
+        [RequireUserPermission(GuildPermission.Administrator)]
+        public async Task AddWhitelistedRole(IRole role)
+        {
+            var config = TranslateService.GetTranslateGuild(Context.Guild.Id);
+            config.WhitelistRoles = config.WhitelistRoles.Where(x => x != role.Id).ToList();
+            config.WhitelistRoles.Add(role.Id);
+            TranslateService.SaveTranslateGuild(config);
+            await ReplyAsync("Role has been whitelisted.");
+        }
+
+        [Priority(100)]
+        [RequireContext(ContextType.Guild)]
+        [Command("Whitelist Remove Role")]
+        [Summary("adds a role to the translation whitelist.")]
+        [RequireUserPermission(GuildPermission.Administrator)]
+        public async Task RemoveWhitelistRole(IRole role)
+        {
+            await RemoveWhitelistRole(role.Id);
+        }
+        
+        [Priority(100)]
+        [RequireContext(ContextType.Guild)]
+        [Command("Whitelist Remove Role")]
+        [Summary("adds a role to the translation whitelist via ID.")]
+        [RequireUserPermission(GuildPermission.Administrator)]
+        public async Task RemoveWhitelistRole(ulong roleId)
+        {
+            var config = TranslateService.GetTranslateGuild(Context.Guild.Id);
+            config.WhitelistRoles.Remove(roleId);
+            TranslateService.SaveTranslateGuild(config);
+            await ReplyAsync("Role removed.");
         }
 
         [Priority(100)]

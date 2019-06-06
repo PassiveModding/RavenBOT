@@ -22,5 +22,7 @@ namespace RavenBOT.Modules.Translation.Models
         public bool ReactionTranslations {get;set;} = false;
         public bool DirectMessageTranslations {get;set;} = false;
         public List<TranslationSet> CustomPairs {get;set;} = new List<TranslationSet>();
+
+        public List<ulong> WhitelistRoles {get;set;} = new List<ulong>();
     }
 }

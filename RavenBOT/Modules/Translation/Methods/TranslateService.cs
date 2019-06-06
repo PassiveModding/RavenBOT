@@ -89,6 +89,16 @@ namespace RavenBOT.Modules.Translation.Methods
                 return;
             }
 
+            //Ensure whitelist isn't enforced unless the list is populated
+            if (config.WhitelistRoles.Any())
+            {
+                //Check to see if the user has a whitelisted role
+                if (!config.WhitelistRoles.Any(x => (message.Author as IGuildUser)?.RoleIds.Contains(x) == true))
+                {
+                    return;
+                }
+            }
+
             var languageType = GetCode(config, reaction);
             if (languageType == null)
             {
