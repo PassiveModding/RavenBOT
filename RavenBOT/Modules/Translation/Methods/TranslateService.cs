@@ -131,10 +131,12 @@ namespace RavenBOT.Modules.Translation.Methods
                 if (translatedEmbed != null)
                 {
                     await dmChannel.SendMessageAsync(response?.TranslateResult?.TranslatedText ?? "", false, translatedEmbed?.Build()).ConfigureAwait(false);
+                    Logger.Log($"Translated Embed to {languageType.Language}");
                 }
                 else
                 {
                     await dmChannel.SendMessageAsync("", false, GetTranslationEmbed(response).Build()).ConfigureAwait(false);
+                    Logger.Log($"**Translated {response.TranslateResult.DetectedSourceLanguage}=>{response.TranslateResult.TargetLanguage}**\n{response?.TranslateResult?.OriginalText} \nto\n {response?.TranslateResult?.TranslatedText}");
                 }
             }
             else
@@ -142,15 +144,16 @@ namespace RavenBOT.Modules.Translation.Methods
                 if (translatedEmbed != null)
                 {
                     await channel.SendMessageAsync(response?.TranslateResult?.TranslatedText ?? "", false, translatedEmbed?.Build()).ConfigureAwait(false);
+                    Logger.Log($"Translated Embed to {languageType.Language}");
                 }
                 else
                 {
                     await channel.SendMessageAsync("", false, GetTranslationEmbed(response).Build()).ConfigureAwait(false);
+                    Logger.Log($"**Translated {response.TranslateResult.DetectedSourceLanguage}=>{response.TranslateResult.TargetLanguage}**\n{response?.TranslateResult?.OriginalText} \nto\n {response?.TranslateResult?.TranslatedText}");
                 }
             }
 
-            Logger.Log($"Translated {response.TranslateResult.DetectedSourceLanguage}=>{response.TranslateResult.TargetLanguage}\n{response?.TranslateResult?.OriginalText} \nto\n {response?.TranslateResult?.TranslatedText}");
-    }   
+            }   
 
         public EmbedBuilder GetTranslationEmbed(TranslateResponse result)
         {
