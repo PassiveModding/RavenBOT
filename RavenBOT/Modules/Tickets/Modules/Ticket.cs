@@ -371,7 +371,9 @@ namespace RavenBOT.Modules.Tickets.Modules
                     try
                     {
                         await target.SendMessageAsync($"A ticket you created in {Context.Guild.Name} has been updated.\n" +
-                                                    $"https://discordapp.com/channels/{Context.Guild.Id}/{config.TicketChannelId}");
+                                                    $"https://discordapp.com/channels/{Context.Guild.Id}/{config.TicketChannelId}\n" +
+                                                    $"State changed to: {ticket.GetState()}\n" +
+                                                    $"Reason: {ticket.GetStateMessage()}".FixLength());
                     }
                     catch
                     {
