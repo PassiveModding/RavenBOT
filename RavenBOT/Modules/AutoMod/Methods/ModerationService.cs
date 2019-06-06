@@ -16,10 +16,11 @@ namespace RavenBOT.Modules.AutoMod.Methods
         private IDatabase Database { get; }
 
         private DiscordShardedClient Client {get;}
+        public LocalManagementService LocalManagementService { get; }
         public Perspective.Api Perspective { get; set; }
         //private Dictionary<ulong, ModerationConfig> ModerationConfigs { get; }
 
-        public ModerationService(IDatabase database, DiscordShardedClient client)
+        public ModerationService(IDatabase database, DiscordShardedClient client, LocalManagementService localManagementService)
         {
             Database = database;
             //ModerationConfigs = new Dictionary<ulong, ModerationConfig>();
@@ -32,6 +33,7 @@ namespace RavenBOT.Modules.AutoMod.Methods
 
             Perspective = setupDoc.PerspectiveToken != null ? new Perspective.Api(setupDoc.PerspectiveToken) : null;
             Client = client;
+            LocalManagementService = localManagementService;
             Client.MessageReceived += MessageReceived;
             Client.UserJoined += UserJoined;
             //Client.GuildMemberUpdated += MemberUpdated;
@@ -106,6 +108,11 @@ namespace RavenBOT.Modules.AutoMod.Methods
 
         public async Task UserJoined(SocketGuildUser user)
         {
+            if (!LocalManagementService.LastConfig.IsAcceptable(user.Guild.Id))
+            {
+                return;
+            }
+            
             await CheckDisplayName(user.Username, user);
         }
 
@@ -127,6 +134,11 @@ namespace RavenBOT.Modules.AutoMod.Methods
             {
                 if (channel.Guild != null)
                 {
+                    if (!LocalManagementService.LastConfig.IsAcceptable(channel.Guild.Id))
+                    {
+                        return;
+                    }
+
                     await RunChecks(message, channel).ConfigureAwait(false);
                 }
             }

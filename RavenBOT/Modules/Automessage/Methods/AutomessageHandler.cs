@@ -10,16 +10,18 @@ namespace RavenBOT.Modules.Automessage.Methods
 {
     public class AutomessageHandler : IServiceable
     {
-        public AutomessageHandler(IDatabase database, DiscordShardedClient client)
+        public AutomessageHandler(IDatabase database, DiscordShardedClient client, LocalManagementService localManagementService)
         {
             Database = database;
             Client = client;
+            LocalManagementService = localManagementService;
             Client.MessageReceived += MessageReceived;
         }
 
         private IDatabase Database { get; }
         private DiscordShardedClient Client { get; }
-        
+        public LocalManagementService LocalManagementService { get; }
+
         public async Task MessageReceived(SocketMessage msg)
         {
             await Task.Yield();         
@@ -31,6 +33,11 @@ namespace RavenBOT.Modules.Automessage.Methods
             if (message.Channel is SocketTextChannel channel)
             {
                 if (channel.Guild == null)
+                {
+                    return;
+                }
+
+                if (!LocalManagementService.LastConfig.IsAcceptable(channel.Guild.Id))
                 {
                     return;
                 }

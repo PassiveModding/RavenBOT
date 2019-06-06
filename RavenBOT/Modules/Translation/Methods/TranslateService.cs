@@ -24,14 +24,15 @@ namespace RavenBOT.Modules.Translation.Methods
         public LicenseService License { get; }
         public LogHandler Logger { get; }
         public DiscordShardedClient Client { get; }
+        public LocalManagementService LocalManagementService { get; }
 
-        public TranslateService(IDatabase database, LicenseService license, LogHandler logger, DiscordShardedClient client)
+        public TranslateService(IDatabase database, LicenseService license, LogHandler logger, DiscordShardedClient client, LocalManagementService localManagementService)
         {
             Database = database;
             License = license;
             Logger = logger;
             Client = client;
-            
+            LocalManagementService = localManagementService;
             var config = GetTranslateConfig();
             if (config.APIKey != null && config.Enabled)
             {
@@ -64,6 +65,11 @@ namespace RavenBOT.Modules.Translation.Methods
         public async Task ReactionAdded(Cacheable<IUserMessage, ulong> messageCacheable, ISocketMessageChannel mChannel, SocketReaction reaction)
         {
             if (!(mChannel is ITextChannel channel) || !reaction.User.IsSpecified)
+            {
+                return;
+            }
+            
+            if (!LocalManagementService.LastConfig.IsAcceptable(channel.GuildId))
             {
                 return;
             }

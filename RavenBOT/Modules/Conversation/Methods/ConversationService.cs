@@ -15,11 +15,12 @@ namespace RavenBOT.Modules.Conversation.Methods
 {
     public class ConversationService : IServiceable
     {
-        public ConversationService(IDatabase database, DiscordShardedClient client, LogHandler logger)
+        public ConversationService(IDatabase database, DiscordShardedClient client, LogHandler logger, LocalManagementService localManagementService)
         {
             Database = database;
             Client = client;
             Logger = logger;
+            LocalManagementService = localManagementService;
             SetAgent();
             Client.MessageReceived += MessageReceived;
             ConversationFunctions = new ConversationFunctions();
@@ -48,6 +49,7 @@ namespace RavenBOT.Modules.Conversation.Methods
         public IDatabase Database { get; }
         public DiscordShardedClient Client { get; }
         public LogHandler Logger { get; }
+        public LocalManagementService LocalManagementService { get; }
         public ConversationFunctions ConversationFunctions { get; }
 
         public bool IsEnabled()
@@ -76,6 +78,20 @@ namespace RavenBOT.Modules.Conversation.Methods
             if (!message.HasMentionPrefix(Client.CurrentUser, ref argPos))
             {
                 return;
+            }
+
+            if (message.Channel is SocketTextChannel tChannel)
+            {
+                if (tChannel.Guild == null)
+                {
+                    return;
+                }
+
+                
+                if (!LocalManagementService.LastConfig.IsAcceptable(tChannel.Guild.Id))
+                {
+                    return;
+                }
             }
 
             var messageContent = message.Content;

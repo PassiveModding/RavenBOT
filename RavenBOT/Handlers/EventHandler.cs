@@ -50,6 +50,11 @@ namespace RavenBOT.Handlers
 
         private async Task JoinedGuildAsync(SocketGuild guild)
         {
+            if (!LocalManagementService.LastConfig.IsAcceptable(guild.Id))
+            {
+                return;
+            }
+
             var user = guild.GetUser(Client.CurrentUser.Id);
             if (user == null)
             {

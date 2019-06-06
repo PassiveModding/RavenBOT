@@ -17,13 +17,15 @@ namespace RavenBOT.Modules.Captcha.Methods
     {
         private IDatabase Database { get; }
         private DiscordShardedClient Client { get; }
+        public LocalManagementService LocalManagementService { get; }
         private Random Random { get; }
 
-        public CaptchaService(IDatabase database, DiscordShardedClient client)
+        public CaptchaService(IDatabase database, DiscordShardedClient client, LocalManagementService localManagementService)
         {
             Database = database;
 
             Client = client;
+            LocalManagementService = localManagementService;
             Client.ChannelCreated += ChannelCreated;
             Client.UserJoined += UserJoined;
             Random = new Random();
@@ -134,6 +136,11 @@ namespace RavenBOT.Modules.Captcha.Methods
         {
             if (channel is SocketGuildChannel gChannel)
             {
+                if (!LocalManagementService.LastConfig.IsAcceptable(gChannel.Guild.Id))
+                {
+                    return;
+                }
+
                 var config = GetCaptchaConfig(gChannel.Guild.Id);
                 if (config.UseCaptcha)
                 {
@@ -148,6 +155,11 @@ namespace RavenBOT.Modules.Captcha.Methods
 
         public async Task UserJoined(SocketGuildUser user)
         {
+            if (!LocalManagementService.LastConfig.IsAcceptable(user.Guild.Id))
+            {
+                return;
+            }
+
             var config = GetCaptchaConfig(user.Guild.Id);
             if (config.UseCaptcha)
             {

@@ -13,16 +13,18 @@ namespace RavenBOT.Modules.Levels.Methods
 {
     public class LevelService : IServiceable
     {
-        public LevelService(IDatabase database, DiscordShardedClient client)
+        public LevelService(IDatabase database, DiscordShardedClient client, LocalManagementService localManagementService)
         {
             Database = database;
             Client = client;
+            LocalManagementService = localManagementService;
             Timer = new Timer(TimerEvent, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
             Client.MessageReceived += LevelEvent;
         }
 
         public IDatabase Database { get; }
         public DiscordShardedClient Client { get; }
+        public LocalManagementService LocalManagementService { get; }
         public Timer Timer { get; }
 
         public void TimerEvent(object _)
@@ -90,6 +92,11 @@ namespace RavenBOT.Modules.Levels.Methods
             }
 
             if (tChannel.Guild == null)
+            {
+                return;
+            }
+            
+            if (!LocalManagementService.LastConfig.IsAcceptable(tChannel.Guild.Id))
             {
                 return;
             }

@@ -17,6 +17,8 @@ namespace RavenBOT.Modules.Events.Methods
     {
         public DiscordShardedClient Client { get; }
         public IDatabase Database { get; }
+        public LocalManagementService LocalManagementService { get; }
+
         private int ChannelCreated = 0;
         private int ChannelDestroyed = 0;
         private int ChannelUpdated = 0;
@@ -28,10 +30,11 @@ namespace RavenBOT.Modules.Events.Methods
 
         private Timer Timer {get;}
 
-        public EventService(DiscordShardedClient client, IDatabase database)
+        public EventService(DiscordShardedClient client, IDatabase database, LocalManagementService localManagementService)
         {
             Client = client;
             Database = database;
+            LocalManagementService = localManagementService;
             Configs = new Dictionary<ulong, EventConfig>();
             
             Client.ChannelCreated += Client_ChannelCreated;
@@ -120,6 +123,12 @@ namespace RavenBOT.Modules.Events.Methods
                 {
                     foreach (var eventGroup in EventQueue.GroupBy(x => x.GuildId).ToList())
                     {
+                        if (!LocalManagementService.LastConfig.IsAcceptable(eventGroup.Key))
+                        {
+                            EventQueue.RemoveAll(x => x.GuildId == eventGroup.Key);
+                            continue;
+                        }
+
                         var mainColor = eventGroup.GroupBy(x => x.Color).OrderByDescending(x => x.Count()).FirstOrDefault()?.FirstOrDefault()?.Color ?? Color.DarkerGrey;
 
                         var channel = Client.GetGuild(eventGroup.FirstOrDefault()?.GuildId ?? 0)?.GetTextChannel(eventGroup.FirstOrDefault()?.Config?.ChannelId ?? 0);

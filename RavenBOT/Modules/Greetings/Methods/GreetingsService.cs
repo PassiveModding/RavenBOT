@@ -11,16 +11,23 @@ namespace RavenBOT.Modules.Greetings.Methods
     {
         private IDatabase Database {get;}
         private DiscordShardedClient Client {get;}
-        public GreetingsService(IDatabase database, DiscordShardedClient client)
+        public LocalManagementService LocalManagementService { get; }
+
+        public GreetingsService(IDatabase database, DiscordShardedClient client, LocalManagementService localManagementService)
         {
             Database = database;
             Client = client;
+            LocalManagementService = localManagementService;
             Client.UserJoined += UserJoined;
             Client.UserLeft += UserLeft;
         }
 
         public async Task UserJoined(SocketGuildUser user)
         {
+            if (!LocalManagementService.LastConfig.IsAcceptable(user.Guild.Id))
+            {
+                return;
+            }
             var config = GetWelcomeConfig(user.Guild.Id);
             if (!config.Enabled)
             {
@@ -52,7 +59,12 @@ namespace RavenBOT.Modules.Greetings.Methods
         }
 
         public async Task UserLeft(SocketGuildUser user)
-        {
+        {            
+            if (!LocalManagementService.LastConfig.IsAcceptable(user.Guild.Id))
+            {
+                return;
+            }
+            
             var config = GetGoodbyeConfig(user.Guild.Id);
             if (!config.Enabled)
             {

@@ -32,6 +32,11 @@ namespace RavenBOT.Handlers
                 guildId = gChannel.GuildId;
             }
 
+            if (!LocalManagementService.LastConfig.IsAcceptable(guildId))
+            {
+                return;
+            }
+
             var argPos = 0;
             if (!message.HasStringPrefix(LocalManagementService.LastConfig.Developer ? LocalManagementService.LastConfig.DeveloperPrefix : PrefixService.GetPrefix(guildId), ref argPos, System.StringComparison.InvariantCultureIgnoreCase)/*&& !message.HasMentionPrefix(Client.CurrentUser, ref argPos)*/)
             {
@@ -45,17 +50,6 @@ namespace RavenBOT.Handlers
             }
 
             var result = await CommandService.ExecuteAsync(context, argPos, Provider);
-
-            /* 
-            if (!result.IsSuccess)
-            {
-                Logger.Log(context.Message.Content + "\n" + result.ErrorReason, new LogContext(context), LogSeverity.Error);
-            }
-            else
-            {
-                Logger.Log(context.Message.Content, new LogContext(context));
-            }
-            */
         }
     }
 }
