@@ -33,7 +33,7 @@ namespace RavenBOT.Handlers
             }
 
             var argPos = 0;
-            if (!message.HasStringPrefix(Local.Developer ? Local.DeveloperPrefix : PrefixService.GetPrefix(guildId), ref argPos, System.StringComparison.InvariantCultureIgnoreCase) && !message.HasMentionPrefix(Client.CurrentUser, ref argPos))
+            if (!message.HasStringPrefix(Local.Developer ? Local.DeveloperPrefix : PrefixService.GetPrefix(guildId), ref argPos, System.StringComparison.InvariantCultureIgnoreCase)/*&& !message.HasMentionPrefix(Client.CurrentUser, ref argPos)*/)
             {
                 return;
             }
