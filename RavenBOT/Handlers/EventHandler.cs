@@ -21,7 +21,7 @@ namespace RavenBOT.Handlers
         private BotConfig BotConfig { get; }
         private LogHandler Logger { get; }
         private CommandService CommandService { get; }
-        public LocalManagementService.LocalConfig Local { get; }
+        public LocalManagementService LocalManagementService { get; }
         private IServiceProvider Provider { get; }
 
         private ModuleManagementService ModuleManager {get;}
@@ -33,7 +33,7 @@ namespace RavenBOT.Handlers
             Logger = handler;
             BotConfig = config;
             CommandService = commandService;
-            Local = local.GetConfig();
+            LocalManagementService = local;
             Provider = provider;
             ModuleManager = moduleManager;
 
@@ -63,7 +63,7 @@ namespace RavenBOT.Handlers
                 return permissions.HasValue ? permissions.Value.ViewChannel && permissions.Value.SendMessages : false;
             }).OrderBy(c => c.Position).FirstOrDefault();
 
-            var prefix = Local.Developer ? Local.DeveloperPrefix : PrefixService.GetPrefix(guild.Id);
+            var prefix = LocalManagementService.LastConfig.Developer ? LocalManagementService.LastConfig.DeveloperPrefix : PrefixService.GetPrefix(guild.Id);
 
             await firstChannel?.SendMessageAsync("", false, new EmbedBuilder()
             {
@@ -86,7 +86,7 @@ namespace RavenBOT.Handlers
                 {
                     if (result.Error.Value == CommandError.UnknownCommand)
                     {
-                        var prefix = Local.Developer ? Local.DeveloperPrefix : PrefixService.GetPrefix(context.Guild?.Id ?? 0);
+                        var prefix = LocalManagementService.LastConfig.Developer ? LocalManagementService.LastConfig.DeveloperPrefix : PrefixService.GetPrefix(context.Guild?.Id ?? 0);
                         var stripped = context.Message.Content.Substring(prefix.Length);
                         var dlDistances = new List<Tuple<int, string>>();
                         foreach (var command in CommandService.Commands)

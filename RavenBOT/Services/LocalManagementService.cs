@@ -13,6 +13,8 @@ namespace RavenBOT.Services
         private static readonly string ConfigDirectory = Path.Combine(AppContext.BaseDirectory, "setup");
         private static readonly string ConfigPath = Path.Combine(ConfigDirectory, "Local.json");
 
+        public LocalConfig LastConfig {get;set;}
+
         public LocalConfig GetConfig()
         {
             if (!File.Exists(ConfigPath))
@@ -21,6 +23,7 @@ namespace RavenBOT.Services
             }
 
             var config = JsonConvert.DeserializeObject<LocalConfig>(File.ReadAllText(ConfigPath));
+            LastConfig = config;
             return config;
         }
 
@@ -72,6 +75,7 @@ namespace RavenBOT.Services
 
                 Console.WriteLine($"Developer config saved to: {ConfigPath}");
             }
+            LastConfig = config;
         }
 
         public class LocalConfig
@@ -82,8 +86,15 @@ namespace RavenBOT.Services
 
             //Used for whitelisting commands/events while in dev mode.
             public List<ulong> WhitelistedGuilds {get;set;} = new List<ulong>();
+
+            public bool EnforceWhitelist {get;set;} = true;
             public bool IsAcceptable(ulong guildId)
             {
+                if (!EnforceWhitelist)
+                {
+                    return true;
+                }
+
                 if (Developer)
                 {
                     if (WhitelistedGuilds.Any())
