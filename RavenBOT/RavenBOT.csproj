@@ -14,5 +14,6 @@
     <PackageReference Include="Google.Cloud.Translation.V2" Version="1.1.0"/>
     <PackageReference Include="RedditSharp" Version="2.0.0-ci00075"/>
     <PackageReference Include="DiscordBotsList.Api.Adapter.Discord.Net" Version="1.1.0"/>
+    <PackageReference Include="Google.Cloud.Dialogflow.V2" Version="1.0.0-beta02"/>
   </ItemGroup>
 </Project>
