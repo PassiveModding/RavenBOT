@@ -105,29 +105,34 @@ namespace RavenBOT.Modules.Conversation.Methods
 
             var session = new SessionName(Config.Certificate.project_id, $"{message.Author.Id}{message.Channel.Id}");
             var dialogResponse = Agent.DetectIntent(session, query);
-
-            //If the response has a display name that is the same as one of the functions defined in conversationfunctions
-            //Run that function with the fulfillment test as a parameter
-            if (ConversationFunctions.GetFunctions().Contains(dialogResponse.QueryResult.Intent.DisplayName))
-            {
-                ConversationFunctions.ConversationResponse response = null;
-                //NOTE: If the fulfillment text is json the external braces must be doubled.
-                if (ConversationFunctions.TryInvoke(dialogResponse.QueryResult.Intent.DisplayName, ref response, dialogResponse.QueryResult.FulfillmentText))
-                {
-                    if (response == null)
-                    {
-                        return;
-                    }
-                    await message.Channel.SendMessageAsync(response.Value);
-                    Logger.Log($"Handled Rich Conversation, IN: {messageContent} => OUT: {dialogResponse.QueryResult.FulfillmentText}");  
-
-                    //Return to discard regular response types
-                    return;
-                }
-            }
-
             if (!string.IsNullOrWhiteSpace(dialogResponse.QueryResult.FulfillmentText))
             {
+                /*
+                //Ensure all parameters have been set before sending data
+                if (!dialogResponse.QueryResult.Parameters.Fields.Any(x => string.IsNullOrWhiteSpace(x.Value.StringValue)))
+                {
+                    //If the response has a display name that is the same as one of the functions defined in conversationfunctions
+                    //Run that function with the fulfillment test as a parameter
+                    if (ConversationFunctions.GetFunctions().Contains(dialogResponse.QueryResult.Intent.DisplayName))
+                    {
+                        ConversationFunctions.ConversationResponse response = null;
+                        //NOTE: If the fulfillment text is json the external braces must be doubled.
+                        if (ConversationFunctions.TryInvoke(dialogResponse.QueryResult.Intent.DisplayName, ref response, dialogResponse.QueryResult.FulfillmentText))
+                        {
+                            if (response == null)
+                            {
+                                return;
+                            }
+                            await message.Channel.SendMessageAsync(response.Value);
+                            Logger.Log($"Handled Rich Conversation, IN: {messageContent} => OUT: {dialogResponse.QueryResult.FulfillmentText}");  
+
+                            //Return to discard regular response types
+                            return;
+                        }
+                    }
+                }
+                */
+
                 await message.Channel.SendMessageAsync(dialogResponse.QueryResult.FulfillmentText);
                 Logger.Log($"Handled Conversation, IN: {messageContent} => OUT: {dialogResponse.QueryResult.FulfillmentText}");                
             }
