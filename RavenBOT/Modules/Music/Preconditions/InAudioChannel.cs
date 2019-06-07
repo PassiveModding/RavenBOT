@@ -19,6 +19,12 @@ namespace RavenBOT.Modules.Music.Preconditions
         public override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)
         {
             var vicService = services.GetRequiredService<VictoriaService>();
+
+            if (!vicService.IsConfigured())
+            {
+                return Task.FromResult(PreconditionResult.FromError("Voice commands have not been configured for this bot."));
+            }
+
             var player = vicService.Client.GetPlayer(context.Guild.Id);
 
             if (context.User.GetVoiceChannel().Result is null)

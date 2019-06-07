@@ -1,7 +1,10 @@
 using System;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using Discord.WebSocket;
 using Newtonsoft.Json;
+using RavenBOT.Handlers;
 using RavenBOT.Services;
 using RavenBOT.Services.Database;
 
@@ -12,22 +15,19 @@ namespace RavenBOT.Modules.Music.Methods
         public Victoria.LavaShardClient Client { get; set; } = null;
         public Victoria.LavaRestClient RestClient { get; set; } = null;
         public IDatabase Database { get; }
+        public LogHandler Logger { get; }
         private DiscordShardedClient DiscordClient { get; }
-        public VictoriaService (DiscordShardedClient client, IDatabase database)
+
+        private readonly string ConfigPath = Path.Combine(AppContext.BaseDirectory, "setup", "Victoria.json");
+
+        public VictoriaService (DiscordShardedClient client, IDatabase database, LogHandler logger)
         {
             DiscordClient = client;
             Database = database;
-            Configure ();
-        }
-
-        public void Configure ()
-        {
-            var configPath = Path.Combine(AppContext.BaseDirectory, "setup", "Victoria.json");
-            Victoria.Configuration config;
-
-            if (!File.Exists(configPath))
+            Logger = logger;
+            if (!File.Exists(ConfigPath))
             {
-                config = new Victoria.Configuration();
+                var config = new Victoria.Configuration();
                 Console.WriteLine("Audio Client Setup");
                 Console.WriteLine("Input Lavalink Host URL");
                 config.Host = Console.ReadLine();
@@ -40,16 +40,31 @@ namespace RavenBOT.Modules.Music.Methods
 
                 Console.WriteLine("Further audio settings can be configured in Victoria.json in the setup directory");
 
-                File.WriteAllText(configPath, JsonConvert.SerializeObject(config, Formatting.Indented));                
+                File.WriteAllText(ConfigPath, JsonConvert.SerializeObject(config, Formatting.Indented));                
             }
-            else
+
+            DiscordClient.ShardConnected += Configure;
+        }
+
+        public async Task Configure(DiscordSocketClient sClient)
+        {
+            if (!DiscordClient.Shards.All(x => x.ConnectionState == Discord.ConnectionState.Connected))
             {
-                config = JsonConvert.DeserializeObject<Victoria.Configuration>(File.ReadAllText(configPath));
+                return;
             }
+
+            Logger.Log("Victoria Initializing...");
+            var config = JsonConvert.DeserializeObject<Victoria.Configuration>(File.ReadAllText(ConfigPath));
 
             Client = new Victoria.LavaShardClient();
             RestClient = new Victoria.LavaRestClient(config);
-            Client.StartAsync(DiscordClient, config);
+            await Client.StartAsync(DiscordClient, config);
+            Logger.Log("Victoria Initialized.");
+        }
+
+        public bool IsConfigured ()
+        {
+            return Client != null && RestClient != null;
         }
     }
 }
