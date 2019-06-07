@@ -8,7 +8,7 @@
 </p>
 </p>
 
-A modular Discord.NET example bot with interchangeable database solutions and independent module support.
+A modular Discord.NET bot with interchangeable database solutions and independent module support.
 ### `Features`
 Database support, sharding, modularity, translations, moderation, nsfw, image lookup, event logging and much more!
 ### `Contributing`
