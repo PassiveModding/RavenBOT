@@ -172,7 +172,7 @@ namespace RavenBOT.Handlers
 
         private Task LogAsync(LogMessage message)
         {
-            if (message.Message.Contains("Rate limit triggered", StringComparison.InvariantCultureIgnoreCase))
+            if (message.Message?.Contains("Rate limit triggered", StringComparison.InvariantCultureIgnoreCase) == true)
             {
                 return Task.CompletedTask;
             }
