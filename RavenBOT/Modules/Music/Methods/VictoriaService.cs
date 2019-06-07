@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Discord;
 using Discord.WebSocket;
 using Newtonsoft.Json;
 using RavenBOT.Handlers;
@@ -60,6 +61,13 @@ namespace RavenBOT.Modules.Music.Methods
             RestClient = new Victoria.LavaRestClient(config);
             await Client.StartAsync(DiscordClient, config);
             Logger.Log("Victoria Initialized.");
+
+            Client.Log += Log;
+        }
+
+        public async Task Log(LogMessage message)
+        {
+            Logger.Log(message.Message + message.Exception?.ToString(), message.Severity);
         }
 
         public bool IsConfigured ()
