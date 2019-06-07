@@ -78,6 +78,7 @@ namespace RavenBOT.Modules.Tickets.Modules
         }
 
         [Command("Re-Open")]
+        [Alias("reopen", "re open")]
         [Summary("Re-opens a closed ticket")]
         public async Task ReOpenTicket(int ticketId, [Remainder]string reason = null)
         {

@@ -91,7 +91,7 @@ namespace RavenBOT.Modules.Birthday.Modules
         }
 
         [Command("SetBirthday")]
-        [Alias("Set Birthday")]
+        [Alias("Set Birthday", "Set")]
         [Summary("Sets your birthday (MAX 3 Sets per user)")]
         public async Task SetBirthday([Remainder]string dateTime = null)
         {
