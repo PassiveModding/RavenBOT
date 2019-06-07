@@ -1,12 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Discord;
 
 namespace RavenBOT.Extensions
 {
     public static class GuildExtensions
     {
+        public static async Task<IVoiceChannel> GetVoiceChannel(this IUser user)
+        {
+            if (user is IGuildUser gUser)
+            {
+                var channels = await gUser.Guild.GetVoiceChannelsAsync();
+                foreach (var channel in channels)
+                {
+                    var users = await channel.GetUsersAsync().FlattenAsync();
+                    if (users.Any(x => x.Id == user.Id))
+                    {
+                        return channel;
+                    }
+                }
+            }
+
+            return null;
+        }
         public static int DamerauLavenshteinDistance(this string s, string t)
         {
             var bounds = new { Height = s.Length + 1, Width = t.Length + 1 };
