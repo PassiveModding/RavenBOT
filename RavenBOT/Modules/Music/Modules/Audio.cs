@@ -1,9 +1,11 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using RavenBOT.Extensions;
+using RavenBOT.Handlers;
 using RavenBOT.Modules.Music.Methods;
 using RavenBOT.Modules.Music.Preconditions;
 using Victoria;
@@ -11,15 +13,17 @@ using Victoria.Entities;
 
 namespace RavenBOT.Modules.Music.Modules
 {
-    [Group("Music")]
+    [Group ("Music")]
     public class Audio : InteractiveBase<ShardedCommandContext>
     {
         private LavaPlayer player;
         private readonly LavaShardClient LavaShardClient;
         private readonly LavaRestClient RestClient;
+        public LogHandler Logger { get; }
 
-        public Audio (VictoriaService vic)
+        public Audio (VictoriaService vic, LogHandler logger)
         {
+            Logger = logger;
             RestClient = vic.RestClient;
             LavaShardClient = vic.Client;
         }
