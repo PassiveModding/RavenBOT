@@ -64,8 +64,13 @@ namespace RavenBOT.Services.Database
 
                 newConfig.DatabaseName = databaseName;
 
-                Console.WriteLine("Please input desired studio port");
-                newConfig.Port = int.Parse(Console.ReadLine());
+                Console.WriteLine("Please input desired studio port (DEFAULT: 8080)");
+                var port = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(port))
+                {
+                    port = "8080";
+                }
+                newConfig.Port = int.Parse(port);
                 
                 /*Console.WriteLine("Please input your certificate path (leave empty if unauthenticated.)");
                 var path = Console.ReadLine();
