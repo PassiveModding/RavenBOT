@@ -21,6 +21,19 @@ namespace RavenBOT.Modules.Music.Methods
 
         private readonly string ConfigPath = Path.Combine(AppContext.BaseDirectory, "setup", "Victoria.json");
 
+        public class VictoriaConfig
+        {
+            public Victoria.Configuration MainConfig {get;set;} = new Victoria.Configuration();
+            public RestConfig RestConfig {get;set;} = new RestConfig();
+        }
+
+        public class RestConfig
+        {
+            public string Host {get;set;}
+            public int Port {get;set;}
+            public string Password {get;set;}
+        }
+
         public VictoriaService (DiscordShardedClient client, IDatabase database, LogHandler logger)
         {
             DiscordClient = client;
@@ -28,16 +41,19 @@ namespace RavenBOT.Modules.Music.Methods
             Logger = logger;
             if (!File.Exists(ConfigPath))
             {
-                var config = new Victoria.Configuration();
+                var config = new VictoriaConfig();
                 Console.WriteLine("Audio Client Setup");
                 Console.WriteLine("Input Lavalink Host URL");
-                config.Host = Console.ReadLine();
+                config.MainConfig.Host = Console.ReadLine();
+                config.RestConfig.Host = config.MainConfig.Host;
                 
                 Console.WriteLine("Input Lavalink Port");
-                config.Port = int.Parse(Console.ReadLine());
+                config.MainConfig.Port = int.Parse(Console.ReadLine());                
+                config.RestConfig.Port = config.MainConfig.Port;
                                 
                 Console.WriteLine("Input Lavalink Password");
-                config.Password = Console.ReadLine();
+                config.MainConfig.Password = Console.ReadLine();
+                config.RestConfig.Password = config.MainConfig.Password;
 
                 Console.WriteLine("Further audio settings can be configured in Victoria.json in the setup directory");
 
@@ -55,11 +71,11 @@ namespace RavenBOT.Modules.Music.Methods
             }
 
             Logger.Log("Victoria Initializing...");
-            var config = JsonConvert.DeserializeObject<Victoria.Configuration>(File.ReadAllText(ConfigPath));
+            var config = JsonConvert.DeserializeObject<VictoriaConfig>(File.ReadAllText(ConfigPath));
 
             Client = new Victoria.LavaShardClient();
-            RestClient = new Victoria.LavaRestClient(config.Host, config.Port, config.Password);
-            await Client.StartAsync(DiscordClient, config);
+            RestClient = new Victoria.LavaRestClient(config.RestConfig.Host, config.RestConfig.Port, config.RestConfig.Password);
+            await Client.StartAsync(DiscordClient, config.MainConfig);
             Logger.Log("Victoria Initialized.");
 
             Client.Log += Log;
