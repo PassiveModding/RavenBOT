@@ -327,6 +327,25 @@ namespace RavenBOT.Modules.Translation.Modules
         }
 
         [Priority(100)]
+        [RequireContext(ContextType.Guild)]
+        [RequireUserPermission(GuildPermission.Administrator)]
+        [Command("Settings")]
+        [Summary("Shows settings")]
+        public async Task Settings()
+        {
+            var profile = TranslateService.License.GetQuantifiableUser(TranslateService.TranslateType, Context.Guild.Id);
+            var config = TranslateService.GetTranslateGuild(Context.Guild.Id);
+            var roles = config.WhitelistRoles.Select(x => Context.Guild.GetRole(x)?.Mention ?? $"Deleted Role: [{x}]").ToList();
+
+            await ReplyAsync($"Remaining Uses: {profile.RemainingUses()}\n" +
+                            $"Total Used: {profile.TotalUsed}\n" +
+                            $"DM Translations: {config.DirectMessageTranslations}\n" +
+                            $"Reaction Translations: {config.ReactionTranslations}\n" +
+                            $"Whitelisted Roles: {(roles.Any() ? string.Join("\n", roles) : "None")}\n" +
+                            $"Use the List and Defaults commands to see reactions settings.");
+        }
+
+        [Priority(100)]
         [RequireOwner]
         [Command("GenerateLicenses")]
         public async Task GenerateLicenses(int quantity, int uses)
