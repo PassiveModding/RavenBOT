@@ -112,6 +112,7 @@ namespace RavenBOT.Modules.Music.Modules
         }
 
         [Command ("NowPlaying")]
+        [Alias("np")]
         [Summary("Displays information about the song that is currently playing")]
         public async Task NowPlaying ()
         {
