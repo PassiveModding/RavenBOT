@@ -131,18 +131,9 @@ namespace RavenBOT.Modules.Translation.Methods
                 return;
             }
 
-            if (Translated.ContainsKey(message.Id))
-            {
-                Translated[message.Id].Add(languageType.Language);
-            }
-            else
-            {
-                Translated.Add(message.Id, new List<LanguageMap.LanguageCode>() {languageType.Language});
-            }
-
             if (config.DirectMessageTranslations)
             {
-                var user = message.Author;
+                var user = reaction.User.Value;
                 var dmChannel = await user.GetOrCreateDMChannelAsync();
                 if (translatedEmbed != null)
                 {
@@ -157,6 +148,15 @@ namespace RavenBOT.Modules.Translation.Methods
             }
             else
             {
+                if (Translated.ContainsKey(message.Id))
+                {
+                    Translated[message.Id].Add(languageType.Language);
+                }
+                else
+                {
+                    Translated.Add(message.Id, new List<LanguageMap.LanguageCode>() {languageType.Language});
+                }
+
                 if (translatedEmbed != null)
                 {
                     await channel.SendMessageAsync(response?.TranslateResult?.TranslatedText ?? "", false, translatedEmbed?.Build()).ConfigureAwait(false);
