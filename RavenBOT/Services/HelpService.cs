@@ -32,7 +32,7 @@ namespace RavenBOT.Services
             Provider = provider;
         }
 
-        public async Task<PaginatedMessage> PagedHelpAsync(ShardedCommandContext context, bool usePreconditions = true, List<string> moduleFilter = null)
+        public async Task<PaginatedMessage> PagedHelpAsync(ShardedCommandContext context, bool usePreconditions = true, List<string> moduleFilter = null, string additionalField = null)
         {
             var commandCollection = CommandService.Commands.ToList();
 
@@ -95,8 +95,10 @@ namespace RavenBOT.Services
                         "Go to the respective page number of each module to view the commands in more detail. "
                         + "You can react with the :1234: emote and type a page number to go directly to that page too,\n"
                         + "otherwise react with the arrows (◀ ▶) to change pages.\n"
+                        + additionalField
                 }
             };
+
             foreach(var commandGroup in modules)
             {
                 var moduleName = commandGroup.Item1;
