@@ -58,7 +58,7 @@ namespace RavenBOT.Modules.Music.Methods
             var config = JsonConvert.DeserializeObject<Victoria.Configuration>(File.ReadAllText(ConfigPath));
 
             Client = new Victoria.LavaShardClient();
-            RestClient = new Victoria.LavaRestClient(config);
+            RestClient = new Victoria.LavaRestClient(config.Host, config.Port, config.Password);
             await Client.StartAsync(DiscordClient, config);
             Logger.Log("Victoria Initialized.");
 
