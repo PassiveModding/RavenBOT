@@ -54,7 +54,7 @@ namespace RavenBOT.Modules.Music.Modules
             await ReplyAsync ($"Moved from {old.Name} to {player.VoiceChannel.Name}!");
         }
 
-        [Command ("Play"), InAudioChannel (true)]
+        [Command ("Play"), InAudioChannel]
         [Summary("Plays the specified track or adds it to the queue")]
         public async Task PlayAsync ([Remainder] string query)
         {
@@ -67,6 +67,13 @@ namespace RavenBOT.Modules.Music.Modules
             }
 
             var track = search.Tracks.FirstOrDefault ();
+
+            //If there is no player, join the current channel and set the player
+            if (player == null)
+            {
+                await Join();
+                player = LavaShardClient.GetPlayer(Context.Guild.Id);
+            }
 
             if (player.IsPlaying)
             {
