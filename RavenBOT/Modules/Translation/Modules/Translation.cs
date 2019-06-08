@@ -26,8 +26,7 @@ namespace RavenBOT.Modules.Translation.Modules
 
 
         [RequireContext(ContextType.Guild)]
-        [Command(RunMode = RunMode.Async)]
-        [Alias("Translate")]
+        [Command("Translate", RunMode = RunMode.Async)]
         [Summary("Translate from one language to another")]
         public async Task Translate(LanguageMap.LanguageCode languageCode, [Remainder] string message)
         {
