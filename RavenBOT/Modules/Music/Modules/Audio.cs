@@ -19,10 +19,13 @@ namespace RavenBOT.Modules.Music.Modules
         private LavaPlayer player;
         private readonly LavaShardClient LavaShardClient;
         private readonly LavaRestClient RestClient;
+
+        public VictoriaService Vic { get; }
         public LogHandler Logger { get; }
 
         public Audio (VictoriaService vic, LogHandler logger)
         {
+            Vic = vic;
             Logger = logger;
             RestClient = vic.RestClient;
             LavaShardClient = vic.Client;
@@ -35,6 +38,7 @@ namespace RavenBOT.Modules.Music.Modules
         }
 
         [Command ("Join"), InAudioChannel]
+        [Summary("Joins the audio channel you are currently in")]
         public async Task Join ()
         {
             await LavaShardClient.ConnectAsync (await Context.User.GetVoiceChannel (), Context.Channel as ITextChannel);
@@ -42,6 +46,7 @@ namespace RavenBOT.Modules.Music.Modules
         }
 
         [Command ("move"), InAudioChannel]
+        [Summary("Moves the bot to a new audio channel")]
         public async Task MoveAsync ()
         {
             var old = player.VoiceChannel;
@@ -50,6 +55,7 @@ namespace RavenBOT.Modules.Music.Modules
         }
 
         [Command ("Play"), InAudioChannel (true)]
+        [Summary("Plays the specified track or adds it to the queue")]
         public async Task PlayAsync ([Remainder] string query)
         {
             var search = await RestClient.SearchYouTubeAsync(query);
@@ -75,6 +81,8 @@ namespace RavenBOT.Modules.Music.Modules
         }
 
         [Command ("Disconnect"), InAudioChannel (true)]
+        [Alias("Stop")]
+        [Summary("Disconnects from the audio channel")]
         public async Task StopAsync ()
         {
             await LavaShardClient.DisconnectAsync (player.VoiceChannel);
@@ -82,6 +90,7 @@ namespace RavenBOT.Modules.Music.Modules
         }
 
         [Command ("Skip"), InAudioChannel (true)]
+        [Summary("Skips the current song and plays the next in queue")]
         public async Task SkipAsync ()
         {
             try
@@ -96,6 +105,7 @@ namespace RavenBOT.Modules.Music.Modules
         }
 
         [Command ("NowPlaying")]
+        [Summary("Displays information about the song that is currently playing")]
         public async Task NowPlaying ()
         {
             if (player.CurrentTrack is null)
@@ -118,6 +128,7 @@ namespace RavenBOT.Modules.Music.Modules
         }
 
         [Command ("Lyrics")]
+        [Summary("Attempts to fetch lyrics for the current song")]
         public async Task LyricsAsync ()
         {
             if (player.CurrentTrack is null)
@@ -138,11 +149,20 @@ namespace RavenBOT.Modules.Music.Modules
         }
 
         [Command ("Queue")]
+        [Summary("Displays all tracks  in the queue")]
         public Task Queue ()
         {
             var tracks = player.Queue.Items.Cast<LavaTrack> ().Select (x => x.Title);
             return ReplyAsync (tracks.Count () is 0 ?
                 "No tracks in queue." : string.Join ("\n", tracks));
+        }
+
+        [Command("Configure")]
+        [Summary("Reconfigured Victoria Sharded Client and Rest client based on the config file")]
+        [RequireOwner]
+        public Task Configure()
+        {
+            return Vic.Configure(Context.Client.GetShardFor(Context.Guild));
         }
     }
 }
