@@ -8,6 +8,8 @@ using Newtonsoft.Json;
 using RavenBOT.Handlers;
 using RavenBOT.Services;
 using RavenBOT.Services.Database;
+using Victoria;
+using Victoria.Entities;
 
 namespace RavenBOT.Modules.Music.Methods
 {
@@ -63,6 +65,40 @@ namespace RavenBOT.Modules.Music.Methods
             DiscordClient.ShardConnected += Configure;
         }
 
+        public async Task TrackFinished(LavaPlayer player, LavaTrack track, TrackEndReason reason)
+        {
+            if (reason == TrackEndReason.LoadFailed || reason == TrackEndReason.Cleanup)
+            {
+                return;
+            }
+
+            //To stop un-necessary use, disconnect if there are no users left listening.
+            var users = await player.VoiceChannel.GetUsersAsync().FlattenAsync();
+            if (!users.Any())
+            {
+                await Client.DisconnectAsync(player.VoiceChannel);
+                await player.TextChannel?.SendMessageAsync("Music playback has been stopped as there are no users listening.");
+                return;
+            }
+
+            if (player.Queue.Count == 0)
+            {
+                await player.TextChannel?.SendMessageAsync("Bot has stopped music playback.");
+                await Client.DisconnectAsync(player.VoiceChannel);
+            }     
+            else
+            {
+                if (player.Queue.TryDequeue(out var nextTrack))
+                {
+                    if (nextTrack is LavaTrack newTrack)
+                    {
+                        await player.PlayAsync(newTrack);
+                        await player.TextChannel?.SendMessageAsync($"Now playing: {newTrack.Title}");
+                    }
+                }
+            }       
+        }
+
         public async Task Configure(DiscordSocketClient sClient)
         {
             if (!DiscordClient.Shards.All(x => x.ConnectionState == Discord.ConnectionState.Connected))
@@ -79,6 +115,8 @@ namespace RavenBOT.Modules.Music.Methods
             Logger.Log("Victoria Initialized.");
 
             Client.Log += Log;
+            Client.OnTrackFinished += TrackFinished;
+
         }
 
         public async Task Log(LogMessage message)
