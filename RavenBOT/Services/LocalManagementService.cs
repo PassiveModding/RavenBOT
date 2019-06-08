@@ -109,12 +109,12 @@ namespace RavenBOT.Services
             }
 
             [JsonConverter(typeof(StringEnumConverter))]
-            public DatabaseSelection DatabaseChoice {get;set;} = DatabaseSelection.LiteDatabase;
+            public DatabaseSelection DatabaseChoice {get;set;} = DatabaseSelection.RavenEmbeddedDatabase;
 
             public enum DatabaseSelection
             {
                 RavenDatabase,
-                LiteDatabase
+                RavenEmbeddedDatabase
             }
         }
     }

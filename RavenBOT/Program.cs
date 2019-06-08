@@ -28,14 +28,14 @@ namespace RavenBOT
             IDatabase database;
             switch (localConfig.DatabaseChoice)
             {
-                case LocalManagementService.LocalConfig.DatabaseSelection.LiteDatabase:
-                    database = new LiteDataStore();
-                    break;
                 case LocalManagementService.LocalConfig.DatabaseSelection.RavenDatabase:
                     database = new RavenDatabase();
                     break;
+                case LocalManagementService.LocalConfig.DatabaseSelection.RavenEmbeddedDatabase:
+                    database = new RavenDBEmbedded();
+                    break;
                 default:
-                    database = new LiteDataStore();
+                    database = new RavenDBEmbedded();
                     break;
             }
 
