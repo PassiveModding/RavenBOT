@@ -172,5 +172,27 @@ namespace RavenBOT.Modules.Music.Modules
         {
             return Vic.Configure(Context.Client.GetShardFor(Context.Guild));
         }
+
+        [Command("Stats")]
+        [Summary("Lavalink server stats")]
+        [RequireOwner]
+        public async Task Stats()
+        {
+            var stats = LavaShardClient.ServerStats;
+
+            await ReplyAsync($"CPU Cores: {stats.Cpu.Cores}\n" +
+                            $"CPU Lavalink Load: {stats.Cpu.LavalinkLoad}\n" +
+                            $"CPU System Load: {stats.Cpu.SystemLoad}\n" +
+                            $"Average Frames Deficit: {stats.Frames.Deficit}\n" +
+                            $"Average Frames Nulled: {stats.Frames.Nulled}\n" +
+                            $"Average Frames Sent: {stats.Frames.Sent}\n" +
+                            $"Memory Allocated: {stats.Memory.Allocated}\n" +
+                            $"Memory Free: {stats.Memory.Free}\n" +
+                            $"Memory Reservable: {stats.Memory.Reservable}\n" +
+                            $"Memory Used: {stats.Memory.Used}\n" +
+                            $"Player Count: {stats.PlayerCount}\n" +
+                            $"Playing Players: {stats.PlayingPlayers}\n" +
+                            $"Uptime: {stats.Uptime.GetReadableLength()}");
+        }
     }
 }
