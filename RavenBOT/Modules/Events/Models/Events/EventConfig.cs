@@ -11,7 +11,7 @@ namespace RavenBOT.Modules.Events.Models.Events
             return $"EventConfig-{id}";
         }
 
-        public ulong GuildId { get; }
+        public ulong GuildId { get; set; }
 
         public EventConfig(ulong guildId)
         {
