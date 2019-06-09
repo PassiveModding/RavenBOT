@@ -61,7 +61,7 @@ namespace RavenBOT.Modules.Translation.Modules
         public async Task TranslateListAsync()
         {
             var embed2 = new EmbedBuilder();
-            embed2.AddField("INFORMATION", "Format:\n" + "<Language> <Language Code>\n" + "Example Usage:\n" + "`.p translate <language code> <message>`\n" + "`.p translate es Hi there this will be converted to spanish`");
+            embed2.AddField("INFORMATION", "Format:\n" + "<Language> <Language Code>\n");
             embed2.AddField("A", "`af` - Afrikaans\n`sq` - Albanian\n`am` - Amharic\n`ar` - Arabic\n`hy` - Armenian\n`az` - Azeerbaijani\n");
             embed2.AddField("B", "`eu` - Basque\n`be` - Belarusian\n`bn` - Bengali\n`bs` - Bosnian\n`bg` - Bulgarian\n");
             embed2.AddField("C", "`ca` - Catalan\n`ceb` - Cebuano\n`zh_CN` - Chinese(Simplified)\n`zh_TW` - Chinese(Traditional)\n`co` - Corsican\n`hr` - Croatian\n`cs` - Czech\n");
