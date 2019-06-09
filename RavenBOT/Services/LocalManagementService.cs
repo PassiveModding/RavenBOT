@@ -114,7 +114,8 @@ namespace RavenBOT.Services
             public enum DatabaseSelection
             {
                 RavenDatabase,
-                RavenEmbeddedDatabase
+                RavenEmbeddedDatabase,
+                LiteDatabase
             }
         }
     }

@@ -16,5 +16,6 @@
     <PackageReference Include="Google.Cloud.Dialogflow.V2" Version="1.0.0-beta02"/>
     <PackageReference Include="Victoria" Version="4.0.10"/>
     <PackageReference Include="RavenDB.Embedded" Version="4.2.0"/>
+    <PackageReference Include="LiteDB" Version="4.1.4"/>
   </ItemGroup>
 </Project>

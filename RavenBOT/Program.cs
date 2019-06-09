@@ -34,6 +34,9 @@ namespace RavenBOT
                 case LocalManagementService.LocalConfig.DatabaseSelection.RavenEmbeddedDatabase:
                     database = new RavenDBEmbedded();
                     break;
+                case LocalManagementService.LocalConfig.DatabaseSelection.LiteDatabase:
+                    database = new LiteDataStore();
+                    break;
                 default:
                     database = new RavenDBEmbedded();
                     break;
