@@ -124,7 +124,9 @@ namespace RavenBOT.Modules.Events.Modules
                              $"Message Updated: {config.MessageUpdated}\n" +
                              $"User Joined: {config.UserJoined}\n" +
                              $"User Left: {config.UserLeft}\n" +
-                             $"User Updated: {config.UserUpdated}");
+                             $"User Updated: {config.UserUpdated}\n" +
+                             $"**ENABLED:** {config.Enabled}\n" +
+                             $"Channel: {Context.Guild.GetChannel(config.ChannelId)?.Name ?? "N/A"}");
         }
 
         [Command("SetChannel")]
