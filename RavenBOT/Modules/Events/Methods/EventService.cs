@@ -35,7 +35,6 @@ namespace RavenBOT.Modules.Events.Methods
             Client = client;
             Database = database;
             LocalManagementService = localManagementService;
-            Configs = new Dictionary<ulong, EventConfig>();
             
             Client.ChannelCreated += Client_ChannelCreated;
             Client.ChannelDestroyed += Client_ChannelDestroyed;
@@ -594,17 +593,10 @@ namespace RavenBOT.Modules.Events.Methods
             EventQueue.Add(new EventClass(config.GuildId, config, title, content, type, color));
         }
 
-        public Dictionary<ulong, EventConfig> Configs { get; set; }
-
         //TODO: Split into tryget and getorcreate
         public EventConfig GetConfig(ulong guildId)
         {
-            if (Configs.TryGetValue(guildId, out EventConfig config))
-            {
-                return config;
-            }
-
-            config = Database.Load<EventConfig>(EventConfig.DocumentName(guildId));
+            var config = Database.Load<EventConfig>(EventConfig.DocumentName(guildId));
 
             if (config == null)
             {
@@ -612,18 +604,12 @@ namespace RavenBOT.Modules.Events.Methods
                 Database.Store(config, EventConfig.DocumentName(guildId));
             }
 
-            //TODO: Check if add or tryadd
-            Configs.Add(guildId, config);
             return config;
         }
 
         public void SaveConfig(EventConfig config)
         {
             Database.Store(config, EventConfig.DocumentName(config.GuildId));
-            if (Configs.ContainsKey(config.GuildId))
-            {
-                Configs[config.GuildId] = config;
-            }
         }
     }
 }
