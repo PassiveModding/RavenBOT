@@ -39,34 +39,6 @@ namespace RavenBOT.Handlers
             }
         }
 
-        public void Log(string message, LogSeverity severity = LogSeverity.Info, object additional = null)
-        {
-            var logObject = new BotLogObject(message, severity, additional);
-            Console.WriteLine(MakeLogMessage(message, severity));
-            if (Config.LogToDatabase)
-            {
-                Store.Store(logObject);
-            }
-
-            if (Config.LogToChannel)
-            {
-                try
-                {
-                    var channel = Client?.GetGuild(Config.GuildId)?.GetTextChannel(Config.ChannelId);
-                    channel?.SendMessageAsync(string.Empty, false, new EmbedBuilder
-                    {
-                        Description = message.FixLength(),
-                        Color = LogSeverityAsColor(severity),
-                        Title = severity.ToString()
-                    }.Build());
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-        }
-
         private Color LogSeverityAsColor(LogSeverity severity)
         {
             switch (severity)
@@ -99,36 +71,66 @@ namespace RavenBOT.Handlers
             return $"[{newSev}][{DateTime.UtcNow.ToShortDateString()} {DateTime.UtcNow.ToShortTimeString()}] {message}{contextString}";
         }
 
-        public void Log(string message, LogContext context, LogSeverity severity = LogSeverity.Info, object additional = null)
+        
+        public void Log(string message, LogSeverity severity = LogSeverity.Info, object additional = null)
         {
-            var logObject = new CommandLogObject(message, context, severity, additional);
+            var logObject = new BotLogObject(message, severity, additional);
+            LogAndStore(message, severity, logObject);
+            LogToDiscord(message, severity);
+        }
+
+        private void LogAndStore<T>(string message, LogSeverity severity, T logObject)
+        {
             Console.WriteLine(MakeLogMessage(message, severity));
             if (Config.LogToDatabase)
             {
                 Store.Store(logObject);
             }
+        }
 
-            if (Config.LogToChannel)
+        private void LogToDiscord(string message, LogSeverity severity, LogContext context = null)
+        {
+            if (!Config.LogToChannel)
             {
-                try
-                {
-                    var channel = Client?.GetGuild(Config.GuildId)?.GetTextChannel(Config.ChannelId);
-                    channel?.SendMessageAsync(string.Empty, false, new EmbedBuilder
-                    {
-                        Description = message.FixLength(),
-                        Color = LogSeverityAsColor(severity),
-                        Title = severity.ToString()
-                    }.AddField("Context", 
-                        $"Channel: {context.channelId}\n" +
-                        $"Guild: {context.guildId}\n" +
-                        $"User: {context.userId}\n" +
-                        $"Message: {context.message}".FixLength()).Build());
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
+                return;
             }
+
+            if (message.Contains("is blocking the gateway task.", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return;
+            }
+            try
+            {
+                var channel = Client?.GetGuild(Config.GuildId)?.GetTextChannel(Config.ChannelId);
+                var embed = new EmbedBuilder
+                {
+                    Description = message.FixLength(),
+                    Color = LogSeverityAsColor(severity),
+                    Title = severity.ToString()
+                };
+
+                if (context != null)
+                {
+                    embed = embed.AddField("Context", 
+                    $"Channel: {context.channelId}\n" +
+                    $"Guild: {context.guildId}\n" +
+                    $"User: {context.userId}\n" +
+                    $"Message: {context.message}".FixLength());
+                }
+
+                channel?.SendMessageAsync(string.Empty, false, embed.Build());
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+        }
+
+        public void Log(string message, LogContext context, LogSeverity severity = LogSeverity.Info, object additional = null)
+        {
+            var logObject = new CommandLogObject(message, context, severity, additional);
+            LogAndStore(message, severity, logObject);
+            LogToDiscord(message, severity, context);
         }
     }
 }
