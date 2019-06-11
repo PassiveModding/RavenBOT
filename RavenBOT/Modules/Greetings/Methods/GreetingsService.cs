@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Threading.Tasks;
 using Discord.WebSocket;
+using RavenBOT.Extensions;
 using RavenBOT.Modules.Greetings.Models;
 using RavenBOT.Services;
 using RavenBOT.Services.Database;
@@ -44,7 +45,7 @@ namespace RavenBOT.Modules.Greetings.Methods
                     return;
                 }
                 
-                await dmChannel.SendMessageAsync(message);
+                await dmChannel.SendMessageAsync("", false, message.QuickEmbed(null));
             }
             else
             {
@@ -54,7 +55,7 @@ namespace RavenBOT.Modules.Greetings.Methods
                     return;
                 }
 
-                await channel.SendMessageAsync(message);
+                await channel.SendMessageAsync(user.Mention, false, message.QuickEmbed(null));
             }
         }
 
@@ -81,7 +82,7 @@ namespace RavenBOT.Modules.Greetings.Methods
                     return;
                 }
                 
-                await dmChannel.SendMessageAsync(message);
+                await dmChannel.SendMessageAsync("", false, message.QuickEmbed(null));
             }
             else
             {
@@ -91,7 +92,7 @@ namespace RavenBOT.Modules.Greetings.Methods
                     return;
                 }
 
-                await channel.SendMessageAsync(message);
+                await channel.SendMessageAsync(user.Mention, false, message.QuickEmbed(null));
             }
         }
 

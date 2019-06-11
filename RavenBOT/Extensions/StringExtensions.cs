@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Discord;
 
 namespace RavenBOT.Extensions
 {
@@ -59,6 +60,15 @@ namespace RavenBOT.Extensions
             }
 
             return value;
+        }
+
+        public static Embed QuickEmbed(this string message, Discord.Color? color)
+        {
+            return new EmbedBuilder
+            {
+                Description = message.FixLength(2047),
+                Color = color ?? Discord.Color.Blue
+            }.Build();
         }
 
         public static List<List<T>> SplitList<T>(this List<T> list, int groupSize = 30)
