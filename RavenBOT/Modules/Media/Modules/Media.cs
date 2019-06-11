@@ -70,6 +70,7 @@ namespace RavenBOT.Modules.Media.Modules
         }
 
         [Command("UrbanDictionary")]
+        [RequireNsfw]
         [Summary("Search Urban Dictionary for the specified term")]
         public async Task UrbanAsync([Remainder] string word)
         {
