@@ -239,6 +239,15 @@ namespace RavenBOT.Modules.Music.Modules
             await ReplyAsync($"Volume set to {volume}");
         }
 
+        [Command("ShowVolume")]
+        [Alias("Volume")]
+        [Summary("Displays the audio player's volume")]
+        [InAudioChannel(true)]
+        public async Task ShowVolume()
+        {
+            await ReplyAsync($"Volume is {player.CurrentVolume}");
+        }
+
         [Command("Stats")]
         [Summary("Lavalink server stats")]
         [RequireOwner]
