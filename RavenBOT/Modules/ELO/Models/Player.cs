@@ -4,9 +4,9 @@ namespace RavenBOT.Modules.ELO.Models
 {
     public class Player
     {
-        public static string DocumentName (ulong guildId, int competitionId, ulong userId)
+        public static string DocumentName (ulong guildId, ulong userId)
         {
-            return $"Player-{guildId}-{userId}-{competitionId}";
+            return $"Player-{guildId}-{userId}";
         }
 
         /// <summary>
@@ -27,18 +27,11 @@ namespace RavenBOT.Modules.ELO.Models
         /// <value></value>
         public ulong GuildId { get; set; }
 
-        /// <summary>
-        /// The competition ID, used for separating different competitions/leaderboards within a single server.
-        /// </summary>
-        /// <value></value>
-        public int CompetitionId { get; set; }
-
-        public Player (ulong userId, ulong guildId, string displayName, int competitionId)
+        public Player (ulong userId, ulong guildId, string displayName)
         {
             this.DisplayName = displayName;
             this.UserId = userId;
             this.GuildId = guildId;
-            this.CompetitionId = competitionId;
         }
 
         /// <summary>
