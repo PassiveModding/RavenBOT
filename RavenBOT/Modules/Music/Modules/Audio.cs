@@ -55,10 +55,10 @@ namespace RavenBOT.Modules.Music.Modules
         }
 
         [Command ("Play"), InAudioChannel]
-        [Summary("Plays the specified track or adds it to the queue (Youtube)")]
+        [Summary("Plays the specified track or adds it to the queue")]
         public async Task PlayAsync ([Remainder] string query)
         {
-            var search = await RestClient.SearchYouTubeAsync(query);
+            var search = await RestClient.SearchTracksAsync(query, true);
             if (search.LoadType == LoadType.NoMatches ||
                 search.LoadType == LoadType.LoadFailed)
             {
