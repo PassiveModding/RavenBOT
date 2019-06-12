@@ -181,7 +181,7 @@ namespace RavenBOT.Modules.Music.Modules
         {
             var tracks = player.Queue.Items.Cast<LavaTrack> ().Select (x => x.Title);
             return ReplyAsync (tracks.Count () is 0 ?
-                "No tracks in queue." : string.Join ("\n", tracks));
+                "No tracks in queue." : string.Join ("\n", tracks).FixLength(2047));
         }
 
         [Command("Configure")]
