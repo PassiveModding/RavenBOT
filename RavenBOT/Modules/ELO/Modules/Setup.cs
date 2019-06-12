@@ -10,6 +10,8 @@ using RavenBOT.Modules.ELO.Models;
 namespace RavenBOT.Modules.ELO.Modules
 {
     [RequireContext(ContextType.Guild)]
+    [RequireUserPermission(GuildPermission.Administrator)]
+    [Group("elo")]
     public class Setup : InteractiveBase<ShardedCommandContext>
     {
         public Setup(ELOService service)
