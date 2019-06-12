@@ -81,22 +81,15 @@ namespace RavenBOT.Modules.Music.Methods
                 return;
             }
 
-            if (player.IsPlaying)
+
+            if (player.Queue.TryDequeue(out var nextTrack))
             {
-                await player.TextChannel?.SendMessageAsync("Bot has stopped music playback.");
-                await Client.DisconnectAsync(player.VoiceChannel);
-            }     
-            else
-            {
-                if (player.Queue.TryDequeue(out var nextTrack))
+                if (nextTrack is LavaTrack newTrack)
                 {
-                    if (nextTrack is LavaTrack newTrack)
-                    {
-                        await player.PlayAsync(newTrack);
-                        await player.TextChannel?.SendMessageAsync($"Now playing: {newTrack.Title}");
-                    }
+                    await player.PlayAsync(newTrack);
+                    await player.TextChannel?.SendMessageAsync($"Now playing: {newTrack.Title}");
                 }
-            }       
+            }     
         }
 
         public async Task Configure(DiscordSocketClient sClient)
