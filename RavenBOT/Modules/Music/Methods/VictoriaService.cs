@@ -67,7 +67,7 @@ namespace RavenBOT.Modules.Music.Methods
 
         public async Task TrackFinished(LavaPlayer player, LavaTrack track, TrackEndReason reason)
         {
-            if (reason == TrackEndReason.LoadFailed || reason == TrackEndReason.Cleanup)
+            if (reason == TrackEndReason.LoadFailed || reason == TrackEndReason.Cleanup || reason == TrackEndReason.Replaced)
             {
                 return;
             }
@@ -89,6 +89,11 @@ namespace RavenBOT.Modules.Music.Methods
                     await player.PlayAsync(newTrack);
                     await player.TextChannel?.SendMessageAsync($"Now playing: {newTrack.Title}");
                 }
+            }
+            else
+            {
+                await player.StopAsync();
+                await player.TextChannel?.SendMessageAsync("Playlist finished.");
             }     
         }
 
