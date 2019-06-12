@@ -81,7 +81,7 @@ namespace RavenBOT.Modules.Music.Methods
                 return;
             }
 
-            if (player.Queue.Count == 0)
+            if (player.IsPlaying)
             {
                 await player.TextChannel?.SendMessageAsync("Bot has stopped music playback.");
                 await Client.DisconnectAsync(player.VoiceChannel);
