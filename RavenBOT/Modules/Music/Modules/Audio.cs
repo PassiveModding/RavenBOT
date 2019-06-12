@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
@@ -117,12 +118,34 @@ namespace RavenBOT.Modules.Music.Modules
 
         [Command ("Skip"), InAudioChannel (true)]
         [Summary("Skips the current song and plays the next in queue")]
-        public async Task SkipAsync ()
+        public async Task SkipAsync (int amount = 1)
         {
             try
             {
-                var skipped = await player.SkipAsync ();
-                await ReplyAsync ($"Skipped: {skipped.Title}\nNow Playing: {player.CurrentTrack.Title}");
+                if (amount <= 1)
+                {
+                    var skipped = await player.SkipAsync ();
+                    await ReplyAsync ($"Skipped: {skipped.Title}\nNow Playing: {player.CurrentTrack.Title}");                    
+                }
+                else
+                {
+                    LavaTrack track = null;
+                    for (int i = 0; i < amount; i++)
+                    {
+                        if (player.Queue.TryDequeue(out var trk))
+                        {
+                            if (trk is LavaTrack lavaTrack)
+                            {
+                                track = lavaTrack;
+                            }
+                        }
+                    }
+                    if (track != null)
+                    {
+                        await player.PlayAsync(track);
+                        await ReplyAsync ($"Skipped {amount} tracks\nNow Playing: {player.CurrentTrack.Title}");  
+                    }
+                }
             }
             catch
             {
@@ -179,9 +202,18 @@ namespace RavenBOT.Modules.Music.Modules
         [Summary("Displays all tracks  in the queue")]
         public Task Queue ()
         {
-            var tracks = player.Queue.Items.Cast<LavaTrack> ().Select (x => x.Title);
-            return ReplyAsync (tracks.Count () is 0 ?
-                "No tracks in queue." : string.Join ("\n", tracks).FixLength(2047));
+            var tracks = player.Queue.Items.Cast<LavaTrack> ().Select (x => x.Title).ToList();
+
+            int i = 0;
+            var trackList = new List<string>();
+            foreach (var track in tracks)
+            {
+                i++;
+                trackList.Add($"{i} - {track}");
+            }
+
+            var response = trackList.Count == 0 ? "No tracks in queue." : string.Join ("\n", trackList);
+            return ReplyAsync (response.FixLength(2047));
         }
 
         [Command("Configure")]
