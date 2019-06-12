@@ -55,7 +55,7 @@ namespace RavenBOT.Modules.Music.Modules
         }
 
         [Command ("Play"), InAudioChannel]
-        [Summary("Plays the specified track or adds it to the queue")]
+        [Summary("Plays the specified track or adds it to the queue (Youtube)")]
         public async Task PlayAsync ([Remainder] string query)
         {
             var search = await RestClient.SearchYouTubeAsync(query);
@@ -66,8 +66,6 @@ namespace RavenBOT.Modules.Music.Modules
                 return;
             }
 
-            var track = search.Tracks.FirstOrDefault ();
-
             //If there is no player, join the current channel and set the player
             if (player == null)
             {
@@ -75,15 +73,36 @@ namespace RavenBOT.Modules.Music.Modules
                 player = LavaShardClient.GetPlayer(Context.Guild.Id);
             }
 
+            var track = search.Tracks.FirstOrDefault();
+
             if (player.IsPlaying)
             {
-                player.Queue.Enqueue (track);
-                await ReplyAsync ($"{track.Title} has been queued.");
+                if (search.LoadType == LoadType.PlaylistLoaded)
+                {
+                    foreach (var playlistTrack in search.Tracks)
+                    {
+                        player.Queue.Enqueue(playlistTrack);
+                    }   
+                    await ReplyAsync($"{search.Tracks.Count()} tracks added from playlist: {search.PlaylistInfo.Name}");
+                }
+                else
+                {
+                    player.Queue.Enqueue(track);
+                    await ReplyAsync ($"{track.Title} has been queued.");
+                }
             }
             else
             {
                 await player.PlayAsync (track);
                 await ReplyAsync ($"Now Playing: {track.Title}");
+                if (search.LoadType == LoadType.PlaylistLoaded)
+                {
+                    foreach (var playlistTrack in search.Tracks.Where(x => x.Id != track.Id))
+                    {
+                        player.Queue.Enqueue(playlistTrack);
+                    }   
+                    await ReplyAsync($"{search.Tracks.Count()} tracks added from playlist: {search.PlaylistInfo.Name}");
+                }
             }
         }
 
