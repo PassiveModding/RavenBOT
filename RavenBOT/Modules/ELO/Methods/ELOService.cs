@@ -6,7 +6,7 @@ using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.ELO.Methods
 {
-    public class ELOService : IServiceable
+    public partial class ELOService : IServiceable
     {
         public ELOService(IDatabase database, DiscordShardedClient client)
         {
@@ -41,6 +41,19 @@ namespace RavenBOT.Modules.ELO.Methods
         public Lobby GetLobby(ulong guildId, ulong channelId)
         {
             return Database.Load<Lobby>(Lobby.DocumentName(guildId, channelId));
+        }
+
+        public Player GetPlayer(ulong guildId, ulong userId)
+        {
+            return Database.Load<Player>(Player.DocumentName(guildId, userId));
+        }
+
+        public Player CreatePlayer(ulong guildId, ulong userId, string name)
+        {
+            var config = new Player(guildId, userId, name);
+            Database.Store(config, Player.DocumentName(guildId, userId));
+
+            return config;
         }
     }
 }
