@@ -1,6 +1,9 @@
+using System.Linq;
 using System.Threading.Tasks;
+using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
+using RavenBOT.Extensions;
 using RavenBOT.Modules.ELO.Methods;
 using RavenBOT.Modules.ELO.Models;
 
@@ -15,13 +18,6 @@ namespace RavenBOT.Modules.ELO.Modules
         }
 
         public ELOService Service { get; }
-
-        [Command("Create Competition")]
-        public async Task CreateCompetitionAsync()
-        {
-            var comp = Service.CreateCompetition(Context.Guild.Id);
-            await ReplyAsync("New competition created.");
-        }
 
         [Command("Create Lobby")]
         public async Task CreateLobbyAsync(int playersPerTeam = 5, Lobby.PickMode pickMode = Lobby.PickMode.Captains)
@@ -72,7 +68,73 @@ namespace RavenBOT.Modules.ELO.Modules
         [Command("PickModes")]
         public async Task DisplayPickModesAsync()
         {
-            
+            var pickDict = StringExtensions.ConvertEnumToDictionary<Lobby.PickMode>();
+            await ReplyAsync($"{string.Join("\n", pickDict.Keys)}");
+        }
+
+        [Command("SetCaptainMode")]
+        public async Task SetCaptainModeAsync(Lobby.CaptainMode captainMode)
+        {
+            var lobby = Service.GetLobby(Context.Guild.Id, Context.Channel.Id);
+            if (lobby == null)
+            {
+                await ReplyAsync("Channel is not a lobby.");
+                return;
+            }
+
+            lobby.CaptainSortMode = captainMode;
+            await ReplyAsync($"Captain mode set.");
+        }
+
+        [Command("CaptainModes")]
+        public async Task DisplayCaptainModesAsync()
+        {
+            var capDict = StringExtensions.ConvertEnumToDictionary<Lobby.CaptainMode>();
+            await ReplyAsync($"{string.Join("\n", capDict.Keys)}");
+        }
+
+        [Command("SetRegisterRole")]
+        public async Task SetRegisterRole(IRole role)
+        {
+            var competition = Service.GetCompetition(Context.Guild.Id) ?? Service.CreateCompetition(Context.Guild.Id);
+            competition.RegisteredRankId = role.Id;
+            Service.Database.Store(competition, CompetitionConfig.DocumentName(Context.Guild.Id));
+            await ReplyAsync("Register role set.");
+        }
+
+        [Command("AddRank")]
+        public async Task AddRank(IRole role, int points)
+        {
+            var competition = Service.GetCompetition(Context.Guild.Id) ?? Service.CreateCompetition(Context.Guild.Id);
+            competition.Ranks = competition.Ranks.Where(x => x.RoleId != role.Id).ToList();
+            competition.Ranks.Add(new Rank
+            {
+                RoleId = role.Id,
+                Points = points
+            });
+            Service.Database.Store(competition, CompetitionConfig.DocumentName(Context.Guild.Id));
+            await ReplyAsync("Rank added.");
+        }
+
+        [Command("AddRank")]
+        public async Task AddRank(int points, IRole role)
+        {
+            await AddRank(role, points);
+        }
+
+        [Command("RemoveRank")]
+        public async Task RemoveRank(ulong roleId)
+        {
+            var competition = Service.GetCompetition(Context.Guild.Id) ?? Service.CreateCompetition(Context.Guild.Id);
+            competition.Ranks = competition.Ranks.Where(x => x.RoleId != roleId).ToList();
+            Service.Database.Store(competition, CompetitionConfig.DocumentName(Context.Guild.Id));
+            await ReplyAsync("Rank Removed.");
+        }
+
+        [Command("RemoveRank")]
+        public async Task RemoveRank(IRole role)
+        {
+            await RemoveRank(role.Id);
         }
     }
 }
