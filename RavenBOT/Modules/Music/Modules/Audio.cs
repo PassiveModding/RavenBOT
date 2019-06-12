@@ -173,6 +173,21 @@ namespace RavenBOT.Modules.Music.Modules
             return Vic.Configure(Context.Client.GetShardFor(Context.Guild));
         }
 
+        [Command("SetVolume")]
+        [Alias("Set Volume")]
+        [Summary("Sets the audio player's volume")]
+        [InAudioChannel(true)]
+        public async Task SetVolume(int volume = 100)
+        {
+            if (volume <= 0 || volume > 1000)
+            {
+                await ReplyAsync("Volume must be between 1 and 1000");
+                return;
+            }
+            await player.SetVolumeAsync(volume);
+            await ReplyAsync($"Volume set to {volume}");
+        }
+
         [Command("Stats")]
         [Summary("Lavalink server stats")]
         [RequireOwner]
@@ -180,19 +195,19 @@ namespace RavenBOT.Modules.Music.Modules
         {
             var stats = LavaShardClient.ServerStats;
 
-            await ReplyAsync($"CPU Cores: {stats.Cpu.Cores}\n" +
-                            $"CPU Lavalink Load: {stats.Cpu.LavalinkLoad}\n" +
-                            $"CPU System Load: {stats.Cpu.SystemLoad}\n" +
-                            $"Average Frames Deficit: {stats.Frames.Deficit}\n" +
-                            $"Average Frames Nulled: {stats.Frames.Nulled}\n" +
-                            $"Average Frames Sent: {stats.Frames.Sent}\n" +
-                            $"Memory Allocated: {stats.Memory.Allocated}\n" +
-                            $"Memory Free: {stats.Memory.Free}\n" +
-                            $"Memory Reservable: {stats.Memory.Reservable}\n" +
-                            $"Memory Used: {stats.Memory.Used}\n" +
-                            $"Player Count: {stats.PlayerCount}\n" +
-                            $"Playing Players: {stats.PlayingPlayers}\n" +
-                            $"Uptime: {stats.Uptime.GetReadableLength()}");
+            await ReplyAsync($"CPU Cores: {stats?.Cpu?.Cores}\n" +
+                            $"CPU Lavalink Load: {stats?.Cpu?.LavalinkLoad}\n" +
+                            $"CPU System Load: {stats?.Cpu?.SystemLoad}\n" +
+                            $"Average Frames Deficit: {stats?.Frames?.Deficit}\n" +
+                            $"Average Frames Nulled: {stats?.Frames?.Nulled}\n" +
+                            $"Average Frames Sent: {stats?.Frames?.Sent}\n" +
+                            $"Memory Allocated: {stats?.Memory?.Allocated}\n" +
+                            $"Memory Free: {stats?.Memory?.Free}\n" +
+                            $"Memory Reservable: {stats?.Memory?.Reservable}\n" +
+                            $"Memory Used: {stats?.Memory?.Used}\n" +
+                            $"Player Count: {stats?.PlayerCount}\n" +
+                            $"Playing Players: {stats?.PlayingPlayers}\n" +
+                            $"Uptime: {stats?.Uptime.GetReadableLength()}");
         }
     }
 }
