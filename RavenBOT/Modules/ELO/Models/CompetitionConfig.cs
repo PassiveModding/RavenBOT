@@ -18,8 +18,8 @@ namespace RavenBOT.Modules.ELO.Models
         //TODO: Competition settings.
         public List<Rank> Ranks {get;set;} = new List<Rank>();
 
-        public ulong RegisteredRankId {get;set;} = 0;
+        public ulong RegisteredRankId {get;set;} = 0;  
 
-        public int PlayersPerTeam {get;set;} = 5;        
+        public string NameFormat {get;set;} = "[{score}] {name}";
     }
 }
