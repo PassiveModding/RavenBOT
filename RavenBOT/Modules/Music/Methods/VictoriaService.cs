@@ -140,7 +140,7 @@ namespace RavenBOT.Modules.Music.Methods
             return Client != null && RestClient != null;
         }
 
-       /// <summary>
+        /// <summary>
         /// Scrapes genius lyrics
         /// </summary>
         /// <param name="query">
@@ -160,8 +160,6 @@ namespace RavenBOT.Modules.Music.Methods
 
             try
             {
-                HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", config.Authorization);
-
                 var request = new HttpRequestMessage(HttpMethod.Get, $"https://api.genius.com/search?q={query}");
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", config.Authorization);
 
