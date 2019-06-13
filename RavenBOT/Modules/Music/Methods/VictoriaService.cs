@@ -23,6 +23,7 @@ namespace RavenBOT.Modules.Music.Methods
         public Victoria.LavaShardClient Client { get; set; } = null;
         public Victoria.LavaRestClient RestClient { get; set; } = null;
         public IDatabase Database { get; }
+        public HttpClient HttpClient { get; }
         public LogHandler Logger { get; }
         private DiscordShardedClient DiscordClient { get; }
 
@@ -47,10 +48,11 @@ namespace RavenBOT.Modules.Music.Methods
             public string Password {get;set;}
         }
 
-        public VictoriaService (DiscordShardedClient client, IDatabase database, LogHandler logger)
+        public VictoriaService (DiscordShardedClient client, IDatabase database, HttpClient httpClient, LogHandler logger)
         {
             DiscordClient = client;
             Database = database;
+            HttpClient = httpClient;
             Logger = logger;
             if (!File.Exists(ConfigPath))
             {
@@ -158,60 +160,64 @@ namespace RavenBOT.Modules.Music.Methods
 
             try
             {
-                using (var client = new HttpClient())
+                HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", config.Authorization);
+
+                var request = new HttpRequestMessage(HttpMethod.Get, $"https://api.genius.com/search?q={query}");
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", config.Authorization);
+
+
+                //Use the genius api to make a song query.
+                var search = await HttpClient.SendAsync(request);
+                var token = JToken.Parse(await search.Content.ReadAsStringAsync());
+                var hits = token.Value<JToken>("response").Value<JArray>("hits");
+
+                if (!hits.HasValues)
                 {
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", config.Authorization);
-
-                    //Use the genius api to make a song query.
-                    var search = await client.GetStringAsync($"https://api.genius.com/search?q={query}");
-                    var token = JToken.Parse(search);
-                    var hits = token.Value<JToken>("response").Value<JArray>("hits");
-
-                    if (hits.HasValues)
-                    {
-                        //Try to get the genius url of the lyrics page
-                        var first = hits.First();
-                        //Access the page qualifier of the first result that was returned
-                        var result = first.Value<JToken>("result");
-                        var pathStr = result.Value<JToken>("path").ToString();
-                        
-                        //Load and scrape the web page content.
-                        var webHtml = await client.GetStringAsync($"https://genius.com{pathStr}");
-                        var doc = new HtmlDocument();
-                        doc.LoadHtml(webHtml);
-                        //Find the lyrics node if possible
-                        var lyricsDivs = doc.DocumentNode.SelectNodes("//div[contains(@class, 'lyrics')]");
-                        if (lyricsDivs.Any())
-                        {
-                            var firstDiv = lyricsDivs.First();
-                            var text = firstDiv.InnerText;
-
-                            //Filter out the spacing between verses
-                            var regex2 = new Regex("\n{2}");
-                            text = regex2.Replace(text, "\n");
-
-                            //strip out additional parts which are prefixed with or contain only spaces
-                            var regex3 = new Regex("\n +");
-                            text = regex3.Replace(text, "");
-                            //Fix up the bracketed content that are at the start of verses
-                            text = text.Replace("[", "\n[");
-
-                            //Strip the additional genius content found at the end of the lyrics
-                            var indexEnd = text.IndexOf("More on genius", StringComparison.InvariantCultureIgnoreCase);
-                            if (indexEnd != -1)
-                            {
-                                text = text.Substring(0, indexEnd);
-                            }
-
-                            //Remove additional whitespace at the start and end of the response
-                            text = text.Trim();
-
-                            return text;
-                        }
-                    }
+                    return null;
                 }
 
-                return null;
+                //Try to get the genius url of the lyrics page
+                var first = hits.First();
+                //Access the page qualifier of the first result that was returned
+                var result = first.Value<JToken>("result");
+                var pathStr = result.Value<JToken>("path").ToString();
+
+                //Load and scrape the web page content.
+                var webHtml = await HttpClient.GetStringAsync($"https://genius.com{pathStr}");
+                var doc = new HtmlDocument();
+                doc.LoadHtml(webHtml);
+                //Find the lyrics node if possible
+                var lyricsDivs = doc.DocumentNode.SelectNodes("//div[contains(@class, 'lyrics')]");
+                if (!lyricsDivs.Any())
+                {
+                    return null;
+                }
+
+                var firstDiv = lyricsDivs.First();
+                var text = firstDiv.InnerText;
+
+                //Filter out the spacing between verses
+                var regex2 = new Regex("\n{2}");
+                text = regex2.Replace(text, "\n");
+
+                //strip out additional parts which are prefixed with or contain only spaces
+                var regex3 = new Regex("\n +");
+                text = regex3.Replace(text, "");
+                //Fix up the bracketed content that are at the start of verses
+                text = text.Replace("[", "\n[");
+                text = text.Replace("&amp;", "&", StringComparison.InvariantCultureIgnoreCase);
+
+                //Strip the additional genius content found at the end of the lyrics
+                var indexEnd = text.IndexOf("More on genius", StringComparison.InvariantCultureIgnoreCase);
+                if (indexEnd != -1)
+                {
+                    text = text.Substring(0, indexEnd);
+                }
+
+                //Remove additional whitespace at the start and end of the response
+                text = text.Trim();
+
+                return text;
             }
             catch
             {
