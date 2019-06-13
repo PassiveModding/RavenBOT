@@ -71,10 +71,10 @@ namespace RavenBOT.Extensions
             }.Build();
         }
 
-        public static List<List<T>> SplitList<T>(this List<T> list, int groupSize = 30)
+        public static IEnumerable<IEnumerable<T>> SplitList<T>(this IEnumerable<T> list, int groupSize = 30)
         {
-            var splitList = new List<List<T>>();
-            for (var i = 0; i < list.Count; i += groupSize)
+            var splitList = new List<IEnumerable<T>>();
+            for (var i = 0; i < list.Count(); i += groupSize)
             {
                 splitList.Add(list.Skip(i).Take(groupSize).ToList());
             }
