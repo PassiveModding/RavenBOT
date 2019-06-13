@@ -5,7 +5,7 @@
     <RuntimeFrameworkVersion>2.1.6</RuntimeFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup>
-	<DefaultItemExcludes>$(DefaultItemExcludes);Modules\ELO\**</DefaultItemExcludes>
+    <DefaultItemExcludes>$(DefaultItemExcludes);Modules\ELO\**</DefaultItemExcludes>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="ahd.Graphite" Version="2.1.0-ci-20190329-121200"/>
@@ -20,5 +20,7 @@
     <PackageReference Include="Victoria" Version="4.0.10"/>
     <PackageReference Include="RavenDB.Embedded" Version="4.2.0"/>
     <PackageReference Include="LiteDB" Version="4.1.4"/>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2"/>
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.7"/>
   </ItemGroup>
 </Project>

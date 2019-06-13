@@ -1,6 +1,8 @@
+using System.Text;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
@@ -55,11 +57,63 @@ namespace RavenBOT.Modules.Music.Modules
             await ReplyAsync ($"Moved from {old.Name} to {player.VoiceChannel.Name}!");
         }
 
+        [Command("Load Playlist"), InAudioChannel]
+        [Summary("Plays the specified playlist or adds it to the queue")]
+        public async Task PlayPlaylistAsync([Remainder]string playlistLink)
+        {
+            var search = await RestClient.SearchTracksAsync(playlistLink, true);
+            if (search.LoadType == LoadType.NoMatches ||
+                search.LoadType == LoadType.LoadFailed)
+            {
+                await ReplyAsync ("Nothing found");
+                return;
+            }
+
+            //If there is no player, join the current channel and set the player
+            if (player == null)
+            {
+                await Join();
+                player = LavaShardClient.GetPlayer(Context.Guild.Id);
+            }
+
+            var track = search.Tracks.FirstOrDefault();
+
+            if (player.IsPlaying)
+            {
+                if (search.LoadType == LoadType.PlaylistLoaded)
+                {
+                    foreach (var playlistTrack in search.Tracks)
+                    {
+                        player.Queue.Enqueue(playlistTrack);
+                    }   
+                    await ReplyAsync($"{search.Tracks.Count()} tracks added from playlist: {search.PlaylistInfo.Name}");
+                }
+                else
+                {
+                    player.Queue.Enqueue(track);
+                    await ReplyAsync ($"{track.Title} has been queued.");
+                }
+            }
+            else
+            {
+                await player.PlayAsync (track);
+                await ReplyAsync ($"Now Playing: {track.Title}");
+                if (search.LoadType == LoadType.PlaylistLoaded)
+                {
+                    foreach (var playlistTrack in search.Tracks.Where(x => x.Id != track.Id))
+                    {
+                        player.Queue.Enqueue(playlistTrack);
+                    }   
+                    await ReplyAsync($"{search.Tracks.Count()} tracks added from playlist: {search.PlaylistInfo.Name}");
+                }
+            }
+        }
+
         [Command ("Play"), InAudioChannel]
         [Summary("Plays the specified track or adds it to the queue")]
         public async Task PlayAsync ([Remainder] string query)
         {
-            var search = await RestClient.SearchTracksAsync(query, true);
+            var search = await RestClient.SearchYouTubeAsync(query);
             if (search.LoadType == LoadType.NoMatches ||
                 search.LoadType == LoadType.LoadFailed)
             {
@@ -187,15 +241,81 @@ namespace RavenBOT.Modules.Music.Modules
                 return;
             }
 
-            var lyrics = await player.CurrentTrack.FetchLyricsAsync ();
+            var lyrics = await Vic.ScrapeGeniusLyricsAsync(player.CurrentTrack.Title);
+
+            if (lyrics == null)
+            {
+                await ReplyAsync("Could not fetch lyrics.");
+                return;
+            }
+
             var thumb = await player.CurrentTrack.FetchThumbnailAsync ();
 
-            var embed = new EmbedBuilder ()
-                .WithImageUrl (thumb)
-                .WithDescription (lyrics)
-                .WithAuthor ($"Lyrics For {player.CurrentTrack.Title}", thumb);
+            var pager = new PaginatedMessage();
+            var pages = new List<PaginatedMessage.Page>();
+            string[] paragraphs = Regex.Split(lyrics , "(\n){2,}");
+            foreach (var group in paragraphs)
+            {
+                //Ensure that we are not including un-necessary empty pages
+                if (string.IsNullOrWhiteSpace(group))
+                {
+                    continue;
+                }
+                //Ensure that the length of the paragraph does not exceed the max embed length
+                if (group.Length >= 2048)
+                {
+                    //Split the paragraph into sub-groups and add individually
+                    var words = group.Split(" ");
+                    var sb = new StringBuilder();
+                    //Add the words of each group individually to ensure that the response is still coherent
+                    foreach (var word in words)
+                    {
+                        if (sb.Length + word.Length >= 2048)
+                        {
+                            pages.Add(new PaginatedMessage.Page()
+                            {
+                                Description = sb.ToString()
+                            });
+                            sb.Clear();
+                        }
+                        sb.Append($"{word} ");
+                    }
 
-            await ReplyAsync ("", false, embed.Build ());
+                    //Ensure that any remaining content is added to the pager.
+                    var remaining = sb.ToString();
+                    if (!string.IsNullOrWhiteSpace(remaining))
+                    {
+                        pages.Add(new PaginatedMessage.Page()
+                        {
+                            Description = remaining
+                        });
+                    }
+                }
+                else
+                {
+                    pages.Add(new PaginatedMessage.Page()
+                    {
+                        Description = group
+                    });                    
+                }
+            }
+            pager.Pages = pages;
+            if (pager.Pages.Any())
+            {
+                pager.Pages.First().ImageUrl = thumb;
+                pager.Pages.First().Author = new EmbedAuthorBuilder()
+                {
+                    Name = $"Lyrics For {player.CurrentTrack.Title}",
+                    IconUrl = thumb
+                };
+
+                await PagedReplyAsync(pager, new ReactionList()
+                {
+                    Forward = true,
+                    Backward = true,
+                    Trash = true
+                });
+            }
         }
 
         [Command ("Queue")]
@@ -222,6 +342,21 @@ namespace RavenBOT.Modules.Music.Modules
         public Task Configure()
         {
             return Vic.Configure(Context.Client.GetShardFor(Context.Guild));
+        }
+
+        [Command("SetAuthorization")]
+        [Summary("Sets the authorization header for genius lyrics")]
+        [RequireOwner]
+        public Task SetGeniusAuth([Remainder]string auth)
+        {
+            var doc = Vic.Database.Load<VictoriaService.GeniusConfig>(VictoriaService.GeniusConfig.DocumentName());
+            if (doc == null)
+            {
+                doc = new VictoriaService.GeniusConfig();
+            }
+            doc.Authorization = auth;
+            Vic.Database.Store(doc, VictoriaService.GeniusConfig.DocumentName());
+            return ReplyAsync("Set.");
         }
 
         [Command("SetVolume")]
