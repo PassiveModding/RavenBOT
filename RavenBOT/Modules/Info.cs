@@ -93,7 +93,7 @@ namespace RavenBOT.Modules
             embed.AddField("Guilds", $"{Context.Client.Guilds.Count}", true);
             var orderedShards = Context.Client.Shards.OrderByDescending(x => x.Guilds.Count).ToList();
             embed.AddField("Stats", $"**Guilds:** {Context.Client.Guilds.Count}\n" + $"**Users:** {Context.Client.Guilds.Sum(x => x.MemberCount)}\n" + $"**Shards:** {Context.Client.Shards.Count}\n" + $"**Max Shard:** G:{orderedShards.First().Guilds.Count} ID:{orderedShards.First().ShardId}\n" + $"**Min Shard:** G:{orderedShards.Last().Guilds.Count} ID:{orderedShards.Last().ShardId}");
-
+            embed.AddField("Command Info", $"Command Count: {CommandService.Commands.Count()}\nModule Count: {CommandService.Modules.Count()}");
             embed.AddField(":hammer_pick:", $"Heap: {Math.Round(GC.GetTotalMemory(true) / (1024.0 * 1024.0), 2)} MB\n" + $"Up: {GetUptime()}", true);
             embed.AddField(":beginner:", "Written by: [PassiveModding](https://github.com/PassiveModding)\n" + $"Discord.Net {DiscordConfig.Version}", true);
 
