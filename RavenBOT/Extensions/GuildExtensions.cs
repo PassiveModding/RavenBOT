@@ -26,6 +26,25 @@ namespace RavenBOT.Extensions
 
             return null;
         }
+
+        public static async Task<IUserMessage> EnsureMention(IMessageChannel channel, IEnumerable<IRole> roles, string messageContent, EmbedBuilder embed = null)
+        {
+            var unmentionable = roles.Where(x => !x.IsMentionable);
+            foreach (var role in unmentionable)
+            {
+                await role.ModifyAsync(x => x.Mentionable = true);
+            }
+
+            var message = await channel.SendMessageAsync(messageContent, false, embed.Build());
+
+            foreach (var role in unmentionable)
+            {
+                await role.ModifyAsync(x => x.Mentionable = false);
+            }
+
+            return message;
+        }
+        
         public static int DamerauLavenshteinDistance(this string s, string t)
         {
             var bounds = new { Height = s.Length + 1, Width = t.Length + 1 };
