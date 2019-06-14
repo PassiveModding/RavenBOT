@@ -19,7 +19,8 @@ using Discord.WebSocket;
 namespace RavenBOT.Modules.RoleManagement.Modules
 {
     [Group("RoleManager")]
-    [RequireContext(ContextType.Guild)]
+    [RequireContext(ContextType.Guild)]        
+    [RequireBotPermission(GuildPermission.ManageRoles)]
     public class RoleManagement : InteractiveBase<ShardedCommandContext>
     {
         public RoleManagement(RoleManager manager)
@@ -30,6 +31,8 @@ namespace RavenBOT.Modules.RoleManagement.Modules
         public RoleManager Manager { get; }
 
         [Command("CreateMessage")]
+        [Summary("Creates an embedded message which users can react to in order to receive the specified role.")]
+        [RequireUserPermission(GuildPermission.Administrator)]
         public async Task RoleMessageAsync(params IRole[] roles)
         {
             if (!roles.Any())
@@ -78,6 +81,7 @@ namespace RavenBOT.Modules.RoleManagement.Modules
         }
 
         [Command("Youtube Example")]
+        [Summary("Verification info about the youtube subcription verification command.")]
         public async Task YoutubeExample()
         {
             var content = $"To verify your subscription status use the `verify subscription` command, followed by the display name of the channel you subscribed to and your own youtube channel id.\n" +
@@ -106,7 +110,6 @@ namespace RavenBOT.Modules.RoleManagement.Modules
         }
 
         [Command("Verify Subscription")]
-        [RequireUserPermission(GuildPermission.Administrator)]
         public async Task SubRoleRemove(string displayName, string userChannelId)
         {
             var config = Manager.GetYTConfig(Context.Guild.Id);
