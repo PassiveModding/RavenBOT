@@ -57,63 +57,22 @@ namespace RavenBOT.Modules.Music.Modules
             await ReplyAsync($"Moved from {old.Name} to {player.VoiceChannel.Name}!");
         }
 
-        [Command("Load Playlist"), InAudioChannel]
-        [Summary("Plays the specified playlist or adds it to the queue")]
-        public async Task PlayPlaylistAsync([Remainder] string playlistLink)
-        {
-            var search = await RestClient.SearchTracksAsync(playlistLink, true);
-            if (search.LoadType == LoadType.NoMatches ||
-                search.LoadType == LoadType.LoadFailed)
-            {
-                await ReplyAsync("Nothing found");
-                return;
-            }
-
-            //If there is no player, join the current channel and set the player
-            if (player == null)
-            {
-                await Join();
-                player = LavaShardClient.GetPlayer(Context.Guild.Id);
-            }
-
-            var track = search.Tracks.FirstOrDefault();
-
-            if (player.IsPlaying)
-            {
-                if (search.LoadType == LoadType.PlaylistLoaded)
-                {
-                    foreach (var playlistTrack in search.Tracks)
-                    {
-                        player.Queue.Enqueue(playlistTrack);
-                    }
-                    await ReplyAsync($"{search.Tracks.Count()} tracks added from playlist: {search.PlaylistInfo.Name}");
-                }
-                else
-                {
-                    player.Queue.Enqueue(track);
-                    await ReplyAsync($"{track.Title} has been queued.");
-                }
-            }
-            else
-            {
-                await player.PlayAsync(track);
-                await ReplyAsync($"Now Playing: {track.Title}");
-                if (search.LoadType == LoadType.PlaylistLoaded)
-                {
-                    foreach (var playlistTrack in search.Tracks.Where(x => x.Id != track.Id))
-                    {
-                        player.Queue.Enqueue(playlistTrack);
-                    }
-                    await ReplyAsync($"{search.Tracks.Count()} tracks added from playlist: {search.PlaylistInfo.Name}");
-                }
-            }
-        }
-
         [Command("Play"), InAudioChannel]
         [Summary("Plays the specified track or adds it to the queue")]
         public async Task PlayAsync([Remainder] string query)
         {
-            var search = await RestClient.SearchYouTubeAsync(query);
+            var regExp = new Regex(@"youtu(.*)(be|com).*(list=([a-zA-Z0-9_\-]+))");
+            var match = regExp.Match(query);
+            Victoria.Entities.SearchResult search;
+            if (match.Success)
+            {
+                search = await RestClient.SearchTracksAsync(query, false);
+            }
+            else
+            {
+                search = await RestClient.SearchYouTubeAsync(query);
+            }
+
             if (search.LoadType == LoadType.NoMatches ||
                 search.LoadType == LoadType.LoadFailed)
             {
@@ -373,6 +332,25 @@ namespace RavenBOT.Modules.Music.Modules
             await player.SetVolumeAsync(volume);
             await ReplyAsync($"Volume set to {volume}");
         }
+
+        [Command("Pause")]
+        [Summary("Pauses the audio player if playing")]
+        [InAudioChannel(true)]
+        public async Task Pause()
+        {
+            await player.PauseAsync();
+            await ReplyAsync("Paused.");
+        }
+
+        [Command("Resume")]
+        [Summary("Resumed the audio player if paused")]
+        [InAudioChannel(true)]
+        public async Task Resume()
+        {
+            await player.ResumeAsync();
+            await ReplyAsync("Resumed.");
+        }
+
 
         [Command("ShowVolume")]
         [Alias("Volume")]
