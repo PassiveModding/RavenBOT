@@ -17,6 +17,7 @@ using RavenBOT.Modules.Events.Models.Events;
 using RavenBOT.Modules.Games.Models;
 using RavenBOT.Modules.Greetings.Models;
 using RavenBOT.Modules.Levels.Models;
+using RavenBOT.Modules.Media.Methods;
 using RavenBOT.Modules.Moderator.Models;
 using RavenBOT.Modules.Partner.Models;
 using RavenBOT.Modules.Statistics.Models;
@@ -36,12 +37,14 @@ namespace RavenBOT.Modules.Developer
         public LogHandler Logger { get; }
         public DeveloperSettings DeveloperSettings { get; }
         public IDatabase Database { get; }
+        public GfycatManager GfyCat { get; }
 
-        public Developer(LogHandler logger, IDatabase dbService, DeveloperSettings developerSettings)
+        public Developer(LogHandler logger, IDatabase dbService, GfycatManager manager, DeveloperSettings developerSettings)
         {
             Logger = logger;
             DeveloperSettings = developerSettings;
             Database = dbService;
+            GfyCat = manager;
         }
 
         /*
@@ -157,6 +160,32 @@ namespace RavenBOT.Modules.Developer
                 await ReplyAsync(e.ToString().FixLength(2047));
             }
 
+        }
+
+        [Command("SetGfycatClient")]
+        [Summary("Sets the gfycat client information")]
+        public async Task SetGfycatClientAsync(string id, string secret)
+        {
+            var config = new GfycatManager.GfycatClientInfo
+            {
+                client_id = id,
+                client_secret = secret
+            };
+            Database.Store(config, "GfycatClientInfo");
+        }
+
+
+        [Command("EmbedGfycatImage")]
+        [Summary("Tests the getgfycaturl method")]
+        public async Task EmbedTest([Remainder]string imageUrl)
+        {
+            var response = await GfyCat.GetGfyCatUrl(imageUrl);
+            var embed = new EmbedBuilder()
+            {
+                Description = imageUrl,
+                ImageUrl = response
+            };
+            await ReplyAsync("", false, embed.Build());
         }
 
         [Command("MigrateToLiteDB", RunMode = RunMode.Async)]

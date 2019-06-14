@@ -18,10 +18,12 @@ namespace RavenBOT.Modules.Media.Modules
         public MediaHelper MediaHelper {get;}
         public NsfwHelper NsfwHelper { get; }
         public Random Random {get;}
+        public GfycatManager GfyManager { get; }
 
-        public NSFW(Random random, MediaHelper mediaHelper, NsfwHelper nsfwHelper)
+        public NSFW(Random random, GfycatManager gfyManager, MediaHelper mediaHelper, NsfwHelper nsfwHelper)
         {
             Random = random;
+            GfyManager = gfyManager;
             MediaHelper = mediaHelper;
             NsfwHelper = nsfwHelper;
         }
@@ -50,7 +52,8 @@ namespace RavenBOT.Modules.Media.Modules
 
             await ReplyAsync($"{selectedPost.Title}\nhttps://reddit.com{selectedPost.Permalink}", false, new EmbedBuilder()
             {
-                ImageUrl = selectedPost.Url.ToString().FixGfycatUrl()
+                //Note that non gfycat urls will be returned as normal even with this function
+                ImageUrl = await GfyManager.GetGfyCatUrl(selectedPost.Url.ToString())
             }.Build());
         }
 
