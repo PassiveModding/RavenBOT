@@ -48,7 +48,7 @@ namespace RavenBOT.Modules
         [Summary("Returns the bot invite")]
         public async Task InviteAsync()
         {
-            await ReplyAsync($"Invite: https://discordapp.com/oauth2/authorize?client_id={Context.Client.CurrentUser.Id}&scope=bot&permissions=2146958591");
+            await ReplyAsync("", false, $"Invite: https://discordapp.com/oauth2/authorize?client_id={Context.Client.CurrentUser.Id}&scope=bot&permissions=2146958591".QuickEmbed());
         }
 
         [Command("Help")]
