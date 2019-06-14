@@ -51,7 +51,7 @@ namespace RavenBOT.Services.Database
                 }
 
 
-                if (DocumentStore.Maintenance.Server.Send(new GetDatabaseNamesOperation(0, 5)).All(x => !x.Equals(Config.DatabaseName)))
+                if (DocumentStore.Maintenance.Server.Send(new GetDatabaseNamesOperation(0, 25)).All(x => !x.Equals(Config.DatabaseName)))
                 {
                     DocumentStore.Maintenance.Server.Send(new CreateDatabaseOperation(new DatabaseRecord(Config.DatabaseName)));
                 }
