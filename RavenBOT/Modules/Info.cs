@@ -65,6 +65,7 @@ namespace RavenBOT.Modules
         {
             string changes;
             var request = new HttpRequestMessage(HttpMethod.Get, "https://api.github.com/repos/PassiveModding/RavenBOT/commits");
+            request.Headers.Add("User-Agent", "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)");
             var response = await HttpClient.SendAsync(request);
             if (!response.IsSuccessStatusCode)
             {
