@@ -55,22 +55,22 @@ namespace RavenBOT.Services.Licensing
         //Returns whether the operation was successful
         public RedemptionResult RedeemLicense(TimedUserProfile profile, string key)
         {
-                var license = key != null ? Store.Load<TimedLicense>($"TimedLicense-{profile.ProfileType}-{key}") : null;
+            var license = key != null ? Store.Load<TimedLicense>($"TimedLicense-{profile.ProfileType}-{key}") : null;
 
-                if (license == null)
-                {
-                    return RedemptionResult.InvalidKey;
-                }
+            if (license == null)
+            {
+                return RedemptionResult.InvalidKey;
+            }
 
-                if (license.RedemptionDate != null)
-                {
-                    return RedemptionResult.AlreadyClaimed;
-                }
+            if (license.RedemptionDate != null)
+            {
+                return RedemptionResult.AlreadyClaimed;
+            }
 
-                profile.RedeemLicense(license);
-                Store.Store(profile);
-                Store.Store(license);
-                return RedemptionResult.Success;
+            profile.RedeemLicense(license);
+            Store.Store(profile);
+            Store.Store(license);
+            return RedemptionResult.Success;
         }
 
         public RedemptionResult RedeemLicense(QuantifiableUserProfile profile, string key)
@@ -114,7 +114,7 @@ namespace RavenBOT.Services.Licensing
             }
 
             Store.StoreMany(newLicenses);
-            
+
             return newLicenses;
         }
 
@@ -140,11 +140,10 @@ namespace RavenBOT.Services.Licensing
             }
 
             Store.StoreMany(newLicenses);
-            
+
             return newLicenses;
         }
 
-        
         private QuantifiableLicense MakeQuantifiableLicense(string type, int uses)
         {
             var license = new QuantifiableLicense($"{GenerateRandomNo()}-{GenerateRandomNo()}-{GenerateRandomNo()}-{GenerateRandomNo()}", type, uses);
@@ -297,7 +296,6 @@ namespace RavenBOT.Services.Licensing
 
                     timed.RedemptionDate = DateTime.UtcNow;
                     Licenses.Add(timedLicense);
-                
 
                     if (ExpireTime <= DateTime.UtcNow)
                     {

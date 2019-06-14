@@ -19,12 +19,11 @@ namespace RavenBOT.Modules.Statistics.Methods
             Client = new HttpClient();
         }
 
-        
         public void SaveGrafanaConfig(GrafanaConfig config)
         {
             Database.Store(config, GrafanaConfig.DocumentName());
         }
-        
+
         public GrafanaConfig GetGrafanaConfig()
         {
             var config = Database.Load<GrafanaConfig>(GrafanaConfig.DocumentName());
@@ -35,18 +34,16 @@ namespace RavenBOT.Modules.Statistics.Methods
             }
             return config;
         }
-        
+
         public HttpRequestMessage GetRequest(GrafanaConfig config, string url)
         {
             return new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new System.Uri(url),
-                Headers = 
-                {
-                    { HttpRequestHeader.Authorization.ToString(), $"Bearer {config.ApiKey}" },
-                    { HttpRequestHeader.Accept.ToString(), "application/json" }
-                }
+                    RequestUri = new System.Uri(url),
+                    Headers = { { HttpRequestHeader.Authorization.ToString(), $"Bearer {config.ApiKey}" },
+                        { HttpRequestHeader.Accept.ToString(), "application/json" }
+                        }
             };
         }
 

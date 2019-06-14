@@ -45,7 +45,7 @@ namespace RavenBOT.Modules.Partner.Modules
 
         [Command("SetImage")]
         [Summary("Sets the partner image")]
-        public async Task SetImageAsync([Remainder]string url = null)
+        public async Task SetImageAsync([Remainder] string url = null)
         {
             var config = Manager.GetOrCreatePartnerConfig(Context.Guild.Id);
             config.ImageUrl = url;
@@ -85,7 +85,7 @@ namespace RavenBOT.Modules.Partner.Modules
 
         [Command("SetMessage")]
         [Summary("Sets the servers partner message")]
-        public async Task SetMessageAsync([Remainder]string message)
+        public async Task SetMessageAsync([Remainder] string message)
         {
             if (message.Length > 512)
             {
@@ -118,15 +118,15 @@ namespace RavenBOT.Modules.Partner.Modules
             var config = Manager.GetOrCreatePartnerConfig(Context.Guild.Id);
             var embed = await config.GetEmbedAsync(Context.Guild);
             await ReplyAsync($"Enabled: {config.Enabled}\n" +
-                             $"Show Thumbnail: {config.UseThumb}\n"+
-                             $"Color: R-{config.Color?.R} G-{config.Color?.G} B-{config.Color?.B}\n" +
-                             $"Receiver Channel: {Context.Guild.GetChannel(config.ReceiverChannelId)?.Name ?? "N/A"}" +
-                             $"Image Url: {config.ImageUrl ?? "N/A"}\n"+
-                             $"Message: \n{config.Message}");
+                $"Show Thumbnail: {config.UseThumb}\n" +
+                $"Color: R-{config.Color?.R} G-{config.Color?.G} B-{config.Color?.B}\n" +
+                $"Receiver Channel: {Context.Guild.GetChannel(config.ReceiverChannelId)?.Name ?? "N/A"}" +
+                $"Image Url: {config.ImageUrl ?? "N/A"}\n" +
+                $"Message: \n{config.Message}");
         }
 
         [Command("Trigger")]
-        [RequireOwner]        
+        [RequireOwner]
         [Summary("DEV: Triggers a partner event")]
         public async Task TriggerEvent()
         {

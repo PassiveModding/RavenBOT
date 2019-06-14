@@ -1,15 +1,15 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CaptchaGen.NetCore;
 using Discord;
 using Discord.WebSocket;
-using CaptchaGen.NetCore;
-using System.IO;
-using RavenBOT.Services.Database;
-using System.Collections.Generic;
 using RavenBOT.Modules.Captcha.Models;
 using RavenBOT.Services;
+using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Captcha.Methods
 {
@@ -37,7 +37,7 @@ namespace RavenBOT.Modules.Captcha.Methods
             {
                 return;
             }
-            
+
             if (actionType == CaptchaConfig.Action.Kick)
             {
                 await user.KickAsync("Failed to pass captcha verification");
@@ -102,7 +102,7 @@ namespace RavenBOT.Modules.Captcha.Methods
             {
                 if (channel.PermissionOverwrites.All(x => x.TargetId != role.Id))
                 {
-                    var _ = Task.Run(async () => await channel.AddPermissionOverwriteAsync(role, new OverwritePermissions(sendMessages: PermValue.Deny, addReactions: PermValue.Deny, connect: PermValue.Deny, speak: PermValue.Deny)));
+                    var _ = Task.Run(async() => await channel.AddPermissionOverwriteAsync(role, new OverwritePermissions(sendMessages: PermValue.Deny, addReactions: PermValue.Deny, connect: PermValue.Deny, speak: PermValue.Deny)));
                 }
             }
 
@@ -149,7 +149,7 @@ namespace RavenBOT.Modules.Captcha.Methods
                     //Captcha temp role.
                     //The Channel will need the permissions to be updated.
                     var _ = await GetOrCreateCaptchaRole(config, gChannel.Guild);
-                }               
+                }
             }
         }
 
@@ -185,7 +185,6 @@ namespace RavenBOT.Modules.Captcha.Methods
                     return;
                 }
 
-
                 Stream imageStream = CaptchaGen.NetCore.ImageFactory.BuildImage(captchaDoc.Captcha, 100, 150, 25, 10, ImageFormatType.Jpeg);
 
                 try
@@ -197,7 +196,7 @@ namespace RavenBOT.Modules.Captcha.Methods
                     var guildChannel = user.Guild.GetTextChannel(config.ChannelId);
                     if (guildChannel != null)
                     {
-                         await guildChannel.SendFileAsync(imageStream, "captcha.jpg", $"{user.Mention} Please run the Verify command in order to speak in {user.Guild.Name}. ie. `lithium.moderation.Verify {user.Guild.Id} <code>`");
+                        await guildChannel.SendFileAsync(imageStream, "captcha.jpg", $"{user.Mention} Please run the Verify command in order to speak in {user.Guild.Name}. ie. `lithium.moderation.Verify {user.Guild.Id} <code>`");
                     }
                 }
             }

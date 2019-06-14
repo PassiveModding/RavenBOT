@@ -11,7 +11,7 @@ namespace RavenBOT.Modules.Captcha.Modules
     [Group("captcha")]
     public class Captcha : InteractiveBase<ShardedCommandContext>
     {
-        public CaptchaService CaptchaService {get;}
+        public CaptchaService CaptchaService { get; }
         public Captcha(CaptchaService captchaService)
         {
             CaptchaService = captchaService;
@@ -19,7 +19,7 @@ namespace RavenBOT.Modules.Captcha.Modules
 
         [Command("Verify")]
         [Summary("Verifies your status in a server")]
-        public async Task VerifyCaptcha(ulong guildId, [Remainder]string captcha = null)
+        public async Task VerifyCaptcha(ulong guildId, [Remainder] string captcha = null)
         {
             if (captcha == null)
             {
@@ -52,7 +52,7 @@ namespace RavenBOT.Modules.Captcha.Modules
             if (captchaUser.Passed)
             {
                 var role = guild.GetRole(config.CaptchaTempRole);
-                
+
                 if (role != null && guildUser != null)
                 {
                     await guildUser.RemoveRoleAsync(role);
@@ -72,10 +72,10 @@ namespace RavenBOT.Modules.Captcha.Modules
 
             if (captcha.Equals(captchaUser.Captcha))
             {
-                captchaUser.Passed = true;            
+                captchaUser.Passed = true;
 
                 var role = guild.GetRole(config.CaptchaTempRole);
-                
+
                 if (role != null && guildUser != null)
                 {
                     await guildUser.RemoveRoleAsync(role);
@@ -91,7 +91,7 @@ namespace RavenBOT.Modules.Captcha.Modules
                 captchaUser.FailureCount++;
 
                 await ReplyAsync($"You have failed attempt {captchaUser.FailureCount}/{config.MaxFailures}");
-                
+
                 if (captchaUser.FailureCount >= config.MaxFailures)
                 {
                     await ReplyAsync("You have exceeded the maximum amount of attempts.");
@@ -124,8 +124,8 @@ namespace RavenBOT.Modules.Captcha.Modules
             config.UseCaptcha = !config.UseCaptcha;
             CaptchaService.SaveCaptchaConfig(config);
 
-            await ReplyAsync($"UseCaptcha: {config.UseCaptcha}\n" + 
-                            "Note: Please ensure you set a captcha channel (using the `SetChannel` command) as the bot will message there in the event that it cannot dm the user directly");
+            await ReplyAsync($"UseCaptcha: {config.UseCaptcha}\n" +
+                "Note: Please ensure you set a captcha channel (using the `SetChannel` command) as the bot will message there in the event that it cannot dm the user directly");
         }
 
         [Command("MaxCaptchaWarnings")]
@@ -153,7 +153,7 @@ namespace RavenBOT.Modules.Captcha.Modules
         public async Task ShowCaptchaActions()
         {
             await ReplyAsync("Captcha Actions:\n" +
-                            "`Ban`\n`Kick`\n`None`");
+                "`Ban`\n`Kick`\n`None`");
         }
 
         [Command("SetCaptchaAction")]
@@ -176,11 +176,11 @@ namespace RavenBOT.Modules.Captcha.Modules
         {
             var config = CaptchaService.GetCaptchaConfig(Context.Guild.Id);
             await ReplyAsync($"**CAPTCHA SETTINGS**\n" +
-                            $"Use Captcha: {config.UseCaptcha}\n" +
-                            $"Temp Role: {Context.Guild.GetRole(config.CaptchaTempRole)?.Mention ?? "N/A"}\n" +
-                            $"Max Captcha Failures: {config.MaxFailures}\n" +
-                            $"Max Captcha Failures Action: {config.MaxFailuresAction}\n" + 
-                            $"Captcha hannel: {Context.Guild.GetTextChannel(config.ChannelId)?.Mention ?? "N/A, it is recommended that you set this asap"}");
+                $"Use Captcha: {config.UseCaptcha}\n" +
+                $"Temp Role: {Context.Guild.GetRole(config.CaptchaTempRole)?.Mention ?? "N/A"}\n" +
+                $"Max Captcha Failures: {config.MaxFailures}\n" +
+                $"Max Captcha Failures Action: {config.MaxFailuresAction}\n" +
+                $"Captcha hannel: {Context.Guild.GetTextChannel(config.ChannelId)?.Mention ?? "N/A, it is recommended that you set this asap"}");
         }
     }
 }

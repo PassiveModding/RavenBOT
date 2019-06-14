@@ -20,7 +20,7 @@ namespace RavenBOT.Modules.Info.Modules
             await ReplyAsync("", false, new EmbedBuilder()
             {
                 Title = $"{role.Name} Members",
-                Description = $"{string.Join(", ", role.Members.Select(x => x.Mention))}".FixLength(2047)
+                    Description = $"{string.Join(", ", role.Members.Select(x => x.Mention))}".FixLength(2047)
             }.Build());
         }
 
@@ -34,13 +34,13 @@ namespace RavenBOT.Modules.Info.Modules
 
             // send the message and store it for later modification
             var msg = await ReplyAsync($"**Websocket latency**: {Context.Client.Latency}ms\n" +
-                                    "**Response**: ...");
+                "**Response**: ...");
             // pause the stopwatch
             sw.Stop();
 
             // modify the message we sent earlier to display measured time
             await msg.ModifyAsync(x => x.Content = $"**Websocket latency**: {Context.Client.Latency}ms\n" +
-                                                $"**Response**: {sw.Elapsed.TotalMilliseconds}ms");
+                $"**Response**: {sw.Elapsed.TotalMilliseconds}ms");
         }
     }
 }

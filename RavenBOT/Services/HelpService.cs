@@ -36,7 +36,7 @@ namespace RavenBOT.Services
         {
             var commandCollection = CommandService.Commands.ToList();
 
-            var modules = commandCollection.GroupBy(c => c.Module.Name).Select(x => new Tuple<string, List<CommandInfo>>(x.Key, x.ToList())).ToList(); 
+            var modules = commandCollection.GroupBy(c => c.Module.Name).Select(x => new Tuple<string, List<CommandInfo>>(x.Key, x.ToList())).ToList();
 
             //Use filter out any modules that are not chosen in the filter.
             if (moduleFilter != null && moduleFilter.Any())
@@ -57,7 +57,7 @@ namespace RavenBOT.Services
                 if (modules.Sum(x => x.Item2.Count) > 20)
                 {
                     await context.Channel.SendMessageAsync("This command filters out all commands that you do not have sufficient permissions to access. As such it may take a moment to generate.\n" +
-                                                            "If you want to see every command, use the fullhelp command instead.");
+                        "If you want to see every command, use the fullhelp command instead.");
                 }
 
                 var newModules = new List<Tuple<string, List<CommandInfo>>>();
@@ -71,11 +71,11 @@ namespace RavenBOT.Services
                         if (await CheckPreconditionsAsync(context, command, devSettings))
                         {
                             commands.Add(command);
-                        }                        
+                        }
                     }
-                    
+
                     if (commands.Any())
-                    {                        
+                    {
                         newModules.Add(new Tuple<string, List<CommandInfo>>(module.Item1, commands));
                     }
                 }
@@ -89,17 +89,17 @@ namespace RavenBOT.Services
             {
                 new EmbedFieldBuilder
                 {
-                    // This gives a brief overview of how to use the paginated message and help commands.
-                    Name = $"Commands Summary",
-                    Value =
-                        "Go to the respective page number of each module to view the commands in more detail. "
-                        + "You can react with the :1234: emote and type a page number to go directly to that page too,\n"
-                        + "otherwise react with the arrows (◀ ▶) to change pages.\n"
-                        + additionalField
+                // This gives a brief overview of how to use the paginated message and help commands.
+                Name = $"Commands Summary",
+                Value =
+                "Go to the respective page number of each module to view the commands in more detail. " +
+                "You can react with the :1234: emote and type a page number to go directly to that page too,\n" +
+                "otherwise react with the arrows (◀ ▶) to change pages.\n" +
+                additionalField
                 }
             };
 
-            foreach(var commandGroup in modules)
+            foreach (var commandGroup in modules)
             {
                 var moduleName = commandGroup.Item1;
                 var commands = commandGroup.Item2;
@@ -122,14 +122,14 @@ namespace RavenBOT.Services
                     overviewFields.Add(new EmbedFieldBuilder
                     {
                         Name = moduleName,
-                        Value = moduleContent.ToString().FixLength()                
+                            Value = moduleContent.ToString().FixLength()
                     });
                 }
             }
 
             int pageIndex = 0;
             var pages = new List<Tuple<int, PaginatedMessage.Page>>();
-            foreach(var commandGroup in modules)
+            foreach (var commandGroup in modules)
             {
                 var moduleName = commandGroup.Item1;
                 var commands = commandGroup.Item2;
@@ -158,7 +158,7 @@ namespace RavenBOT.Services
                         commandContent.AppendLine($"[Aliases]{string.Join(",", command.Aliases)}");
                     }
                     commandContent.AppendLine($"`{command.Aliases.First() ?? command.Module.Aliases.FirstOrDefault()} {string.Join(" ", command.Parameters.Select(x => x.ParameterInformation()))}`");
-                
+
                     if (pageContent.Length + commandContent.Length > 2047)
                     {
                         page.Title = moduleName;
@@ -175,7 +175,7 @@ namespace RavenBOT.Services
                     }
                     commandContent.Clear();
                 }
-                
+
                 page.Title = moduleName;
                 page.Description = pageContent.ToString();
                 pages.Add(new Tuple<int, PaginatedMessage.Page>(pageIndex, page));
@@ -183,12 +183,12 @@ namespace RavenBOT.Services
             }
 
             //This division will round upwards (overviewFields.Count - 1)/5 +1
-            int overviewPageCount = ((overviewFields.Count - 1)/5) + 1;
+            int overviewPageCount = ((overviewFields.Count - 1) / 5) + 1;
 
             for (int i = 0; i < pages.Count; i++)
             {
                 //Use indexing rather than foreach to avoid updating a collection while it is being interated
-                pages[i] = new Tuple<int, PaginatedMessage.Page>(pages[i].Item1 + overviewPageCount + 1 /* Use + 1 as the pages are appended to the overview page count */, pages[i].Item2);
+                pages[i] = new Tuple<int, PaginatedMessage.Page>(pages[i].Item1 + overviewPageCount + 1 /* Use + 1 as the pages are appended to the overview page count */ , pages[i].Item2);
             }
 
             var overviewPages = new List<PaginatedMessage.Page>();
@@ -211,7 +211,7 @@ namespace RavenBOT.Services
                 Pages = overviewPages,
                 Color = Color.Green,
                 Title = $"{context.Client.CurrentUser.Username} Commands"
-            };           
+            };
             pager.Pages = overviewPages;
 
             return pager;

@@ -1,5 +1,5 @@
-using System.Linq;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -9,7 +9,7 @@ using RavenBOT.Modules.Moderator.Methods;
 namespace RavenBOT.Modules.Moderator.Preconditions
 {
     public class Moderator : PreconditionAttribute
-    {        
+    {
         public override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)
         {
             var modHandler = services.GetRequiredService<ModerationHandler>();
@@ -19,7 +19,7 @@ namespace RavenBOT.Modules.Moderator.Preconditions
                 return Task.FromResult(PreconditionResult.FromError("This is a guild only command."));
             }
 
-            var user = ((SocketGuildUser)context.User);
+            var user = ((SocketGuildUser) context.User);
 
             //Always allow admins the moderator permission
             if (user.GuildPermissions.Administrator)

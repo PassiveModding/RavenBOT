@@ -57,7 +57,7 @@ namespace RavenBOT.Preconditions
 
         private readonly TimeSpan invokeLimitPeriod;
 
-        private readonly Dictionary<(ulong, ulong?), CommandTimeout> invokeTracker = new Dictionary<(ulong, ulong?), CommandTimeout>();
+        private readonly Dictionary < (ulong, ulong?), CommandTimeout > invokeTracker = new Dictionary < (ulong, ulong?), CommandTimeout > ();
 
         private readonly bool noLimitForAdmins;
 

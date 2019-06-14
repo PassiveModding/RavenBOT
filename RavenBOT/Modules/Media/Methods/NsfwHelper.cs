@@ -10,8 +10,8 @@ namespace RavenBOT.Modules.Media.Methods
 {
     public class NsfwHelper : IServiceable
     {
-        private Random Random {get;}
-        public HttpClient Client {get;}
+        private Random Random { get; }
+        public HttpClient Client { get; }
         public NsfwHelper(Random random)
         {
             Random = random;
@@ -94,7 +94,7 @@ namespace RavenBOT.Modules.Media.Methods
         {
             string url = null;
             string result;
-            tags = !tags.Any() ? new[] { "boobs", "tits", "ass", "sexy", "neko" }.ToList() : tags;
+            tags = !tags.Any() ? new [] { "boobs", "tits", "ass", "sexy", "neko" }.ToList() : tags;
             switch (nsfwType)
             {
                 case NsfwType.Danbooru:

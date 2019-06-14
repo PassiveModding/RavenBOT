@@ -28,7 +28,7 @@ namespace RavenBOT.Modules.Conversation.Methods
 
         public void SetAgent()
         {
-            var config = Database.Load<ConversationConfig>(ConversationConfig.DocumentName ());
+            var config = Database.Load<ConversationConfig>(ConversationConfig.DocumentName());
             if (config == null)
             {
                 Agent = null;
@@ -38,7 +38,7 @@ namespace RavenBOT.Modules.Conversation.Methods
 
             Config = config;
             var credentials = GoogleCredential.FromJson(config.ApiJson);
-            var channel = new Grpc.Core.Channel(SessionsClient.DefaultEndpoint.Host, credentials.ToChannelCredentials ());
+            var channel = new Grpc.Core.Channel(SessionsClient.DefaultEndpoint.Host, credentials.ToChannelCredentials());
             Agent = SessionsClient.Create(channel);
         }
 
@@ -87,7 +87,6 @@ namespace RavenBOT.Modules.Conversation.Methods
                     return;
                 }
 
-                
                 if (!LocalManagementService.LastConfig.IsAcceptable(tChannel.Guild.Id))
                 {
                     return;
@@ -114,8 +113,8 @@ namespace RavenBOT.Modules.Conversation.Methods
             {
                 Text = new TextInput
                 {
-                    Text = messageContent,
-                    LanguageCode = "en-us"
+                Text = messageContent,
+                LanguageCode = "en-us"
                 }
             };
 
@@ -150,7 +149,7 @@ namespace RavenBOT.Modules.Conversation.Methods
                 */
 
                 await message.Channel.SendMessageAsync(dialogResponse.QueryResult.FulfillmentText);
-                Logger.Log($"Handled Conversation, IN: {messageContent} => OUT: {dialogResponse.QueryResult.FulfillmentText}");                
+                Logger.Log($"Handled Conversation, IN: {messageContent} => OUT: {dialogResponse.QueryResult.FulfillmentText}");
             }
 
         }

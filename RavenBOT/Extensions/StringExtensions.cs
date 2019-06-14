@@ -1,10 +1,10 @@
-﻿using System.Net.Http;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
-using Discord;
 using System.Threading.Tasks;
+using Discord;
 using Newtonsoft.Json.Linq;
 
 namespace RavenBOT.Extensions
@@ -26,7 +26,7 @@ namespace RavenBOT.Extensions
             return new EmbedBuilder
             {
                 Description = message.FixLength(2047),
-                Color = color ?? Discord.Color.Blue
+                    Color = color ?? Discord.Color.Blue
             }.Build();
         }
 
@@ -62,7 +62,7 @@ namespace RavenBOT.Extensions
             catch
             {
                 return original;
-            }            
+            }
         }
 
         public static IDictionary<String, Int32> ConvertEnumToDictionary<K>()

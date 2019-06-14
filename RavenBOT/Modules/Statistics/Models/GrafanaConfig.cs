@@ -7,7 +7,7 @@ namespace RavenBOT.Modules.Statistics.Models
             return $"GrafanaConfig";
         }
 
-        public string GrafanaUrl {get;set;}
-        public string ApiKey {get;set;}
+        public string GrafanaUrl { get; set; }
+        public string ApiKey { get; set; }
     }
 }

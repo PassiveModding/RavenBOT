@@ -42,7 +42,7 @@ namespace RavenBOT.Modules.Statistics.Methods
                 DBLApi = new ShardedDiscordNetDblApi(Client, config.APIKey);
                 DBLApi?.CreateListener();
             }
-            catch 
+            catch
             {
                 //
             }

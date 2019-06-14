@@ -4,7 +4,7 @@ namespace RavenBOT.Modules.ELO.Models
 {
     public class Player
     {
-        public static string DocumentName (ulong guildId, ulong userId)
+        public static string DocumentName(ulong guildId, ulong userId)
         {
             return $"Player-{guildId}-{userId}";
         }
@@ -14,7 +14,7 @@ namespace RavenBOT.Modules.ELO.Models
         /// </summary>
         /// <value></value>
         public string DisplayName { get; set; }
-        
+
         /// <summary>
         /// The user ID
         /// </summary>
@@ -27,7 +27,7 @@ namespace RavenBOT.Modules.ELO.Models
         /// <value></value>
         public ulong GuildId { get; set; }
 
-        public Player (ulong userId, ulong guildId, string displayName)
+        public Player(ulong userId, ulong guildId, string displayName)
         {
             this.DisplayName = displayName;
             this.UserId = userId;
@@ -47,22 +47,22 @@ namespace RavenBOT.Modules.ELO.Models
         /// <typeparam name="string">The property name</typeparam>
         /// <typeparam name="int">The value</typeparam>
         /// <returns></returns>
-        public Dictionary<string, int> AdditionalProperties { get; set; } = new Dictionary<string, int> ();
+        public Dictionary<string, int> AdditionalProperties { get; set; } = new Dictionary<string, int>();
 
-        public void SetValue (string key, int count)
+        public void SetValue(string key, int count)
         {
             AdditionalProperties[key] = count;
         }
 
-        public void UpdateValue (string key, int modifier)
+        public void UpdateValue(string key, int modifier)
         {
-            if (AdditionalProperties.TryGetValue (key, out int value))
+            if (AdditionalProperties.TryGetValue(key, out int value))
             {
                 AdditionalProperties[key] = value + modifier;
             }
             else
             {
-                AdditionalProperties.Add (key, modifier);
+                AdditionalProperties.Add(key, modifier);
             }
         }
     }

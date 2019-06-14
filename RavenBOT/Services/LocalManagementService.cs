@@ -13,7 +13,7 @@ namespace RavenBOT.Services
         private static readonly string ConfigDirectory = Path.Combine(AppContext.BaseDirectory, "setup");
         private static readonly string ConfigPath = Path.Combine(ConfigDirectory, "Local.json");
 
-        public LocalConfig LastConfig {get;set;}
+        public LocalConfig LastConfig { get; set; }
 
         public LocalConfig GetConfig()
         {
@@ -85,9 +85,9 @@ namespace RavenBOT.Services
             public string DeveloperPrefix { get; set; } = "dev.";
 
             //Used for whitelisting commands/events while in dev mode.
-            public List<ulong> WhitelistedGuilds {get;set;} = new List<ulong>();
+            public List<ulong> WhitelistedGuilds { get; set; } = new List<ulong>();
 
-            public bool EnforceWhitelist {get;set;} = true;
+            public bool EnforceWhitelist { get; set; } = true;
             public bool IsAcceptable(ulong guildId)
             {
                 if (!EnforceWhitelist)
@@ -109,7 +109,7 @@ namespace RavenBOT.Services
             }
 
             [JsonConverter(typeof(StringEnumConverter))]
-            public DatabaseSelection DatabaseChoice {get;set;} = DatabaseSelection.RavenEmbeddedDatabase;
+            public DatabaseSelection DatabaseChoice { get; set; } = DatabaseSelection.RavenEmbeddedDatabase;
 
             public enum DatabaseSelection
             {

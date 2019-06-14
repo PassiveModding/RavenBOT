@@ -29,18 +29,18 @@ namespace RavenBOT.Modules.Reminders.Models
             ReminderMessage = message;
         }
 
-        public Reminder() {}
+        public Reminder() { }
 
-        public ulong GuildId {get;set;}
-        public ulong UserId {get;set;}
+        public ulong GuildId { get; set; }
+        public ulong UserId { get; set; }
 
-        public ulong ChannelId {get;set;}
-        public DateTime TimeStamp {get;set;}
+        public ulong ChannelId { get; set; }
+        public DateTime TimeStamp { get; set; }
 
-        public TimeSpan Length {get;set;}
+        public TimeSpan Length { get; set; }
 
-        public string ReminderMessage {get;set;}
+        public string ReminderMessage { get; set; }
 
-        public int ReminderNumber {get;set;}
+        public int ReminderNumber { get; set; }
     }
 }

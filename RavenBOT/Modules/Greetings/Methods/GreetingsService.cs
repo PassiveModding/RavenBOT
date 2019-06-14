@@ -10,8 +10,8 @@ namespace RavenBOT.Modules.Greetings.Methods
 {
     public class GreetingsService : IServiceable
     {
-        private IDatabase Database {get;}
-        private DiscordShardedClient Client {get;}
+        private IDatabase Database { get; }
+        private DiscordShardedClient Client { get; }
         public LocalManagementService LocalManagementService { get; }
 
         public GreetingsService(IDatabase database, DiscordShardedClient client, LocalManagementService localManagementService)
@@ -44,7 +44,7 @@ namespace RavenBOT.Modules.Greetings.Methods
                 {
                     return;
                 }
-                
+
                 await dmChannel.SendMessageAsync("", false, message.QuickEmbed());
             }
             else
@@ -60,12 +60,12 @@ namespace RavenBOT.Modules.Greetings.Methods
         }
 
         public async Task UserLeft(SocketGuildUser user)
-        {            
+        {
             if (!LocalManagementService.LastConfig.IsAcceptable(user.Guild.Id))
             {
                 return;
             }
-            
+
             var config = GetGoodbyeConfig(user.Guild.Id);
             if (!config.Enabled)
             {
@@ -81,7 +81,7 @@ namespace RavenBOT.Modules.Greetings.Methods
                 {
                     return;
                 }
-                
+
                 await dmChannel.SendMessageAsync("", false, message.QuickEmbed());
             }
             else
@@ -134,17 +134,16 @@ namespace RavenBOT.Modules.Greetings.Methods
         public string DoReplacements(string original, SocketGuildUser user)
         {
             original = original.Replace("{username}", user.Username, true, CultureInfo.InvariantCulture)
-                                .Replace("{servername}", user.Guild.Name, true, CultureInfo.InvariantCulture)
-                                .Replace("{nickname}", user.Nickname ?? user.Username, true, CultureInfo.InvariantCulture)
-                                .Replace("{userid}", user.Id.ToString(), true, CultureInfo.InvariantCulture)
-                                .Replace("{discriminator}", user.Discriminator, true, CultureInfo.InvariantCulture)
-                                .Replace("{mention}", user.Mention, true, CultureInfo.InvariantCulture)
-                                .Replace("{serverownerusername}", user.Guild.Owner.Username, true, CultureInfo.InvariantCulture)
-                                .Replace("{serverownernickname}", user.Guild.Owner.Nickname ?? user.Guild.Owner.Username, true, CultureInfo.InvariantCulture)
-                                .Replace("{serverid}", user.Guild.Id.ToString(), true, CultureInfo.InvariantCulture);
+                .Replace("{servername}", user.Guild.Name, true, CultureInfo.InvariantCulture)
+                .Replace("{nickname}", user.Nickname ?? user.Username, true, CultureInfo.InvariantCulture)
+                .Replace("{userid}", user.Id.ToString(), true, CultureInfo.InvariantCulture)
+                .Replace("{discriminator}", user.Discriminator, true, CultureInfo.InvariantCulture)
+                .Replace("{mention}", user.Mention, true, CultureInfo.InvariantCulture)
+                .Replace("{serverownerusername}", user.Guild.Owner.Username, true, CultureInfo.InvariantCulture)
+                .Replace("{serverownernickname}", user.Guild.Owner.Nickname ?? user.Guild.Owner.Username, true, CultureInfo.InvariantCulture)
+                .Replace("{serverid}", user.Guild.Id.ToString(), true, CultureInfo.InvariantCulture);
             return original;
         }
-
 
     }
 }

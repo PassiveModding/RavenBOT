@@ -15,7 +15,7 @@ namespace RavenBOT.Modules.AutoMod.Methods
             None
         }
 
-        public Dictionary<ulong, SpamGuild> SpamGuilds {get;set;} = new Dictionary<ulong, SpamGuild>();
+        public Dictionary<ulong, SpamGuild> SpamGuilds { get; set; } = new Dictionary<ulong, SpamGuild>();
 
         public class SpamGuild
         {
@@ -23,7 +23,7 @@ namespace RavenBOT.Modules.AutoMod.Methods
             {
                 GuildId = guildId;
             }
-            public ulong GuildId {get;}
+            public ulong GuildId { get; }
             public Dictionary<ulong, SpamChannel> SpamChannels = new Dictionary<ulong, SpamChannel>();
             public class SpamChannel
             {
@@ -32,7 +32,7 @@ namespace RavenBOT.Modules.AutoMod.Methods
                     ChannelId = channelId;
                 }
 
-                public ulong ChannelId {get;}
+                public ulong ChannelId { get; }
 
                 public Dictionary<ulong, SpamUser> SpamUsers = new Dictionary<ulong, SpamUser>();
 
@@ -43,9 +43,9 @@ namespace RavenBOT.Modules.AutoMod.Methods
                         UserId = userId;
                     }
 
-                    public ulong UserId {get;}
+                    public ulong UserId { get; }
 
-                    public List<SpamMessage> Messages {get; private set;} = new List<SpamMessage>();
+                    public List<SpamMessage> Messages { get; private set; } = new List<SpamMessage>();
                     public SpamType AddMessage(SocketUserMessage message, int maxMessages, int secondsCapture, int maxRepetitions, int cacheSize, out List<SpamMessage> messages)
                     {
                         var msg = new SpamMessage();
@@ -60,7 +60,7 @@ namespace RavenBOT.Modules.AutoMod.Methods
                         {
                             msg.Responded = true;
                             messages = Messages;
-                            returnType = SpamType.TooFast;   
+                            returnType = SpamType.TooFast;
                         }
                         else if (Messages.GroupBy(x => x.Message).Max(x => x.Count()) >= maxRepetitions)
                         {
@@ -96,11 +96,11 @@ namespace RavenBOT.Modules.AutoMod.Methods
                     }
                     public class SpamMessage
                     {
-                        public string Message {get;set;}
-                        public ulong MessageId {get;set;}
-                        public DateTime TimeStamp {get;set;} = DateTime.UtcNow;
-                        public bool Responded {get;set;} = false;
-                        
+                        public string Message { get; set; }
+                        public ulong MessageId { get; set; }
+                        public DateTime TimeStamp { get; set; } = DateTime.UtcNow;
+                        public bool Responded { get; set; } = false;
+
                     }
                 }
             }

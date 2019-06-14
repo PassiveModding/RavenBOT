@@ -26,10 +26,10 @@ namespace RavenBOT.Modules.Tags.Modules
         [Command("Add")]
         [Summary("Adds a new tag with the given name and message")]
         [RequireUserPermission(Discord.GuildPermission.Administrator)]
-        public async Task AddTag([Summary("Wrap this in quotations if you want it to use spaces")]string name, [Remainder]string response)
+        public async Task AddTag([Summary("Wrap this in quotations if you want it to use spaces")] string name, [Remainder] string response)
         {
             var config = TagManager.GetTagGuild(Context.Guild.Id);
-            
+
             if (config.Tags.Any(x => name.Equals(x.Name, StringComparison.InvariantCultureIgnoreCase)))
             {
                 await ReplyAsync("There is already a tag with that name. Please delete it before trying to add a new one with that name.");
@@ -45,7 +45,7 @@ namespace RavenBOT.Modules.Tags.Modules
         [Command("Remove")]
         [Summary("Removes the specified tag")]
         [RequireUserPermission(Discord.GuildPermission.Administrator)]
-        public async Task RemoveTag([Remainder]string name)
+        public async Task RemoveTag([Remainder] string name)
         {
             var config = TagManager.GetTagGuild(Context.Guild.Id);
 
@@ -79,7 +79,7 @@ namespace RavenBOT.Modules.Tags.Modules
         [Command()]
         [Alias("Tag")]
         [Summary("Shows a tag with the given name")]
-        public async Task GetTag([Remainder]string tagName)
+        public async Task GetTag([Remainder] string tagName)
         {
             var config = TagManager.GetTagGuild(Context.Guild.Id);
             var match = config.Tags.FirstOrDefault(x => x.Name.Equals(tagName, StringComparison.InvariantCultureIgnoreCase));
@@ -99,8 +99,8 @@ namespace RavenBOT.Modules.Tags.Modules
             {
                 embed.Author = new EmbedAuthorBuilder
                 {
-                    Name = creator.Nickname ?? creator.Username,
-                    IconUrl = creator.GetAvatarUrl()
+                Name = creator.Nickname ?? creator.Username,
+                IconUrl = creator.GetAvatarUrl()
                 };
             }
 

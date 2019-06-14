@@ -11,8 +11,8 @@ namespace RavenBOT.Modules.Conversation.Models
 
         [JsonIgnore]
         public string ApiJson => JsonConvert.SerializeObject(Certificate);
-        
-        public GoogleCert Certificate {get;set;} = new GoogleCert();
+
+        public GoogleCert Certificate { get; set; } = new GoogleCert();
         public class GoogleCert
         {
             public string type { get; set; }

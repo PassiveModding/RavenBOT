@@ -30,7 +30,7 @@ namespace RavenBOT.Modules.Levels.Modules
         [RequireUserPermission(Discord.GuildPermission.Administrator)]
         public async Task ToggleLevelingAsync()
         {
-            var config = LevelService.GetOrCreateLevelConfig(Context.Guild.Id);   
+            var config = LevelService.GetOrCreateLevelConfig(Context.Guild.Id);
             config.Enabled = !config.Enabled;
             LevelService.Database.Store(config, LevelConfig.DocumentName(Context.Guild.Id));
             await ReplyAsync($"Leveling Enabled: {config.Enabled}");
@@ -41,7 +41,7 @@ namespace RavenBOT.Modules.Levels.Modules
         [RequireUserPermission(Discord.GuildPermission.Administrator)]
         public async Task Enable()
         {
-            var config = LevelService.TryGetLevelConfig(Context.Guild.Id);   
+            var config = LevelService.TryGetLevelConfig(Context.Guild.Id);
             if (config == null || !config.Enabled)
             {
                 await ReplyAsync("You must enable leveling before editing it's settings.");
@@ -50,15 +50,15 @@ namespace RavenBOT.Modules.Levels.Modules
 
             config.LogChannelId = Context.Channel.Id;
             LevelService.Database.Store(config, LevelConfig.DocumentName(Context.Guild.Id));
-            await ReplyAsync($"Level up events will be logged to: {Context.Channel.Name}");            
+            await ReplyAsync($"Level up events will be logged to: {Context.Channel.Name}");
         }
 
-        [Command("DisableLogChannel")]   
-        [Summary("Disables the level log channel")]     
+        [Command("DisableLogChannel")]
+        [Summary("Disables the level log channel")]
         [RequireUserPermission(Discord.GuildPermission.Administrator)]
         public async Task DisableLogChannel()
         {
-            var config = LevelService.TryGetLevelConfig(Context.Guild.Id);   
+            var config = LevelService.TryGetLevelConfig(Context.Guild.Id);
             if (config == null || !config.Enabled)
             {
                 await ReplyAsync("You must enable leveling before editing it's settings.");
@@ -70,12 +70,12 @@ namespace RavenBOT.Modules.Levels.Modules
             await ReplyAsync("Log channel disabled.");
         }
 
-        [Command("ToggleMessages")]  
-        [Summary("Toggles the use of level up messages")]      
+        [Command("ToggleMessages")]
+        [Summary("Toggles the use of level up messages")]
         [RequireUserPermission(Discord.GuildPermission.Administrator)]
         public async Task ToggleLevelUpNotifications()
         {
-            var config = LevelService.TryGetLevelConfig(Context.Guild.Id);   
+            var config = LevelService.TryGetLevelConfig(Context.Guild.Id);
             if (config == null || !config.Enabled)
             {
                 await ReplyAsync("You must enable leveling before editing it's settings.");
@@ -87,13 +87,12 @@ namespace RavenBOT.Modules.Levels.Modules
             await ReplyAsync($"Reply Level Ups: {config.ReplyLevelUps}");
         }
 
-        
-        [Command("ToggleMultiRole")]  
-        [Summary("Toggles whether users keep all level roles or just the highest")]      
+        [Command("ToggleMultiRole")]
+        [Summary("Toggles whether users keep all level roles or just the highest")]
         [RequireUserPermission(Discord.GuildPermission.Administrator)]
         public async Task ToggleMultiRole()
         {
-            var config = LevelService.TryGetLevelConfig(Context.Guild.Id);   
+            var config = LevelService.TryGetLevelConfig(Context.Guild.Id);
             if (config == null || !config.Enabled)
             {
                 await ReplyAsync("You must enable leveling before editing it's settings.");
@@ -105,12 +104,12 @@ namespace RavenBOT.Modules.Levels.Modules
             await ReplyAsync($"Multiple role rewards: {config.MultiRole}");
         }
 
-        [Command("AddRoleReward")] 
-        [Summary("Adds a role for a user to earn")]       
+        [Command("AddRoleReward")]
+        [Summary("Adds a role for a user to earn")]
         [RequireUserPermission(Discord.GuildPermission.Administrator)]
         public async Task AddRole(IRole role, int level)
         {
-            var config = LevelService.TryGetLevelConfig(Context.Guild.Id);   
+            var config = LevelService.TryGetLevelConfig(Context.Guild.Id);
             if (config == null || !config.Enabled)
             {
                 await ReplyAsync("You must enable leveling before editing it's settings.");
@@ -129,32 +128,32 @@ namespace RavenBOT.Modules.Levels.Modules
             config.RewardRoles.Add(new LevelConfig.LevelReward
             {
                 RoleId = role.Id,
-                LevelRequirement = level
+                    LevelRequirement = level
             });
             LevelService.Database.Store(config, LevelConfig.DocumentName(Context.Guild.Id));
             await ReplyAsync($"Role Added");
         }
 
-        [Command("AddRoleReward")]        
+        [Command("AddRoleReward")]
         [RequireUserPermission(Discord.GuildPermission.Administrator)]
         public async Task AddRole(int level, IRole role)
         {
             await AddRole(role, level);
         }
 
-        [Command("RemoveRoleReward")]        
+        [Command("RemoveRoleReward")]
         [RequireUserPermission(Discord.GuildPermission.Administrator)]
         public async Task RemoveRole(IRole role)
         {
             await RemoveRole(role.Id);
-        }  
+        }
 
-        [Command("RemoveRoleReward")]  
-        [Summary("Removes a role from the role rewards")]      
+        [Command("RemoveRoleReward")]
+        [Summary("Removes a role from the role rewards")]
         [RequireUserPermission(Discord.GuildPermission.Administrator)]
         public async Task RemoveRole(ulong roleId)
         {
-            var config = LevelService.TryGetLevelConfig(Context.Guild.Id);   
+            var config = LevelService.TryGetLevelConfig(Context.Guild.Id);
             if (config == null || !config.Enabled)
             {
                 await ReplyAsync("You must enable leveling before editing it's settings.");
@@ -165,18 +164,18 @@ namespace RavenBOT.Modules.Levels.Modules
             config.RewardRoles = config.RewardRoles.Where(x => x.RoleId != roleId).ToList();
             LevelService.Database.Store(config, LevelConfig.DocumentName(Context.Guild.Id));
             await ReplyAsync($"Role Removed\nNOTE: Users who have this role will still keep it.");
-        }    
+        }
 
-        [Command("Rank")]   
-        [Alias("Level")] 
-        [Summary("Displays the current (or specified) user's level")]    
+        [Command("Rank")]
+        [Alias("Level")]
+        [Summary("Displays the current (or specified) user's level")]
         public async Task Rank(SocketGuildUser user = null)
         {
             if (user == null)
             {
                 user = Context.User as SocketGuildUser;
             }
-            var config = LevelService.GetLevelUser(Context.Guild.Id, user.Id);   
+            var config = LevelService.GetLevelUser(Context.Guild.Id, user.Id);
 
             if (config == null || config.Item2 == null || !config.Item2.Enabled)
             {
@@ -192,26 +191,25 @@ namespace RavenBOT.Modules.Levels.Modules
                 Title = "Level Info",
                 Author = new EmbedAuthorBuilder()
                 {
-                    IconUrl = user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl(),
-                    Name = user.ToString()
+                IconUrl = user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl(),
+                Name = user.ToString()
                 },
                 Description = $"**Current Level:** {config.Item1.UserLevel}\n" +
-                            $"**Current XP:** {config.Item1.UserXP}\n" +
-                            $"**XP To Next Level:** {LevelService.RequiredExp(config.Item1.UserLevel + 1) - config.Item1.UserXP}\n" +
-                            $"**Rank:** {rank}/{users.Count}"
+                $"**Current XP:** {config.Item1.UserXP}\n" +
+                $"**XP To Next Level:** {LevelService.RequiredExp(config.Item1.UserLevel + 1) - config.Item1.UserXP}\n" +
+                $"**Rank:** {rank}/{users.Count}"
             };
 
             await ReplyAsync("", false, embed.Build());
 
             //TODO: Rank
-        }    
+        }
 
-        
-        [Command("Rewards")]  
-        [Summary("Shows role rewards for reaching a specific level.")]      
+        [Command("Rewards")]
+        [Summary("Shows role rewards for reaching a specific level.")]
         public async Task Rewards()
         {
-            var config = LevelService.TryGetLevelConfig(Context.Guild.Id);   
+            var config = LevelService.TryGetLevelConfig(Context.Guild.Id);
             if (config == null || !config.Enabled)
             {
                 await ReplyAsync("Leveling is not enabled in this server.");
@@ -224,7 +222,7 @@ namespace RavenBOT.Modules.Levels.Modules
                 return;
             }
 
-            var responses = config.RewardRoles.OrderByDescending(x => x.LevelRequirement).Select(x => 
+            var responses = config.RewardRoles.OrderByDescending(x => x.LevelRequirement).Select(x =>
             {
                 var role = Context.Guild.GetRole(x.RoleId);
                 if (role == null)
@@ -244,8 +242,8 @@ namespace RavenBOT.Modules.Levels.Modules
             await ReplyAsync($"", false, new EmbedBuilder()
             {
                 Title = "Role Rewards",
-                Description = string.Join("\n", responses).FixLength(2047),
-                Color = Color.Blue
+                    Description = string.Join("\n", responses).FixLength(2047),
+                    Color = Color.Blue
             }.Build());
 
             //TODO: Rank
@@ -261,7 +259,7 @@ namespace RavenBOT.Modules.Levels.Modules
                 await ReplyAsync("There are no users with levelling in this server.");
                 return;
             }
-            
+
             await Context.Guild.DownloadUsersAsync();
 
             var pages = new List<PaginatedMessage.Page>();
@@ -269,7 +267,7 @@ namespace RavenBOT.Modules.Levels.Modules
             foreach (var userGroup in users.SplitList(15))
             {
                 var page = new PaginatedMessage.Page();
-                var userText = userGroup.Select(x => 
+                var userText = userGroup.Select(x =>
                 {
                     var user = Context.Guild.GetUser(x.UserId);
                     if (user == null)
@@ -293,13 +291,13 @@ namespace RavenBOT.Modules.Levels.Modules
             await PagedReplyAsync(pager, new ReactionList
             {
                 Forward = true,
-                Backward = true,
-                Jump = true,
-                First = true,
-                Last = true
+                    Backward = true,
+                    Jump = true,
+                    First = true,
+                    Last = true
             });
         }
-        
+
         [Command("ResetUser")]
         [Summary("Resets the specified user's level stats")]
         [RequireUserPermission(GuildPermission.Administrator)]
@@ -337,8 +335,8 @@ namespace RavenBOT.Modules.Levels.Modules
             if (confirm == null)
             {
                 await ReplyAsync("Run this command again with the confirmation code `cop432ih`\n" +
-                "This will remove all earned xp from users and **CANNOT** be undone\n" +
-                "NOTE: It will not remove earned roles from users.");
+                    "This will remove all earned xp from users and **CANNOT** be undone\n" +
+                    "NOTE: It will not remove earned roles from users.");
                 return;
             }
             else if (!confirm.Equals("cop432ih"))

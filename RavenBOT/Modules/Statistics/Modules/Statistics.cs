@@ -31,7 +31,7 @@ namespace RavenBOT.Modules.Statistics.Modules
         public GrafanaManager GrafanaManager { get; }
 
         [Command("SetGraphiteUrl")]
-        public async Task SetGraphiteUrl([Remainder]string url = null)
+        public async Task SetGraphiteUrl([Remainder] string url = null)
         {
             var config = GraphManager.GetConfig();
             config.GraphiteUrl = url;
@@ -40,7 +40,7 @@ namespace RavenBOT.Modules.Statistics.Modules
         }
 
         [Command("SetDBLApiKey")]
-        public async Task SetDBLAPIKey([Remainder]string key = null)
+        public async Task SetDBLAPIKey([Remainder] string key = null)
         {
             var config = DblManager.GetOrCreateConfig();
             config.APIKey = key;
@@ -49,7 +49,7 @@ namespace RavenBOT.Modules.Statistics.Modules
         }
 
         [Command("SetGrafanaUrl")]
-        public async Task SetGrafanaUrl([Remainder]string url = null)
+        public async Task SetGrafanaUrl([Remainder] string url = null)
         {
             var config = GrafanaManager.GetGrafanaConfig();
             config.GrafanaUrl = url;
@@ -58,7 +58,7 @@ namespace RavenBOT.Modules.Statistics.Modules
         }
 
         [Command("SetGrafanaApiKey")]
-        public async Task SetGrafanaApiKey([Remainder]string key = null)
+        public async Task SetGrafanaApiKey([Remainder] string key = null)
         {
             var config = GrafanaManager.GetGrafanaConfig();
             config.ApiKey = key;

@@ -39,8 +39,7 @@ namespace RavenBOT.Modules.Events.Modules
             EventService.SaveConfig(config);
             await ReplyAsync($"Log Channel Creations: {config.ChannelCreated}");
         }
-        
-                
+
         [Command("ChannelDeleted")]
         [Summary("Toggles logging of channel deletions")]
         public async Task ChannelDeletedAsync()
@@ -80,7 +79,7 @@ namespace RavenBOT.Modules.Events.Modules
             EventService.SaveConfig(config);
             await ReplyAsync($"Log User Joins: {config.UserJoined}");
         }
-        
+
         [Command("UserLeft")]
         [Summary("Toggles logging of user leaves")]
         public async Task UserLeftAsync()
@@ -89,9 +88,9 @@ namespace RavenBOT.Modules.Events.Modules
             config.UserLeft = !config.UserLeft;
             EventService.SaveConfig(config);
             await ReplyAsync($"Log User Leaves: {config.UserLeft}");
-        }  
-        
-        [Command("MessageUpdated")]        
+        }
+
+        [Command("MessageUpdated")]
         [Summary("Toggles logging of message updates")]
         public async Task MessageUpdatedAsync()
         {
@@ -117,16 +116,16 @@ namespace RavenBOT.Modules.Events.Modules
         {
             var config = EventService.GetConfig(Context.Guild.Id);
             await ReplyAsync("**Event Log Config**\n" +
-                             $"Channel Created: {config.ChannelCreated}\n" +
-                             $"Channel Deleted: {config.ChannelDeleted}\n" +
-                             $"Channel Updated: {config.ChannelUpdated}\n" +
-                             $"Message Deleted: {config.MessageDeleted}\n" +
-                             $"Message Updated: {config.MessageUpdated}\n" +
-                             $"User Joined: {config.UserJoined}\n" +
-                             $"User Left: {config.UserLeft}\n" +
-                             $"User Updated: {config.UserUpdated}\n" +
-                             $"**ENABLED:** {config.Enabled}\n" +
-                             $"Channel: {Context.Guild.GetChannel(config.ChannelId)?.Name ?? "N/A"}");
+                $"Channel Created: {config.ChannelCreated}\n" +
+                $"Channel Deleted: {config.ChannelDeleted}\n" +
+                $"Channel Updated: {config.ChannelUpdated}\n" +
+                $"Message Deleted: {config.MessageDeleted}\n" +
+                $"Message Updated: {config.MessageUpdated}\n" +
+                $"User Joined: {config.UserJoined}\n" +
+                $"User Left: {config.UserLeft}\n" +
+                $"User Updated: {config.UserUpdated}\n" +
+                $"**ENABLED:** {config.Enabled}\n" +
+                $"Channel: {Context.Guild.GetChannel(config.ChannelId)?.Name ?? "N/A"}");
         }
 
         [Command("SetChannel")]

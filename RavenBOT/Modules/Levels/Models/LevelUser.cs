@@ -7,19 +7,18 @@ namespace RavenBOT.Modules.Levels.Models
             UserId = userId;
             GuildId = guildId;
         }
-        
 
-        public LevelUser(){}
+        public LevelUser() { }
 
         public static string DocumentName(ulong userId, ulong guildId)
         {
             return $"LevelUser-{guildId}-{userId}";
         }
 
-        public ulong UserId {get;set;}
-        public ulong GuildId {get; set;}
-        public int UserXP {get;set;} = 0;
+        public ulong UserId { get; set; }
+        public ulong GuildId { get; set; }
+        public int UserXP { get; set; } = 0;
 
-        public int UserLevel {get;set;} = 1;
+        public int UserLevel { get; set; } = 1;
     }
 }

@@ -12,13 +12,13 @@ namespace RavenBOT.Modules.Moderator.Methods
 {
     public class ModerationHandler : IServiceable
     {
-        public IDatabase Database {get;}
+        public IDatabase Database { get; }
 
-        public TimeTracker TimedActions {get;set;}
+        public TimeTracker TimedActions { get; set; }
 
-        public DiscordShardedClient Client {get;}
+        public DiscordShardedClient Client { get; }
 
-        public Timer Timer {get;}
+        public Timer Timer { get; }
         public ModerationHandler(IDatabase database, DiscordShardedClient client)
         {
             Database = database;
@@ -77,17 +77,16 @@ namespace RavenBOT.Modules.Moderator.Methods
                 //Update channel permission overwrites to stop the user from being able to communicate
                 if (channel.PermissionOverwrites.All(x => x.TargetId != role.Id))
                 {
-                    var _ = Task.Run(async () => await channel.AddPermissionOverwriteAsync(role, new OverwritePermissions(sendMessages: PermValue.Deny, addReactions: PermValue.Deny, connect: PermValue.Deny, speak: PermValue.Deny)));
+                    var _ = Task.Run(async() => await channel.AddPermissionOverwriteAsync(role, new OverwritePermissions(sendMessages: PermValue.Deny, addReactions: PermValue.Deny, connect: PermValue.Deny, speak: PermValue.Deny)));
                 }
             }
 
             return role;
         }
 
-
         public void TimerEvent(object _)
         {
-            var run = Task.Run(async () => 
+            var run = Task.Run(async() =>
             {
                 var now = DateTime.UtcNow;
                 var modified = false;
@@ -110,7 +109,7 @@ namespace RavenBOT.Modules.Moderator.Methods
                             {
                                 continue;
                             }
-                            
+
                             await discordUser.RemoveRoleAsync(role);
                         }
                         else if (user.Action == TimeTracker.User.TimedAction.SoftBan)
@@ -129,7 +128,7 @@ namespace RavenBOT.Modules.Moderator.Methods
                 {
                     Save(TimedActions, TimeTracker.DocumentName);
                 }
-            });            
+            });
         }
 
         public void SaveModeratorConfig(ModeratorConfig config)
@@ -144,7 +143,7 @@ namespace RavenBOT.Modules.Moderator.Methods
             {
                 config = new ModeratorConfig
                 {
-                    GuildId = guildId
+                GuildId = guildId
                 };
                 SaveModeratorConfig(config);
             }

@@ -16,13 +16,13 @@ namespace RavenBOT.Modules.Moderator.Modules
     [Preconditions.Moderator]
     [RequireContext(ContextType.Guild)]
     public partial class Moderation : InteractiveBase<ShardedCommandContext>
-    {      
-        public ModerationHandler ModHandler {get;}
+    {
+        public ModerationHandler ModHandler { get; }
 
         public Moderation(ModerationHandler modHandler)
         {
             ModHandler = modHandler;
-        }   
+        }
 
         public async Task<bool> IsActionable(SocketGuildUser target, SocketGuildUser currentUser)
         {
@@ -58,7 +58,6 @@ namespace RavenBOT.Modules.Moderator.Modules
             await RemoveModeratorAsync(role.Id);
         }
 
-        
         [Command("Moderators")]
         public async Task ViewModeratorsAsync()
         {
@@ -86,7 +85,7 @@ namespace RavenBOT.Modules.Moderator.Modules
         [RequireBotPermission(Discord.GuildPermission.BanMembers)]
         [RequireUserPermission(Discord.GuildPermission.BanMembers)]
         [Summary("Bans a user based on their user ID")]
-        public async Task MaxWarnings(ulong userId, [Remainder]string reason = null)
+        public async Task MaxWarnings(ulong userId, [Remainder] string reason = null)
         {
             var gUser = Context.Guild.GetUser(userId);
             if (gUser != null)
@@ -154,7 +153,7 @@ namespace RavenBOT.Modules.Moderator.Modules
 
         [Command("SetReason")]
         [Summary("Sets the reason for a specific moderation case")]
-        public async Task SetReason(int caseId, [Remainder]string reason)
+        public async Task SetReason(int caseId, [Remainder] string reason)
         {
             var config = ModHandler.GetActionConfig(Context.Guild.Id);
 
@@ -173,7 +172,7 @@ namespace RavenBOT.Modules.Moderator.Modules
             }
             else
             {
-                action.Reason =  $"**Original Reason**\n{action.Reason}**Updated Reason**\n{reason}";
+                action.Reason = $"**Original Reason**\n{action.Reason}**Updated Reason**\n{reason}";
                 //TODO: Show action in embed
                 await ReplyAsync("Appended reason to message.");
             }
@@ -185,7 +184,7 @@ namespace RavenBOT.Modules.Moderator.Modules
         [Summary("Bans a user")]
         [RequireBotPermission(Discord.GuildPermission.BanMembers)]
         [RequireUserPermission(Discord.GuildPermission.BanMembers)]
-        public async Task BanUser(SocketGuildUser user, [Remainder]string reason = null)
+        public async Task BanUser(SocketGuildUser user, [Remainder] string reason = null)
         {
             if (!await IsActionable(user, Context.User as SocketGuildUser))
             {
@@ -202,11 +201,11 @@ namespace RavenBOT.Modules.Moderator.Modules
             ModHandler.Save(config, ActionConfig.DocumentName(Context.Guild.Id));
         }
 
-        [Command("kick")]        
+        [Command("kick")]
         [Summary("Kicks a user from the server")]
         [RequireBotPermission(Discord.GuildPermission.KickMembers)]
         [RequireUserPermission(Discord.GuildPermission.KickMembers)]
-        public async Task KickUser(SocketGuildUser user, [Remainder]string reason = null)
+        public async Task KickUser(SocketGuildUser user, [Remainder] string reason = null)
         {
             if (!await IsActionable(user, Context.User as SocketGuildUser))
             {
@@ -225,7 +224,7 @@ namespace RavenBOT.Modules.Moderator.Modules
         [Command("warn")]
         [Summary("Warns a user")]
         //TODO: check user permission level
-        public async Task WarnUser(SocketGuildUser user, [Remainder]string reason = null)
+        public async Task WarnUser(SocketGuildUser user, [Remainder] string reason = null)
         {
             //Log this to some config file?
             var config = ModHandler.GetActionConfig(Context.Guild.Id);
@@ -257,15 +256,15 @@ namespace RavenBOT.Modules.Moderator.Modules
         [Command("mute")]
         [Summary("Stops a user from being able to talk")]
         //TODO: Mod permissions
-        public async Task MuteUser(SocketGuildUser user, [Remainder]string reason = null)
+        public async Task MuteUser(SocketGuildUser user, [Remainder] string reason = null)
         {
-           await MuteUser(user, null, reason);
+            await MuteUser(user, null, reason);
         }
 
         [Command("mute")]
         [Summary("Stops a user from being able to talk for the specified amount of time")]
         //TODO: Mod permissions
-        public async Task MuteUser(SocketGuildUser user, TimeSpan? time = null, [Remainder]string reason = null)
+        public async Task MuteUser(SocketGuildUser user, TimeSpan? time = null, [Remainder] string reason = null)
         {
             if (!await IsActionable(user, Context.User as SocketGuildUser))
             {
@@ -299,7 +298,7 @@ namespace RavenBOT.Modules.Moderator.Modules
         [RequireBotPermission(Discord.GuildPermission.BanMembers)]
         [RequireUserPermission(Discord.GuildPermission.BanMembers)]
         //TODO: Mod permissions
-        public async Task SoftBanUser(SocketGuildUser user, [Remainder]string reason = null)
+        public async Task SoftBanUser(SocketGuildUser user, [Remainder] string reason = null)
         {
             await SoftBanUser(user, null, reason);
         }
@@ -309,13 +308,13 @@ namespace RavenBOT.Modules.Moderator.Modules
         [RequireBotPermission(Discord.GuildPermission.BanMembers)]
         [RequireUserPermission(Discord.GuildPermission.BanMembers)]
         //TODO: Mod permissions
-        public async Task SoftBanUser(SocketGuildUser user, TimeSpan? time = null, [Remainder]string reason = null)
+        public async Task SoftBanUser(SocketGuildUser user, TimeSpan? time = null, [Remainder] string reason = null)
         {
             if (!await IsActionable(user, Context.User as SocketGuildUser))
             {
                 return;
             }
-            
+
             var config = ModHandler.GetActionConfig(Context.Guild.Id);
             await Context.Guild.AddBanAsync(user, 0, reason);
 

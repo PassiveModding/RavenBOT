@@ -71,9 +71,9 @@ namespace RavenBOT.Modules.Developer
         {
             var newLicenses = LicenseService.MakeLicenses(ServiceType, quantity, uses);
             await ReplyAsync($"{quantity} Licenses, {uses} Uses\n" +
-                             "```\n" +
-                             $"{string.Join("\n", newLicenses.Select(x => x.Key))}\n" +
-                             "```");
+                "```\n" +
+                $"{string.Join("\n", newLicenses.Select(x => x.Key))}\n" +
+                "```");
         }
     }
 }

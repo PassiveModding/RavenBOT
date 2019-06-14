@@ -7,6 +7,6 @@ namespace RavenBOT.Modules.Statistics.Models
             return "DBLConfig";
         }
 
-        public string APIKey {get;set;} = null;
+        public string APIKey { get; set; } = null;
     }
 }

@@ -27,7 +27,7 @@ namespace RavenBOT.Modules.Tickets.Methods
 
         private async Task TicketVote(SocketReaction reaction, ISocketMessageChannel channel, bool added)
         {
-                        //Check if live message, update up/downvote count
+            //Check if live message, update up/downvote count
             if (reaction.Emote.Name == "👍" || reaction.Emote.Name == "👎")
             {
                 if (reaction.UserId == Client.CurrentUser.Id)
@@ -48,7 +48,6 @@ namespace RavenBOT.Modules.Tickets.Methods
                         //Ignore votes on closed or solved tickets.
                         return;
                     }
-
 
                     if (reaction.Emote.Name == "👍")
                     {
@@ -229,7 +228,7 @@ namespace RavenBOT.Modules.Tickets.Methods
             var ticket = Database.Load<Ticket>(Ticket.DocumentName(context.Guild.Id, ticketId));
             return ticket;
         }
-        
+
         public Ticket GetTicket(ulong messageId)
         {
             var ticket = Database.Query<Ticket>().FirstOrDefault(x => x.LiveMessageId == messageId);
@@ -238,7 +237,7 @@ namespace RavenBOT.Modules.Tickets.Methods
         public async Task<Tuple<Ticket, IUserMessage>> NewTicket(ShardedCommandContext context, string message)
         {
             var tGuild = GetTicketGuild(context.Guild.Id);
-            var ticket = new Ticket(context.Guild.Id, context.User.Id, TicketCount(context.Guild)+1, message);
+            var ticket = new Ticket(context.Guild.Id, context.User.Id, TicketCount(context.Guild) + 1, message);
             SaveTicket(ticket);
             var msg = await UpdateLiveMessageAsync(context.Guild, tGuild, ticket);
             return new Tuple<Ticket, IUserMessage>(ticket, msg);

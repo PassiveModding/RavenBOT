@@ -51,8 +51,6 @@ namespace RavenBOT.Modules
             await ReplyAsync($"Invite: https://discordapp.com/oauth2/authorize?client_id={Context.Client.CurrentUser.Id}&scope=bot&permissions=2146958591");
         }
 
-
-
         [Command("Help")]
         [Summary("Shows available commands based on the current user permissions")]
         public async Task HelpAsync()
@@ -82,11 +80,11 @@ namespace RavenBOT.Modules
 
             embed.WithAuthor(
                 x =>
-                    {
-                        x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl();
-                        x.Name = $"{Context.Client.CurrentUser.Username}'s Official Invite";
-                        x.Url = $"https://discordapp.com/oauth2/authorize?client_id={Context.Client.CurrentUser.Id}&scope=bot&permissions=2146958591";
-                    });
+                {
+                    x.IconUrl = Context.Client.CurrentUser.GetAvatarUrl();
+                    x.Name = $"{Context.Client.CurrentUser.Username}'s Official Invite";
+                    x.Url = $"https://discordapp.com/oauth2/authorize?client_id={Context.Client.CurrentUser.Id}&scope=bot&permissions=2146958591";
+                });
             embed.AddField("Changes", changes.FixLength());
 
             embed.AddField("Members", $"Bot: {Context.Client.Guilds.Sum(x => x.Users.Count(z => z.IsBot))}\n" + $"Human: {Context.Client.Guilds.Sum(x => x.Users.Count(z => !z.IsBot))}\n" + $"Total: {Context.Client.Guilds.Sum(x => x.Users.Count)}", true);
@@ -126,12 +124,12 @@ namespace RavenBOT.Modules
                     await PagedReplyAsync(res, new ReactionList
                     {
                         Backward = true,
-                        First = false,
-                        Forward = true,
-                        Info = false,
-                        Jump = true,
-                        Last = false,
-                        Trash = true
+                            First = false,
+                            Forward = true,
+                            Info = false,
+                            Jump = true,
+                            Last = false,
+                            Trash = true
                     });
                 }
             }

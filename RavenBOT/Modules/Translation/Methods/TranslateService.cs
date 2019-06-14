@@ -18,9 +18,9 @@ namespace RavenBOT.Modules.Translation.Methods
 {
     public partial class TranslateService : IServiceable
     {
-        public TranslationClient TranslationClient {get;}
+        public TranslationClient TranslationClient { get; }
 
-        public IDatabase Database {get;}
+        public IDatabase Database { get; }
         public LicenseService License { get; }
         public LogHandler Logger { get; }
         public DiscordShardedClient Client { get; }
@@ -68,7 +68,7 @@ namespace RavenBOT.Modules.Translation.Methods
             {
                 return;
             }
-            
+
             if (!LocalManagementService.LastConfig.IsAcceptable(channel.GuildId))
             {
                 return;
@@ -154,7 +154,7 @@ namespace RavenBOT.Modules.Translation.Methods
                 }
                 else
                 {
-                    Translated.Add(message.Id, new List<LanguageMap.LanguageCode>() {languageType.Language});
+                    Translated.Add(message.Id, new List<LanguageMap.LanguageCode>() { languageType.Language });
                 }
 
                 if (translatedEmbed != null)
@@ -169,7 +169,7 @@ namespace RavenBOT.Modules.Translation.Methods
                 }
             }
 
-            }   
+        }
 
         public EmbedBuilder GetTranslationEmbed(TranslateResponse result)
         {
@@ -179,13 +179,13 @@ namespace RavenBOT.Modules.Translation.Methods
             }
 
             var translationString = result.TranslateResult.TranslatedText;
-            
+
             try
             {
                 var matchUser = Regex.Matches(translationString, @"(<@!?) (\d+)>");
                 if (matchUser.Any())
                 {
-                    foreach(Match match in matchUser)
+                    foreach (Match match in matchUser)
                     {
                         translationString = translationString.Replace(match.Value, $"{match.Groups[1].Value}{match.Groups[2].Value}>");
                     }
@@ -194,7 +194,7 @@ namespace RavenBOT.Modules.Translation.Methods
                 var matchRole = Regex.Matches(translationString, @"<@ & (\d+)>");
                 if (matchRole.Any())
                 {
-                    foreach(Match match in matchRole)
+                    foreach (Match match in matchRole)
                     {
                         translationString = translationString.Replace(match.Value, $"<@&{match.Groups[1].Value}>");
                     }
@@ -203,7 +203,7 @@ namespace RavenBOT.Modules.Translation.Methods
                 var matchChannel = Regex.Matches(translationString, @"<# (\d+)>");
                 if (matchChannel.Any())
                 {
-                    foreach(Match match in matchChannel)
+                    foreach (Match match in matchChannel)
                     {
                         translationString = translationString.Replace(match.Value, $"<#{match.Groups[1].Value}>");
                     }

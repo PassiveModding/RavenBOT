@@ -18,24 +18,24 @@ namespace RavenBOT.Modules.Partner.Models
             GuildId = guildId;
         }
 
-        public PartnerConfig(){}
+        public PartnerConfig() { }
 
-        public ulong GuildId {get;set;}
-        public ulong ReceiverChannelId {get;set;} = 0;
+        public ulong GuildId { get; set; }
+        public ulong ReceiverChannelId { get; set; } = 0;
 
-        public bool Enabled {get;set;}= false;
+        public bool Enabled { get; set; } = false;
 
-        public bool UseThumb {get;set;} = false;
+        public bool UseThumb { get; set; } = false;
 
-        public string Message {get;set;} = null;
+        public string Message { get; set; } = null;
 
-        public string ImageUrl {get;set;} = null;
+        public string ImageUrl { get; set; } = null;
 
-        public int ServerCount {get;set;}
-        public int UserCount {get;set;}
+        public int ServerCount { get; set; }
+        public int UserCount { get; set; }
 
-        public RGB Color {get;set;} = new RGB(0,0,0);
-        
+        public RGB Color { get; set; } = new RGB(0, 0, 0);
+
         public class RGB
         {
             public RGB(int r, int g, int b)
@@ -45,7 +45,7 @@ namespace RavenBOT.Modules.Partner.Models
                 B = b;
             }
 
-            public RGB(){}
+            public RGB() { }
 
             /// <summary>
             ///     Gets or sets the blue value
@@ -84,7 +84,7 @@ namespace RavenBOT.Modules.Partner.Models
             }
 
         }
-        
+
         public async Task<EmbedBuilder> GetEmbedAsync(SocketGuild guild)
         {
             var builder = new EmbedBuilder();
@@ -108,7 +108,7 @@ namespace RavenBOT.Modules.Partner.Models
             builder.Fields.Add(new EmbedFieldBuilder
             {
                 Name = "Invite",
-                Value = invite?.Url ?? "N/A This server does not have a non-expiring invite available" 
+                    Value = invite?.Url ?? "N/A This server does not have a non-expiring invite available"
             });
 
             return builder;

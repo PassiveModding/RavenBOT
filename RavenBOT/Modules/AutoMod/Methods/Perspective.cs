@@ -91,10 +91,10 @@ namespace RavenBOT.Modules.AutoMod.Methods
 
             public string GetResponseString(AnalyzeCommentRequest request)
             {
-                    var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
-                    var response = Client.PostAsync(BaseAddress, content).Result;
-                    response.EnsureSuccessStatusCode();
-                    return response.Content.ReadAsStringAsync().Result;
+                var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
+                var response = Client.PostAsync(BaseAddress, content).Result;
+                response.EnsureSuccessStatusCode();
+                return response.Content.ReadAsStringAsync().Result;
             }
 
             /// <summary>
@@ -118,12 +118,12 @@ namespace RavenBOT.Modules.AutoMod.Methods
 
             public AnalyzeCommentResponse SendRequest(AnalyzeCommentRequest request)
             {
-                    var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
-                    var response = Client.PostAsync(BaseAddress, content).Result;
-                    response.EnsureSuccessStatusCode();
-                    var data = response.Content.ReadAsStringAsync().Result;
-                    var result = JsonConvert.DeserializeObject<AnalyzeCommentResponse>(data);
-                    return result;
+                var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
+                var response = Client.PostAsync(BaseAddress, content).Result;
+                response.EnsureSuccessStatusCode();
+                var data = response.Content.ReadAsStringAsync().Result;
+                var result = JsonConvert.DeserializeObject<AnalyzeCommentResponse>(data);
+                return result;
             }
         }
 

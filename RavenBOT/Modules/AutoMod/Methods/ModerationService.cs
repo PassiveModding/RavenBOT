@@ -15,7 +15,7 @@ namespace RavenBOT.Modules.AutoMod.Methods
     {
         private IDatabase Database { get; }
 
-        private DiscordShardedClient Client {get;}
+        private DiscordShardedClient Client { get; }
         public LocalManagementService LocalManagementService { get; }
         public Perspective.Api Perspective { get; set; }
         //private Dictionary<ulong, ModerationConfig> ModerationConfigs { get; }
@@ -91,7 +91,6 @@ namespace RavenBOT.Modules.AutoMod.Methods
                     return content.Contains(x.Content, StringComparison.InvariantCultureIgnoreCase);
                 });
 
-
                 if (match != null && match.Content != null)
                 {
                     if (match.Content.Equals("💩"))
@@ -112,7 +111,7 @@ namespace RavenBOT.Modules.AutoMod.Methods
             {
                 return;
             }
-            
+
             await CheckDisplayName(user.Username, user);
         }
 
@@ -128,7 +127,6 @@ namespace RavenBOT.Modules.AutoMod.Methods
             {
                 return;
             }
-            
 
             if (message.Channel is SocketTextChannel channel)
             {
@@ -173,7 +171,7 @@ namespace RavenBOT.Modules.AutoMod.Methods
             //if there is a cached version, return that.
             //if (ModerationConfigs.ContainsKey(guildId))
             //{
-           //     return ModerationConfigs[guildId];
+            //     return ModerationConfigs[guildId];
             //}
 
             //Try to load it from database, otherwise create a new one and store it.

@@ -14,7 +14,6 @@ namespace RavenBOT.Modules.Media.Models
 
         public List<List> list { get; set; }
 
-
         public List<string> sounds { get; set; }
 
         public class List

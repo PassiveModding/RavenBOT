@@ -132,8 +132,8 @@ namespace RavenBOT.Modules.Translation.Models
 
         public class TranslationSet
         {
-            public List<string> EmoteMatches {get;set;} = new List<string>();
-            public LanguageCode Language {get;set;}
+            public List<string> EmoteMatches { get; set; } = new List<string>();
+            public LanguageCode Language { get; set; }
         }
     }
 }

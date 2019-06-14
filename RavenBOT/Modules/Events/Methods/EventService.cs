@@ -28,14 +28,14 @@ namespace RavenBOT.Modules.Events.Methods
         private int UserLeft = 0;
         private int UserUpdated = 0;
 
-        private Timer Timer {get;}
+        private Timer Timer { get; }
 
         public EventService(DiscordShardedClient client, IDatabase database, LocalManagementService localManagementService)
         {
             Client = client;
             Database = database;
             LocalManagementService = localManagementService;
-            
+
             Client.ChannelCreated += Client_ChannelCreated;
             Client.ChannelDestroyed += Client_ChannelDestroyed;
             Client.ChannelUpdated += Client_ChannelUpdated;
@@ -73,14 +73,14 @@ namespace RavenBOT.Modules.Events.Methods
                 Color = color;
             }
 
-            public EventType Type {get;set;}
+            public EventType Type { get; set; }
 
-            public Color Color {get;set;}
+            public Color Color { get; set; }
 
-            public ulong GuildId {get;set;}
-            public EventConfig Config {get;set;}
+            public ulong GuildId { get; set; }
+            public EventConfig Config { get; set; }
 
-            public string Title {get;private set;}
+            public string Title { get; private set; }
 
             public void SetTitle(string title)
             {
@@ -93,7 +93,7 @@ namespace RavenBOT.Modules.Events.Methods
                 Title = title;
             }
 
-            public string Content {get;private set;}
+            public string Content { get; private set; }
             public void SetContent(string content)
             {
                 if (String.IsNullOrWhiteSpace(content))
@@ -106,17 +106,17 @@ namespace RavenBOT.Modules.Events.Methods
             }
         }
 
-        public List<EventClass> EventQueue {get;set;} = new List<EventClass>();
+        public List<EventClass> EventQueue { get; set; } = new List<EventClass>();
 
         public class EventClassDuplicate
         {
-            public int Count {get;set;}
-            public EventClass Class {get;set;}
+            public int Count { get; set; }
+            public EventClass Class { get; set; }
         }
 
         private void TimerEvent(object _)
         {
-            var task = Task.Run(async () =>
+            var task = Task.Run(async() =>
             {
                 try
                 {
@@ -135,11 +135,10 @@ namespace RavenBOT.Modules.Events.Methods
                         {
                             var bulkEmbed = new EmbedBuilder
                             {
-                                Color = mainColor
+                            Color = mainColor
                             };
 
                             var typeGroups = eventGroup.GroupBy(x => x.Type).OrderByDescending(x => x.Count());
-                            
 
                             foreach (var typeGroup in typeGroups)
                             {
@@ -157,7 +156,7 @@ namespace RavenBOT.Modules.Events.Methods
                                         typeCopies.Add(new EventClassDuplicate
                                         {
                                             Count = 1,
-                                            Class = eClass
+                                                Class = eClass
                                         });
                                     }
                                 }
@@ -206,8 +205,8 @@ namespace RavenBOT.Modules.Events.Methods
                                     //Ignore
                                 }
                             }
-                        } 
-                    }                 
+                        }
+                    }
                 }
                 catch (System.Exception e)
                 {
@@ -281,7 +280,7 @@ namespace RavenBOT.Modules.Events.Methods
             {
                 builder.AppendLine($"**Permissions Removed:** {string.Join("\n", permissionsLost.Select(x => x.ToString()))}");
             }
-            
+
             if (permissionsGained.Any())
             {
                 builder.AppendLine($"**Permissions Gained:** {string.Join("\n", permissionsGained.Select(x => x.ToString()))}");
@@ -311,11 +310,11 @@ namespace RavenBOT.Modules.Events.Methods
             {
                 return Task.CompletedTask;
             }
-            
-            LogEvent(config, "User Left",$"Name: {user.Username}#{user.Discriminator}\n" +
-                              $"Nickname: {user.Nickname ?? "N/A"}\n" +
-                              $"ID: {user.Id}\n" +
-                              $"Mention: {user.Mention}", EventClass.EventType.UserLeft, Color.DarkOrange);
+
+            LogEvent(config, "User Left", $"Name: {user.Username}#{user.Discriminator}\n" +
+                $"Nickname: {user.Nickname ?? "N/A"}\n" +
+                $"ID: {user.Id}\n" +
+                $"Mention: {user.Mention}", EventClass.EventType.UserLeft, Color.DarkOrange);
             return Task.CompletedTask;
         }
 
@@ -328,10 +327,10 @@ namespace RavenBOT.Modules.Events.Methods
                 return Task.CompletedTask;
             }
 
-            LogEvent(config, "User Joined",$"Name: {user.Username}#{user.Discriminator}\n" +
-                              $"Nickname: {user.Nickname ?? "N/A"}\n" +
-                              $"ID: {user.Id}\n" +
-                              $"Mention: {user.Mention}", EventClass.EventType.UserJoined, Color.Green);
+            LogEvent(config, "User Joined", $"Name: {user.Username}#{user.Discriminator}\n" +
+                $"Nickname: {user.Nickname ?? "N/A"}\n" +
+                $"ID: {user.Id}\n" +
+                $"Mention: {user.Mention}", EventClass.EventType.UserJoined, Color.Green);
 
             return Task.CompletedTask;
         }
@@ -364,11 +363,11 @@ namespace RavenBOT.Modules.Events.Methods
                     }
 
                     LogEvent(config, "Message Updated", $"**Author:** {messageNew.Author.Mention}\n" +
-                                      "**Old:**\n" +
-                                      $"{oldMessage}\n" +
-                                      "**New:**\n" +
-                                      $"{messageNew.Content}\n" +
-                                      $"**Channel:** {messageChannel.Name}", EventClass.EventType.MessageUpdated, Color.DarkPurple);
+                        "**Old:**\n" +
+                        $"{oldMessage}\n" +
+                        "**New:**\n" +
+                        $"{messageNew.Content}\n" +
+                        $"**Channel:** {messageChannel.Name}", EventClass.EventType.MessageUpdated, Color.DarkPurple);
                 }
             }
 
@@ -388,18 +387,18 @@ namespace RavenBOT.Modules.Events.Methods
 
                 if (messageCache.HasValue)
                 {
-                    var oldMessage =  messageCache.Value.Content;
+                    var oldMessage = messageCache.Value.Content;
 
                     LogEvent(config, "Message Deleted", "**Message:**\n" +
-                                      $"{oldMessage}\n" +
-                                      $"**Channel:** {messageChannel.Name}\n" +
-                                      $"**Author:** {messageCache.Value.Author.Username}#{messageCache.Value.Author.Discriminator}", EventClass.EventType.MessageDeleted, Color.DarkBlue);
+                        $"{oldMessage}\n" +
+                        $"**Channel:** {messageChannel.Name}\n" +
+                        $"**Author:** {messageCache.Value.Author.Username}#{messageCache.Value.Author.Discriminator}", EventClass.EventType.MessageDeleted, Color.DarkBlue);
                 }
                 else
                 {
                     LogEvent(config, "Message Deleted", "**Message:**\n" +
-                                      $"Unable to be retrieved ({messageCache.Id})\n" +
-                                      $"**Channel:** {messageChannel.Name}", EventClass.EventType.MessageDeleted, Color.DarkBlue);
+                        $"Unable to be retrieved ({messageCache.Id})\n" +
+                        $"**Channel:** {messageChannel.Name}", EventClass.EventType.MessageDeleted, Color.DarkBlue);
                 }
             }
             return Task.CompletedTask;
@@ -434,7 +433,7 @@ namespace RavenBOT.Modules.Events.Methods
                     {
                         builder.AppendLine($"**Category:** {textChannelBefore.Category?.Name ?? "N/A"} => {textChannelAfter.Category?.Name ?? "N/A"}");
                     }
-                    
+
                     if (textChannelBefore.IsNsfw != textChannelAfter.IsNsfw)
                     {
                         builder.AppendLine($"**NSFW:** {textChannelBefore.IsNsfw} => {textChannelAfter.IsNsfw}");
@@ -445,19 +444,18 @@ namespace RavenBOT.Modules.Events.Methods
                         builder.AppendLine($"**Slow Mode Interval:** {textChannelBefore.SlowModeInterval} => {textChannelAfter.SlowModeInterval}");
                     }
 
-
                     var permissionsAdded = textChannelAfter.PermissionOverwrites.Where(x => textChannelBefore.PermissionOverwrites.All(bef => bef.TargetId != x.TargetId)).ToList();
                     if (permissionsAdded.Any())
                     {
                         builder.AppendLine("**Permissions Added:**\n" +
-                                           $"{PermissionList(textChannelAfter, permissionsAdded)}");
+                            $"{PermissionList(textChannelAfter, permissionsAdded)}");
                     }
-                    
+
                     var permissionsRemoved = textChannelBefore.PermissionOverwrites.Where(x => textChannelAfter.PermissionOverwrites.All(bef => bef.TargetId != x.TargetId)).ToList();
                     if (permissionsRemoved.Any())
                     {
                         builder.AppendLine("**Permissions Removed:**\n" +
-                                           $"{PermissionList(textChannelAfter, permissionsRemoved)}");
+                            $"{PermissionList(textChannelAfter, permissionsRemoved)}");
                     }
 
                     if (builder.Length == 0)
@@ -485,21 +483,21 @@ namespace RavenBOT.Modules.Events.Methods
                 if (channel is SocketTextChannel tChannel)
                 {
                     LogEvent(config, "Text Channel Destroyed", $"Name: {tChannel.Name}\n" +
-                                      $"Topic: {tChannel.Topic ?? "N/A"}\n" +
-                                      $"NSFW: {tChannel.IsNsfw}\n" +
-                                      $"SlowModeInterval: {tChannel.SlowModeInterval}\n" +
-                                      $"Category: {tChannel.Category?.Name ?? "N/A"}\n" +
-                                      $"Position: {tChannel.Position}\n" +
-                                      $"Permissions:\n{PermissionList(gChannel, tChannel.PermissionOverwrites.ToList())}", EventClass.EventType.ChannelDestroyed, Color.DarkRed);
+                        $"Topic: {tChannel.Topic ?? "N/A"}\n" +
+                        $"NSFW: {tChannel.IsNsfw}\n" +
+                        $"SlowModeInterval: {tChannel.SlowModeInterval}\n" +
+                        $"Category: {tChannel.Category?.Name ?? "N/A"}\n" +
+                        $"Position: {tChannel.Position}\n" +
+                        $"Permissions:\n{PermissionList(gChannel, tChannel.PermissionOverwrites.ToList())}", EventClass.EventType.ChannelDestroyed, Color.DarkRed);
                 }
                 else if (channel is SocketVoiceChannel vChannel)
                 {
                     LogEvent(config, "Voice Channel Destroyed", $"Name: {vChannel.Name}\n" +
-                                      $"Category: {vChannel.Category?.Name ?? "N/A"}\n" +
-                                      $"User Limit: {(vChannel.UserLimit == null ? "N/A" : vChannel.UserLimit.ToString())}\n" +
-                                      $"BitRate: {vChannel.Bitrate}\n" +
-                                      $"Position: {vChannel.Position}\n" +
-                                      $"Permissions:\n{PermissionList(gChannel, vChannel.PermissionOverwrites.ToList())}", EventClass.EventType.ChannelDestroyed, Color.DarkRed);
+                        $"Category: {vChannel.Category?.Name ?? "N/A"}\n" +
+                        $"User Limit: {(vChannel.UserLimit == null ? "N/A" : vChannel.UserLimit.ToString())}\n" +
+                        $"BitRate: {vChannel.Bitrate}\n" +
+                        $"Position: {vChannel.Position}\n" +
+                        $"Permissions:\n{PermissionList(gChannel, vChannel.PermissionOverwrites.ToList())}", EventClass.EventType.ChannelDestroyed, Color.DarkRed);
                 }
             }
             return Task.CompletedTask;
@@ -520,21 +518,21 @@ namespace RavenBOT.Modules.Events.Methods
                 if (channel is SocketTextChannel tChannel)
                 {
                     LogEvent(config, "Text Channel Created", $"Name: {tChannel.Name}\n" +
-                                      $"Topic: {tChannel.Topic ?? "N/A"}\n" +
-                                      $"NSFW: {tChannel.IsNsfw}\n" +
-                                      $"SlowModeInterval: {tChannel.SlowModeInterval}\n" +
-                                      $"Category: {tChannel.Category?.Name ?? "N/A"}\n" +
-                                      $"Position: {tChannel.Position}\n" +
-                                      $"Permissions: {PermissionList(gChannel, tChannel.PermissionOverwrites.ToList())}", EventClass.EventType.ChannelCreated, Color.Green);
+                        $"Topic: {tChannel.Topic ?? "N/A"}\n" +
+                        $"NSFW: {tChannel.IsNsfw}\n" +
+                        $"SlowModeInterval: {tChannel.SlowModeInterval}\n" +
+                        $"Category: {tChannel.Category?.Name ?? "N/A"}\n" +
+                        $"Position: {tChannel.Position}\n" +
+                        $"Permissions: {PermissionList(gChannel, tChannel.PermissionOverwrites.ToList())}", EventClass.EventType.ChannelCreated, Color.Green);
                 }
                 else if (channel is SocketVoiceChannel vChannel)
                 {
                     LogEvent(config, "Voice Channel Created", $"Name: {vChannel.Name}\n" +
-                                      $"Category: {vChannel.Category?.Name ?? "N/A"}\n" +
-                                      $"User Limit: {(vChannel.UserLimit == null ? "N/A" : vChannel.UserLimit.ToString())}\n" +
-                                      $"BitRate: {vChannel.Bitrate}\n" +
-                                      $"Position: {vChannel.Position}\n" +
-                                      $"Permissions: {PermissionList(gChannel, vChannel.PermissionOverwrites.ToList())}", EventClass.EventType.ChannelCreated, Color.Green);
+                        $"Category: {vChannel.Category?.Name ?? "N/A"}\n" +
+                        $"User Limit: {(vChannel.UserLimit == null ? "N/A" : vChannel.UserLimit.ToString())}\n" +
+                        $"BitRate: {vChannel.Bitrate}\n" +
+                        $"Position: {vChannel.Position}\n" +
+                        $"Permissions: {PermissionList(gChannel, vChannel.PermissionOverwrites.ToList())}", EventClass.EventType.ChannelCreated, Color.Green);
                 }
             }
             return Task.CompletedTask;
@@ -554,13 +552,13 @@ namespace RavenBOT.Modules.Events.Methods
                         if (permission.Permissions.ToAllowList().Any())
                         {
                             builder.AppendLine("**Allowed Permissions:**\n" +
-                                     $"{string.Join("\n", permission.Permissions.ToAllowList().Select(x => x.ToString()))}\n");
+                                $"{string.Join("\n", permission.Permissions.ToAllowList().Select(x => x.ToString()))}\n");
                         }
 
                         if (permission.Permissions.ToDenyList().Any())
                         {
                             builder.AppendLine("**Denied Permissions:**\n" +
-                                     $"{string.Join("\n", permission.Permissions.ToDenyList().Select(x => x.ToString()))}\n");
+                                $"{string.Join("\n", permission.Permissions.ToDenyList().Select(x => x.ToString()))}\n");
                         }
                     }
                 }
@@ -573,13 +571,13 @@ namespace RavenBOT.Modules.Events.Methods
                         if (permission.Permissions.ToAllowList().Any())
                         {
                             builder.AppendLine("**Allowed Permissions:**\n" +
-                                               $"{string.Join("\n", permission.Permissions.ToAllowList().Select(x => x.ToString()))}\n");
+                                $"{string.Join("\n", permission.Permissions.ToAllowList().Select(x => x.ToString()))}\n");
                         }
 
                         if (permission.Permissions.ToDenyList().Any())
                         {
                             builder.AppendLine("**Denied Permissions:**\n" +
-                                               $"{string.Join("\n", permission.Permissions.ToDenyList().Select(x => x.ToString()))}\n");
+                                $"{string.Join("\n", permission.Permissions.ToDenyList().Select(x => x.ToString()))}\n");
                         }
                     }
                 }

@@ -14,8 +14,8 @@ namespace RavenBOT.Modules.Tickets
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public abstract class GroupedBase<T> : InteractiveBase<T> where T : ShardedCommandContext
-    { 
-        protected string Group {get; set;}
+    {
+        protected string Group { get; set; }
 
         protected override void OnModuleBuilding(CommandService commandService, Discord.Commands.Builders.ModuleBuilder builder)
         {
@@ -24,12 +24,12 @@ namespace RavenBOT.Modules.Tickets
 
             foreach (var command in builder.Commands)
             {
-                var aliases = (List<string>)list.GetValue(command);
+                var aliases = (List<string>) list.GetValue(command);
                 for (int i = 0; i < aliases.Count; i++)
                 {
                     aliases[i] = $"{Group}{aliases[i]}";
                 }
-            }      
-        }        
+            }
+        }
     }
 }

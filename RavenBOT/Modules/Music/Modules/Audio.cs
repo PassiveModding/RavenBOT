@@ -1,7 +1,7 @@
-using System.Text;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord;
@@ -16,7 +16,7 @@ using Victoria.Entities;
 
 namespace RavenBOT.Modules.Music.Modules
 {
-    [Group ("Music")]
+    [Group("Music")]
     public class Audio : InteractiveBase<ShardedCommandContext>
     {
         private LavaPlayer player;
@@ -26,7 +26,7 @@ namespace RavenBOT.Modules.Music.Modules
         public VictoriaService Vic { get; }
         public LogHandler Logger { get; }
 
-        public Audio (VictoriaService vic, LogHandler logger)
+        public Audio(VictoriaService vic, LogHandler logger)
         {
             Vic = vic;
             Logger = logger;
@@ -34,38 +34,38 @@ namespace RavenBOT.Modules.Music.Modules
             LavaShardClient = vic.Client;
         }
 
-        protected override void BeforeExecute (CommandInfo command)
+        protected override void BeforeExecute(CommandInfo command)
         {
-            player = LavaShardClient.GetPlayer (Context.Guild.Id);
-            base.BeforeExecute (command);
+            player = LavaShardClient.GetPlayer(Context.Guild.Id);
+            base.BeforeExecute(command);
         }
 
-        [Command ("Join"), InAudioChannel]
+        [Command("Join"), InAudioChannel]
         [Summary("Joins the audio channel you are currently in")]
-        public async Task Join ()
+        public async Task Join()
         {
-            await LavaShardClient.ConnectAsync (await Context.User.GetVoiceChannel (), Context.Channel as ITextChannel);
-            await ReplyAsync ("Connected!");
+            await LavaShardClient.ConnectAsync(await Context.User.GetVoiceChannel(), Context.Channel as ITextChannel);
+            await ReplyAsync("Connected!");
         }
 
-        [Command ("move"), InAudioChannel]
+        [Command("move"), InAudioChannel]
         [Summary("Moves the bot to a new audio channel")]
-        public async Task MoveAsync ()
+        public async Task MoveAsync()
         {
             var old = player.VoiceChannel;
-            await LavaShardClient.MoveChannelsAsync (await Context.User.GetVoiceChannel ());
-            await ReplyAsync ($"Moved from {old.Name} to {player.VoiceChannel.Name}!");
+            await LavaShardClient.MoveChannelsAsync(await Context.User.GetVoiceChannel());
+            await ReplyAsync($"Moved from {old.Name} to {player.VoiceChannel.Name}!");
         }
 
         [Command("Load Playlist"), InAudioChannel]
         [Summary("Plays the specified playlist or adds it to the queue")]
-        public async Task PlayPlaylistAsync([Remainder]string playlistLink)
+        public async Task PlayPlaylistAsync([Remainder] string playlistLink)
         {
             var search = await RestClient.SearchTracksAsync(playlistLink, true);
             if (search.LoadType == LoadType.NoMatches ||
                 search.LoadType == LoadType.LoadFailed)
             {
-                await ReplyAsync ("Nothing found");
+                await ReplyAsync("Nothing found");
                 return;
             }
 
@@ -85,39 +85,39 @@ namespace RavenBOT.Modules.Music.Modules
                     foreach (var playlistTrack in search.Tracks)
                     {
                         player.Queue.Enqueue(playlistTrack);
-                    }   
+                    }
                     await ReplyAsync($"{search.Tracks.Count()} tracks added from playlist: {search.PlaylistInfo.Name}");
                 }
                 else
                 {
                     player.Queue.Enqueue(track);
-                    await ReplyAsync ($"{track.Title} has been queued.");
+                    await ReplyAsync($"{track.Title} has been queued.");
                 }
             }
             else
             {
-                await player.PlayAsync (track);
-                await ReplyAsync ($"Now Playing: {track.Title}");
+                await player.PlayAsync(track);
+                await ReplyAsync($"Now Playing: {track.Title}");
                 if (search.LoadType == LoadType.PlaylistLoaded)
                 {
                     foreach (var playlistTrack in search.Tracks.Where(x => x.Id != track.Id))
                     {
                         player.Queue.Enqueue(playlistTrack);
-                    }   
+                    }
                     await ReplyAsync($"{search.Tracks.Count()} tracks added from playlist: {search.PlaylistInfo.Name}");
                 }
             }
         }
 
-        [Command ("Play"), InAudioChannel]
+        [Command("Play"), InAudioChannel]
         [Summary("Plays the specified track or adds it to the queue")]
-        public async Task PlayAsync ([Remainder] string query)
+        public async Task PlayAsync([Remainder] string query)
         {
             var search = await RestClient.SearchYouTubeAsync(query);
             if (search.LoadType == LoadType.NoMatches ||
                 search.LoadType == LoadType.LoadFailed)
             {
-                await ReplyAsync ("Nothing found");
+                await ReplyAsync("Nothing found");
                 return;
             }
 
@@ -137,49 +137,49 @@ namespace RavenBOT.Modules.Music.Modules
                     foreach (var playlistTrack in search.Tracks)
                     {
                         player.Queue.Enqueue(playlistTrack);
-                    }   
+                    }
                     await ReplyAsync($"{search.Tracks.Count()} tracks added from playlist: {search.PlaylistInfo.Name}");
                 }
                 else
                 {
                     player.Queue.Enqueue(track);
-                    await ReplyAsync ($"{track.Title} has been queued.");
+                    await ReplyAsync($"{track.Title} has been queued.");
                 }
             }
             else
             {
-                await player.PlayAsync (track);
-                await ReplyAsync ($"Now Playing: {track.Title}");
+                await player.PlayAsync(track);
+                await ReplyAsync($"Now Playing: {track.Title}");
                 if (search.LoadType == LoadType.PlaylistLoaded)
                 {
                     foreach (var playlistTrack in search.Tracks.Where(x => x.Id != track.Id))
                     {
                         player.Queue.Enqueue(playlistTrack);
-                    }   
+                    }
                     await ReplyAsync($"{search.Tracks.Count()} tracks added from playlist: {search.PlaylistInfo.Name}");
                 }
             }
         }
 
-        [Command ("Disconnect"), InAudioChannel (true)]
+        [Command("Disconnect"), InAudioChannel(true)]
         [Alias("Stop")]
         [Summary("Disconnects from the audio channel")]
-        public async Task StopAsync ()
+        public async Task StopAsync()
         {
-            await LavaShardClient.DisconnectAsync (player.VoiceChannel);
-            await ReplyAsync ("Disconnected!");
+            await LavaShardClient.DisconnectAsync(player.VoiceChannel);
+            await ReplyAsync("Disconnected!");
         }
 
-        [Command ("Skip"), InAudioChannel (true)]
+        [Command("Skip"), InAudioChannel(true)]
         [Summary("Skips the current song and plays the next in queue")]
-        public async Task SkipAsync (int amount = 1)
+        public async Task SkipAsync(int amount = 1)
         {
             try
             {
                 if (amount <= 1)
                 {
-                    var skipped = await player.SkipAsync ();
-                    await ReplyAsync ($"Skipped: {skipped.Title}\nNow Playing: {player.CurrentTrack.Title}");                    
+                    var skipped = await player.SkipAsync();
+                    await ReplyAsync($"Skipped: {skipped.Title}\nNow Playing: {player.CurrentTrack.Title}");
                 }
                 else
                 {
@@ -197,47 +197,47 @@ namespace RavenBOT.Modules.Music.Modules
                     if (track != null)
                     {
                         await player.PlayAsync(track);
-                        await ReplyAsync ($"Skipped {amount} tracks\nNow Playing: {player.CurrentTrack.Title}");  
+                        await ReplyAsync($"Skipped {amount} tracks\nNow Playing: {player.CurrentTrack.Title}");
                     }
                 }
             }
             catch
             {
-                await ReplyAsync ("There are no more items left in queue.");
+                await ReplyAsync("There are no more items left in queue.");
             }
         }
 
-        [Command ("NowPlaying")]
+        [Command("NowPlaying")]
         [Alias("np")]
         [Summary("Displays information about the song that is currently playing")]
-        public async Task NowPlaying ()
+        public async Task NowPlaying()
         {
             if (player.CurrentTrack is null)
             {
-                await ReplyAsync ("There is no track playing right now.");
+                await ReplyAsync("There is no track playing right now.");
                 return;
             }
 
             var track = player.CurrentTrack;
-            var thumb = await track.FetchThumbnailAsync ();
-            var embed = new EmbedBuilder ()
-                .WithAuthor ($"Now Playing {player.CurrentTrack.Title}", thumb, $"{track.Uri}")
-                .WithThumbnailUrl (thumb)
-                .AddField ("Author", track.Author, true)
-                .AddField ("Length", track.Length, true)
-                .AddField ("Position", track.Position, true)
-                .AddField ("Streaming?", track.IsStream, true);
+            var thumb = await track.FetchThumbnailAsync();
+            var embed = new EmbedBuilder()
+                .WithAuthor($"Now Playing {player.CurrentTrack.Title}", thumb, $"{track.Uri}")
+                .WithThumbnailUrl(thumb)
+                .AddField("Author", track.Author, true)
+                .AddField("Length", track.Length, true)
+                .AddField("Position", track.Position, true)
+                .AddField("Streaming?", track.IsStream, true);
 
-            await ReplyAsync ("", false, embed.Build ());
+            await ReplyAsync("", false, embed.Build());
         }
 
-        [Command ("Lyrics")]
+        [Command("Lyrics")]
         [Summary("Attempts to fetch lyrics for the current song")]
-        public async Task LyricsAsync ()
+        public async Task LyricsAsync()
         {
             if (player.CurrentTrack is null)
             {
-                await ReplyAsync ("There is no track playing right now.");
+                await ReplyAsync("There is no track playing right now.");
                 return;
             }
 
@@ -249,11 +249,11 @@ namespace RavenBOT.Modules.Music.Modules
                 return;
             }
 
-            var thumb = await player.CurrentTrack.FetchThumbnailAsync ();
+            var thumb = await player.CurrentTrack.FetchThumbnailAsync();
 
             var pager = new PaginatedMessage();
             var pages = new List<PaginatedMessage.Page>();
-            string[] paragraphs = Regex.Split(lyrics , "(\n){2,}");
+            string[] paragraphs = Regex.Split(lyrics, "(\n){2,}");
             foreach (var group in paragraphs)
             {
                 //Ensure that we are not including un-necessary empty pages
@@ -296,7 +296,7 @@ namespace RavenBOT.Modules.Music.Modules
                     pages.Add(new PaginatedMessage.Page()
                     {
                         Description = group
-                    });                    
+                    });
                 }
             }
             pager.Pages = pages;
@@ -312,17 +312,17 @@ namespace RavenBOT.Modules.Music.Modules
                 await PagedReplyAsync(pager, new ReactionList()
                 {
                     Forward = true,
-                    Backward = true,
-                    Trash = true
+                        Backward = true,
+                        Trash = true
                 });
             }
         }
 
-        [Command ("Queue")]
+        [Command("Queue")]
         [Summary("Displays all tracks  in the queue")]
-        public Task Queue ()
+        public Task Queue()
         {
-            var tracks = player.Queue.Items.Cast<LavaTrack> ().Select (x => x.Title).ToList();
+            var tracks = player.Queue.Items.Cast<LavaTrack>().Select(x => x.Title).ToList();
 
             int i = 0;
             var trackList = new List<string>();
@@ -332,8 +332,8 @@ namespace RavenBOT.Modules.Music.Modules
                 trackList.Add($"{i} - {track}");
             }
 
-            var response = trackList.Count == 0 ? "No tracks in queue." : string.Join ("\n", trackList);
-            return ReplyAsync (response.FixLength(2047));
+            var response = trackList.Count == 0 ? "No tracks in queue." : string.Join("\n", trackList);
+            return ReplyAsync(response.FixLength(2047));
         }
 
         [Command("Configure")]
@@ -347,7 +347,7 @@ namespace RavenBOT.Modules.Music.Modules
         [Command("SetAuthorization")]
         [Summary("Sets the authorization header for genius lyrics")]
         [RequireOwner]
-        public Task SetGeniusAuth([Remainder]string auth)
+        public Task SetGeniusAuth([Remainder] string auth)
         {
             var doc = Vic.Database.Load<VictoriaService.GeniusConfig>(VictoriaService.GeniusConfig.DocumentName());
             if (doc == null)
@@ -391,18 +391,18 @@ namespace RavenBOT.Modules.Music.Modules
             var stats = LavaShardClient.ServerStats;
 
             await ReplyAsync($"CPU Cores: {stats?.Cpu?.Cores}\n" +
-                            $"CPU Lavalink Load: {stats?.Cpu?.LavalinkLoad}\n" +
-                            $"CPU System Load: {stats?.Cpu?.SystemLoad}\n" +
-                            $"Average Frames Deficit: {stats?.Frames?.Deficit}\n" +
-                            $"Average Frames Nulled: {stats?.Frames?.Nulled}\n" +
-                            $"Average Frames Sent: {stats?.Frames?.Sent}\n" +
-                            $"Memory Allocated: {stats?.Memory?.Allocated}\n" +
-                            $"Memory Free: {stats?.Memory?.Free}\n" +
-                            $"Memory Reservable: {stats?.Memory?.Reservable}\n" +
-                            $"Memory Used: {stats?.Memory?.Used}\n" +
-                            $"Player Count: {stats?.PlayerCount}\n" +
-                            $"Playing Players: {stats?.PlayingPlayers}\n" +
-                            $"Uptime: {stats?.Uptime.GetReadableLength()}");
+                $"CPU Lavalink Load: {stats?.Cpu?.LavalinkLoad}\n" +
+                $"CPU System Load: {stats?.Cpu?.SystemLoad}\n" +
+                $"Average Frames Deficit: {stats?.Frames?.Deficit}\n" +
+                $"Average Frames Nulled: {stats?.Frames?.Nulled}\n" +
+                $"Average Frames Sent: {stats?.Frames?.Sent}\n" +
+                $"Memory Allocated: {stats?.Memory?.Allocated}\n" +
+                $"Memory Free: {stats?.Memory?.Free}\n" +
+                $"Memory Reservable: {stats?.Memory?.Reservable}\n" +
+                $"Memory Used: {stats?.Memory?.Used}\n" +
+                $"Player Count: {stats?.PlayerCount}\n" +
+                $"Playing Players: {stats?.PlayingPlayers}\n" +
+                $"Uptime: {stats?.Uptime.GetReadableLength()}");
         }
     }
 }

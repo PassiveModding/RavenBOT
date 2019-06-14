@@ -9,7 +9,7 @@ namespace RavenBOT.Modules.ELO.Models
             return $"LobbyConfig-{guildId}-{channelId}";
         }
 
-        public Lobby (ulong guildId, ulong channelId)
+        public Lobby(ulong guildId, ulong channelId)
         {
             this.GuildId = guildId;
             this.ChannelId = channelId;
@@ -17,22 +17,22 @@ namespace RavenBOT.Modules.ELO.Models
         public ulong GuildId { get; set; }
         public ulong ChannelId { get; set; }
 
-        public int MinimumPoints {get;set;} = 0;
+        public int MinimumPoints { get; set; } = 0;
 
-        public int PlayersPerTeam {get;set;} = 5;
+        public int PlayersPerTeam { get; set; } = 5;
 
-        public List<ulong> Queue {get;set;} = new List<ulong>();
+        public List<ulong> Queue { get; set; } = new List<ulong>();
 
-        public PickMode TeamPickMode {get;set;} = PickMode.Random;
+        public PickMode TeamPickMode { get; set; } = PickMode.Random;
 
         public enum PickMode
         {
-            Captains, 
+            Captains,
             Random,
             TryBalance
         }
 
-        public CaptainMode CaptainSortMode {get;set;} = CaptainMode.RandomHighestRanked;
+        public CaptainMode CaptainSortMode { get; set; } = CaptainMode.RandomHighestRanked;
 
         public enum CaptainMode
         {
@@ -42,7 +42,7 @@ namespace RavenBOT.Modules.ELO.Models
         }
 
         //TODO: Allow for votes on maps, reduce change of repeate games on the same map.
-        public List<string> Maps {get;set;} = new List<string>();
+        public List<string> Maps { get; set; } = new List<string>();
         public string LastMap = null;
     }
 }

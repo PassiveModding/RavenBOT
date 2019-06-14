@@ -9,29 +9,29 @@ namespace RavenBOT.Modules.Levels.Models
             GuildId = guildId;
         }
 
-        public LevelConfig(){}
+        public LevelConfig() { }
 
         public static string DocumentName(ulong guildId)
         {
             return $"LevelConfig-{guildId}";
         }
 
-        public ulong GuildId {get;set;}
-        public bool Enabled {get;set;} = false;
+        public ulong GuildId { get; set; }
+        public bool Enabled { get; set; } = false;
 
         //User keeps 1 level role only if this is false
         //Otherwise they keep a role for each, reward
-        public bool MultiRole {get;set;} = false;
+        public bool MultiRole { get; set; } = false;
 
-        public ulong LogChannelId {get;set;} = 0;
-        public bool ReplyLevelUps {get;set;} = true;
+        public ulong LogChannelId { get; set; } = 0;
+        public bool ReplyLevelUps { get; set; } = true;
 
-        public List<LevelReward> RewardRoles {get;set;} = new List<LevelReward>();
+        public List<LevelReward> RewardRoles { get; set; } = new List<LevelReward>();
 
         public class LevelReward
         {
-            public ulong RoleId {get;set;}
-            public int LevelRequirement {get;set;}
+            public ulong RoleId { get; set; }
+            public int LevelRequirement { get; set; }
         }
     }
 }

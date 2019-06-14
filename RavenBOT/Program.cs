@@ -58,12 +58,12 @@ namespace RavenBOT
                 .AddSingleton(x => new DiscordShardedClient(new DiscordSocketConfig
                 {
                     AlwaysDownloadUsers = false,
-                    MessageCacheSize = 50,
-                    LogLevel = LogSeverity.Info,
+                        MessageCacheSize = 50,
+                        LogLevel = LogSeverity.Info,
 
-                    //You may want to edit the shard count as the bot grows more and more popular.
-                    //Discord will block single shards that try to connect to more than 2500 servers
-                    TotalShards = 1
+                        //You may want to edit the shard count as the bot grows more and more popular.
+                        //Discord will block single shards that try to connect to more than 2500 servers
+                        TotalShards = 1
                 }))
                 .AddSingleton(x => new LogHandler(x.GetRequiredService<DiscordShardedClient>(), x.GetRequiredService<IDatabase>()))
                 .AddSingleton(localManagement)
@@ -75,14 +75,14 @@ namespace RavenBOT
                     {
                         Console.WriteLine("Please enter your bot token (found at https://discordapp.com/developers/applications/ )");
                         var token = Console.ReadLine();
-                        
+
                         Console.WriteLine("Input a bot name (this will be used for certain database tasks)");
                         var name = Console.ReadLine();
 
                         Console.WriteLine("Input a bot prefix (this will be used to run commands, ie. prefix = f. command will be f.command)");
                         var prefix = Console.ReadLine();
                         config = new BotConfig(token, prefix, name);
-                        
+
                         x.GetRequiredService<IDatabase>().Store(config, "BotConfig");
                     }
 
@@ -94,12 +94,12 @@ namespace RavenBOT
                 .AddSingleton(new CommandService(new CommandServiceConfig
                 {
                     ThrowOnError = false,
-                    CaseSensitiveCommands = false,
-                    IgnoreExtraArgs = false,
-                    DefaultRunMode = RunMode.Async,
-                    LogLevel = LogSeverity.Info
+                        CaseSensitiveCommands = false,
+                        IgnoreExtraArgs = false,
+                        DefaultRunMode = RunMode.Async,
+                        LogLevel = LogSeverity.Info
                 }))
-                .AddSingleton(x =>  new PrefixService(x.GetRequiredService<IDatabase>(), localConfig.Developer ? localConfig.DeveloperPrefix : x.GetRequiredService<BotConfig>().Prefix))
+                .AddSingleton(x => new PrefixService(x.GetRequiredService<IDatabase>(), localConfig.Developer ? localConfig.DeveloperPrefix : x.GetRequiredService<BotConfig>().Prefix))
                 .AddSingleton<EventHandler>()
                 .AddSingleton(x => new LicenseService(x.GetRequiredService<IDatabase>()))
                 .AddSingleton<InteractiveService>()

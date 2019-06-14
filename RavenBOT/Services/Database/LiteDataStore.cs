@@ -5,7 +5,7 @@ using System.Linq;
 using LiteDB;
 
 namespace RavenBOT.Services.Database
-{      
+{
     public class BaseEntity<T>
     {
         public BaseEntity(T value, string id = null)
@@ -14,13 +14,13 @@ namespace RavenBOT.Services.Database
             Value = value;
         }
 
-        public BaseEntity(){}
+        public BaseEntity() { }
 
         public string Id { get; set; }
-        public T Value {get;set;}
+        public T Value { get; set; }
     }
 
-    public class LiteDataStore: IDatabase
+    public class LiteDataStore : IDatabase
     {
         public string DatabaseFolder = Path.Combine(AppContext.BaseDirectory, "LiteDB");
 

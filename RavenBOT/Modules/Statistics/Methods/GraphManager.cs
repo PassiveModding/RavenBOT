@@ -56,11 +56,11 @@ namespace RavenBOT.Modules.Statistics.Methods
         public class MessageStats
         {
             public int LoopCount = 0;
-            public List<DateTime> ThisMinute {get;set;} = new List<DateTime>();
-            public List<DateTime> ThisHour {get;set;} = new List<DateTime>();
-            public List<DateTime> ThisDay {get;set;} = new List<DateTime>();
+            public List<DateTime> ThisMinute { get; set; } = new List<DateTime>();
+            public List<DateTime> ThisHour { get; set; } = new List<DateTime>();
+            public List<DateTime> ThisDay { get; set; } = new List<DateTime>();
 
-            public int ThisSession {get;set;} = 0;
+            public int ThisSession { get; set; } = 0;
         }
 
         public async Task MessageReceived(SocketMessage message)
@@ -77,14 +77,13 @@ namespace RavenBOT.Modules.Statistics.Methods
         public async Task GuildCountChanged(SocketGuild guild)
         {
             GraphiteService.Report(new ahd.Graphite.Datapoint($"Bot/GuildCount", Client.Guilds.Count, DateTime.UtcNow));
-            GraphiteService.Report(new ahd.Graphite.Datapoint($"Bot/MemberCount", Client.Guilds.Sum(x => x.MemberCount), DateTime.UtcNow));           
+            GraphiteService.Report(new ahd.Graphite.Datapoint($"Bot/MemberCount", Client.Guilds.Sum(x => x.MemberCount), DateTime.UtcNow));
         }
 
         public async Task UserCountChanged(SocketGuildUser user)
         {
             GraphiteService.Report(new ahd.Graphite.Datapoint($"Guilds/{user.Guild.Id}/UserCount", user.Guild.MemberCount, DateTime.UtcNow));
         }
-
 
         public IDatabase Database { get; }
         public DiscordShardedClient Client { get; }

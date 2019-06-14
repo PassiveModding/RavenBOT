@@ -9,7 +9,7 @@ namespace RavenBOT.Modules.ELO.Models
         {
             GameId = gameId;
         }
-        public int GameId {get;set;}
+        public int GameId { get; set; }
         public enum State
         {
             Undecided,
@@ -18,17 +18,17 @@ namespace RavenBOT.Modules.ELO.Models
             Canceled
         }
 
-        public DateTime CreationTime {get;set;} = DateTime.UtcNow;
+        public DateTime CreationTime { get; set; } = DateTime.UtcNow;
 
-        public State GameState {get;set;} = State.Undecided;
-        public int WinningTeam {get;set;} = -1;
+        public State GameState { get; set; } = State.Undecided;
+        public int WinningTeam { get; set; } = -1;
 
-        public Team Team1 {get;set;} = new Team();
-        public Team Team2 {get;set;} = new Team();
-        public List<ulong> Queue {get;set;} = new List<ulong>();
+        public Team Team1 { get; set; } = new Team();
+        public Team Team2 { get; set; } = new Team();
+        public List<ulong> Queue { get; set; } = new List<ulong>();
         public class Team
         {
-            public List<ulong> Players {get;set;} = new List<ulong>();
+            public List<ulong> Players { get; set; } = new List<ulong>();
         }
     }
 }

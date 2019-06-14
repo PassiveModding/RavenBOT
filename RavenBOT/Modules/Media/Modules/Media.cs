@@ -15,8 +15,8 @@ namespace RavenBOT.Modules.Media.Modules
     [Group("Media")]
     public class Media : InteractiveBase<ShardedCommandContext>
     {
-        public MediaHelper MediaHelper {get;}
-        public Random Random {get;}
+        public MediaHelper MediaHelper { get; }
+        public Random Random { get; }
 
         public Media(Random random, MediaHelper mediaHelper)
         {
@@ -40,7 +40,7 @@ namespace RavenBOT.Modules.Media.Modules
 
             RedditSharp.Things.Post selectedPost = null;
             //Filter out nsfw posts
-            foreach(var post in posts)
+            foreach (var post in posts)
             {
                 if (post.NSFW)
                 {
@@ -59,7 +59,6 @@ namespace RavenBOT.Modules.Media.Modules
             await ReplyAsync($"{selectedPost.Title}\nhttps://reddit.com{selectedPost.Permalink}");
         }
 
-        
         [Command("dog")]
         [Summary("Gets a random dog image from random.dog")]
         public async Task DogAsync()
@@ -89,8 +88,8 @@ namespace RavenBOT.Modules.Media.Modules
 
         [Command("xkcd", RunMode = RunMode.Async)]
         [Summary("Get a random xkcd post, or the specified post numer")]
-        public async Task XkcdAsync([Summary("the post number, use 'latest' for most recent or leave empty for random")]string number = null)
-        {  
+        public async Task XkcdAsync([Summary("the post number, use 'latest' for most recent or leave empty for random")] string number = null)
+        {
             string res;
             if (number == "latest")
             {

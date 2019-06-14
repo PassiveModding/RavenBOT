@@ -14,12 +14,12 @@ namespace RavenBOT.Modules.Reminders.Methods
 {
     public class ReminderHandler : IServiceable
     {
-        private IDatabase Database {get;}
-        private DiscordShardedClient Client {get;}
+        private IDatabase Database { get; }
+        private DiscordShardedClient Client { get; }
         public LocalManagementService LocalManagementService { get; }
-        private Timer Timer {get;}
+        private Timer Timer { get; }
 
-        private List<Reminder> Reminders {get;set;}
+        private List<Reminder> Reminders { get; set; }
 
         public ReminderHandler(IDatabase database, DiscordShardedClient client, LocalManagementService localManagementService)
         {
@@ -52,7 +52,7 @@ namespace RavenBOT.Modules.Reminders.Methods
             }
         }
 
-        public bool TimerWait {get;set;} = false;
+        public bool TimerWait { get; set; } = false;
 
         public void TimerEvent(object _)
         {
@@ -70,7 +70,7 @@ namespace RavenBOT.Modules.Reminders.Methods
                 foreach (var reminder in Reminders.ToList())
                 {
                     if (reminder.TimeStamp + reminder.Length < DateTime.UtcNow)
-                    {                        
+                    {
                         if (!LocalManagementService.LastConfig.IsAcceptable(reminder.GuildId))
                         {
                             return;
@@ -100,7 +100,7 @@ namespace RavenBOT.Modules.Reminders.Methods
                         channel.SendMessageAsync($"{user.Mention}", false, new EmbedBuilder()
                         {
                             Description = $"{reminder.ReminderMessage}".FixLength(1024),
-                            Color = Color.Green
+                                Color = Color.Green
                         }.Build()).ConfigureAwait(false);
                         RemoveReminder(reminder);
                     }

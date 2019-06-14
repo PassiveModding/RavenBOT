@@ -14,7 +14,7 @@ namespace RavenBOT.Modules.Conversation.Methods
             MethodInfo mi = this.GetType().GetMethod(methodName);
             if (mi != null)
             {
-                var res = mi.Invoke(this, new object[]{ payload });
+                var res = mi.Invoke(this, new object[] { payload });
                 if (res is ConversationResponse convResponse)
                 {
                     response = convResponse;
@@ -31,7 +31,7 @@ namespace RavenBOT.Modules.Conversation.Methods
             {
                 Value = response;
             }
-            public string Value {get;set;}
+            public string Value { get; set; }
         }
 
         public ConversationResponse GetWeather(string payload)
@@ -48,7 +48,7 @@ namespace RavenBOT.Modules.Conversation.Methods
 
         public class WeatherPayload
         {
-            public string Location {get;set;}
+            public string Location { get; set; }
         }
 
         public List<string> GetFunctions()

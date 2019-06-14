@@ -13,12 +13,12 @@ namespace RavenBOT.Modules.Moderator.Models
 
         public ActionConfig(ulong guildId)
         {
-            GuildId= guildId;
+            GuildId = guildId;
         }
 
-        public ActionConfig() {}
+        public ActionConfig() { }
 
-        public ulong GuildId {get;set;}
+        public ulong GuildId { get; set; }
 
         public enum Action
         {
@@ -27,11 +27,11 @@ namespace RavenBOT.Modules.Moderator.Models
             None
         }
 
-        public int MaxWarnings {get;set;} = 5;
+        public int MaxWarnings { get; set; } = 5;
 
-        public Action MaxWarningsAction {get;set;} = Action.Ban;
+        public Action MaxWarningsAction { get; set; } = Action.Ban;
 
-        public ulong MuteRole {get;set;}
+        public ulong MuteRole { get; set; }
 
         public int AddLogAction(ulong user, ulong moderator, Log.LogAction action, string reason = null, TimeSpan? length = null)
         {
@@ -41,11 +41,11 @@ namespace RavenBOT.Modules.Moderator.Models
             return id;
         }
 
-        public TimeSpan SoftBanLength {get;set;} = TimeSpan.FromHours(24);
+        public TimeSpan SoftBanLength { get; set; } = TimeSpan.FromHours(24);
 
-        public TimeSpan MuteLength {get;set;} = TimeSpan.FromHours(1);
+        public TimeSpan MuteLength { get; set; } = TimeSpan.FromHours(1);
 
-        public List<Log> LogActions {get;set;} = new List<Log>();
+        public List<Log> LogActions { get; set; } = new List<Log>();
 
         public class Log
         {
@@ -60,17 +60,17 @@ namespace RavenBOT.Modules.Moderator.Models
                 Duration = length;
             }
 
-            public Log() {}
+            public Log() { }
 
-            public ulong Target {get;set;}
-            public ulong Moderator {get;set;}
-            public string Reason {get;set;}
-            public int CaseId {get;set;}
-            public DateTime TimeStamp {get;set;} = DateTime.UtcNow;
+            public ulong Target { get; set; }
+            public ulong Moderator { get; set; }
+            public string Reason { get; set; }
+            public int CaseId { get; set; }
+            public DateTime TimeStamp { get; set; } = DateTime.UtcNow;
 
-            public LogAction Action {get;set;}
+            public LogAction Action { get; set; }
 
-            public TimeSpan? Duration {get;set;} = null;
+            public TimeSpan? Duration { get; set; } = null;
 
             public enum LogAction
             {
@@ -95,12 +95,12 @@ namespace RavenBOT.Modules.Moderator.Models
                 GuildId = guildId;
             }
 
-            public ActionUser(){}
+            public ActionUser() { }
 
-            public ulong UserId {get;set;}
-            public ulong GuildId {get;set;}
+            public ulong UserId { get; set; }
+            public ulong GuildId { get; set; }
 
-            public List<Warning> Warnings {get;set;} = new List<Warning>();
+            public List<Warning> Warnings { get; set; } = new List<Warning>();
 
             public int WarnUser(ulong modId, string reason = null)
             {
@@ -114,12 +114,12 @@ namespace RavenBOT.Modules.Moderator.Models
 
             public class Warning
             {
-                public string Reason {get;set;}
+                public string Reason { get; set; }
 
                 //The ID of the user who issued the warning
-                public ulong Warner {get;set;}
+                public ulong Warner { get; set; }
 
-                public DateTime TimeStamp {get;set;} = DateTime.UtcNow;
+                public DateTime TimeStamp { get; set; } = DateTime.UtcNow;
             }
         }
     }

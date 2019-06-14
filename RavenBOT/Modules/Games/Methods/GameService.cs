@@ -6,7 +6,7 @@ namespace RavenBOT.Modules.Games.Methods
 {
     public class GameService : IServiceable
     {
-        private IDatabase Database {get;}
+        private IDatabase Database { get; }
 
         public GameService(IDatabase database)
         {

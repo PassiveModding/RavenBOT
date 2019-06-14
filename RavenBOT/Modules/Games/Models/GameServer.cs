@@ -7,13 +7,13 @@ namespace RavenBOT.Modules.Games.Models
             return $"GameServer-{guildId}";
         }
 
-        public ulong GuildId {get;set;}
+        public ulong GuildId { get; set; }
 
         public GameServer(ulong guildId)
         {
             GuildId = guildId;
         }
 
-        public GameServer(){}
+        public GameServer() { }
     }
 }

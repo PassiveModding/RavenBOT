@@ -19,7 +19,6 @@ namespace RavenBOT.Modules.StatChannels.Modules
 
         public StatChannelService Service { get; }
 
-
         [Command("ToggleMemberCount")]
         public async Task ToggleMemberCountAsync()
         {
@@ -27,10 +26,10 @@ namespace RavenBOT.Modules.StatChannels.Modules
             if (config.UserCountChannelId == 0 || Context.Guild.GetVoiceChannel(config.UserCountChannelId) == null)
             {
                 var newChannel = await Context.Guild.CreateVoiceChannelAsync($"👥 Members: {Context.Guild.MemberCount}", x => x.Position = (Context.Channel as SocketGuildChannel).Position);
-                
+
                 await newChannel.AddPermissionOverwriteAsync(Context.Guild.EveryoneRole, new Discord.OverwritePermissions(connect: Discord.PermValue.Deny));
-                await ReplyAsync($"I have created a new channel to track the member count in. {newChannel.Name}");        
-                config.UserCountChannelId = newChannel.Id;        
+                await ReplyAsync($"I have created a new channel to track the member count in. {newChannel.Name}");
+                config.UserCountChannelId = newChannel.Id;
                 Service.SaveConfig(config);
             }
             else

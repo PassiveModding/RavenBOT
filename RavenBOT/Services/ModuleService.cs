@@ -25,7 +25,7 @@ namespace RavenBOT.Services
             var reflectedDll = Assembly.LoadFile(dllPath);
 
             AppDomain currentDomain = AppDomain.CurrentDomain;
-            
+
             var probeDirectory = Directory.GetParent(dllPath).FullName;
             var assemblies = reflectedDll.GetReferencedAssemblies().Select(x => x.Name);
             var currentDirectory = AppContext.BaseDirectory;

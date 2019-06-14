@@ -18,7 +18,7 @@ namespace RavenBOT.Modules.AutoMod.Models.Moderation
             GuildId = guildId;
             PerspectiveMax = 95;
         }
-        
+
         public ModerationConfig() { }
 
         public ulong GuildId { get; set; }
@@ -52,8 +52,8 @@ namespace RavenBOT.Modules.AutoMod.Models.Moderation
         public bool BlockInvites { get; set; } = false;
         public bool BlockIps { get; set; } = false;
 
-        public bool BlacklistUsernames {get;set;} = false;
-        public List<BlacklistSet.BlacklistMessage> BlacklistedUsernames {get;set;} = new List<BlacklistSet.BlacklistMessage>();
+        public bool BlacklistUsernames { get; set; } = false;
+        public List<BlacklistSet.BlacklistMessage> BlacklistedUsernames { get; set; } = new List<BlacklistSet.BlacklistMessage>();
 
         public bool BlockMassMentions { get; set; } = false;
         public int MaxMentions { get; set; } = 5;
@@ -64,15 +64,15 @@ namespace RavenBOT.Modules.AutoMod.Models.Moderation
         public bool UsePerspective { get; set; } = false;
         public int PerspectiveMax { get; set; } = 95;
 
-        public bool UseAntiSpam {get;set;} = false;
-        public AntiSpam SpamSettings {get;set;} = new AntiSpam();
+        public bool UseAntiSpam { get; set; } = false;
+        public AntiSpam SpamSettings { get; set; } = new AntiSpam();
 
-        public List<ulong> AutoModExempt {get;set;} = new List<ulong>();
+        public List<ulong> AutoModExempt { get; set; } = new List<ulong>();
 
         public class AntiSpam
         {
             //Max messages to cache
-            public int CacheSize {get; private set;} = 10;
+            public int CacheSize { get; private set; } = 10;
 
             public bool SetCacheSize(int size)
             {
@@ -86,10 +86,10 @@ namespace RavenBOT.Modules.AutoMod.Models.Moderation
             }
 
             //Seconds to check for timed spam
-            public int SecondsToCheck {get;set;} = 10;
+            public int SecondsToCheck { get; set; } = 10;
 
             //NOTE: Change setter to ensure amount is less than cache size.
-            public int MessagesPerTime {get; private set;} = 10;
+            public int MessagesPerTime { get; private set; } = 10;
 
             public bool SetMaxMessagesPerTime(int max)
             {
@@ -102,7 +102,7 @@ namespace RavenBOT.Modules.AutoMod.Models.Moderation
                 return false;
             }
 
-            public int MaxRepititions {get; private set;} = 5;
+            public int MaxRepititions { get; private set; } = 5;
 
             public bool SetMaxRepititions(int max)
             {

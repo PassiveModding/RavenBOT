@@ -15,7 +15,7 @@ namespace RavenBOT.Modules.Partner.Methods
         {
             Database = database;
             Client = client;
-            
+
             Timer = new Timer(TimerEvent, null, TimeSpan.FromSeconds(0), TimeSpan.FromMinutes(60));
 
             Random = new Random();
@@ -50,8 +50,8 @@ namespace RavenBOT.Modules.Partner.Methods
 
         public class GroupedConfig
         {
-            public SocketGuild Guild {get;set;}
-            public PartnerConfig Config {get;set;}
+            public SocketGuild Guild { get; set; }
+            public PartnerConfig Config { get; set; }
         }
 
         public async Task PartnerEvent()
@@ -62,7 +62,7 @@ namespace RavenBOT.Modules.Partner.Methods
                 .Select(x => new GroupedConfig
                 {
                     Guild = Client.GetGuild(x.GuildId),
-                    Config = x
+                        Config = x
                 })
                 .Where(x => x.Guild != null)
                 .ToList();

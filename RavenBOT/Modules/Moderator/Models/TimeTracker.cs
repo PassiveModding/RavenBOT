@@ -5,9 +5,9 @@ namespace RavenBOT.Modules.Moderator.Models
 {
     public class TimeTracker
     {
-        public static string DocumentName {get;set;} = "TimedModerations";
+        public static string DocumentName { get; set; } = "TimedModerations";
 
-        public List<User> Users {get;set;} = new List<User>();
+        public List<User> Users { get; set; } = new List<User>();
 
         public class User
         {
@@ -19,7 +19,7 @@ namespace RavenBOT.Modules.Moderator.Models
                 Action = action;
             }
 
-            public User() {}
+            public User() { }
 
             public enum TimedAction
             {
@@ -27,14 +27,14 @@ namespace RavenBOT.Modules.Moderator.Models
                 Mute
             }
 
-            public TimedAction Action {get;set;}
+            public TimedAction Action { get; set; }
 
-            public ulong UserId {get;set;}
-            public ulong GuildId {get;set;}
+            public ulong UserId { get; set; }
+            public ulong GuildId { get; set; }
 
-            public TimeSpan Length {get;set;}
+            public TimeSpan Length { get; set; }
 
-            public DateTime TimeStamp {get;set;} = DateTime.UtcNow;
+            public DateTime TimeStamp { get; set; } = DateTime.UtcNow;
         }
     }
 }

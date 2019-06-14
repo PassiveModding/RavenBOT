@@ -55,10 +55,10 @@ namespace RavenBOT.Modules.Translation.Methods
                 TranslationError
             }
 
-            public Result ResponseResult {get;set;}
-            public TranslationResult TranslateResult {get;set;}
+            public Result ResponseResult { get; set; }
+            public TranslationResult TranslateResult { get; set; }
 
-            public int RemainingUses {get;set;} = 0;
+            public int RemainingUses { get; set; } = 0;
         }
 
         public EmbedBuilder TranslateEmbed(ulong guildId, IEmbed embed, LanguageCode code)
@@ -103,10 +103,10 @@ namespace RavenBOT.Modules.Translation.Methods
                     {
                         builder.Footer = new EmbedFooterBuilder()
                         {
-                            IconUrl = embed.Footer.Value.IconUrl,
-                            Text = footerTextResult.TranslateResult.TranslatedText.FixLength(250)
+                        IconUrl = embed.Footer.Value.IconUrl,
+                        Text = footerTextResult.TranslateResult.TranslatedText.FixLength(250)
                         };
-                    } 
+                    }
                 }
                 else
                 {
@@ -116,7 +116,6 @@ namespace RavenBOT.Modules.Translation.Methods
                     };
                 }
             }
-
 
             if (!string.IsNullOrWhiteSpace(embed.Description))
             {
@@ -188,7 +187,7 @@ namespace RavenBOT.Modules.Translation.Methods
                 Console.WriteLine(e);
             }
 
-            return new TranslateResponse(TranslateResponse.Result.TranslationError); ;
+            return new TranslateResponse(TranslateResponse.Result.TranslationError);;
         }
 
         private TranslationResult TranslateText(string inputText, string languageCode)
@@ -199,7 +198,7 @@ namespace RavenBOT.Modules.Translation.Methods
             }
 
             var response = TranslationClient.TranslateText(inputText, languageCode);
-            
+
             return response;
         }
     }

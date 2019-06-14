@@ -35,21 +35,20 @@ namespace RavenBOT.Services.Database
                 if (Config.CertificatePath != null && File.Exists(Config.CertificatePath))
                 {
                     DocumentStore = new DocumentStore
-                                {
-                                    Database = Config.DatabaseName,
-                                    Urls = Config.DatabaseUrls.ToArray(),
-                                    Certificate = new X509Certificate2(X509Certificate.CreateFromCertFile(Config.CertificatePath))
-                                }.Initialize();
+                    {
+                        Database = Config.DatabaseName,
+                            Urls = Config.DatabaseUrls.ToArray(),
+                            Certificate = new X509Certificate2(X509Certificate.CreateFromCertFile(Config.CertificatePath))
+                    }.Initialize();
                 }
                 else
                 {
                     DocumentStore = new DocumentStore
-                                {
-                                    Database = Config.DatabaseName,
-                                    Urls = Config.DatabaseUrls.ToArray()
-                                }.Initialize();
+                    {
+                        Database = Config.DatabaseName,
+                            Urls = Config.DatabaseUrls.ToArray()
+                    }.Initialize();
                 }
-
 
                 if (DocumentStore.Maintenance.Server.Send(new GetDatabaseNamesOperation(0, 25)).All(x => !x.Equals(Config.DatabaseName)))
                 {
@@ -91,9 +90,9 @@ namespace RavenBOT.Services.Database
                 }
 
                 newConfig.DatabaseUrls = new List<string>
-                                             {
-                                                 databaseUrl
-                                             };
+                {
+                    databaseUrl
+                };
 
                 Console.WriteLine("Please input the path to your certificate for the database (Leave blank if you are using an unauthenticated deployment of ravendb)");
                 newConfig.CertificatePath = Console.ReadLine();
@@ -107,10 +106,9 @@ namespace RavenBOT.Services.Database
             return JsonConvert.DeserializeObject<RavenDatabaseConfig>(File.ReadAllText(ConfigPath));
         }
 
-
         public void Store<T>(T document, string name = null)
         {
-            using (var session = DocumentStore.OpenSession())
+            using(var session = DocumentStore.OpenSession())
             {
                 if (name == null)
                 {
@@ -127,7 +125,7 @@ namespace RavenBOT.Services.Database
 
         public void StoreMany<T>(List<T> documents, Func<T, string> docName = null)
         {
-            using (var session = DocumentStore.OpenSession())
+            using(var session = DocumentStore.OpenSession())
             {
                 if (docName == null)
                 {
@@ -150,7 +148,7 @@ namespace RavenBOT.Services.Database
 
         public T Load<T>(string documentName)
         {
-            using (var session = DocumentStore.OpenSession())
+            using(var session = DocumentStore.OpenSession())
             {
                 var document = session.Load<T>(documentName);
                 return document;
@@ -159,7 +157,7 @@ namespace RavenBOT.Services.Database
 
         public IEnumerable<T> Query<T>()
         {
-            using (var session = DocumentStore.OpenSession())
+            using(var session = DocumentStore.OpenSession())
             {
                 return session.Query<T>().ToList();
             }
@@ -167,7 +165,7 @@ namespace RavenBOT.Services.Database
 
         public void RemoveDocument<T>(T document)
         {
-            using (var session = DocumentStore.OpenSession())
+            using(var session = DocumentStore.OpenSession())
             {
                 try
                 {
@@ -184,7 +182,7 @@ namespace RavenBOT.Services.Database
 
         public void Remove<T>(string documentName)
         {
-            using (var session = DocumentStore.OpenSession())
+            using(var session = DocumentStore.OpenSession())
             {
                 session.Delete(documentName);
                 session.SaveChanges();
@@ -193,9 +191,9 @@ namespace RavenBOT.Services.Database
 
         public void RemoveManyDocuments<T>(List<T> documents)
         {
-            using (var session = DocumentStore.OpenSession())
+            using(var session = DocumentStore.OpenSession())
             {
-                foreach(var document in documents)
+                foreach (var document in documents)
                 {
                     session.Delete(document);
                 }
@@ -206,9 +204,9 @@ namespace RavenBOT.Services.Database
 
         public void RemoveMany<T>(List<string> docNames)
         {
-            using (var session = DocumentStore.OpenSession())
+            using(var session = DocumentStore.OpenSession())
             {
-                foreach(var name in docNames)
+                foreach (var name in docNames)
                 {
                     session.Delete(name);
                 }
@@ -219,7 +217,7 @@ namespace RavenBOT.Services.Database
 
         public bool Exists<T>(string docName)
         {
-            using (var session = DocumentStore.OpenSession())
+            using(var session = DocumentStore.OpenSession())
             {
                 return session.Advanced.Exists(docName);
             }

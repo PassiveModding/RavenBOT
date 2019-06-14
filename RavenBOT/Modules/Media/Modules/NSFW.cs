@@ -15,9 +15,9 @@ namespace RavenBOT.Modules.Media.Modules
     [RequireNsfw]
     public class NSFW : InteractiveBase<ShardedCommandContext>
     {
-        public MediaHelper MediaHelper {get;}
+        public MediaHelper MediaHelper { get; }
         public NsfwHelper NsfwHelper { get; }
-        public Random Random {get;}
+        public Random Random { get; }
         public GfycatManager GfyManager { get; }
 
         public NSFW(Random random, GfycatManager gfyManager, MediaHelper mediaHelper, NsfwHelper nsfwHelper)
@@ -28,7 +28,6 @@ namespace RavenBOT.Modules.Media.Modules
             NsfwHelper = nsfwHelper;
         }
 
-        
         [Command("RedditPost", RunMode = RunMode.Async)]
         [Summary("Get a random post from first 25 in hot of a sub")]
         public async Task GetPostAsync(string subreddit)
@@ -65,22 +64,22 @@ namespace RavenBOT.Modules.Media.Modules
             await GetPostAsync("NSFW");
         }
 
-        [Command("NsfwGif", RunMode = RunMode.Async)]        
+        [Command("NsfwGif", RunMode = RunMode.Async)]
         [Alias("gif")]
         [Summary("Shorthand for redditpost with various nsfw gif subreddits")]
         public Task NsfwGifAsync()
         {
             var rnd = new Random();
-            var subs = new[] { "nsfwgif", "booty_gifs", "boobgifs", "creampiegifs", "pussyjobs", "gifsgonewild", "nsfw_gif", "nsfw_gifs", "porn_gifs", "adultgifs" };
+            var subs = new [] { "nsfwgif", "booty_gifs", "boobgifs", "creampiegifs", "pussyjobs", "gifsgonewild", "nsfw_gif", "nsfw_gifs", "porn_gifs", "adultgifs" };
             return GetPostAsync(subs[rnd.Next(subs.Length - 1)]);
         }
 
-        [Command("pussy", RunMode = RunMode.Async)]        
+        [Command("pussy", RunMode = RunMode.Async)]
         [Summary("Shorthand for redditpost with various subreddits focussed on the female genitals")]
         public Task PussyAsync()
         {
             var rnd = new Random();
-            var subs = new[] { "grool", "creampies", "creampie", "creampiegifs", "pussyjobs", "pussyslip", "upskirt", "pussy", "rearpussy", "simps", "vagina", "moundofvenus" };
+            var subs = new [] { "grool", "creampies", "creampie", "creampiegifs", "pussyjobs", "pussyslip", "upskirt", "pussy", "rearpussy", "simps", "vagina", "moundofvenus" };
             return GetPostAsync(subs[rnd.Next(subs.Length - 1)]);
         }
 
@@ -126,7 +125,7 @@ namespace RavenBOT.Modules.Media.Modules
             JToken obj;
             var rnd = Random.Next(0, 10229);
 
-            obj = JArray.Parse(await MediaHelper.Client.GetStringAsync($"http://api.oboobs.ru/boobs/{rnd}"))[0];
+            obj = JArray.Parse(await MediaHelper.Client.GetStringAsync($"http://api.oboobs.ru/boobs/{rnd}")) [0];
 
             var builder = new EmbedBuilder { ImageUrl = $"http://media.oboobs.ru/{obj["preview"]}", Description = $"Tits Database Size: 10229\n Image Number: {rnd}", Title = "Tits", Url = $"http://adult.passivenation.com/18217229/http://media.oboobs.ru/{obj["preview"]}" };
 
@@ -139,7 +138,7 @@ namespace RavenBOT.Modules.Media.Modules
         {
             JToken obj;
             var rnd = Random.Next(0, 4222);
-            obj = JArray.Parse(await MediaHelper.Client.GetStringAsync($"http://api.obutts.ru/butts/{rnd}"))[0];
+            obj = JArray.Parse(await MediaHelper.Client.GetStringAsync($"http://api.obutts.ru/butts/{rnd}")) [0];
 
             var builder = new EmbedBuilder { ImageUrl = $"http://media.obutts.ru/{obj["preview"]}", Description = $"Ass Database Size: 4222\n Image Number: {rnd}", Title = "Ass", Url = $"http://adult.passivenation.com/18217229/http://media.obutts.ru/{obj["preview"]}" };
             await ReplyAsync(string.Empty, false, builder.Build());

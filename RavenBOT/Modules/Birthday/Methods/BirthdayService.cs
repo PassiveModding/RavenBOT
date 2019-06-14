@@ -13,7 +13,7 @@ namespace RavenBOT.Modules.Birthday.Methods
 {
     public class BirthdayService : IServiceable
     {
-        public BirthdayService (DiscordShardedClient client, IDatabase database, Timer timer)
+        public BirthdayService(DiscordShardedClient client, IDatabase database, Timer timer)
         {
             this.Client = client;
             this.Database = database;
@@ -27,26 +27,26 @@ namespace RavenBOT.Modules.Birthday.Methods
 
         public bool Running { get; set; } = false;
 
-        public BirthdayService (DiscordShardedClient client, IDatabase database, LocalManagementService localManagementService)
+        public BirthdayService(DiscordShardedClient client, IDatabase database, LocalManagementService localManagementService)
         {
             Client = client;
             Database = database;
             LocalManagementService = localManagementService;
-            Timer = new Timer (TimerEvent, null, TimeSpan.FromMinutes (0), TimeSpan.FromHours(1));
+            Timer = new Timer(TimerEvent, null, TimeSpan.FromMinutes(0), TimeSpan.FromHours(1));
         }
 
-        public void TimerEvent (object _)
+        public void TimerEvent(object _)
         {
-            var t = Task.Run (() => NotifyGuilds ());
+            var t = Task.Run(() => NotifyGuilds());
         }
 
-        public List<BirthdayModel> GetCurrentBirthdays ()
+        public List<BirthdayModel> GetCurrentBirthdays()
         {
-            var birthdays = Database.Query<BirthdayModel> ()?.Where (x => x.IsToday ()).ToList () ?? new List<BirthdayModel> ();
+            var birthdays = Database.Query<BirthdayModel>()?.Where(x => x.IsToday()).ToList() ?? new List<BirthdayModel>();
             return birthdays;
         }
 
-        public async Task NotifyGuilds ()
+        public async Task NotifyGuilds()
         {
             if (Running)
             {
@@ -56,8 +56,8 @@ namespace RavenBOT.Modules.Birthday.Methods
             try
             {
                 Running = true;
-                var guilds = Database.Query<BirthdayConfig> ()?.Where (x => x.Enabled).ToList () ?? new List<BirthdayConfig> ();
-                var currentBirthdays = GetCurrentBirthdays ();
+                var guilds = Database.Query<BirthdayConfig>()?.Where(x => x.Enabled).ToList() ?? new List<BirthdayConfig>();
+                var currentBirthdays = GetCurrentBirthdays();
                 foreach (var guildConfig in guilds)
                 {
                     if (!LocalManagementService.LastConfig.IsAcceptable(guildConfig.GuildId))
@@ -65,13 +65,13 @@ namespace RavenBOT.Modules.Birthday.Methods
                         return;
                     }
 
-                    var guild = Client.GetGuild (guildConfig.GuildId);
+                    var guild = Client.GetGuild(guildConfig.GuildId);
                     if (guild == null)
                     {
                         continue;
                     }
 
-                    var role = guild.GetRole (guildConfig.BirthdayRole);
+                    var role = guild.GetRole(guildConfig.BirthdayRole);
                     if (role == null)
                     {
                         return;
@@ -79,22 +79,22 @@ namespace RavenBOT.Modules.Birthday.Methods
 
                     foreach (var user in role.Members)
                     {
-                        if (currentBirthdays.All (x => x.UserId != user.Id))
+                        if (currentBirthdays.All(x => x.UserId != user.Id))
                         {
-                            await user.RemoveRoleAsync (role).ConfigureAwait (false);
+                            await user.RemoveRoleAsync(role).ConfigureAwait(false);
                         }
                     }
 
-                    var channel = guild.GetTextChannel (guildConfig.BirthdayAnnouncementChannelId);
+                    var channel = guild.GetTextChannel(guildConfig.BirthdayAnnouncementChannelId);
                     if (channel == null)
                     {
                         continue;
                     }
 
-                    await guild.DownloadUsersAsync ().ContinueWith (async x =>
+                    await guild.DownloadUsersAsync().ContinueWith(async x =>
                     {
-                        await NotifyGuild (currentBirthdays, guild, channel, role).ConfigureAwait (false);
-                    }).ConfigureAwait (false);
+                        await NotifyGuild(currentBirthdays, guild, channel, role).ConfigureAwait(false);
+                    }).ConfigureAwait(false);
                 }
             }
             finally
@@ -103,62 +103,62 @@ namespace RavenBOT.Modules.Birthday.Methods
             }
         }
 
-        public BirthdayConfig GetConfig (ulong guildId)
+        public BirthdayConfig GetConfig(ulong guildId)
         {
-            var config = Database.Load<BirthdayConfig> (BirthdayConfig.DocumentName (guildId));
+            var config = Database.Load<BirthdayConfig>(BirthdayConfig.DocumentName(guildId));
             if (config == null)
             {
-                config = new BirthdayConfig (guildId);
-                Database.Store (config, BirthdayConfig.DocumentName (guildId));
+                config = new BirthdayConfig(guildId);
+                Database.Store(config, BirthdayConfig.DocumentName(guildId));
             }
 
             return config;
         }
 
-        public void SaveConfig (BirthdayConfig config)
+        public void SaveConfig(BirthdayConfig config)
         {
-            Database.Store (config, BirthdayConfig.DocumentName (config.GuildId));
+            Database.Store(config, BirthdayConfig.DocumentName(config.GuildId));
         }
 
-        public BirthdayModel GetUser (ulong userId)
+        public BirthdayModel GetUser(ulong userId)
         {
-            var config = Database.Load<BirthdayModel> (BirthdayModel.DocumentName (userId));
+            var config = Database.Load<BirthdayModel>(BirthdayModel.DocumentName(userId));
             return config;
         }
 
-        public void SaveUser (BirthdayModel config)
+        public void SaveUser(BirthdayModel config)
         {
-            Database.Store (config, BirthdayModel.DocumentName (config.UserId));
+            Database.Store(config, BirthdayModel.DocumentName(config.UserId));
         }
 
-        private async Task NotifyGuild (List<BirthdayModel> currentBirthdays, SocketGuild guild, SocketTextChannel channel, IRole role)
+        private async Task NotifyGuild(List<BirthdayModel> currentBirthdays, SocketGuild guild, SocketTextChannel channel, IRole role)
         {
 
-            if (currentBirthdays.Any (x => guild.GetUser (x.UserId) != null))
+            if (currentBirthdays.Any(x => guild.GetUser(x.UserId) != null))
             {
-                var guildBirthdays = currentBirthdays.Select (x => (guild.GetUser (x.UserId), x)).Where (x => x.Item1 != null).ToList ();
+                var guildBirthdays = currentBirthdays.Select(x => (guild.GetUser(x.UserId), x)).Where(x => x.Item1 != null).ToList();
 
                 foreach (var user in guildBirthdays)
                 {
-                    if (user.Item1.Roles.Any (x => x.Id == role.Id))
+                    if (user.Item1.Roles.Any(x => x.Id == role.Id))
                     {
                         //Users are assigned the birthday role
                         //Therefore if they already have the role their birthday will have been announced.
                         continue;
                     }
 
-                    await user.Item1.AddRoleAsync (role).ConfigureAwait (false);
-                    await channel.SendMessageAsync ($"{user.Item1.Mention}", false, new EmbedBuilder ()
+                    await user.Item1.AddRoleAsync(role).ConfigureAwait(false);
+                    await channel.SendMessageAsync($"{user.Item1.Mention}", false, new EmbedBuilder()
                     {
                         Title = $"Happy Birthday to {user.Item1.Nickname ?? user.Item1.Username}",
                             Description = user.Item2.ShowYear ? $"They are now: {user.Item2.Age()} years old" : null,
                             Color = Color.Blue,
-                            Author = new EmbedAuthorBuilder ()
+                            Author = new EmbedAuthorBuilder()
                             {
-                                IconUrl = user.Item1.GetAvatarUrl (),
+                                IconUrl = user.Item1.GetAvatarUrl(),
                                     Name = user.Item1.Nickname ?? user.Item1.Username
                             }
-                    }.Build ()).ConfigureAwait (false);
+                    }.Build()).ConfigureAwait(false);
                 }
             }
         }
@@ -169,9 +169,9 @@ namespace RavenBOT.Modules.Birthday.Methods
 
         private string[] Delimeters = { " ", "-", "/" };
 
-        public string[] GetTimeFormats (bool useYear)
+        public string[] GetTimeFormats(bool useYear)
         {
-            var responses = new List<string> ();
+            var responses = new List<string>();
             foreach (var dayType in DayTypes)
             {
                 var baseFormat = dayType;
@@ -185,13 +185,13 @@ namespace RavenBOT.Modules.Birthday.Methods
 
                     foreach (var delimiter in Delimeters)
                     {
-                        var delimited = secondaryFormat.Replace (" ", delimiter);
-                        responses.Add (delimited);
+                        var delimited = secondaryFormat.Replace(" ", delimiter);
+                        responses.Add(delimited);
                     }
                 }
             }
 
-            return responses.ToArray ();
+            return responses.ToArray();
         }
     }
 }

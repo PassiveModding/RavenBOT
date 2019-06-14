@@ -6,6 +6,6 @@ namespace RavenBOT.Modules.Statistics.Models
         {
             return $"GraphiteConfig";
         }
-        public string GraphiteUrl {get;set;}
+        public string GraphiteUrl { get; set; }
     }
 }

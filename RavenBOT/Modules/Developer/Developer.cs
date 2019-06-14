@@ -84,7 +84,7 @@ namespace RavenBOT.Modules.Developer
             DeveloperSettings.SetDeveloperSettings(settings);
 
             await ReplyAsync("Settings:\n" +
-                             $"{string.Join("\n", settings.SkippableHelpPreconditions)}");
+                $"{string.Join("\n", settings.SkippableHelpPreconditions)}");
         }
 
         [Command("ClearHelpPreconditionSkips")]
@@ -102,11 +102,11 @@ namespace RavenBOT.Modules.Developer
         {
             var settings = DeveloperSettings.GetDeveloperSettings();
             await ReplyAsync("Settings:\n" +
-                             $"{string.Join("\n", settings.SkippableHelpPreconditions)}");
+                $"{string.Join("\n", settings.SkippableHelpPreconditions)}");
         }
 
         [Command("SetGame")]
-        public async Task SetGame([Remainder]string game)
+        public async Task SetGame([Remainder] string game)
         {
             await Context.Client.SetActivityAsync(new Game(game));
         }
@@ -174,10 +174,9 @@ namespace RavenBOT.Modules.Developer
             Database.Store(config, "GfycatClientInfo");
         }
 
-
         [Command("EmbedGfycatImage")]
         [Summary("Tests the getgfycaturl method")]
-        public async Task EmbedTest([Remainder]string imageUrl)
+        public async Task EmbedTest([Remainder] string imageUrl)
         {
             var response = await GfyCat.GetGfyCatUrl(imageUrl);
             var embed = new EmbedBuilder()
@@ -204,7 +203,7 @@ namespace RavenBOT.Modules.Developer
             newDB.StoreMany(Database.Query<EventConfig>().ToList(), x => EventConfig.DocumentName(x.GuildId));
             newDB.StoreMany(Database.Query<GameServer>().ToList(), x => GameServer.DocumentName(x.GuildId));
             newDB.StoreMany(Database.Query<GameUser>().ToList(), x => GameUser.DocumentName(x.UserId, x.GuildId));
-            newDB.StoreMany(Database.Query<GoodbyeConfig>().ToList(), x => GoodbyeConfig.DocumentName(x.GuildId));            
+            newDB.StoreMany(Database.Query<GoodbyeConfig>().ToList(), x => GoodbyeConfig.DocumentName(x.GuildId));
             newDB.StoreMany(Database.Query<WelcomeConfig>().ToList(), x => WelcomeConfig.DocumentName(x.GuildId));
             newDB.StoreMany(Database.Query<ModerationConfig>().ToList(), x => ModerationConfig.DocumentName(x.GuildId));
             newDB.StoreMany(Database.Query<ModuleManagementService.ModuleConfig>().ToList(), x => ModuleManagementService.ModuleConfig.DocumentName(x.GuildId));
@@ -224,7 +223,7 @@ namespace RavenBOT.Modules.Developer
             newDB.Store(Database.Load<DeveloperSettings.Settings>("Settings"), "Settings");
             newDB.Store(Database.Load<TimeTracker>("TimedModerations"), "TimedModerations");
             newDB.Store(Database.Load<TranslateConfig>("TranslateConfig"), "TranslateConfig");
-            newDB.Store(Database.Load<GraphiteConfig>(GrafanaConfig.DocumentName()), GrafanaConfig.DocumentName());            
+            newDB.Store(Database.Load<GraphiteConfig>(GrafanaConfig.DocumentName()), GrafanaConfig.DocumentName());
             await ReplyAsync("Done.");
         }
 

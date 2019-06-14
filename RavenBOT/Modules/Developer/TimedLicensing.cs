@@ -80,9 +80,9 @@ namespace RavenBOT.Modules.Developer
         {
             var newLicenses = LicenseService.MakeLicenses(ServiceType, quantity, time);
             await ReplyAsync($"{quantity} Licenses, {LicenseService.GetReadableLength(time)}\n" +
-                             "```\n" +
-                             $"{string.Join("\n", newLicenses.Select(x => x.Key))}\n" +
-                             "```");
+                "```\n" +
+                $"{string.Join("\n", newLicenses.Select(x => x.Key))}\n" +
+                "```");
         }
     }
 }

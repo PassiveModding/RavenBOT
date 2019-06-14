@@ -26,7 +26,7 @@ namespace RavenBOT.Modules.Tickets.Models
             SetState(TicketState.open);
         }
 
-        public Ticket() {}
+        public Ticket() { }
 
         public static string DocumentName(ulong guildId, int ticketId)
         {
@@ -84,8 +84,8 @@ namespace RavenBOT.Modules.Tickets.Models
             {
                 return new EmbedAuthorBuilder
                 {
-                    IconUrl = user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl(),
-                    Name = $"{user.Username}#{user.Discriminator}"
+                IconUrl = user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl(),
+                Name = $"{user.Username}#{user.Discriminator}"
                 };
             }
 
@@ -171,12 +171,9 @@ namespace RavenBOT.Modules.Tickets.Models
         public enum TicketState
         {
             [Description("Open")]
-            open,
-            [Description("Solve")]
-            solved,
-            [Description("Hold")]
-            on_hold,
-            [Description("Close")]
+            open, [Description("Solve")]
+            solved, [Description("Hold")]
+            on_hold, [Description("Close")]
             close
         }
 

@@ -20,15 +20,15 @@ namespace RavenBOT.Modules.Conversation.Modules
 
         [Command("SetConfigValue")]
         [Summary("Sets the google cloud authentication json for dialogflow")]
-        public async Task SetConfigJson(string value, [Remainder]string content)
+        public async Task SetConfigJson(string value, [Remainder] string content)
         {
             var currentConfig = Service.Database.Load<ConversationConfig>(ConversationConfig.DocumentName()) ?? new ConversationConfig();
             PropertyInfo prop = currentConfig.Certificate.GetType().GetProperty(value, BindingFlags.Public | BindingFlags.Instance);
-            if(null != prop && prop.CanWrite)
+            if (null != prop && prop.CanWrite)
             {
                 prop.SetValue(currentConfig.Certificate, content, null);
             }
-            
+
             Service.Database.Store(currentConfig, ConversationConfig.DocumentName());
             await ReplyAsync("Set.");
         }
@@ -45,7 +45,6 @@ namespace RavenBOT.Modules.Conversation.Modules
         }
         */
 
-        
         [Command("Initialize")]
         [Summary("Attempts to initialize the dialogflow agent")]
         public async Task InitializeAgent()

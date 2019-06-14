@@ -11,12 +11,12 @@ namespace RavenBOT.Modules.Birthday.Models
         {
             GuildId = guildId;
         }
-        public BirthdayConfig() {}
+        public BirthdayConfig() { }
 
-        public ulong BirthdayRole {get;set;}
+        public ulong BirthdayRole { get; set; }
 
-        public ulong GuildId {get;set;}
-        public ulong BirthdayAnnouncementChannelId {get;set;}
-        public bool Enabled {get;set;} = false;
+        public ulong GuildId { get; set; }
+        public ulong BirthdayAnnouncementChannelId { get; set; }
+        public bool Enabled { get; set; } = false;
     }
 }

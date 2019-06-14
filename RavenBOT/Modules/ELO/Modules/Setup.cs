@@ -35,8 +35,8 @@ namespace RavenBOT.Modules.ELO.Modules
             lobby.TeamPickMode = pickMode;
             Service.Database.Store(lobby, Lobby.DocumentName(Context.Guild.Id, Context.Channel.Id));
             await ReplyAsync("New Lobby has been created\n" +
-                            $"Players per team: {playersPerTeam}\n" +
-                            $"Pick Mode: {pickMode}");
+                $"Players per team: {playersPerTeam}\n" +
+                $"Pick Mode: {pickMode}");
         }
 
         [Command("Set Player Count")]
@@ -112,7 +112,7 @@ namespace RavenBOT.Modules.ELO.Modules
             competition.Ranks.Add(new Rank
             {
                 RoleId = role.Id,
-                Points = points
+                    Points = points
             });
             Service.Database.Store(competition, CompetitionConfig.DocumentName(Context.Guild.Id));
             await ReplyAsync("Rank added.");

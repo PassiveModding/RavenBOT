@@ -23,7 +23,7 @@ namespace RavenBOT.Modules.Automessage.Modules
 
         [Command("AddChannel")]
         [Summary("Adds the current channel as an auto-message chanel")]
-        public async Task AddAutoMessageChannelAsync([Summary("The amount of messages between each auto-message")]int messageCount, [Remainder]string message)
+        public async Task AddAutoMessageChannelAsync([Summary("The amount of messages between each auto-message")] int messageCount, [Remainder] string message)
         {
             var config = AutomessageHandler.GetAutomessageChannel(Context.Channel.Id);
 

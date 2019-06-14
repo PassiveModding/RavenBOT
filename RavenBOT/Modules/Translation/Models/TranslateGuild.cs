@@ -15,14 +15,14 @@ namespace RavenBOT.Modules.Translation.Models
             GuildId = guildId;
         }
 
-        public TranslateGuild(){}
+        public TranslateGuild() { }
 
-        public ulong GuildId {get;set;}
+        public ulong GuildId { get; set; }
 
-        public bool ReactionTranslations {get;set;} = false;
-        public bool DirectMessageTranslations {get;set;} = false;
-        public List<TranslationSet> CustomPairs {get;set;} = new List<TranslationSet>();
+        public bool ReactionTranslations { get; set; } = false;
+        public bool DirectMessageTranslations { get; set; } = false;
+        public List<TranslationSet> CustomPairs { get; set; } = new List<TranslationSet>();
 
-        public List<ulong> WhitelistRoles {get;set;} = new List<ulong>();
+        public List<ulong> WhitelistRoles { get; set; } = new List<ulong>();
     }
 }

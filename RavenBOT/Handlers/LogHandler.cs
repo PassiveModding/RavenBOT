@@ -71,7 +71,6 @@ namespace RavenBOT.Handlers
             return $"[{newSev}][{DateTime.UtcNow.ToShortDateString()} {DateTime.UtcNow.ToShortTimeString()}] {message}{contextString}";
         }
 
-        
         public void Log(string message, LogSeverity severity = LogSeverity.Info, object additional = null)
         {
             var logObject = new BotLogObject(message, severity, additional);
@@ -111,11 +110,11 @@ namespace RavenBOT.Handlers
 
                 if (context != null)
                 {
-                    embed = embed.AddField("Context", 
-                    $"Channel: {context.channelId}\n" +
-                    $"Guild: {context.guildId}\n" +
-                    $"User: {context.userId}\n" +
-                    $"Message: {context.message}".FixLength());
+                    embed = embed.AddField("Context",
+                        $"Channel: {context.channelId}\n" +
+                        $"Guild: {context.guildId}\n" +
+                        $"User: {context.userId}\n" +
+                        $"Message: {context.message}".FixLength());
                 }
 
                 channel?.SendMessageAsync(string.Empty, false, embed.Build());

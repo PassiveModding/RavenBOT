@@ -9,7 +9,7 @@ namespace RavenBOT.Services
         private PrefixInfo Info { get; }
         private string DocumentName { get; }
 
-        public string DefaultPrefix {get;}
+        public string DefaultPrefix { get; }
 
         public PrefixService(IDatabase store, string defaultPrefix)
         {
@@ -43,7 +43,7 @@ namespace RavenBOT.Services
             private Dictionary<ulong, string> Prefixes { get; } = new Dictionary<ulong, string>();
 
             public void SetPrefix(ulong guildId, string prefix)
-            { 
+            {
                 if (Prefixes.ContainsKey(guildId))
                 {
                     if (prefix == null)
@@ -52,7 +52,7 @@ namespace RavenBOT.Services
                     }
                     else
                     {
-                       Prefixes[guildId] = prefix; 
+                        Prefixes[guildId] = prefix;
                     }
                 }
                 else

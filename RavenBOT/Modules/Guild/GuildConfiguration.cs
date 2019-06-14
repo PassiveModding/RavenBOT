@@ -14,7 +14,7 @@ namespace RavenBOT.Modules.Guild
     public class GuildConfiguration : InteractiveBase<SocketCommandContext>
     {
         public PrefixService PrefixService { get; }
-        public ModuleManagementService ModuleManager {get;}
+        public ModuleManagementService ModuleManager { get; }
 
         public GuildConfiguration(PrefixService prefixService, ModuleManagementService mms)
         {

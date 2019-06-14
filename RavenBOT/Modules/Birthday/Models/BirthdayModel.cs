@@ -15,16 +15,16 @@ namespace RavenBOT.Modules.Birthday.Models
             Birthday = birthday;
             ShowYear = showYear;
         }
-        public BirthdayModel(){}
+        public BirthdayModel() { }
 
-        public ulong UserId {get;set;}
-        public DateTime Birthday {get;set;}
+        public ulong UserId { get; set; }
+        public DateTime Birthday { get; set; }
 
-        public bool ShowYear {get;set;}
+        public bool ShowYear { get; set; }
 
-        public double Offset {get;set;} = 0;
+        public double Offset { get; set; } = 0;
 
-        public int Attempts {get;set;} = 0;
+        public int Attempts { get; set; } = 0;
 
         public bool IsToday()
         {
@@ -38,7 +38,7 @@ namespace RavenBOT.Modules.Birthday.Models
             }
 
             double days = (birthdayThisYear - today).TotalDays;
-            bool isToday =  days <= 1;
+            bool isToday = days <= 1;
 
             return isToday;
         }

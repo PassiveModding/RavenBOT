@@ -31,24 +31,24 @@ namespace RavenBOT.Modules.Music.Methods
 
         public class VictoriaConfig
         {
-            public Victoria.Configuration MainConfig {get;set;} = new Victoria.Configuration();
-            public RestConfig RestConfig {get;set;} = new RestConfig();
+            public Victoria.Configuration MainConfig { get; set; } = new Victoria.Configuration();
+            public RestConfig RestConfig { get; set; } = new RestConfig();
         }
 
         public class GeniusConfig
         {
             public static string DocumentName() => "GeniusConfig";
-            public string Authorization {get;set;} = null;
+            public string Authorization { get; set; } = null;
         }
 
         public class RestConfig
         {
-            public string Host {get;set;}
-            public int Port {get;set;}
-            public string Password {get;set;}
+            public string Host { get; set; }
+            public int Port { get; set; }
+            public string Password { get; set; }
         }
 
-        public VictoriaService (DiscordShardedClient client, IDatabase database, HttpClient httpClient, LogHandler logger)
+        public VictoriaService(DiscordShardedClient client, IDatabase database, HttpClient httpClient, LogHandler logger)
         {
             DiscordClient = client;
             Database = database;
@@ -61,18 +61,18 @@ namespace RavenBOT.Modules.Music.Methods
                 Console.WriteLine("Input Lavalink Host URL");
                 config.MainConfig.Host = Console.ReadLine();
                 config.RestConfig.Host = config.MainConfig.Host;
-                
+
                 Console.WriteLine("Input Lavalink Port");
-                config.MainConfig.Port = int.Parse(Console.ReadLine());                
+                config.MainConfig.Port = int.Parse(Console.ReadLine());
                 config.RestConfig.Port = config.MainConfig.Port;
-                                
+
                 Console.WriteLine("Input Lavalink Password");
                 config.MainConfig.Password = Console.ReadLine();
                 config.RestConfig.Password = config.MainConfig.Password;
 
                 Console.WriteLine("Further audio settings can be configured in Victoria.json in the setup directory");
 
-                File.WriteAllText(ConfigPath, JsonConvert.SerializeObject(config, Formatting.Indented));                
+                File.WriteAllText(ConfigPath, JsonConvert.SerializeObject(config, Formatting.Indented));
             }
 
             DiscordClient.ShardConnected += Configure;
@@ -94,7 +94,6 @@ namespace RavenBOT.Modules.Music.Methods
                 return;
             }
 
-
             if (player.Queue.TryDequeue(out var nextTrack))
             {
                 if (nextTrack is LavaTrack newTrack)
@@ -107,7 +106,7 @@ namespace RavenBOT.Modules.Music.Methods
             {
                 await player.StopAsync();
                 await player.TextChannel?.SendMessageAsync("Playlist finished.");
-            }     
+            }
         }
 
         public async Task Configure(DiscordSocketClient sClient)
@@ -135,7 +134,7 @@ namespace RavenBOT.Modules.Music.Methods
             Logger.Log(message.Message + message.Exception?.ToString(), message.Severity);
         }
 
-        public bool IsConfigured ()
+        public bool IsConfigured()
         {
             return Client != null && RestClient != null;
         }
@@ -162,7 +161,6 @@ namespace RavenBOT.Modules.Music.Methods
             {
                 var request = new HttpRequestMessage(HttpMethod.Get, $"https://api.genius.com/search?q={query}");
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", config.Authorization);
-
 
                 //Use the genius api to make a song query.
                 var search = await HttpClient.SendAsync(request);

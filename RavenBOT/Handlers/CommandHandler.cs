@@ -20,7 +20,7 @@ namespace RavenBOT.Handlers
             {
                 return;
             }
-            
+
             if (message.Author.IsBot || message.Author.IsWebhook)
             {
                 return;
@@ -38,11 +38,11 @@ namespace RavenBOT.Handlers
             }
 
             var argPos = 0;
-            if (!message.HasStringPrefix(LocalManagementService.LastConfig.Developer ? LocalManagementService.LastConfig.DeveloperPrefix : PrefixService.GetPrefix(guildId), ref argPos, System.StringComparison.InvariantCultureIgnoreCase)/*&& !message.HasMentionPrefix(Client.CurrentUser, ref argPos)*/)
+            if (!message.HasStringPrefix(LocalManagementService.LastConfig.Developer ? LocalManagementService.LastConfig.DeveloperPrefix : PrefixService.GetPrefix(guildId), ref argPos, System.StringComparison.InvariantCultureIgnoreCase) /*&& !message.HasMentionPrefix(Client.CurrentUser, ref argPos)*/ )
             {
                 return;
             }
-            
+
             var context = new ShardedCommandContext(Client, message);
             if (!ModuleManager.IsAllowed(context.Guild?.Id ?? 0, message.Content))
             {

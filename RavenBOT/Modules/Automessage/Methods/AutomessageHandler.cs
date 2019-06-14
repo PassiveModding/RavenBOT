@@ -24,7 +24,7 @@ namespace RavenBOT.Modules.Automessage.Methods
 
         public async Task MessageReceived(SocketMessage msg)
         {
-            await Task.Yield();         
+            await Task.Yield();
             if (!(msg is SocketUserMessage message))
             {
                 return;
@@ -59,7 +59,7 @@ namespace RavenBOT.Modules.Automessage.Methods
                 if (messageChannel.MessageCount >= messageChannel.RespondOn)
                 {
                     messageChannel.MessageCount = 0;
-                    
+
                     if (messageChannel.Response == null)
                     {
                         return;

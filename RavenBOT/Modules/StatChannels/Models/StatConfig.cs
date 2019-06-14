@@ -12,9 +12,9 @@ namespace RavenBOT.Modules.StatChannels.Models
             GuildId = guildId;
         }
 
-        public StatConfig(){}
+        public StatConfig() { }
 
-        public ulong GuildId {get;set;}
-        public ulong UserCountChannelId {get;set;} = 0;
+        public ulong GuildId { get; set; }
+        public ulong UserCountChannelId { get; set; } = 0;
     }
 }

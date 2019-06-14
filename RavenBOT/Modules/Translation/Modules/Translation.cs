@@ -18,12 +18,11 @@ namespace RavenBOT.Modules.Translation.Modules
     [Group("Translate")]
     public class Translation : InteractiveBase<ShardedCommandContext>
     {
-        public TranslateService TranslateService {get;}
+        public TranslateService TranslateService { get; }
         public Translation(TranslateService translateService)
         {
             TranslateService = translateService;
         }
-
 
         [RequireContext(ContextType.Guild)]
         [Command("Translate", RunMode = RunMode.Async)]
@@ -109,7 +108,7 @@ namespace RavenBOT.Modules.Translation.Modules
             await ReplyAsync("", false, new EmbedBuilder()
             {
                 Description = string.Join("\n", roles),
-                Title = "Role whitelist"
+                    Title = "Role whitelist"
             }.Build());
         }
 
@@ -136,7 +135,7 @@ namespace RavenBOT.Modules.Translation.Modules
         {
             await RemoveWhitelistRole(role.Id);
         }
-        
+
         [Priority(100)]
         [RequireContext(ContextType.Guild)]
         [Command("Whitelist Remove Role")]
@@ -175,8 +174,7 @@ namespace RavenBOT.Modules.Translation.Modules
             TranslateService.SaveTranslateGuild(config);
             await ReplyAsync($"DM Users Translations: {config.DirectMessageTranslations}");
         }
-        
-        
+
         [Priority(100)]
         [RequireContext(ContextType.Guild)]
         [Command("RemoveEmote")]
@@ -184,7 +182,7 @@ namespace RavenBOT.Modules.Translation.Modules
         public async Task AddPair(Emoji emote)
         {
             var config = TranslateService.GetTranslateGuild(Context.Guild.Id);
-            
+
             foreach (var pair in config.CustomPairs)
             {
                 pair.EmoteMatches.Remove(emote.Name);
@@ -193,7 +191,7 @@ namespace RavenBOT.Modules.Translation.Modules
             await ReplyAsync("Reaction removed.");
             TranslateService.SaveTranslateGuild(config);
         }
-        
+
         [Priority(100)]
         [RequireContext(ContextType.Guild)]
         [Command("AddPair")]
@@ -235,7 +233,7 @@ namespace RavenBOT.Modules.Translation.Modules
         {
             var config = TranslateService.GetTranslateGuild(Context.Guild.Id);
             var match = config.CustomPairs.FirstOrDefault(x => x.Language == code);
-            
+
             if (match != null)
             {
                 if (match.EmoteMatches.Any(x => x == emote.Name))
@@ -250,8 +248,8 @@ namespace RavenBOT.Modules.Translation.Modules
             {
                 config.CustomPairs.Add(new LanguageMap.TranslationSet()
                 {
-                    EmoteMatches = new List<string>{emote.Name},
-                    Language = code
+                    EmoteMatches = new List<string> { emote.Name },
+                        Language = code
                 });
             }
 
@@ -338,11 +336,11 @@ namespace RavenBOT.Modules.Translation.Modules
             var roles = config.WhitelistRoles.Select(x => Context.Guild.GetRole(x)?.Mention ?? $"Deleted Role: [{x}]").ToList();
 
             await ReplyAsync($"Remaining Uses: {profile.RemainingUses()}\n" +
-                            $"Total Used: {profile.TotalUsed}\n" +
-                            $"DM Translations: {config.DirectMessageTranslations}\n" +
-                            $"Reaction Translations: {config.ReactionTranslations}\n" +
-                            $"Whitelisted Roles: {(roles.Any() ? string.Join("\n", roles) : "None")}\n" +
-                            $"Use the List and Defaults commands to see reactions settings.");
+                $"Total Used: {profile.TotalUsed}\n" +
+                $"DM Translations: {config.DirectMessageTranslations}\n" +
+                $"Reaction Translations: {config.ReactionTranslations}\n" +
+                $"Whitelisted Roles: {(roles.Any() ? string.Join("\n", roles) : "None")}\n" +
+                $"Use the List and Defaults commands to see reactions settings.");
         }
 
         [Priority(100)]
@@ -352,9 +350,9 @@ namespace RavenBOT.Modules.Translation.Modules
         {
             var newLicenses = TranslateService.License.MakeLicenses(TranslateService.TranslateType, quantity, uses);
             await ReplyAsync($"{quantity} Licenses, {uses} Uses\n" +
-                             "```\n" +
-                             $"{string.Join("\n", newLicenses.Select(x => x.Key))}\n" +
-                             "```");
+                "```\n" +
+                $"{string.Join("\n", newLicenses.Select(x => x.Key))}\n" +
+                "```");
         }
 
         [Priority(100)]

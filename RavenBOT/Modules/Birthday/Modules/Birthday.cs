@@ -15,7 +15,7 @@ namespace RavenBOT.Modules.Birthday.Modules
     [Group("Birthday")]
     public class Birthday : InteractiveBase<ShardedCommandContext>
     {
-        public BirthdayService BirthdayService {get;}
+        public BirthdayService BirthdayService { get; }
         public Birthday(BirthdayService birthdayService)
         {
             BirthdayService = birthdayService;
@@ -33,7 +33,7 @@ namespace RavenBOT.Modules.Birthday.Modules
             BirthdayService.SaveConfig(model);
 
             await ReplyAsync($"Birthday Service Enabled: {model.Enabled}\n" +
-                            $"NOTE: You need to run the setchannel and setrole command in order for this to work");
+                $"NOTE: You need to run the setchannel and setrole command in order for this to work");
         }
 
         [Priority(100)]
@@ -48,7 +48,7 @@ namespace RavenBOT.Modules.Birthday.Modules
             BirthdayService.SaveConfig(model);
 
             await ReplyAsync($"Birthday Service Enabled: {model.Enabled}\n" +
-                            $"Channel has been set to: {Context.Channel.Name}");
+                $"Channel has been set to: {Context.Channel.Name}");
         }
 
         [Priority(100)]
@@ -64,7 +64,7 @@ namespace RavenBOT.Modules.Birthday.Modules
             BirthdayService.SaveConfig(model);
 
             await ReplyAsync($"Birthday Service Enabled: {model.Enabled}\n" +
-                            $"Birthday Role: {role?.Mention ?? "N/A"}");
+                $"Birthday Role: {role?.Mention ?? "N/A"}");
         }
 
         [Priority(100)]
@@ -93,7 +93,7 @@ namespace RavenBOT.Modules.Birthday.Modules
         [Command("SetBirthday")]
         [Alias("Set Birthday", "Set")]
         [Summary("Sets your birthday (MAX 3 Sets per user)")]
-        public async Task SetBirthday([Remainder]string dateTime = null)
+        public async Task SetBirthday([Remainder] string dateTime = null)
         {
             var user = BirthdayService.GetUser(Context.User.Id);
             if (user != null && user.Attempts >= 3)
@@ -107,12 +107,12 @@ namespace RavenBOT.Modules.Birthday.Modules
                 await ReplyAsync("Please use the following example to set your birthday: `01 Jan 2000` or `05 Feb`");
                 return;
             }
-            
+
             DateTime? parsedTime;
             if (DateTime.TryParseExact(dateTime, BirthdayService.GetTimeFormats(true), CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out DateTime resultWithYear))
             {
                 parsedTime = resultWithYear;
-            } 
+            }
             else if (DateTime.TryParseExact(dateTime, BirthdayService.GetTimeFormats(false), CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out DateTime resultWithoutYear))
             {
                 parsedTime = new DateTime(0001, resultWithoutYear.Month, resultWithoutYear.Day);

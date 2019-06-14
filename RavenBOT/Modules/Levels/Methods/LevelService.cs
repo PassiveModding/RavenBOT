@@ -95,12 +95,12 @@ namespace RavenBOT.Modules.Levels.Methods
             {
                 return;
             }
-            
+
             if (!LocalManagementService.LastConfig.IsAcceptable(tChannel.Guild.Id))
             {
                 return;
             }
-        
+
             if (UsersUpdated.TryGetValue(tChannel.Guild.Id, out var userList))
             {
                 if (userList.Contains(message.Author.Id))
@@ -119,7 +119,7 @@ namespace RavenBOT.Modules.Levels.Methods
                     message.Author.Id
                 });
             }
-            var _ = Task.Run(async () =>
+            var _ = Task.Run(async() =>
             {
                 try
                 {

@@ -9,16 +9,16 @@ namespace RavenBOT.Modules.Captcha.Models
             GuildId = guildId;
         }
 
-        public CaptchaConfig() {}
+        public CaptchaConfig() { }
 
-        public ulong GuildId {get;set;}
+        public ulong GuildId { get; set; }
 
-        public ulong ChannelId {get;set;}
+        public ulong ChannelId { get; set; }
 
-        public bool UseCaptcha {get;set;} = false;
-        public ulong CaptchaTempRole {get; set;} = 0;
+        public bool UseCaptcha { get; set; } = false;
+        public ulong CaptchaTempRole { get; set; } = 0;
 
-        public int MaxFailures {get; set;} = 3;
+        public int MaxFailures { get; set; } = 3;
 
         public bool SetMaxFailures(int count)
         {
@@ -31,10 +31,10 @@ namespace RavenBOT.Modules.Captcha.Models
             return false;
         }
 
-        public Action MaxFailuresAction {get;set;} = Action.Kick;
+        public Action MaxFailuresAction { get; set; } = Action.Kick;
         public enum Action
         {
-            Kick, 
+            Kick,
             Ban,
             None
         }

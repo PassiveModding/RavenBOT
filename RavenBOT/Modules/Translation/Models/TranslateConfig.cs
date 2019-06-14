@@ -7,8 +7,8 @@ namespace RavenBOT.Modules.Translation.Models
             return $"TranslateConfig";
         }
 
-        public string APIKey {get;set;}
-        public bool Enabled {get;set;} = false;
-        public string StoreUrl {get;set;}
+        public string APIKey { get; set; }
+        public bool Enabled { get; set; } = false;
+        public string StoreUrl { get; set; }
     }
 }

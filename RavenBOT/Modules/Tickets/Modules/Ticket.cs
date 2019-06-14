@@ -21,9 +21,9 @@ namespace RavenBOT.Modules.Tickets.Modules
             TicketService = ticketService;
         }
 
-        [Command("SetChannel")]          
-        [Summary("Sets the current channel for ticket updates")]    
-        [Remarks("Administrators only.")]  
+        [Command("SetChannel")]
+        [Summary("Sets the current channel for ticket updates")]
+        [Remarks("Administrators only.")]
         [RequireUserPermission(Discord.GuildPermission.Administrator)]
         public async Task SetChannel()
         {
@@ -35,14 +35,13 @@ namespace RavenBOT.Modules.Tickets.Modules
             }
             guild.TicketChannelId = Context.Channel.Id;
             TicketService.SaveGuild(guild);
-            
+
             foreach (var ticket in TicketService.GetTickets(Context.Guild.Id).OrderBy(x => x.TicketNumber).ToList())
             {
                 var message = await Context.Channel.SendMessageAsync("", false, ticket.GenerateEmbed(Context.Guild, guild.UseVoting).Build());
                 ticket.LiveMessageId = message.Id;
                 TicketService.SaveTicket(ticket);
             }
-            
 
             await ReplyAsync("Channel has been set.");
         }
@@ -60,7 +59,7 @@ namespace RavenBOT.Modules.Tickets.Modules
 
         [Command("Open")]
         [Summary("Opens a new ticket with the given message")]
-        public async Task OpenTicket([Remainder]string message)
+        public async Task OpenTicket([Remainder] string message)
         {
             var guild = TicketService.GetTicketGuild(Context.Guild.Id);
             if (!TicketService.CanCreate(guild, Context.User as IGuildUser))
@@ -72,7 +71,7 @@ namespace RavenBOT.Modules.Tickets.Modules
             var ticket = await TicketService.NewTicket(Context, message);
             if (guild.UseVoting)
             {
-                ticket.Item2?.AddReactionsAsync(new IEmote[]{new Emoji("👍"), new Emoji("👎")});
+                ticket.Item2?.AddReactionsAsync(new IEmote[] { new Emoji("👍"), new Emoji("👎") });
             }
             await ReplyAsync($"Ticket #{ticket.Item1.TicketNumber} has been created. {(ticket.Item2 == null ? "" : $"\nhttps://discordapp.com/channels/{Context.Guild.Id}/{ticket.Item2.Channel.Id}/{ticket.Item2.Id}")}");
         }
@@ -80,7 +79,7 @@ namespace RavenBOT.Modules.Tickets.Modules
         [Command("Re-Open")]
         [Alias("reopen", "re open")]
         [Summary("Re-opens a closed ticket")]
-        public async Task ReOpenTicket(int ticketId, [Remainder]string reason = null)
+        public async Task ReOpenTicket(int ticketId, [Remainder] string reason = null)
         {
             var ticket = TicketService.GetTicket(Context, ticketId);
             if (ticket == null)
@@ -103,9 +102,8 @@ namespace RavenBOT.Modules.Tickets.Modules
             await ReplyAsync("Re-opened.");
         }
 
-        
-        [Command("Delete")] 
-        [Summary("Deletes a ticket from the database")]       
+        [Command("Delete")]
+        [Summary("Deletes a ticket from the database")]
         public async Task DeleteTicket(int ticketId)
         {
             var ticket = TicketService.GetTicket(Context, ticketId);
@@ -139,7 +137,7 @@ namespace RavenBOT.Modules.Tickets.Modules
 
         [Command("Close")]
         [Summary("Closes a ticket with the specified reason")]
-        public async Task CloseTicket(int ticketId, [Remainder]string reason = null)
+        public async Task CloseTicket(int ticketId, [Remainder] string reason = null)
         {
             var ticket = TicketService.GetTicket(Context, ticketId);
             if (ticket == null)
@@ -164,7 +162,7 @@ namespace RavenBOT.Modules.Tickets.Modules
 
         [Command("Solve")]
         [Summary("Marks a ticket as solved")]
-        public async Task SolveTicket(int ticketId, [Remainder]string reason = null)
+        public async Task SolveTicket(int ticketId, [Remainder] string reason = null)
         {
             var ticket = TicketService.GetTicket(Context, ticketId);
             if (ticket == null)
@@ -180,7 +178,6 @@ namespace RavenBOT.Modules.Tickets.Modules
                 return;
             }
 
-
             ticket.SetState(Models.Ticket.TicketState.solved, reason ?? $"Solved by {Context.User.Mention}");
             TicketService.SaveTicket(ticket);
             await TicketService.UpdateLiveMessageAsync(Context.Guild, tGuild, ticket);
@@ -190,7 +187,7 @@ namespace RavenBOT.Modules.Tickets.Modules
 
         [Command("Hold")]
         [Summary("Marks a ticket as on hold")]
-        public async Task HoldTicket(int ticketId, [Remainder]string reason = null)
+        public async Task HoldTicket(int ticketId, [Remainder] string reason = null)
         {
             var ticket = TicketService.GetTicket(Context, ticketId);
             if (ticket == null)
@@ -236,7 +233,7 @@ namespace RavenBOT.Modules.Tickets.Modules
             TicketService.SaveGuild(guild);
 
             await ReplyAsync($"Notify ticket creator on state change: {guild.NotifyCreatorOnStateChange}");
-        }   
+        }
 
         [Command("AddCreatorRole")]
         [Summary("Adds a creator role to the ticket config")]
@@ -279,7 +276,7 @@ namespace RavenBOT.Modules.Tickets.Modules
         [RequireUserPermission(GuildPermission.Administrator)]
         public async Task RemoveManagerRole(ulong roleId)
         {
-            var guild = TicketService.GetTicketGuild(Context.Guild.Id);            
+            var guild = TicketService.GetTicketGuild(Context.Guild.Id);
             guild.TicketManagers.Remove(roleId);
             TicketService.SaveGuild(guild);
 
@@ -299,7 +296,7 @@ namespace RavenBOT.Modules.Tickets.Modules
         [RequireUserPermission(GuildPermission.Administrator)]
         public async Task RemoveCreatorRole(ulong roleId)
         {
-            var guild = TicketService.GetTicketGuild(Context.Guild.Id);            
+            var guild = TicketService.GetTicketGuild(Context.Guild.Id);
             guild.TicketCreatorWhitelist.Remove(roleId);
             TicketService.SaveGuild(guild);
 
@@ -329,7 +326,7 @@ namespace RavenBOT.Modules.Tickets.Modules
             await ReplyAsync("", false, new EmbedBuilder()
             {
                 Title = "Ticket Creator Roles",
-                Description = mentionlist.FixLength()
+                    Description = mentionlist.FixLength()
             }.Build());
         }
 
@@ -348,7 +345,7 @@ namespace RavenBOT.Modules.Tickets.Modules
             await ReplyAsync("", false, new EmbedBuilder()
             {
                 Title = "Ticket Manager Roles",
-                Description = mentionlist.FixLength()
+                    Description = mentionlist.FixLength()
             }.Build());
         }
 
@@ -369,16 +366,16 @@ namespace RavenBOT.Modules.Tickets.Modules
                     try
                     {
                         await target.SendMessageAsync($"A ticket you created in {Context.Guild.Name} has been updated.\n" +
-                                                    $"https://discordapp.com/channels/{Context.Guild.Id}/{config.TicketChannelId}\n" +
-                                                    $"State changed to: {ticket.GetState()}\n" +
-                                                    $"Reason: {ticket.GetStateMessage()}".FixLength());
+                            $"https://discordapp.com/channels/{Context.Guild.Id}/{config.TicketChannelId}\n" +
+                            $"State changed to: {ticket.GetState()}\n" +
+                            $"Reason: {ticket.GetStateMessage()}".FixLength());
                     }
                     catch
                     {
                         //
                     }
                 }
-            }   
+            }
         }
     }
 }

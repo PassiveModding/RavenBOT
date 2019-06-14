@@ -8,7 +8,7 @@ using RavenBOT.Modules.Music.Methods;
 namespace RavenBOT.Modules.Music.Preconditions
 {
     public class InAudioChannel : PreconditionAttribute
-    {        
+    {
         public bool PlayerCheck { get; }
 
         public InAudioChannel(bool playerCheck = false)
@@ -29,7 +29,6 @@ namespace RavenBOT.Modules.Music.Preconditions
 
             if (context.User.GetVoiceChannel().Result is null)
                 return Task.FromResult(PreconditionResult.FromError("You're not connected to a voice channel."));
-
 
             if (PlayerCheck && player is null)
                 return Task.FromResult(PreconditionResult.FromError("There is no player created for this guild."));

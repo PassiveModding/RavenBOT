@@ -43,11 +43,11 @@ namespace RavenBOT.Modules.Media.Methods
 
         public class GfycatClientInfo
         {
-            public string client_id {get;set;}
-            public string client_secret {get;set;}
+            public string client_id { get; set; }
+            public string client_secret { get; set; }
         }
 
-        private GfyCatOauthResponse Authentication {get;set;} = null;
+        private GfyCatOauthResponse Authentication { get; set; } = null;
 
         public async Task<string> GetAuthToken()
         {
@@ -72,7 +72,7 @@ namespace RavenBOT.Modules.Media.Methods
             }
 
             return Authentication.access_token;
-        } 
+        }
 
         /// <summary>
         /// Attempts to find client info in the database and authenticate with gfycat using it
@@ -90,8 +90,8 @@ namespace RavenBOT.Modules.Media.Methods
 
             var request = new HttpRequestMessage(HttpMethod.Post, "https://api.gfycat.com/v1/oauth/token");
             request.Content = new StringContent($"{{\"grant_type\":\"client_credentials\",\"client_id\":\"{config.client_id}\",\"client_secret\":\"{config.client_secret}\"}}",
-                                    Encoding.UTF8, 
-                                    "application/json");
+                Encoding.UTF8,
+                "application/json");
 
             var response = await Client.SendAsync(request);
             if (!response.IsSuccessStatusCode)

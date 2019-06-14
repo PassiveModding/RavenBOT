@@ -23,13 +23,13 @@ namespace RavenBOT.Modules.StatChannels.Methods
 
         public class QueueObject
         {
-            public DateTime Time {get;set;} = DateTime.UtcNow;
-            public SocketGuild Guild {get;set;}
-            public SocketVoiceChannel Channel {get;set;}
-            public string NewName {get;set;}
+            public DateTime Time { get; set; } = DateTime.UtcNow;
+            public SocketGuild Guild { get; set; }
+            public SocketVoiceChannel Channel { get; set; }
+            public string NewName { get; set; }
         }
 
-        public List<QueueObject> Queue {get;set;} = new List<QueueObject>();
+        public List<QueueObject> Queue { get; set; } = new List<QueueObject>();
 
         public void TimerEvent(object _)
         {
@@ -73,8 +73,8 @@ namespace RavenBOT.Modules.StatChannels.Methods
                 Queue.Add(new QueueObject()
                 {
                     Guild = user.Guild,
-                    Channel = channel,
-                    NewName = $"👥 Members: {user.Guild.MemberCount}"
+                        Channel = channel,
+                        NewName = $"👥 Members: {user.Guild.MemberCount}"
                 });
             }
 
@@ -102,8 +102,8 @@ namespace RavenBOT.Modules.StatChannels.Methods
                 Queue.Add(new QueueObject()
                 {
                     Guild = user.Guild,
-                    Channel = channel,
-                    NewName = $"👥 Members: {user.Guild.MemberCount}"
+                        Channel = channel,
+                        NewName = $"👥 Members: {user.Guild.MemberCount}"
                 });
             }
 

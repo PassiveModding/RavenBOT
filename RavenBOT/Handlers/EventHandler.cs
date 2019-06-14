@@ -24,7 +24,7 @@ namespace RavenBOT.Handlers
         public LocalManagementService LocalManagementService { get; }
         private IServiceProvider Provider { get; }
 
-        private ModuleManagementService ModuleManager {get;}
+        private ModuleManagementService ModuleManager { get; }
 
         public EventHandler(DiscordShardedClient client, ModuleManagementService moduleManager, PrefixService prefixService, CommandService commandService, LocalManagementService local, BotConfig config, LogHandler handler, IServiceProvider provider)
         {
@@ -62,7 +62,7 @@ namespace RavenBOT.Handlers
                 user = guild.GetUser(Client.CurrentUser.Id);
             }
 
-            var firstChannel = guild.TextChannels.Where(x => 
+            var firstChannel = guild.TextChannels.Where(x =>
             {
                 var permissions = user?.GetPermissions(x);
                 return permissions.HasValue ? permissions.Value.ViewChannel && permissions.Value.SendMessages : false;
@@ -73,8 +73,8 @@ namespace RavenBOT.Handlers
             await firstChannel?.SendMessageAsync("", false, new EmbedBuilder()
             {
                 Title = $"{Client.CurrentUser.Username}",
-                Description = $"Get started by using the help command: `{prefix}help`",
-                Color = Color.Green
+                    Description = $"Get started by using the help command: `{prefix}help`",
+                    Color = Color.Green
             }.Build());
         }
 
@@ -112,9 +112,9 @@ namespace RavenBOT.Handlers
                         await context.Channel.SendMessageAsync("", false, new EmbedBuilder()
                         {
                             Title = $"Unknown Command",
-                            Description = $"Message: {context.Message.Content.FixLength(512)}\n" +
-                                            $"Similar commands: \n{string.Join("\n", similar)}",
-                            Color = Color.Red
+                                Description = $"Message: {context.Message.Content.FixLength(512)}\n" +
+                                $"Similar commands: \n{string.Join("\n", similar)}",
+                                Color = Color.Red
                         }.Build());
                         return;
                     }
@@ -123,25 +123,24 @@ namespace RavenBOT.Handlers
                         await context.Channel.SendMessageAsync("", false, new EmbedBuilder
                         {
                             Title = $"Command Error {result.Error.Value}",
-                            Description = $"`{commandInfo.Value.Aliases.First()}{string.Join(" ", commandInfo.Value.Parameters.Select(x => x.ParameterInformation()))}`\n" +
-                                        $"Message: {context.Message.Content.FixLength(512)}\n" +
-                                        "__**Error**__\n" +
-                                        $"{result.ErrorReason.FixLength(512)}",
-                            Color = Color.DarkRed
+                                Description = $"`{commandInfo.Value.Aliases.First()}{string.Join(" ", commandInfo.Value.Parameters.Select(x => x.ParameterInformation()))}`\n" +
+                                $"Message: {context.Message.Content.FixLength(512)}\n" +
+                                "__**Error**__\n" +
+                                $"{result.ErrorReason.FixLength(512)}",
+                                Color = Color.DarkRed
 
                         }.Build());
                         return;
                     }
                 }
 
-
                 await context.Channel.SendMessageAsync("", false, new EmbedBuilder
                 {
                     Title = $"Command Error{(result.Error.HasValue ? $": {result.Error.Value}" : "")}",
-                    Description = $"Message: {context.Message.Content.FixLength(512)}\n" +
-                                  "__**Error**__\n" +
-                                  $"{result.ErrorReason.FixLength(512)}",
-                    Color = Color.LightOrange
+                        Description = $"Message: {context.Message.Content.FixLength(512)}\n" +
+                        "__**Error**__\n" +
+                        $"{result.ErrorReason.FixLength(512)}",
+                        Color = Color.LightOrange
                 }.Build());
             }
         }
@@ -188,7 +187,7 @@ namespace RavenBOT.Handlers
                 Logger.Log(message.Message, new LogContext(exc.Context), message.Severity);
                 return Task.CompletedTask;
             }
-            
+
             Logger.Log(message.Message, message.Severity);
             return Task.CompletedTask;
         }
