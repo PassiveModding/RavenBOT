@@ -164,6 +164,11 @@ namespace RavenBOT.Modules.Music.Methods
 
                 //Use the genius api to make a song query.
                 var search = await HttpClient.SendAsync(request);
+                if (!search.IsSuccessStatusCode)
+                {
+                    return null;
+                }
+
                 var token = JToken.Parse(await search.Content.ReadAsStringAsync());
                 var hits = token.Value<JToken>("response").Value<JArray>("hits");
 
