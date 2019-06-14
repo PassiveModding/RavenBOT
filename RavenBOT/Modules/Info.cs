@@ -66,21 +66,16 @@ namespace RavenBOT.Modules
         public async Task InformationAsync()
         {
             string changes;
-
-            HttpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)");
-            using (var response = await HttpClient.GetAsync("https://api.github.com/repos/PassiveModding/RavenBOT/commits"))
+            var request = new HttpRequestMessage(HttpMethod.Get, "https://api.github.com/repos/PassiveModding/RavenBOT/commits");
+            var response = await HttpClient.SendAsync(request);
+            if (!response.IsSuccessStatusCode)
             {
-                if (!response.IsSuccessStatusCode)
-                {
-                    changes = "There was an error fetching the latest changes.";
-                }
-                else
-                {
-                    dynamic result = JArray.Parse(await response.Content.ReadAsStringAsync());
-                    changes = $"[{((string)result[0].sha).Substring(0, 7)}]({result[0].html_url}) {result[0].commit.message}\n" + $"[{((string)result[1].sha).Substring(0, 7)}]({result[1].html_url}) {result[1].commit.message}\n" + $"[{((string)result[2].sha).Substring(0, 7)}]({result[2].html_url}) {result[2].commit.message}";
-                }
-
-                response.Dispose();
+                changes = "There was an error fetching the latest changes.";
+            }
+            else
+            {
+                dynamic result = JArray.Parse(await response.Content.ReadAsStringAsync());
+                changes = $"[{((string)result[0].sha).Substring(0, 7)}]({result[0].html_url}) {result[0].commit.message}\n" + $"[{((string)result[1].sha).Substring(0, 7)}]({result[1].html_url}) {result[1].commit.message}\n" + $"[{((string)result[2].sha).Substring(0, 7)}]({result[2].html_url}) {result[2].commit.message}";
             }
 
             var embed = new EmbedBuilder();
