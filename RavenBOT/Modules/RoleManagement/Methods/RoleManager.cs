@@ -1,3 +1,4 @@
+using System.Net.Http;
 using System.Linq;
 using System;
 using System.Threading.Tasks;
@@ -6,20 +7,23 @@ using Discord.WebSocket;
 using RavenBOT.Modules.RoleManagement.Models;
 using RavenBOT.Services;
 using RavenBOT.Services.Database;
+using Newtonsoft.Json.Linq;
 
 namespace RavenBOT.Modules.RoleManagement.Methods
 {
     public class RoleManager : IServiceable
     {
-        public RoleManager(IDatabase database, DiscordShardedClient client)
+        public RoleManager(IDatabase database, HttpClient httpClient, DiscordShardedClient client)
         {
             Database = database;
+            HttpClient = httpClient;
             Client = client;
             Client.ReactionAdded += ReactionAdded;
             Client.ReactionRemoved += ReactionRemoved;
         }
 
         public IDatabase Database { get; }
+        public HttpClient HttpClient { get; }
         public DiscordShardedClient Client { get; }
 
         public int IsUnicodeNumberEmote(string name)
@@ -33,6 +37,47 @@ namespace RavenBOT.Modules.RoleManagement.Methods
             }
 
             return -1;
+        }
+
+        public enum SubscriptionStatus
+        {
+            Error,
+            NotSubscribed,
+            Subscribed,
+            Unknown
+        }
+
+        public async Task<SubscriptionStatus> IsSubscribedTo(string user, string subbedTo)
+        {
+            var config = Database.Load<YoutubeConfig>(YoutubeConfig.DocumentName());
+            if (config == null)
+            {
+                return SubscriptionStatus.Unknown;
+            }
+
+            var parameters = $"?part=snippet%2CcontentDetails&forChannelId={subbedTo}&channelId={user}&key={config.ApiKey}";
+            var request = new HttpRequestMessage(HttpMethod.Get, $"https://www.googleapis.com/youtube/v3/subscriptions{parameters}");
+
+            var response = await HttpClient.SendAsync(request);
+            if (!response.IsSuccessStatusCode)
+            {
+                return SubscriptionStatus.Error;
+            }
+
+            var content = await response.Content.ReadAsStringAsync();
+            var token = JToken.Parse(content);
+            var firstMatch = token.Value<JToken>("items").FirstOrDefault();
+            if (firstMatch == null)
+            {
+                return SubscriptionStatus.NotSubscribed;
+            }
+            
+            if (firstMatch.Value<JToken>("snippet").Value<JToken>("resourceId").Value<JToken>("channelId").ToString().Equals(subbedTo))
+            {
+                return SubscriptionStatus.Subscribed;
+            }
+
+            return SubscriptionStatus.Unknown;
         }
 
         private async Task RunReaction(Discord.Cacheable<Discord.IUserMessage, ulong> cache, ISocketMessageChannel channel, SocketReaction reaction, bool added)
@@ -141,6 +186,29 @@ namespace RavenBOT.Modules.RoleManagement.Methods
             }
 
             return message;
+        }
+
+        public YoutubeRoleConfig GetOrCreateYTConfig(ulong guildId)
+        {
+            var config = GetYTConfig(guildId);
+            if (config == null)
+            {
+                config = new YoutubeRoleConfig();
+                config.GuildId = guildId;
+                SaveYTConfig(config);
+            }
+
+            return config;
+        }
+
+        public void SaveYTConfig(YoutubeRoleConfig config)
+        {
+            Database.Store(config, YoutubeRoleConfig.DocumentName(config.GuildId));
+        }
+
+        public YoutubeRoleConfig GetYTConfig(ulong guildId)
+        {
+            return Database.Load<YoutubeRoleConfig>(YoutubeRoleConfig.DocumentName(guildId));
         }
 
         public RoleConfig GetOrCreateConfig(ulong guildId)

@@ -1,3 +1,5 @@
+using System;
+using System.Net.Http;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,6 +10,11 @@ using MoreLinq;
 using RavenBOT.Modules.RoleManagement.Methods;
 using RavenBOT.Modules.RoleManagement.Models;
 using RavenBOT.Services.Database;
+using System.Net.Http.Headers;
+using System.IO;
+using Newtonsoft.Json.Linq;
+using RavenBOT.Extensions;
+using Discord.WebSocket;
 
 namespace RavenBOT.Modules.RoleManagement.Modules
 {
@@ -19,8 +26,7 @@ namespace RavenBOT.Modules.RoleManagement.Modules
         {
             Manager = manager;
         }
-
-        public IDatabase Database { get; }
+        
         public RoleManager Manager { get; }
 
         [Command("CreateMessage")]
@@ -70,6 +76,173 @@ namespace RavenBOT.Modules.RoleManagement.Modules
             Manager.SaveConfig(config);
             await ReplyAsync("Message created.");
         }
+
+        [Command("Youtube Example")]
+        public async Task YoutubeExample()
+        {
+            var content = $"To verify your subscription status use the `verify subscription` command, followed by the display name of the channel you subscribed to and your own youtube channel id.\n" +
+                            $"eg. `verify subscription PassiveModding UCSEd2z_QfxQ_GJpDAAsvs4A`\n" +
+                            $"To find your channel ID, visit your channel and check the url for the following content:\n" +
+                            $"http://discord.passivenation.com/co3a0b1a2143.png\n" +
+                            $"NOTE: You must have your youtube subscriptions public when authenticating.\n" +
+                            "You can make them public by following the tutorial here:\n" +
+                            "https://support.google.com/youtube/answer/7280190?hl=en";
+            await ReplyAsync("", false, content.QuickEmbed());
+        }
+
+        [Command("Sub Channels")]
+        [Summary("Displays all configured youtube sub channels")]
+        public async Task SubChannel()
+        {
+            var config = Manager.GetYTConfig(Context.Guild.Id);
+            if (config == null || !config.SubRewards.Any())
+            {
+                await ReplyAsync("There are no sub roles configured.");
+                return;
+            }
+
+            var content = string.Join("\n", config.SubRewards.Select(x => $"`{x.Key}` - https://www.youtube.com/channel/{x.Value.YoutubeChannelId}"));
+            await ReplyAsync("", false, content.QuickEmbed());
+        }
+
+        [Command("Verify Subscription")]
+        [RequireUserPermission(GuildPermission.Administrator)]
+        public async Task SubRoleRemove(string displayName, string userChannelId)
+        {
+            var config = Manager.GetYTConfig(Context.Guild.Id);
+            if (config == null)
+            {
+                await ReplyAsync("There are no sub roles configured.");
+                return;
+            }
+
+            if (!config.SubRewards.TryGetValue(displayName, out var channelConfig))
+            {
+                await ReplyAsync("The specified youtube channel is not a sub channel.");
+                return;
+            }
+
+            var reAuthenticating = false;
+            if (channelConfig.AuthenticatedUserIds.Any(x => x.UserId == Context.User.Id))
+            {
+                await ReplyAsync("You've already authenticated yourself as a subscriber to this person's channel. Reauthenticating...");
+                reAuthenticating = true;
+            }
+            else if (channelConfig.AuthenticatedUserIds.Any(x => x.YoutubeChannelId.Equals(userChannelId, StringComparison.InvariantCultureIgnoreCase)))
+            {
+                //Ensure that a user hasn't already used the specified channel to verify their subscription
+                await ReplyAsync("Another user has already used this channel to authenticate their subscription status.");
+                return;
+            }
+
+            var response = await Manager.IsSubscribedTo(userChannelId, channelConfig.YoutubeChannelId);
+
+            var role = Context.Guild.GetRole(channelConfig.RewardedRoleId);
+            if (role == null)
+            {
+                return;
+            }
+
+            var gUser = Context.User as SocketGuildUser;
+
+            switch (response)
+            {
+                case RoleManager.SubscriptionStatus.Error:
+                    await ReplyAsync("There was an error configuring the subscription status.\n" +
+                                    "This may be because your youtube subscriptions are private. You can make them public by following the tutorial here:\n" +
+                                    "https://support.google.com/youtube/answer/7280190?hl=en");
+                    await gUser.RemoveRoleAsync(role);
+                return;
+                case RoleManager.SubscriptionStatus.NotSubscribed:
+                    await ReplyAsync("You are not subscribed.");
+                    await gUser.RemoveRoleAsync(role);
+                return;
+                case RoleManager.SubscriptionStatus.Unknown:
+                    await ReplyAsync("There was an error confirming your subscription status.");
+                    await gUser.RemoveRoleAsync(role);
+                return;
+            }
+
+            await gUser.AddRoleAsync(role);
+
+            if (!reAuthenticating)
+            {
+                channelConfig.AuthenticatedUserIds.Add(new YoutubeRoleConfig.SubReward.YoutubeSubscriber
+                {
+                    UserId = Context.User.Id,
+                    YoutubeChannelId = userChannelId
+                });  
+                Manager.SaveYTConfig(config);
+            }
+
+            var embed = $"You have been authenticated.".QuickEmbed();
+            await ReplyAsync("", false, embed);
+        }
+
+        [Command("RemoveYoutubeSub")]
+        [RequireUserPermission(GuildPermission.Administrator)]
+        public async Task SubRoleRemove(string displayName)
+        {
+            var config = Manager.GetYTConfig(Context.Guild.Id);
+            if (config == null)
+            {
+                await ReplyAsync("There are no sub roles configured.");
+                return;
+            }
+
+            if (!config.SubRewards.Keys.Contains(displayName))
+            {
+                await ReplyAsync("The specified youtube channel is not a sub channel.");
+                return;
+            }
+
+            config.SubRewards.Remove(displayName);
+
+            Manager.SaveYTConfig(config);
+            var embed = $"Channel Removed.".QuickEmbed();
+            await ReplyAsync("", false, embed);
+        }
+
+        [Command("SetYoutubeSub")]
+        [RequireUserPermission(GuildPermission.Administrator)]
+        public async Task SubRoleCreate(string displayName, string subChannelId, IRole role)
+        {
+            var config = Manager.GetOrCreateYTConfig(Context.Guild.Id);
+
+            if (config.SubRewards.Keys.Contains(displayName))
+            {
+                await ReplyAsync("Channel config already created. Run the removal command first.");
+                return;
+            }
+
+            config.SubRewards.Add(displayName, new YoutubeRoleConfig.SubReward
+            {
+                DisplayName = displayName,
+                YoutubeChannelId = subChannelId,
+                RewardedRoleId = role.Id
+            });
+
+            Manager.SaveYTConfig(config);
+            var embed = $"Youtube sub reward enabled. Note, for users to authenticate themselves\nthey must make their subscriptions public for youtube\nto do so, let them visit the following link: https://support.google.com/youtube/answer/7280190?hl=en\nUser verificaion is done using the `verify subscription` command and specifying the display name and their youtube channel id. ie. `verify subsription {displayName} UCSEd2z_QfxQ_GJpDAAsvs4A`".QuickEmbed();
+            await ReplyAsync("", false, embed);
+        }
+
+        [Command("SetYoutubeApiKey")]
+        [Summary("Set the youtube api key for checking the subscription status of users.")]
+        [RequireOwner]
+        public async Task SetYoutubeApiKeyAsync([Remainder]string key)
+        {
+            var config = Manager.Database.Load<YoutubeConfig>(YoutubeConfig.DocumentName());
+            if (config == null)
+            {
+                config = new YoutubeConfig();
+                config.ApiKey = key;
+            }
+
+            Manager.Database.Store(config, YoutubeConfig.DocumentName());
+            await ReplyAsync("Key set.");
+        }
+
 
         public string[] numberedEmotes = new string[]
         {
