@@ -62,7 +62,7 @@ namespace RavenBOT.Extensions
             return value;
         }
 
-        public static Embed QuickEmbed(this string message, Discord.Color? color)
+        public static Embed QuickEmbed(this string message, Discord.Color? color = null)
         {
             return new EmbedBuilder
             {

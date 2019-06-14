@@ -45,7 +45,7 @@ namespace RavenBOT.Modules.Greetings.Methods
                     return;
                 }
                 
-                await dmChannel.SendMessageAsync("", false, message.QuickEmbed(null));
+                await dmChannel.SendMessageAsync("", false, message.QuickEmbed());
             }
             else
             {
@@ -55,7 +55,7 @@ namespace RavenBOT.Modules.Greetings.Methods
                     return;
                 }
 
-                await channel.SendMessageAsync(user.Mention, false, message.QuickEmbed(null));
+                await channel.SendMessageAsync(user.Mention, false, message.QuickEmbed());
             }
         }
 
@@ -82,7 +82,7 @@ namespace RavenBOT.Modules.Greetings.Methods
                     return;
                 }
                 
-                await dmChannel.SendMessageAsync("", false, message.QuickEmbed(null));
+                await dmChannel.SendMessageAsync("", false, message.QuickEmbed());
             }
             else
             {
@@ -92,7 +92,7 @@ namespace RavenBOT.Modules.Greetings.Methods
                     return;
                 }
 
-                await channel.SendMessageAsync(user.Mention, false, message.QuickEmbed(null));
+                await channel.SendMessageAsync(user.Mention, false, message.QuickEmbed());
             }
         }
 

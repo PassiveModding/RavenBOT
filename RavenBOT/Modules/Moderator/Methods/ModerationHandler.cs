@@ -132,7 +132,30 @@ namespace RavenBOT.Modules.Moderator.Methods
             });            
         }
 
+        public void SaveModeratorConfig(ModeratorConfig config)
+        {
+            Database.Store(config, ModeratorConfig.DocumentName(config.GuildId));
+        }
 
+        public ModeratorConfig GetOrCreateModeratorConfig(ulong guildId)
+        {
+            var config = GetModeratorConfig(guildId);
+            if (config == null)
+            {
+                config = new ModeratorConfig
+                {
+                    GuildId = guildId
+                };
+                SaveModeratorConfig(config);
+            }
+
+            return config;
+        }
+
+        public ModeratorConfig GetModeratorConfig(ulong guildId)
+        {
+            return Database.Load<ModeratorConfig>(ModeratorConfig.DocumentName(guildId));
+        }
 
         public ActionConfig GetActionConfig(ulong guildId)
         {

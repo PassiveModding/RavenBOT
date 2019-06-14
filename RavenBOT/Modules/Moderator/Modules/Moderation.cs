@@ -1,21 +1,20 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
-using Microsoft.Extensions.DependencyInjection;
+using MoreLinq;
 using RavenBOT.Extensions;
 using RavenBOT.Modules.Moderator.Methods;
 using RavenBOT.Modules.Moderator.Models;
-using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Moderator.Modules
 {
     [Group("mod")]
-    [RequireUserPermission(Discord.GuildPermission.Administrator)]
+    [Preconditions.Moderator]
     [RequireContext(ContextType.Guild)]
-    //TODO: Custom precondition that allows for commands to work based off 'moderator' list in modconfig
     public partial class Moderation : InteractiveBase<ShardedCommandContext>
     {      
         public ModerationHandler ModHandler {get;}
@@ -39,6 +38,48 @@ namespace RavenBOT.Modules.Moderator.Modules
             }
 
             return true;
+        }
+
+        [Command("AddMod")]
+        [RequireUserPermission(GuildPermission.Administrator)]
+        public async Task AddModeratorAsync(IRole role)
+        {
+            var modConfig = ModHandler.GetOrCreateModeratorConfig(Context.Guild.Id);
+            modConfig.ModeratorRoles = modConfig.ModeratorRoles.Where(x => x != role.Id).ToList();
+            modConfig.ModeratorRoles.Add(role.Id);
+            ModHandler.SaveModeratorConfig(modConfig);
+            await ReplyAsync("Mod role added.");
+        }
+
+        [Command("DelMod")]
+        [RequireUserPermission(GuildPermission.Administrator)]
+        public async Task RemoveModeratorAsync(IRole role)
+        {
+            await RemoveModeratorAsync(role.Id);
+        }
+
+        
+        [Command("Moderators")]
+        public async Task ViewModeratorsAsync()
+        {
+            var config = ModHandler.GetModeratorConfig(Context.Guild.Id);
+            var roles = Context.Guild.Roles.Where(x => x.Permissions.Administrator).ToList();
+            if (config != null)
+            {
+                roles.AddRange(Context.Guild.Roles.Where(x => config.ModeratorRoles.Contains(x.Id)));
+            }
+            roles = roles.DistinctBy(x => x.Id).ToList();
+            await ReplyAsync("", false, string.Join("\n", roles.OrderByDescending(x => x.Position).Select(x => x.Permissions.Administrator ? $"[Admin] {x.Mention}" : $"[Mod] {x.Mention}")).QuickEmbed());
+        }
+
+        [Command("DelMod")]
+        [RequireUserPermission(GuildPermission.Administrator)]
+        public async Task RemoveModeratorAsync(ulong roleId)
+        {
+            var modConfig = ModHandler.GetOrCreateModeratorConfig(Context.Guild.Id);
+            modConfig.ModeratorRoles = modConfig.ModeratorRoles.Where(x => x != roleId).ToList();
+            ModHandler.SaveModeratorConfig(modConfig);
+            await ReplyAsync("Mod role removed.");
         }
 
         [Command("HackBan")]
@@ -69,6 +110,7 @@ namespace RavenBOT.Modules.Moderator.Modules
 
         [Command("SetMaxWarnings")]
         [Summary("Sets the most warnings a user can receive before an action is taken")]
+        [RequireUserPermission(GuildPermission.Administrator)]
         public async Task MaxWarnings(int max)
         {
             var config = ModHandler.GetActionConfig(Context.Guild.Id);
@@ -79,6 +121,7 @@ namespace RavenBOT.Modules.Moderator.Modules
 
         [Command("MaxWarningsAction")]
         [Summary("Sets the action to take on users who receive too many warnings")]
+        [RequireUserPermission(GuildPermission.Administrator)]
         public async Task MaxWarningsAction(ActionConfig.Action action)
         {
             var config = ModHandler.GetActionConfig(Context.Guild.Id);
@@ -89,6 +132,7 @@ namespace RavenBOT.Modules.Moderator.Modules
 
         [Command("SetDefaultSoftBanTime")]
         [Summary("Sets the default amount of time for a softban")]
+        [RequireUserPermission(GuildPermission.Administrator)]
         public async Task DefaultSoftBanTime(TimeSpan time)
         {
             var config = ModHandler.GetActionConfig(Context.Guild.Id);
@@ -99,6 +143,7 @@ namespace RavenBOT.Modules.Moderator.Modules
 
         [Command("SetDefaultMuteTime")]
         [Summary("Sets the default amount of time for mutes")]
+        [RequireUserPermission(GuildPermission.Administrator)]
         public async Task DefaultMuteTime(TimeSpan time)
         {
             var config = ModHandler.GetActionConfig(Context.Guild.Id);
@@ -179,8 +224,6 @@ namespace RavenBOT.Modules.Moderator.Modules
 
         [Command("warn")]
         [Summary("Warns a user")]
-        [RequireBotPermission(Discord.GuildPermission.BanMembers)]
-        [RequireBotPermission(Discord.GuildPermission.KickMembers)]
         //TODO: check user permission level
         public async Task WarnUser(SocketGuildUser user, [Remainder]string reason = null)
         {
