@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Discord;
+using Discord.WebSocket;
 
 namespace RavenBOT.Extensions
 {
@@ -27,9 +28,17 @@ namespace RavenBOT.Extensions
             return null;
         }
 
-        public static async Task<IUserMessage> EnsureMention(IMessageChannel channel, IEnumerable<IRole> roles, string messageContent, EmbedBuilder embed = null)
+        public static async Task<IUserMessage> EnsureMention(SocketTextChannel channel, IEnumerable<IRole> roles, string messageContent, EmbedBuilder embed = null)
         {
-            var unmentionable = roles.Where(x => !x.IsMentionable);
+            var client = channel.Guild.CurrentUser;
+            if (client.GuildPermissions.ManageRoles)
+            {
+                //If the bot doesn't have permissions just ignore the editing of roles.
+                return await channel.SendMessageAsync(messageContent, false, embed.Build());
+            }
+
+            //Ensure the bot is only editing roles which aren't already mentionable and are actually able to be edited (are lower than the bot's heirachal role).
+            var unmentionable = roles.Where(x => !x.IsMentionable && x.Position < client.Hierarchy);
             foreach (var role in unmentionable)
             {
                 await role.ModifyAsync(x => x.Mentionable = true);
