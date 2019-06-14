@@ -37,7 +37,6 @@ namespace RavenBOT.Services.Database
                 FrameworkVersion = "2.1.6",
                 ServerUrl = $"http://127.0.0.1:{config.Port}"
             };
-            //TODO: Secure mode with certificates support.
 
             EmbeddedServer.Instance.StartServer(serverOptions);
             DocumentStore = EmbeddedServer.Instance.GetDocumentStore(config.DatabaseName);
