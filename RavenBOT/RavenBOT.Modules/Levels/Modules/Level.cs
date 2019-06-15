@@ -33,6 +33,142 @@ namespace RavenBOT.Modules.Levels.Modules
             await ReplyAsync($"Leveling Enabled: {config.Enabled}");
         }
 
+        [Command("ShowSettings")]
+        [Summary("Displays all available level settings")]
+        [RequireUserPermission(GuildPermission.Administrator)]
+        public async Task ShowSettings()
+        {
+            var config = LevelService.TryGetLevelConfig(Context.Guild.Id);
+            if (config == null)
+            {
+                await ReplyAsync("Leveling has not been enabled in this server.");
+                return;
+            }
+
+            var responses = config.RewardRoles.OrderByDescending(x => x.LevelRequirement).Select(x =>
+            {
+                var role = Context.Guild.GetRole(x.RoleId);
+                if (role == null)
+                {
+                    return null;
+                }
+
+                return $"{x.LevelRequirement} | {role.Mention}";
+            }).Where(x => x != null).ToList();
+
+            var message = $"Enabled: {config.Enabled}\n" +
+                        $"Multiple Role rewards: {config.MultiRole}\n" +
+                        $"Reply with level ups: {config.ReplyLevelUps}\n" +
+                        $"Restriction Mode: {config.RestrictionMode}\n" +
+                        $"Restricted Channels:" + string.Join("\n", config.RestrictedChannels.Select(x => Context.Guild.GetTextChannel(x)?.Name ?? $"DELETED: [{x}]")) + 
+                        "\nNOTE: If there are deleted channels you can remove them by running the clearchannels command\n" +
+                        $"Role Rewards: \n{(responses.Any() ? string.Join("\n", responses) : "N/A" )}\n";
+
+            await ReplyAsync("", false, message.QuickEmbed());
+        }
+
+        [Command("ToggleWhitelist")]
+        [Summary("Toggles the whitelisting of specific channels for leveling")]
+        [RequireUserPermission(Discord.GuildPermission.Administrator)]
+        public async Task ToggleWhitelist()
+        {
+            var config = LevelService.GetOrCreateLevelConfig(Context.Guild.Id);
+            config.RestrictionMode = LevelConfig.LevelRestrictionType.Whitelist;
+            LevelService.Database.Store(config, LevelConfig.DocumentName(Context.Guild.Id));
+            await ReplyAsync($"Leveling will now be restricted to channels added with the `addchannel` command");
+        }
+
+        [Command("ToggleBlacklist")]
+        [Summary("Toggles the Blacklisting of specific channels for leveling")]
+        [RequireUserPermission(Discord.GuildPermission.Administrator)]
+        public async Task ToggleBlacklist()
+        {
+            var config = LevelService.GetOrCreateLevelConfig(Context.Guild.Id);
+            config.RestrictionMode = LevelConfig.LevelRestrictionType.Blacklist;
+            LevelService.Database.Store(config, LevelConfig.DocumentName(Context.Guild.Id));
+            await ReplyAsync($"Leveling will now be ignored in channels added with the `addchannel` command");
+        }
+        
+        [Command("AddChannel")]
+        [Summary("Adds a blacklist or whitelist specific channel")]
+        [RequireUserPermission(Discord.GuildPermission.Administrator)]
+        public async Task AddChannel()
+        {
+            var config = LevelService.GetOrCreateLevelConfig(Context.Guild.Id);
+            if (config.RestrictedChannels.Contains(Context.Channel.Id))
+            {
+                await ReplyAsync("This channel is already restricted.");
+                return;
+            }
+            if (config.RestrictionMode == LevelConfig.LevelRestrictionType.None)
+            {
+                await ReplyAsync("You must enable either the blacklist or whitelist to use this command.");
+                return;
+            }
+
+            config.RestrictedChannels.Add(Context.Channel.Id);
+            LevelService.Database.Store(config, LevelConfig.DocumentName(Context.Guild.Id));
+            await ReplyAsync($"This channel is now added to the level {config.RestrictionMode}.");
+        }
+
+        [Command("ClearChannels")]
+        [Summary("Clears all blacklist or whitelist specific channels")]
+        [RequireUserPermission(Discord.GuildPermission.Administrator)]
+        public async Task RemoveChannels()
+        {
+            var config = LevelService.GetOrCreateLevelConfig(Context.Guild.Id);
+            if (config.RestrictionMode == LevelConfig.LevelRestrictionType.None)
+            {
+                await ReplyAsync("You must enable either the blacklist or whitelist to use this command.");
+                return;
+            }
+
+            config.RestrictedChannels = new List<ulong>();
+            LevelService.Database.Store(config, LevelConfig.DocumentName(Context.Guild.Id));
+            await ReplyAsync($"Restricted channels have been cleared.");
+        }
+
+        [Command("ShowChannnels")]
+        [Summary("Shows all blacklist or whitelist specific channels")]
+        [RequireUserPermission(Discord.GuildPermission.Administrator)]
+        public async Task ShowChannnels()
+        {
+            var config = LevelService.GetOrCreateLevelConfig(Context.Guild.Id);
+            if (config.RestrictionMode == LevelConfig.LevelRestrictionType.None)
+            {
+                await ReplyAsync("You must enable either the blacklist or whitelist to use this command.");
+                return;
+            }
+
+            if (!config.RestrictedChannels.Any())
+            {
+                await ReplyAsync("There are no restricted channels.");
+                return;
+            }
+
+            var message = string.Join("\n", config.RestrictedChannels.Select(x => Context.Guild.GetTextChannel(x)?.Name ?? $"DELETED: [{x}]")) + 
+                        "\nNOTE: If there are deleted channels you can remove them by running the clearchannels command";
+
+            await ReplyAsync("", false, message.QuickEmbed());
+        }
+
+        [Command("RemoveChannel")]
+        [Summary("Removes a blacklist or whitelist specific channel")]
+        [RequireUserPermission(Discord.GuildPermission.Administrator)]
+        public async Task RemoveChannel()
+        {
+            var config = LevelService.GetOrCreateLevelConfig(Context.Guild.Id);
+            if (config.RestrictionMode == LevelConfig.LevelRestrictionType.None)
+            {
+                await ReplyAsync("You must enable either the blacklist or whitelist to use this command.");
+                return;
+            }
+
+            config.RestrictedChannels.Remove(Context.Channel.Id);
+            LevelService.Database.Store(config, LevelConfig.DocumentName(Context.Guild.Id));
+            await ReplyAsync($"This channel is now removed from the level {config.RestrictionMode}.");
+        }
+
         [Command("SetLogChannel")]
         [Summary("Sets the channel for level logging")]
         [RequireUserPermission(Discord.GuildPermission.Administrator)]

@@ -132,6 +132,29 @@ namespace RavenBOT.Modules.Levels.Methods
 
                     var user = config.Item1;
                     var guild = config.Item2;
+                    if (guild.RestrictionMode != LevelConfig.LevelRestrictionType.None)
+                    {
+                        //Ensure that there are restricted channels enabled
+                        if (guild.RestrictedChannels.Any())
+                        {
+                            if (guild.RestrictionMode == LevelConfig.LevelRestrictionType.Blacklist)
+                            {
+                                if (guild.RestrictedChannels.Contains(tChannel.Id))
+                                {
+                                    return;
+                                }
+                            }
+                            else if (guild.RestrictionMode == LevelConfig.LevelRestrictionType.Whitelist)
+                            {
+                                if (guild.RestrictedChannels.Contains(tChannel.Id))
+                                {
+                                    return;
+                                } 
+                            }                              
+                        }
+                     
+                    }
+
 
                     user.UserXP += 10;
 

@@ -26,6 +26,17 @@ namespace RavenBOT.Modules.Levels.Models
         public ulong LogChannelId { get; set; } = 0;
         public bool ReplyLevelUps { get; set; } = true;
 
+        public enum LevelRestrictionType
+        {
+            Whitelist,
+            Blacklist,
+            None
+        }
+
+        public LevelRestrictionType RestrictionMode { get; set; } = LevelRestrictionType.None;
+
+        public List<ulong> RestrictedChannels { get; set; } = new List<ulong>();
+
         public List<LevelReward> RewardRoles { get; set; } = new List<LevelReward>();
 
         public class LevelReward
