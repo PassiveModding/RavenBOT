@@ -13,11 +13,13 @@ namespace RavenBOT.Modules.Media.Methods
     {
         public IDatabase Database { get; }
         public DiscordShardedClient Client { get; }
+        public LocalManagementService Local { get; }
 
-        public MediaRestrictorHelper(IDatabase database, DiscordShardedClient client)
+        public MediaRestrictorHelper(IDatabase database, DiscordShardedClient client, LocalManagementService local)
         {
             Database = database;
             Client = client;
+            Local = local;
             Client.MessageReceived += MessageReceivedAsync;
         }
 
@@ -39,7 +41,12 @@ namespace RavenBOT.Modules.Media.Methods
             }
 
             //Ensure the bot actually has permissions to delete messages
-            if (channel.Guild?.CurrentUser?.GuildPermissions.ManageMessages != true)
+            if (channel.Guild == null || channel.Guild.CurrentUser == null || channel.Guild.CurrentUser.GuildPermissions.ManageMessages != true)
+            {
+                return;
+            }
+
+            if (!Local.LastConfig.IsAcceptable(channel.Guild.Id))
             {
                 return;
             }

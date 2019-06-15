@@ -13,11 +13,12 @@ namespace RavenBOT.Modules.RoleManagement.Methods
 {
     public class RoleManager : IServiceable
     {
-        public RoleManager(IDatabase database, HttpClient httpClient, DiscordShardedClient client)
+        public RoleManager(IDatabase database, HttpClient httpClient, DiscordShardedClient client, LocalManagementService local)
         {
             Database = database;
             HttpClient = httpClient;
             Client = client;
+            Local = local;
             Client.ReactionAdded += ReactionAdded;
             Client.ReactionRemoved += ReactionRemoved;
         }
@@ -25,6 +26,7 @@ namespace RavenBOT.Modules.RoleManagement.Methods
         public IDatabase Database { get; }
         public HttpClient HttpClient { get; }
         public DiscordShardedClient Client { get; }
+        public LocalManagementService Local { get; }
 
         public int IsUnicodeNumberEmote(string name)
         {
@@ -82,6 +84,8 @@ namespace RavenBOT.Modules.RoleManagement.Methods
 
         private async Task RunReaction(Discord.Cacheable<Discord.IUserMessage, ulong> cache, ISocketMessageChannel channel, SocketReaction reaction, bool added)
         {
+
+
             var unicodeNumberResult = IsUnicodeNumberEmote(reaction.Emote.Name);
             if (unicodeNumberResult == -1)
             {
@@ -89,6 +93,11 @@ namespace RavenBOT.Modules.RoleManagement.Methods
             }
 
             if (!(channel is ITextChannel tChannel))
+            {
+                return;
+            }
+
+            if (!Local.LastConfig.IsAcceptable(tChannel.Guild?.Id ?? 0))
             {
                 return;
             }
