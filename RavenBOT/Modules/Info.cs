@@ -88,14 +88,15 @@ namespace RavenBOT.Modules
                 });
             embed.AddField("Changes", changes.FixLength());
 
-            embed.AddField("Members", $"Bot: {Context.Client.Guilds.Sum(x => x.Users.Count(z => z.IsBot))}\n" + $"Human: {Context.Client.Guilds.Sum(x => x.Users.Count(z => !z.IsBot))}\n" + $"Total: {Context.Client.Guilds.Sum(x => x.Users.Count)}", true);
-            embed.AddField("Channels", $"Text: {Context.Client.Guilds.Sum(x => x.TextChannels.Count)}\n" + $"Voice: {Context.Client.Guilds.Sum(x => x.VoiceChannels.Count)}\n" + $"Total: {Context.Client.Guilds.Sum(x => x.Channels.Count)}", true);
-            embed.AddField("Guilds", $"{Context.Client.Guilds.Count}", true);
+            embed.AddField("Members", $"Bot: {Context.Client.Guilds.Sum(x => x.Users.Count(z => z.IsBot))}\nHuman: {Context.Client.Guilds.Sum(x => x.Users.Count(z => !z.IsBot))}\nPresent: {Context.Client.Guilds.Sum(x => x.Users.Count(u => u.Status != UserStatus.Offline))}", true);
+            embed.AddField("Members", $"Online: {Context.Client.Guilds.Sum(x => x.Users.Count(z => z.Status == UserStatus.Online))}\nAFK: {Context.Client.Guilds.Sum(x => x.Users.Count(z => z.Status == UserStatus.Idle))}\nDND: {Context.Client.Guilds.Sum(x => x.Users.Count(u => u.Status == UserStatus.DoNotDisturb))}", true);
+            embed.AddField("Channels", $"Text: {Context.Client.Guilds.Sum(x => x.TextChannels.Count)}\nVoice: {Context.Client.Guilds.Sum(x => x.VoiceChannels.Count)}\nTotal: {Context.Client.Guilds.Sum(x => x.Channels.Count)}", true);
+            embed.AddField("Guilds", $"Count: {Context.Client.Guilds.Count}\nTotal Users: {Context.Client.Guilds.Sum(x => x.MemberCount)}\nTotal Cached: {Context.Client.Guilds.Sum(x => x.Users.Count())}\n", true);
             var orderedShards = Context.Client.Shards.OrderByDescending(x => x.Guilds.Count).ToList();
-            embed.AddField("Stats", $"**Guilds:** {Context.Client.Guilds.Count}\n" + $"**Users:** {Context.Client.Guilds.Sum(x => x.MemberCount)}\n" + $"**Shards:** {Context.Client.Shards.Count}\n" + $"**Max Shard:** G:{orderedShards.First().Guilds.Count} ID:{orderedShards.First().ShardId}\n" + $"**Min Shard:** G:{orderedShards.Last().Guilds.Count} ID:{orderedShards.Last().ShardId}");
-            embed.AddField("Command Info", $"Command Count: {CommandService.Commands.Count()}\nModule Count: {CommandService.Modules.Count()}");
-            embed.AddField(":hammer_pick:", $"Heap: {Math.Round(GC.GetTotalMemory(true) / (1024.0 * 1024.0), 2)} MB\n" + $"Up: {GetUptime()}", true);
-            embed.AddField(":beginner:", "Written by: [PassiveModding](https://github.com/PassiveModding)\n" + $"Discord.Net {DiscordConfig.Version}", true);
+            embed.AddField("Shards", $"Shards: {Context.Client.Shards.Count}\nMax: G:{orderedShards.First().Guilds.Count} ID:{orderedShards.First().ShardId}\nMin: G:{orderedShards.Last().Guilds.Count} ID:{orderedShards.Last().ShardId}", true);
+            embed.AddField("Commands", $"Commands: {CommandService.Commands.Count()}\nAliases: {CommandService.Commands.Sum(x => x.Attributes.Count)}\nModules: {CommandService.Modules.Count()}", true);
+            embed.AddField(":hammer_pick:", $"Heap: {Math.Round(GC.GetTotalMemory(true) / (1024.0 * 1024.0), 2)} MB\nUp: {GetUptime()}", true);
+            embed.AddField(":beginner:", "Written by: [PassiveModding](https://github.com/PassiveModding)\nDiscord.Net {DiscordConfig.Version}", true);
 
             await ReplyAsync("", false, embed.Build());
         }
@@ -104,7 +105,7 @@ namespace RavenBOT.Modules
         [Summary("Displays information about all shards")]
         public async Task ShardInfoAsync()
         {
-            var info = Context.Client.Shards.Select(x => $"[{x.ShardId}] {x.Status} - Guilds: {x.Guilds.Count} Users: {x.Guilds.Sum(g => g.MemberCount)}");
+            var info = Context.Client.Shards.Select(x => $"[{x.ShardId}] {x.Status} {x.ConnectionState} - Guilds: {x.Guilds.Count} Users: {x.Guilds.Sum(g => g.MemberCount)}");
             await ReplyAsync($"```\n" + $"{string.Join("\n", info)}\n" + $"```");
         }
 
