@@ -64,7 +64,7 @@ namespace RavenBOT.Modules.Automessage.Methods
                     {
                         return;
                     }
-                    channel.SendMessageAsync(messageChannel.Response);
+                    await channel.SendMessageAsync(messageChannel.Response);
                 }
             }
         }

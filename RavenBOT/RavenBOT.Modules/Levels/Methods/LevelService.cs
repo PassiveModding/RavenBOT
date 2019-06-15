@@ -119,6 +119,7 @@ namespace RavenBOT.Modules.Levels.Methods
                     message.Author.Id
                 });
             }
+
             var _ = Task.Run(async() =>
             {
                 try
@@ -166,7 +167,7 @@ namespace RavenBOT.Modules.Levels.Methods
                         Database.Store(user, LevelUser.DocumentName(user.UserId, user.GuildId));
                     }
                 }
-                catch (Exception e)
+                catch
                 {
                     //
                 }

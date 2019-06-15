@@ -28,7 +28,7 @@ namespace RavenBOT.Modules.Partner.Methods
 
         public void TimerEvent(object _)
         {
-            PartnerEvent();
+            Task.Run(() =>PartnerEvent());
         }
 
         public void SavePartnerConfig(PartnerConfig config)
@@ -93,7 +93,7 @@ namespace RavenBOT.Modules.Partner.Methods
                     group.Config.UserCount += receiver.Guild.MemberCount;
                     Database.Store(group.Config, PartnerConfig.DocumentName(group.Config.GuildId));
                 }
-                catch (Exception e)
+                catch
                 {
                     //
                 }
