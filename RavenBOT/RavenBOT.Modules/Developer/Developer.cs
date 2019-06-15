@@ -28,6 +28,9 @@ using RavenBOT.Services;
 using RavenBOT.Services.Database;
 using static RavenBOT.Services.PrefixService;
 
+/// <summary>
+/// Developer module, requires all imported modules in order to function.
+/// </summary>
 namespace RavenBOT.Modules.Developer
 {
     [RequireOwner]
