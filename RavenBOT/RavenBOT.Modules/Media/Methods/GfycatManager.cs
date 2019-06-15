@@ -1,11 +1,9 @@
 using System;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using RavenBOT.Extensions;
 using RavenBOT.Services;
 using RavenBOT.Services.Database;
 

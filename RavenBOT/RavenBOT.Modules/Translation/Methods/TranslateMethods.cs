@@ -1,15 +1,14 @@
 using System;
-using System.Threading.Tasks;
 using Discord;
 using Google.Cloud.Translation.V2;
 using RavenBOT.Extensions;
-using static RavenBOT.Modules.Translation.Models.LanguageMap;
+using RavenBOT.Modules.Translation.Models;
 
 namespace RavenBOT.Modules.Translation.Methods
 {
     public partial class TranslateService
     {
-        public static string LanguageCodeToString(LanguageCode? code)
+        public static string LanguageCodeToString(LanguageMap.LanguageCode? code)
         {
             if (code == null)
             {
@@ -61,7 +60,7 @@ namespace RavenBOT.Modules.Translation.Methods
             public int RemainingUses { get; set; } = 0;
         }
 
-        public EmbedBuilder TranslateEmbed(ulong guildId, IEmbed embed, LanguageCode code)
+        public EmbedBuilder TranslateEmbed(ulong guildId, IEmbed embed, LanguageMap.LanguageCode code)
         {
             if (embed.Type != EmbedType.Rich)
             {
@@ -157,7 +156,7 @@ namespace RavenBOT.Modules.Translation.Methods
             return builder;
         }
 
-        public TranslateResponse Translate(ulong guildId, string inputText, LanguageCode languageCode)
+        public TranslateResponse Translate(ulong guildId, string inputText, LanguageMap.LanguageCode languageCode)
         {
             if (string.IsNullOrWhiteSpace(inputText))
             {

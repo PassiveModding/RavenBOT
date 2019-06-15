@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using static RavenBOT.Modules.Translation.Models.LanguageMap;
+using RavenBOT.Modules.Translation.Models;
 
 namespace RavenBOT.Modules.Translation.Models
 {
@@ -21,7 +21,7 @@ namespace RavenBOT.Modules.Translation.Models
 
         public bool ReactionTranslations { get; set; } = false;
         public bool DirectMessageTranslations { get; set; } = false;
-        public List<TranslationSet> CustomPairs { get; set; } = new List<TranslationSet>();
+        public List<LanguageMap.TranslationSet> CustomPairs { get; set; } = new List<LanguageMap.TranslationSet>();
 
         public List<ulong> WhitelistRoles { get; set; } = new List<ulong>();
     }

@@ -1,36 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using RavenBOT.Extensions;
 using RavenBOT.Handlers;
 using RavenBOT.Models;
-using RavenBOT.Modules.AutoMod.Models;
-using RavenBOT.Modules.AutoMod.Models.Moderation;
-using RavenBOT.Modules.Birthday.Models;
-using RavenBOT.Modules.Captcha.Models;
-using RavenBOT.Modules.Conversation.Models;
-using RavenBOT.Modules.Events.Models.Events;
-using RavenBOT.Modules.Games.Models;
-using RavenBOT.Modules.Greetings.Models;
-using RavenBOT.Modules.Levels.Models;
-using RavenBOT.Modules.Media.Methods;
-using RavenBOT.Modules.Moderator.Models;
-using RavenBOT.Modules.Partner.Models;
-using RavenBOT.Modules.Statistics.Models;
-using RavenBOT.Modules.Tags.Models;
-using RavenBOT.Modules.Tickets.Models;
-using RavenBOT.Modules.Translation.Models;
-using RavenBOT.Services;
 using RavenBOT.Services.Database;
-using static RavenBOT.Services.PrefixService;
 
-/// <summary>
-/// Developer module, requires all imported modules in order to function.
-/// </summary>
 namespace RavenBOT.Modules.Developer
 {
     [RequireOwner]
@@ -40,34 +16,13 @@ namespace RavenBOT.Modules.Developer
         public LogHandler Logger { get; }
         public DeveloperSettings DeveloperSettings { get; }
         public IDatabase Database { get; }
-        public GfycatManager GfyCat { get; }
 
-        public Developer(LogHandler logger, IDatabase dbService, GfycatManager manager, DeveloperSettings developerSettings)
+        public Developer(LogHandler logger, IDatabase dbService, DeveloperSettings developerSettings)
         {
             Logger = logger;
             DeveloperSettings = developerSettings;
             Database = dbService;
-            GfyCat = manager;
         }
-
-        /*
-        [Command("AddModule")]
-        public async Task AddModule([Remainder]string location)
-        {
-            try
-            {
-                var modules = await ModuleService.RegisterModule(location);
-                foreach (var module in modules)
-                {
-                    await ReplyAsync($"Module Added: {module.Name}");
-                }
-            }
-            catch (Exception e)
-            {
-                Console.Write(e);
-            }
-        }
-        */
 
         [Command("EditHelpPreconditionSkips")]
         public async Task EditHelpPreconditionSkipsAsync(string skip)
@@ -138,58 +93,8 @@ namespace RavenBOT.Modules.Developer
             await ReplyAsync($"Set Logger channel to {channel.Mention}");
         }
 
-        [Command("TestDatabase")]
-        public async Task DBTest()
-        {
-            //Yes I know this is rudimentary and probably a terrible way of doing things but oh well.
-            try
-            {
-                var testDoc = new DBTestDocument();
 
-                testDoc.value = "Test";
-
-                Database.Store(testDoc);
-                Database.Store(testDoc, "Document");
-                var docA = Database.Load<DBTestDocument>(null);
-                var docB = Database.Load<DBTestDocument>("Document");
-                var docList = Database.Query<DBTestDocument>();
-                Database.RemoveDocument(testDoc);
-                Database.Remove<DBTestDocument>("Document");
-                Database.StoreMany(new List<DBTestDocument>(), x => x.value);
-                await ReplyAsync("No Errors were thrown");
-            }
-            catch (Exception e)
-            {
-                await ReplyAsync(e.ToString().FixLength(2047));
-            }
-
-        }
-
-        [Command("SetGfycatClient")]
-        [Summary("Sets the gfycat client information")]
-        public async Task SetGfycatClientAsync(string id, string secret)
-        {
-            var config = new GfycatManager.GfycatClientInfo
-            {
-                client_id = id,
-                client_secret = secret
-            };
-            Database.Store(config, "GfycatClientInfo");
-        }
-
-        [Command("EmbedGfycatImage")]
-        [Summary("Tests the getgfycaturl method")]
-        public async Task EmbedTest([Remainder] string imageUrl)
-        {
-            var response = await GfyCat.GetGfyCatUrl(imageUrl);
-            var embed = new EmbedBuilder()
-            {
-                Description = imageUrl,
-                ImageUrl = response
-            };
-            await ReplyAsync("", false, embed.Build());
-        }
-
+        /*
         [Command("MigrateToLiteDB", RunMode = RunMode.Async)]
         public async Task MigrateDB()
         {
@@ -228,11 +133,6 @@ namespace RavenBOT.Modules.Developer
             newDB.Store(Database.Load<TranslateConfig>("TranslateConfig"), "TranslateConfig");
             newDB.Store(Database.Load<GraphiteConfig>(GrafanaConfig.DocumentName()), GrafanaConfig.DocumentName());
             await ReplyAsync("Done.");
-        }
-
-        public class DBTestDocument
-        {
-            public string value { get; set; }
-        }
+        }*/
     }
 }

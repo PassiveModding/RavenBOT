@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Discord;
@@ -7,7 +6,6 @@ using Discord.Addons.Interactive;
 using Discord.Commands;
 using RavenBOT.Modules.Games.Methods;
 using RavenBOT.Preconditions;
-using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Games.Modules
 {

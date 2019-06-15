@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace RavenBOT.Modules.Events.Models.Events
+﻿namespace RavenBOT.Modules.Events.Models.Events
 {
     public class EventConfig
     {

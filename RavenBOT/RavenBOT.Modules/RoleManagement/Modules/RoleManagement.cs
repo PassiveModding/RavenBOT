@@ -1,5 +1,4 @@
 using System;
-using System.Net.Http;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,10 +8,6 @@ using Discord.Commands;
 using MoreLinq;
 using RavenBOT.Modules.RoleManagement.Methods;
 using RavenBOT.Modules.RoleManagement.Models;
-using RavenBOT.Services.Database;
-using System.Net.Http.Headers;
-using System.IO;
-using Newtonsoft.Json.Linq;
 using RavenBOT.Extensions;
 using Discord.WebSocket;
 

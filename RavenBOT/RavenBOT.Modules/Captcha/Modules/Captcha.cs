@@ -1,10 +1,8 @@
 using System.Threading.Tasks;
 using Discord.Addons.Interactive;
 using Discord.Commands;
-using Discord.WebSocket;
 using RavenBOT.Modules.Captcha.Methods;
 using RavenBOT.Modules.Captcha.Models;
-using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Captcha.Modules
 {

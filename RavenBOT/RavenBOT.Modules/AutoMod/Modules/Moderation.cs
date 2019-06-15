@@ -4,11 +4,9 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
-using Discord.WebSocket;
 using RavenBOT.Extensions;
 using RavenBOT.Modules.AutoMod.Methods;
 using RavenBOT.Modules.AutoMod.Models.Moderation;
-using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.AutoMod.Modules
 {

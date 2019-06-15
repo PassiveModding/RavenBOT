@@ -1,5 +1,3 @@
-using System;
-using System.Threading;
 using Discord.WebSocket;
 using DiscordBotsList.Api.Adapter.Discord.Net;
 using RavenBOT.Modules.Statistics.Models;

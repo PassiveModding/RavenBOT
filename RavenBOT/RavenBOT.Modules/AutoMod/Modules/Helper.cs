@@ -2,9 +2,7 @@ using System.Threading.Tasks;
 using Discord.Addons.Interactive;
 using System.Collections.Generic;
 using Discord.Commands;
-using Discord.WebSocket;
 using RavenBOT.Services;
-using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.AutoMod.Modules
 {

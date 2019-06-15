@@ -5,12 +5,9 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
-using Discord.WebSocket;
-using Microsoft.Extensions.DependencyInjection;
 using RavenBOT.Extensions;
 using RavenBOT.Modules.Translation.Methods;
 using RavenBOT.Modules.Translation.Models;
-using RavenBOT.Services.Database;
 using RavenBOT.Services.Licensing;
 
 namespace RavenBOT.Modules.Translation.Modules

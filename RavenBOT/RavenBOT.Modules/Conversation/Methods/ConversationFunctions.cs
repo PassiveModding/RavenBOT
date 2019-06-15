@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Google.Cloud.Dialogflow.V2;
 using Newtonsoft.Json;
 
 namespace RavenBOT.Modules.Conversation.Methods

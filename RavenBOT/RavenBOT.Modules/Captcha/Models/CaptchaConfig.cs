@@ -1,5 +1,3 @@
-using System;
-
 namespace RavenBOT.Modules.Captcha.Models
 {
     public class CaptchaConfig

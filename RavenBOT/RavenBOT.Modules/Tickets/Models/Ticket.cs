@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
-using System.Text;
 using Discord;
-using Discord.Commands;
 using Discord.WebSocket;
 using RavenBOT.Extensions;
 

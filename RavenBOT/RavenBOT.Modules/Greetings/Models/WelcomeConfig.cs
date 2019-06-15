@@ -1,5 +1,3 @@
-using System;
-
 namespace RavenBOT.Modules.Greetings.Models
 {
     public class WelcomeConfig

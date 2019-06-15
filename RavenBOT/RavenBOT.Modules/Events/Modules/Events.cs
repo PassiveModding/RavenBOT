@@ -2,9 +2,7 @@
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
-using Discord.WebSocket;
 using RavenBOT.Modules.Events.Methods;
-using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Events.Modules
 {

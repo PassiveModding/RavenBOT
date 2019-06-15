@@ -7,13 +7,11 @@ using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
-using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
 using RavenBOT.Extensions;
 using RavenBOT.Models;
 using RavenBOT.Preconditions;
 using RavenBOT.Services;
-using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules
 {

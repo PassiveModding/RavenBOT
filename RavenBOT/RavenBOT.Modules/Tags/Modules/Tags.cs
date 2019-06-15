@@ -4,10 +4,8 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
-using Microsoft.Extensions.DependencyInjection;
 using RavenBOT.Extensions;
 using RavenBOT.Modules.Tags.Methods;
-using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Tags.Modules
 {

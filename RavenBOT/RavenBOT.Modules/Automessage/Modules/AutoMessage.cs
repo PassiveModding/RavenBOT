@@ -1,11 +1,8 @@
-using System.Linq;
 using System.Threading.Tasks;
 using Discord.Addons.Interactive;
 using Discord.Commands;
-using Discord.WebSocket;
 using RavenBOT.Modules.Automessage.Methods;
 using RavenBOT.Modules.Automessage.Models;
-using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Automessage.Modules
 {

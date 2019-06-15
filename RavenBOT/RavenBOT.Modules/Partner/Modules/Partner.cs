@@ -4,10 +4,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord.Addons.Interactive;
 using Discord.Commands;
-using Discord.WebSocket;
-using Microsoft.Extensions.DependencyInjection;
 using RavenBOT.Modules.Partner.Methods;
-using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Partner.Modules
 {

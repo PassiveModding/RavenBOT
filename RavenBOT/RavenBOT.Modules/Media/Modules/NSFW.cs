@@ -4,9 +4,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
-using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
-using RavenBOT.Extensions;
 using RavenBOT.Modules.Media.Methods;
 
 namespace RavenBOT.Modules.Media.Modules

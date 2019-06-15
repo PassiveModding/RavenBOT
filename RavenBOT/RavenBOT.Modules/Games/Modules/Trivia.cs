@@ -4,13 +4,9 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
-
-using Microsoft.Extensions.DependencyInjection;
-
 using Newtonsoft.Json;
 using RavenBOT.Extensions;
 

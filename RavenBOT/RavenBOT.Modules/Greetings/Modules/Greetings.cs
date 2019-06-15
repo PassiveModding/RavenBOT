@@ -1,9 +1,7 @@
 using System.Threading.Tasks;
 using Discord.Addons.Interactive;
 using Discord.Commands;
-using Discord.WebSocket;
 using RavenBOT.Modules.Greetings.Methods;
-using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Greetings.Modules
 {

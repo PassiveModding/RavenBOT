@@ -1,14 +1,10 @@
 using System;
 using System.Globalization;
-using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
-using Discord.WebSocket;
-using RavenBOT.Extensions;
 using RavenBOT.Modules.Birthday.Methods;
-using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Birthday.Modules
 {

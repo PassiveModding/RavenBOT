@@ -1,16 +1,8 @@
-using System;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Discord.Addons.Interactive;
 using Discord.Commands;
-using Discord.WebSocket;
-using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
 using RavenBOT.Modules.Statistics.Methods;
 using RavenBOT.Modules.Statistics.Models;
-using RavenBOT.Services.Database;
 
 namespace RavenBOT.Modules.Statistics.Modules
 {
