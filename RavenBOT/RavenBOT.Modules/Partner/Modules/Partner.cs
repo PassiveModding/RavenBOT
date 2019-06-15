@@ -117,9 +117,8 @@ namespace RavenBOT.Modules.Partner.Modules
             await ReplyAsync($"Enabled: {config.Enabled}\n" +
                 $"Show Thumbnail: {config.UseThumb}\n" +
                 $"Color: R-{config.Color?.R} G-{config.Color?.G} B-{config.Color?.B}\n" +
-                $"Receiver Channel: {Context.Guild.GetChannel(config.ReceiverChannelId)?.Name ?? "N/A"}" +
-                $"Image Url: {config.ImageUrl ?? "N/A"}\n" +
-                $"Message: \n{config.Message}");
+                $"Receiver Channel: {Context.Guild.GetChannel(config.ReceiverChannelId)?.Name ?? "N/A"}\n" +
+                $"Image Url: {config.ImageUrl ?? "N/A"}", false, (await config.GetEmbedAsync(Context.Guild))?.Build());
         }
 
         [Command("Trigger")]
