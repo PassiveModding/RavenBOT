@@ -16,7 +16,7 @@ namespace RavenBOT.Modules.Partner.Methods
             Database = database;
             Client = client;
 
-            Timer = new Timer(TimerEvent, null, TimeSpan.FromSeconds(0), TimeSpan.FromMinutes(60));
+            Timer = new Timer(TimerEvent, null, TimeSpan.FromSeconds(0), TimeSpan.FromHours(1));
 
             Random = new Random();
         }
@@ -28,7 +28,7 @@ namespace RavenBOT.Modules.Partner.Methods
 
         public void TimerEvent(object _)
         {
-            Task.Run(() =>PartnerEvent());
+            Task.Run(() => PartnerEvent());
         }
 
         public void SavePartnerConfig(PartnerConfig config)
