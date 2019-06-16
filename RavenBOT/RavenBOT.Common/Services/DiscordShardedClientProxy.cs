@@ -28,8 +28,161 @@ namespace RavenBOT.Common.Services
             Client.MessageReceived += OnMessageReceived;
             Client.MessageUpdated += OnMessageUpdated;
             Client.ReactionAdded += OnReactionAdded;
-            //TODO: Finish adding events
+            Client.ReactionRemoved += OnReactionRemoved;
+            Client.ReactionsCleared += OnReactionsCleared;
+            Client.RecipientAdded += OnRecipientAdded;
+            Client.RecipientRemoved += OnRecipientRemoved;
+            Client.RoleCreated += OnRoleCreated;
+            Client.RoleDeleted += OnRoleDeleted;
+            Client.RoleUpdated += OnRoleUpdated;
+            Client.ShardConnected += OnShardConnected;
+            Client.ShardDisconnected += OnShardDisconnected;
+            Client.ShardLatencyUpdated += OnShardLatencyUpdated;
+            Client.ShardReady += OnShardReady;
+            Client.UserBanned += OnUserBanned;
+            Client.UserIsTyping += OnUserIsTyping;
+            Client.UserJoined += OnUserJoined;
+            Client.UserLeft += OnUserLeft;
+            Client.UserUnbanned += OnUserUnbanned;
+            Client.UserUpdated += OnUserUpdated;
+            Client.UserVoiceStateUpdated += OnUserVoiceStateUpdated;
+            Client.VoiceServerUpdated += OnVoiceServerUpdated;
         }
+
+        //TODO: Expose method of adding certain functions to run prior to each task.
+
+        private Task OnVoiceServerUpdated(SocketVoiceServer server)
+        {
+            return VoiceServerUpdated(server);
+        }
+
+        public event Func<SocketVoiceServer, Task> VoiceServerUpdated;
+
+        private Task OnUserVoiceStateUpdated(SocketUser user, SocketVoiceState voiceBefore, SocketVoiceState voiceAfter)
+        {
+            return UserVoiceStateUpdated(user, voiceBefore, voiceAfter);
+        }
+
+        public event Func<SocketUser, SocketVoiceState, SocketVoiceState, Task> UserVoiceStateUpdated;
+
+        private Task OnUserUpdated(SocketUser userBefore, SocketUser userAfter)
+        {
+            return UserUpdated(userBefore, userAfter);
+        }
+
+        public event Func<SocketUser, SocketUser, Task> UserUpdated;
+
+        private Task OnUserLeft(SocketGuildUser user)
+        {
+            return UserLeft(user);
+        }
+
+        public event Func<SocketUser, Task> UserLeft;
+
+        private Task OnUserJoined(SocketGuildUser user)
+        {
+            return UserJoined(user);
+        }
+
+        public event Func<SocketUser, Task> UserJoined;
+
+        private Task OnUserIsTyping(SocketUser user, ISocketMessageChannel channel)
+        {
+            return UserIsTyping(user, channel);
+        }
+
+        public event Func<SocketUser, ISocketMessageChannel, Task> UserIsTyping;
+
+        private Task OnUserUnbanned(SocketUser user, SocketGuild guild)
+        {
+            return UserUnbanned(user, guild);
+        }
+
+        public event Func<SocketUser, SocketGuild, Task> UserUnbanned;
+
+        private Task OnUserBanned(SocketUser user, SocketGuild guild)
+        {
+            return UserBanned(user, guild);
+        }
+
+        public event Func<SocketUser, SocketGuild, Task> UserBanned;
+
+        private Task OnShardReady(DiscordSocketClient client)
+        {
+            return ShardReady(client);
+        }
+
+        public event Func<DiscordSocketClient, Task> ShardReady;
+
+        private Task OnShardLatencyUpdated(int before, int after, DiscordSocketClient client)
+        {
+            return ShardLatencyUpdated(before, after, client);
+        }
+
+        public event Func<int, int, DiscordSocketClient, Task> ShardLatencyUpdated;
+
+        private Task OnShardDisconnected(Exception exception, DiscordSocketClient client)
+        {
+            return ShardDisconnected(exception, client);
+        }
+
+        public event Func<Exception, DiscordSocketClient, Task> ShardDisconnected;
+
+        private Task OnShardConnected(DiscordSocketClient client)
+        {
+            return ShardConnected(client);
+        }
+
+        public event Func<DiscordSocketClient, Task> ShardConnected;
+
+        private Task OnRoleUpdated(SocketRole roleBefore, SocketRole roleAfter)
+        {
+            return RoleUpdated(roleBefore, roleAfter);
+        }
+
+        public event Func<SocketRole, SocketRole, Task> RoleUpdated;
+
+        private Task OnRoleDeleted(SocketRole role)
+        {
+            return RoleDeleted(role);
+        }
+
+        public event Func<SocketRole, Task> RoleDeleted;
+        
+        private Task OnRoleCreated(SocketRole role)
+        {
+            return RoleCreated(role);
+        }
+
+        public event Func<SocketRole, Task> RoleCreated;
+
+        private Task OnRecipientRemoved(SocketGroupUser user)
+        {
+            return RecipientRemoved(user);
+        }
+
+        public event Func<SocketGroupUser, Task> RecipientRemoved;
+
+        private Task OnRecipientAdded(SocketGroupUser user)
+        {
+            return RecipientAdded(user);
+        }
+
+        public event Func<SocketGroupUser, Task> RecipientAdded;
+        
+        private Task OnReactionsCleared(Cacheable<IUserMessage, ulong> cacheableMessage, ISocketMessageChannel channel)
+        {
+            return ReactionsCleared(cacheableMessage, channel);
+        }
+
+        public event Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, Task> ReactionsCleared;
+
+        private Task OnReactionRemoved(Cacheable<IUserMessage, ulong> cacheableMessage, ISocketMessageChannel channel, SocketReaction reaction)
+        {
+            return ReactionRemoved(cacheableMessage, channel, reaction);
+        }
+
+        public event Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, SocketReaction, Task> ReactionRemoved;
 
         private Task OnReactionAdded(Cacheable<IUserMessage, ulong> cacheableMessage, ISocketMessageChannel channel, SocketReaction reaction)
         {
