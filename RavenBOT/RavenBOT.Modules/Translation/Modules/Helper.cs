@@ -23,7 +23,7 @@ namespace RavenBOT.Modules.Translation.Modules
             var res = await HelpService.PagedHelpAsync(Context, true, new List<string>
             {
                 "translate"
-            });
+            }, $"You can follow a video tutorial for the translation module here: https://www.youtube.com/watch?v=CjHSXNurCMQ");
 
             if (res != null)
             {
