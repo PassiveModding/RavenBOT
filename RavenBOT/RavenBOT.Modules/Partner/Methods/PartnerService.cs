@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Discord;
 using Discord.WebSocket;
 using RavenBOT.Modules.Partner.Models;
 using RavenBOT.Services;
@@ -84,7 +85,11 @@ namespace RavenBOT.Modules.Partner.Methods
                     continue;
                 }
 
-                //TODO: Check permissions before sending message.
+                ChannelPermissions? perms = receiver.Guild?.CurrentUser?.GetPermissions(receiverChannel);
+                if (perms.HasValue && !perms.Value.SendMessages)
+                {
+                    continue;
+                }
 
                 try
                 {
