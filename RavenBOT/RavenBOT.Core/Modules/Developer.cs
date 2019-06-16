@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System.Net.Http;
+using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
@@ -6,6 +8,7 @@ using Discord.WebSocket;
 using RavenBOT.Handlers;
 using RavenBOT.Models;
 using RavenBOT.Services.Database;
+using System.IO;
 
 namespace RavenBOT.Modules.Developer
 {
@@ -15,12 +18,14 @@ namespace RavenBOT.Modules.Developer
     {
         public LogHandler Logger { get; }
         public DeveloperSettings DeveloperSettings { get; }
+        public HttpClient _HttpClient { get; }
         public IDatabase Database { get; }
 
-        public Developer(LogHandler logger, IDatabase dbService, DeveloperSettings developerSettings)
+        public Developer(LogHandler logger, IDatabase dbService, DeveloperSettings developerSettings, HttpClient httpClient)
         {
             Logger = logger;
             DeveloperSettings = developerSettings;
+            _HttpClient = httpClient;
             Database = dbService;
         }
 
@@ -67,6 +72,23 @@ namespace RavenBOT.Modules.Developer
         public async Task SetGame([Remainder] string game)
         {
             await Context.Client.SetActivityAsync(new Game(game));
+        }
+
+        [Command("FileTest")]
+        public async Task FileTest()
+        {
+            if (!Context.Message.Attachments.Any())
+            {
+                await ReplyAsync("No attachments.");
+                return;
+            }
+
+            var file  = Context.Message.Attachments.FirstOrDefault();
+            var stream = await _HttpClient.GetStreamAsync(file.Url);
+            await Context.Channel.SendFileAsync(stream, file.Filename, "As Stream");
+
+            var bytes = await _HttpClient.GetByteArrayAsync(file.Url);
+            await Context.Channel.SendFileAsync(new MemoryStream(bytes), file.Filename, "As Byte Array");
         }
 
         [Command("SetLoggerChannel")]
