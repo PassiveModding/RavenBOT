@@ -13,6 +13,13 @@ namespace RavenBOT.Modules.Guild
     [Group("config")]
     public class GuildConfiguration : InteractiveBase<SocketCommandContext>
     {
+        protected override void BeforeExecute(CommandInfo info)
+        {
+            Command = info;
+        }
+
+        private CommandInfo Command;
+
         public PrefixService PrefixService { get; }
         public ModuleManagementService ModuleManager { get; }
 
@@ -39,8 +46,7 @@ namespace RavenBOT.Modules.Guild
         [Command("AddToBlacklist")]
         public async Task AddToBlacklist(string name)
         {
-            //TODO: Make this dynamically use the module name in order to remode the hardcoding of 'config.'
-            if (name.StartsWith("config", StringComparison.InvariantCultureIgnoreCase))
+            if (name.StartsWith(Command.Module.Name, StringComparison.InvariantCultureIgnoreCase))
             {
                 await ReplyAsync("It would be a bad idea to blacklist this module don't you think.");
                 return;
