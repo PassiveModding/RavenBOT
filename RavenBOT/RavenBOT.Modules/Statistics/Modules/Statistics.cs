@@ -8,7 +8,6 @@ namespace RavenBOT.Modules.Statistics.Modules
 {
     [Group("Stats")]
     [RequireOwner]
-    //TODO: Test this module
     public class Statistics : InteractiveBase<ShardedCommandContext>
     {
         public Statistics(GraphManager graphManager, DBLManager dblManager, GrafanaManager grafanaManager)

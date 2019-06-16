@@ -20,7 +20,7 @@ namespace RavenBOT.Modules.Tickets.Methods
         {
             Database = database;
             Client = client;
-            //TODO: Do not count votes while a ticket is solved or closed
+            
             Client.ReactionAdded += ReactionAdded;
             Client.ReactionRemoved += ReactionRemoved;
         }
