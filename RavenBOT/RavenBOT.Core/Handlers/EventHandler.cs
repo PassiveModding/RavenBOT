@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -155,7 +156,10 @@ namespace RavenBOT.Handlers
             ModulePrefixes = CommandService.Modules.Select(x => x.Group ?? "").Distinct().ToList();
         }
 
-        public Task RegisterModulesAsync() => CommandService.AddModulesAsync(Assembly.GetCallingAssembly(), Provider);
+        public async Task RegisterModulesAsync()
+        {           
+            await CommandService.AddModulesAsync(Assembly.GetEntryAssembly(), Provider);
+        }
 
         private Task ShardConnectedAsync(DiscordSocketClient shard)
         {
