@@ -393,7 +393,6 @@ namespace RavenBOT.Services
             var pageContents = new ConcurrentDictionary<string, List<string>>();
             var setIndex = 1;
 
-            //TODO: Handle command filters from modulemanagementservice
 
             foreach (var moduleSet in moduleSets)
             {

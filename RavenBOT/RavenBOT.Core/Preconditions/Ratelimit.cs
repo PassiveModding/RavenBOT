@@ -86,7 +86,6 @@ namespace RavenBOT.Preconditions
             noLimitForAdmins = (flags & RateLimitFlags.NoLimitForAdmins) == RateLimitFlags.NoLimitForAdmins;
             applyPerGuild = (flags & RateLimitFlags.ApplyPerGuild) == RateLimitFlags.ApplyPerGuild;
 
-            // TODO: C# 8 candidate switch expression
             switch (measure)
             {
                 case Measure.Days:
