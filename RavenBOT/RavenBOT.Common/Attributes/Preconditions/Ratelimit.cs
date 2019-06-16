@@ -5,7 +5,7 @@ using Discord;
 using Discord.Commands;
 using RavenBOT.Extensions;
 
-namespace RavenBOT.Preconditions
+namespace RavenBOT.Common.Attributes.Preconditions
 {
     /// <summary> Used to set behavior of the rate limit </summary>
     [Flags]

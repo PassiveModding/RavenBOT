@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using RavenBOT.Services.Database;
+using RavenBOT.Common.Interfaces;
 
-namespace RavenBOT.Services
+namespace RavenBOT.Common.Services
 {
     public class ModuleManagementService
     {

@@ -1,9 +1,8 @@
 using System;
 using System.Threading.Tasks;
 using Discord.Commands;
-using RavenBOT.TypeReaders.EmojiReader;
 
-namespace RavenBOT.TypeReaders.EmojiReader
+namespace RavenBOT.Core.TypeReaders.EmojiReader
 {
     public class EmojiTypeReader : TypeReader
     {

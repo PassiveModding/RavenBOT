@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using ahd.Graphite;
 
-namespace RavenBOT.Services
+namespace RavenBOT.Common
 {
     public class GraphiteService
     {

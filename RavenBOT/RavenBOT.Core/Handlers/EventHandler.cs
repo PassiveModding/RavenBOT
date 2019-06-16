@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -9,8 +8,10 @@ using Discord.Commands;
 using Discord.WebSocket;
 using RavenBOT.Extensions;
 using RavenBOT.Models;
-using RavenBOT.Services;
-using RavenBOT.TypeReaders.EmojiReader;
+using RavenBOT.Common.Handlers;
+using RavenBOT.Common.Services;
+using RavenBOT.Common.Extensions;
+using RavenBOT.Core.TypeReaders.EmojiReader;
 
 namespace RavenBOT.Handlers
 {

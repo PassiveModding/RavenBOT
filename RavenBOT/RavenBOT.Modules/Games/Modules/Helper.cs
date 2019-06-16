@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 using Discord.Addons.Interactive;
 using System.Collections.Generic;
 using Discord.Commands;
-using RavenBOT.Services;
+using RavenBOT.Common.Services;
 
 namespace RavenBOT.Modules.Games.Modules
 {

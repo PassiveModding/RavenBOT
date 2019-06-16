@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using LiteDB;
 
-namespace RavenBOT.Services.Database
+namespace RavenBOT.Common.Interfaces.Database
 {
     public class BaseEntity<T>
     {

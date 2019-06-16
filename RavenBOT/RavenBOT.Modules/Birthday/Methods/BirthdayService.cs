@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 using RavenBOT.Modules.Birthday.Models;
-using RavenBOT.Services;
-using RavenBOT.Services.Database;
+using RavenBOT.Common;
+using RavenBOT.Common.Interfaces;
+using RavenBOT.Common.Services;
 
 namespace RavenBOT.Modules.Birthday.Methods
 {

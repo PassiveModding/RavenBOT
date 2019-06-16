@@ -1,11 +1,9 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.Commands.Builders;
 
-namespace RavenBOT.Modules.Tickets
+namespace RavenBOT.Common.Bases
 {
     /// <summary>
     /// Interactive base extension which implements module prefixes without the additional space delimiter.

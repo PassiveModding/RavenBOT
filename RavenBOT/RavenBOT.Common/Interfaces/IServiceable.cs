@@ -1,4 +1,4 @@
-namespace RavenBOT.Services
+namespace RavenBOT.Common
 {
     public interface IServiceable
     {

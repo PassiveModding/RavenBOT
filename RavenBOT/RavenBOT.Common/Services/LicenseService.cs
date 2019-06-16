@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using RavenBOT.Services.Database;
+using RavenBOT.Common.Interfaces;
 
-namespace RavenBOT.Services.Licensing
+namespace RavenBOT.Common.Services
 {
     public class LicenseService
     {

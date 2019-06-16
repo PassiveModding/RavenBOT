@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Discord.Addons.Interactive;
 using Discord.Commands;
-using RavenBOT.Services;
+using RavenBOT.Common.Services;
 
 namespace RavenBOT.Modules.Tickets.Modules
 {

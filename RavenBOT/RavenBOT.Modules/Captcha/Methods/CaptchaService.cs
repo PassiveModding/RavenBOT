@@ -7,8 +7,9 @@ using CaptchaGen.NetCore;
 using Discord;
 using Discord.WebSocket;
 using RavenBOT.Modules.Captcha.Models;
-using RavenBOT.Services;
-using RavenBOT.Services.Database;
+using RavenBOT.Common;
+using RavenBOT.Common.Interfaces;
+using RavenBOT.Common.Services;
 
 namespace RavenBOT.Modules.Captcha.Methods
 {

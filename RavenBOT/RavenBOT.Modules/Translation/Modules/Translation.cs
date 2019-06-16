@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
+using RavenBOT.Common.Services;
 using RavenBOT.Extensions;
 using RavenBOT.Modules.Translation.Methods;
 using RavenBOT.Modules.Translation.Models;
-using RavenBOT.Services.Licensing;
 
 namespace RavenBOT.Modules.Translation.Modules
 {

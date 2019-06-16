@@ -1,6 +1,6 @@
 using RavenBOT.Modules.Tags.Models;
-using RavenBOT.Services;
-using RavenBOT.Services.Database;
+using RavenBOT.Common;
+using RavenBOT.Common.Interfaces;
 
 namespace RavenBOT.Modules.Tags.Methods
 {

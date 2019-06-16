@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using RavenBOT.Services;
-using RavenBOT.Services.Database;
+using RavenBOT.Common;
+using RavenBOT.Common.Interfaces;
 
 namespace RavenBOT.Models
 {

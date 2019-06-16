@@ -3,8 +3,9 @@ using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using Discord.WebSocket;
 using RavenBOT.Modules.Automessage.Models;
-using RavenBOT.Services;
-using RavenBOT.Services.Database;
+using RavenBOT.Common;
+using RavenBOT.Common.Interfaces;
+using RavenBOT.Common.Services;
 
 namespace RavenBOT.Modules.Automessage.Methods
 {

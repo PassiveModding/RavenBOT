@@ -2,9 +2,10 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Discord.WebSocket;
-using RavenBOT.Services;
-using RavenBOT.Services.Database;
+using RavenBOT.Common;
+using RavenBOT.Common.Interfaces;
 using System.Text.RegularExpressions;
+using RavenBOT.Common.Services;
 
 namespace RavenBOT.Modules.Media.Methods
 {

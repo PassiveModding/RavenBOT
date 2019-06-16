@@ -7,11 +7,11 @@ using Discord;
 using Discord.WebSocket;
 using Google.Cloud.Translation.V2;
 using RavenBOT.Extensions;
-using RavenBOT.Handlers;
 using RavenBOT.Modules.Translation.Models;
-using RavenBOT.Services;
-using RavenBOT.Services.Database;
-using RavenBOT.Services.Licensing;
+using RavenBOT.Common;
+using RavenBOT.Common.Interfaces;
+using RavenBOT.Common.Services;
+using RavenBOT.Common.Handlers;
 
 namespace RavenBOT.Modules.Translation.Methods
 {

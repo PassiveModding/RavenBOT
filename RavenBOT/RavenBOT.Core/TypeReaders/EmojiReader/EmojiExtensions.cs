@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using Discord;
 
-namespace RavenBOT.TypeReaders.EmojiReader
+namespace RavenBOT.Core.TypeReaders.EmojiReader
 {
     public static class EmojiExtensions
     {

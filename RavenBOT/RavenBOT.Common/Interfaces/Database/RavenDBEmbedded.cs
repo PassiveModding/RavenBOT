@@ -2,15 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.Versioning;
-using System.Security.Cryptography.X509Certificates;
 using Newtonsoft.Json;
-using Raven;
 using Raven.Client.Documents;
 using Raven.Embedded;
 
-namespace RavenBOT.Services.Database
+namespace RavenBOT.Common.Interfaces.Database
 {
     public class RavenDBEmbedded : IDatabase
     {

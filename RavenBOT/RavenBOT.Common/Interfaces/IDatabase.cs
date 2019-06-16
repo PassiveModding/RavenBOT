@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace RavenBOT.Services.Database
+namespace RavenBOT.Common.Interfaces
 {
     public interface IDatabase
     {

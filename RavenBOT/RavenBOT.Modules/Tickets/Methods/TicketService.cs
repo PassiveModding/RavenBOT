@@ -6,8 +6,8 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using RavenBOT.Modules.Tickets.Models;
-using RavenBOT.Services;
-using RavenBOT.Services.Database;
+using RavenBOT.Common;
+using RavenBOT.Common.Interfaces;
 
 namespace RavenBOT.Modules.Tickets.Methods
 {

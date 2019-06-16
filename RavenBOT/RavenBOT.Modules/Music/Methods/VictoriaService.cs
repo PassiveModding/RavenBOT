@@ -10,9 +10,9 @@ using Discord.WebSocket;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using RavenBOT.Handlers;
-using RavenBOT.Services;
-using RavenBOT.Services.Database;
+using RavenBOT.Common;
+using RavenBOT.Common.Handlers;
+using RavenBOT.Common.Interfaces;
 using Victoria;
 using Victoria.Entities;
 

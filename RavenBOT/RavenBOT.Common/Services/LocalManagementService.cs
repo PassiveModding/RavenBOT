@@ -6,7 +6,7 @@ using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace RavenBOT.Services
+namespace RavenBOT.Common.Services
 {
     public class LocalManagementService
     {

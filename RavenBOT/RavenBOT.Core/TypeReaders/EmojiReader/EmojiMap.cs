@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace RavenBOT.TypeReaders.EmojiReader
+namespace RavenBOT.Core.TypeReaders.EmojiReader
 {
     public class EmojiMap
     {

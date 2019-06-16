@@ -1,6 +1,6 @@
 using Discord.Commands;
 
-namespace RavenBOT.Extensions
+namespace RavenBOT.Common.Extensions
 {
     public static class CommandExtensions
     {

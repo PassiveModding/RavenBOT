@@ -8,7 +8,7 @@ using Raven.Client.Documents;
 using Raven.Client.ServerWide;
 using Raven.Client.ServerWide.Operations;
 
-namespace RavenBOT.Services.Database
+namespace RavenBOT.Common.Interfaces.Database
 {
     public class RavenDatabase : IDatabase
     {

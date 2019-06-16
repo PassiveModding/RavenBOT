@@ -7,12 +7,13 @@ using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
-using RavenBOT.Handlers;
 using RavenBOT.Models;
-using RavenBOT.Services;
-using RavenBOT.Services.Database;
-using RavenBOT.Services.Licensing;
+using RavenBOT.Common;
+using RavenBOT.Common.Interfaces;
+using RavenBOT.Common.Interfaces.Database;
 using EventHandler = RavenBOT.Handlers.EventHandler;
+using RavenBOT.Common.Services;
+using RavenBOT.Common.Handlers;
 
 namespace RavenBOT
 {

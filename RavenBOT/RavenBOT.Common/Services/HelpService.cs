@@ -1,17 +1,16 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
+using RavenBOT.Common.Extensions;
 using RavenBOT.Extensions;
 using RavenBOT.Models;
 
-namespace RavenBOT.Services
+namespace RavenBOT.Common.Services
 {
     public class HelpService
     {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using RavenBOT.Services.Database;
+using RavenBOT.Common.Interfaces;
 
-namespace RavenBOT.Services
+namespace RavenBOT.Common.Services
 {
     public class PrefixService
     {

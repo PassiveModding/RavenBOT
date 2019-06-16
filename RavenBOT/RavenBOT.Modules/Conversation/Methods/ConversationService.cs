@@ -4,10 +4,11 @@ using Discord.WebSocket;
 using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Dialogflow.V2;
 using Grpc.Auth;
-using RavenBOT.Handlers;
 using RavenBOT.Modules.Conversation.Models;
-using RavenBOT.Services;
-using RavenBOT.Services.Database;
+using RavenBOT.Common;
+using RavenBOT.Common.Interfaces;
+using RavenBOT.Common.Handlers;
+using RavenBOT.Common.Services;
 
 namespace RavenBOT.Modules.Conversation.Methods
 {

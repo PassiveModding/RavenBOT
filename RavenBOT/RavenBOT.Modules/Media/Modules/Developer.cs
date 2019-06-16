@@ -3,7 +3,7 @@ using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using RavenBOT.Modules.Media.Methods;
-using RavenBOT.Services.Database;
+using RavenBOT.Common.Interfaces;
 
 namespace RavenBOT.Modules.Media.Modules
 {

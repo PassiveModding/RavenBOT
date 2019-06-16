@@ -6,8 +6,9 @@ using Discord;
 using Discord.WebSocket;
 using RavenBOT.Extensions;
 using RavenBOT.Modules.Reminders.Models;
-using RavenBOT.Services;
-using RavenBOT.Services.Database;
+using RavenBOT.Common;
+using RavenBOT.Common.Interfaces;
+using RavenBOT.Common.Services;
 
 namespace RavenBOT.Modules.Reminders.Methods
 {
