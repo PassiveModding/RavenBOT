@@ -291,8 +291,8 @@ namespace RavenBOT.Modules.Events.Methods
                 return Task.CompletedTask;
             }
 
-            var config = GetConfig(userBefore.Guild.Id);
-            if (!config.Enabled || config.ChannelId == 0 || !config.UserUpdated)
+            var config = TryGetConfig(userBefore.Guild.Id);
+            if (config == null || !config.Enabled || config.ChannelId == 0 || !config.UserUpdated)
             {
                 return Task.CompletedTask;
             }
@@ -305,8 +305,8 @@ namespace RavenBOT.Modules.Events.Methods
         {
             UserLeft++;
 
-            var config = GetConfig(user.Guild.Id);
-            if (!config.Enabled || config.ChannelId == 0 || !config.UserLeft)
+            var config = TryGetConfig(user.Guild.Id);
+            if (config == null || !config.Enabled || config.ChannelId == 0 || !config.UserLeft)
             {
                 return Task.CompletedTask;
             }
@@ -321,8 +321,8 @@ namespace RavenBOT.Modules.Events.Methods
         private Task Client_UserJoined(SocketGuildUser user)
         {
             UserJoined++;
-            var config = GetConfig(user.Guild.Id);
-            if (!config.Enabled || config.ChannelId == 0 || !config.UserJoined)
+            var config = TryGetConfig(user.Guild.Id);
+            if (config == null || !config.Enabled || config.ChannelId == 0 || !config.UserJoined)
             {
                 return Task.CompletedTask;
             }
@@ -340,8 +340,8 @@ namespace RavenBOT.Modules.Events.Methods
             MessageUpdated++;
             if (messageChannel is SocketGuildChannel gChannel)
             {
-                var config = GetConfig(gChannel.Guild.Id);
-                if (!config.Enabled || config.ChannelId == 0 || !config.MessageUpdated)
+                var config = TryGetConfig(gChannel.Guild.Id);
+                if (config == null || !config.Enabled || config.ChannelId == 0 || !config.MessageUpdated)
                 {
                     return Task.CompletedTask;
                 }
@@ -352,7 +352,6 @@ namespace RavenBOT.Modules.Events.Methods
                     return Task.CompletedTask;
                 }
 
-                //TODO: Embeds although the only instances where embeds would be updated would be from bots, which are being ignored above.
                 if (messageOldCache.HasValue)
                 {
                     var oldMessage = messageOldCache.Value.Content;
@@ -379,8 +378,8 @@ namespace RavenBOT.Modules.Events.Methods
             MessageDeleted++;
             if (messageChannel is SocketGuildChannel gChannel)
             {
-                var config = GetConfig(gChannel.Guild.Id);
-                if (!config.Enabled || config.ChannelId == 0 || !config.MessageDeleted)
+                var config = TryGetConfig(gChannel.Guild.Id);
+                if (config == null || !config.Enabled || config.ChannelId == 0 || !config.MessageDeleted)
                 {
                     return Task.CompletedTask;
                 }
@@ -409,8 +408,8 @@ namespace RavenBOT.Modules.Events.Methods
             ChannelUpdated++;
             if (channelBefore is SocketGuildChannel gChannel)
             {
-                var config = GetConfig(gChannel.Guild.Id);
-                if (!config.Enabled || config.ChannelId == 0 || !config.ChannelUpdated)
+                var config = TryGetConfig(gChannel.Guild.Id);
+                if (config == null || !config.Enabled || config.ChannelId == 0 || !config.ChannelUpdated)
                 {
                     return Task.CompletedTask;
                 }
@@ -474,8 +473,8 @@ namespace RavenBOT.Modules.Events.Methods
             ChannelDestroyed++;
             if (channel is SocketGuildChannel gChannel)
             {
-                var config = GetConfig(gChannel.Guild.Id);
-                if (!config.Enabled || config.ChannelId == 0 || !config.ChannelDeleted)
+                var config = TryGetConfig(gChannel.Guild.Id);
+                if (config == null || !config.Enabled || config.ChannelId == 0 || !config.ChannelDeleted)
                 {
                     return Task.CompletedTask;
                 }
@@ -509,8 +508,8 @@ namespace RavenBOT.Modules.Events.Methods
 
             if (channel is SocketGuildChannel gChannel)
             {
-                var config = GetConfig(gChannel.Guild.Id);
-                if (!config.Enabled || config.ChannelId == 0 || !config.ChannelCreated)
+                var config = TryGetConfig(gChannel.Guild.Id);
+                if (config == null || !config.Enabled || config.ChannelId == 0 || !config.ChannelCreated)
                 {
                     return Task.CompletedTask;
                 }
@@ -591,18 +590,20 @@ namespace RavenBOT.Modules.Events.Methods
             EventQueue.Add(new EventClass(config.GuildId, config, title, content, type, color));
         }
 
-        //TODO: Split into tryget and getorcreate
-        public EventConfig GetConfig(ulong guildId)
+        public EventConfig GetOrCreateConfig(ulong guildId)
         {
-            var config = Database.Load<EventConfig>(EventConfig.DocumentName(guildId));
-
+            var config = TryGetConfig(guildId);
             if (config == null)
             {
                 config = new EventConfig(guildId);
-                Database.Store(config, EventConfig.DocumentName(guildId));
+                SaveConfig(config);
             }
 
             return config;
+        }
+        public EventConfig TryGetConfig(ulong guildId)
+        {
+            return Database.Load<EventConfig>(EventConfig.DocumentName(guildId));
         }
 
         public void SaveConfig(EventConfig config)
