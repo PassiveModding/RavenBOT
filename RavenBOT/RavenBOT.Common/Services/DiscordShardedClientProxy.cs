@@ -1,4 +1,6 @@
+using System.Linq;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
@@ -7,15 +9,16 @@ namespace RavenBOT.Common.Services
 {
     public class DiscordShardedClientProxy
     {
+
         public DiscordShardedClientProxy(DiscordShardedClient client)
         {
             Client = client;
-            Client.ChannelCreated += OnChannelCreated;  
+            Client.ChannelCreated += OnChannelCreated;
             Client.ChannelDestroyed += OnChannelDestroyed;
             Client.ChannelUpdated += OnChannelUpdated;
             Client.CurrentUserUpdated += OnCurrentUserUpdated;
             Client.GuildAvailable += OnGuildAvailable;
-            Client.GuildMemberUpdated += OnGuildMemberUpdated; 
+            Client.GuildMemberUpdated += OnGuildMemberUpdated;
             Client.GuildMembersDownloaded += OnGuildMembersDownloaded;
             Client.GuildUnavailable += OnGuildUnavailable;
             Client.GuildUpdated += OnGuildUpdated;
@@ -49,267 +52,363 @@ namespace RavenBOT.Common.Services
             Client.VoiceServerUpdated += OnVoiceServerUpdated;
         }
 
-        //TODO: Expose method of adding certain functions to run prior to each task.
+        public List<(ClientEventType[], Func<Task<bool>>)> PreEventFunctions { get; set; } = new List<(ClientEventType[], Func<Task<bool>>)>();
 
-        private Task OnVoiceServerUpdated(SocketVoiceServer server)
+        public enum ClientEventType
         {
-            return VoiceServerUpdated(server);
+            ChannelCreated,
+            ChannelDestroyed,
+            ChannelUpdated,
+            CurrentUserUpdated,
+            GuildAvailable,
+            GuildMemberUpdated,
+            GuildMembersDownloaded,
+            GuildUnavailable,
+            GuildUpdated,
+            JoinedGuild,
+            LeftGuild,
+            Log,
+            LoggedIn,
+            LoggedOut,
+            MessageDeleted,
+            MessageReceived,
+            MessageUpdated,
+            ReactionAdded,
+            ReactionRemoved,
+            ReactionsCleared,
+            RecipientAdded,
+            RecipientRemoved,
+            RoleCreated,
+            RoleDeleted,
+            RoleUpdated,
+            ShardConnected,
+            ShardDisconnected,
+            ShardLatencyUpdated,
+            ShardReady,
+            UserBanned,
+            UserIsTyping,
+            UserJoined,
+            UserLeft,
+            UserUnbanned,
+            UserUpdated,
+            UserVoiceStateUpdated,
+            VoiceServerUpdated,
+        }
+
+        /// <summary>
+        /// Checks the result of all pore-event tasks.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns>True if any event returned true</returns>
+        private async Task<bool> GetPreEventTaskResult(ClientEventType type)
+        {
+            var result = false;
+            foreach (var func in PreEventFunctions.Where(x => x.Item1.Contains(type)))
+            {
+                var funcResult = await func.Item2.Invoke();
+                if (funcResult == true)
+                {
+                    result = true;
+                }
+            }
+
+            return result;
+        }
+
+        private async Task OnVoiceServerUpdated(SocketVoiceServer server)
+        {
+            if (await GetPreEventTaskResult(ClientEventType.VoiceServerUpdated)) return;
+            await VoiceServerUpdated(server);
         }
 
         public event Func<SocketVoiceServer, Task> VoiceServerUpdated;
 
-        private Task OnUserVoiceStateUpdated(SocketUser user, SocketVoiceState voiceBefore, SocketVoiceState voiceAfter)
+        private async Task OnUserVoiceStateUpdated(SocketUser user, SocketVoiceState voiceBefore, SocketVoiceState voiceAfter)
         {
-            return UserVoiceStateUpdated(user, voiceBefore, voiceAfter);
+            if (await GetPreEventTaskResult(ClientEventType.UserVoiceStateUpdated)) return;
+            await UserVoiceStateUpdated(user, voiceBefore, voiceAfter);
         }
 
         public event Func<SocketUser, SocketVoiceState, SocketVoiceState, Task> UserVoiceStateUpdated;
 
-        private Task OnUserUpdated(SocketUser userBefore, SocketUser userAfter)
+        private async Task OnUserUpdated(SocketUser userBefore, SocketUser userAfter)
         {
-            return UserUpdated(userBefore, userAfter);
+            if (await GetPreEventTaskResult(ClientEventType.UserUpdated)) return;
+            await UserUpdated(userBefore, userAfter);
         }
 
         public event Func<SocketUser, SocketUser, Task> UserUpdated;
 
-        private Task OnUserLeft(SocketGuildUser user)
+        private async Task OnUserLeft(SocketGuildUser user)
         {
-            return UserLeft(user);
+            if (await GetPreEventTaskResult(ClientEventType.UserLeft)) return;
+            await UserLeft(user);
         }
 
         public event Func<SocketUser, Task> UserLeft;
 
-        private Task OnUserJoined(SocketGuildUser user)
+        private async Task OnUserJoined(SocketGuildUser user)
         {
-            return UserJoined(user);
+            if (await GetPreEventTaskResult(ClientEventType.UserJoined)) return;
+            await UserJoined(user);
         }
 
         public event Func<SocketUser, Task> UserJoined;
 
-        private Task OnUserIsTyping(SocketUser user, ISocketMessageChannel channel)
+        private async Task OnUserIsTyping(SocketUser user, ISocketMessageChannel channel)
         {
-            return UserIsTyping(user, channel);
+            if (await GetPreEventTaskResult(ClientEventType.UserIsTyping)) return;
+            await UserIsTyping(user, channel);
         }
 
         public event Func<SocketUser, ISocketMessageChannel, Task> UserIsTyping;
 
-        private Task OnUserUnbanned(SocketUser user, SocketGuild guild)
+        private async Task OnUserUnbanned(SocketUser user, SocketGuild guild)
         {
-            return UserUnbanned(user, guild);
+            if (await GetPreEventTaskResult(ClientEventType.UserUnbanned)) return;
+            await UserUnbanned(user, guild);
         }
 
         public event Func<SocketUser, SocketGuild, Task> UserUnbanned;
 
-        private Task OnUserBanned(SocketUser user, SocketGuild guild)
+        private async Task OnUserBanned(SocketUser user, SocketGuild guild)
         {
-            return UserBanned(user, guild);
+            if (await GetPreEventTaskResult(ClientEventType.UserBanned)) return;
+            await UserBanned(user, guild);
         }
 
         public event Func<SocketUser, SocketGuild, Task> UserBanned;
 
-        private Task OnShardReady(DiscordSocketClient client)
+        private async Task OnShardReady(DiscordSocketClient client)
         {
-            return ShardReady(client);
+            if (await GetPreEventTaskResult(ClientEventType.ShardReady)) return;
+            await ShardReady(client);
         }
 
         public event Func<DiscordSocketClient, Task> ShardReady;
 
-        private Task OnShardLatencyUpdated(int before, int after, DiscordSocketClient client)
+        private async Task OnShardLatencyUpdated(int before, int after, DiscordSocketClient client)
         {
-            return ShardLatencyUpdated(before, after, client);
+            if (await GetPreEventTaskResult(ClientEventType.ShardLatencyUpdated)) return;
+            await ShardLatencyUpdated(before, after, client);
         }
 
         public event Func<int, int, DiscordSocketClient, Task> ShardLatencyUpdated;
 
-        private Task OnShardDisconnected(Exception exception, DiscordSocketClient client)
+        private async Task OnShardDisconnected(Exception exception, DiscordSocketClient client)
         {
-            return ShardDisconnected(exception, client);
+            if (await GetPreEventTaskResult(ClientEventType.ShardDisconnected)) return;
+            await ShardDisconnected(exception, client);
         }
 
         public event Func<Exception, DiscordSocketClient, Task> ShardDisconnected;
 
-        private Task OnShardConnected(DiscordSocketClient client)
+        private async Task OnShardConnected(DiscordSocketClient client)
         {
-            return ShardConnected(client);
+            if (await GetPreEventTaskResult(ClientEventType.ShardConnected)) return;
+            await ShardConnected(client);
         }
 
         public event Func<DiscordSocketClient, Task> ShardConnected;
 
-        private Task OnRoleUpdated(SocketRole roleBefore, SocketRole roleAfter)
+        private async Task OnRoleUpdated(SocketRole roleBefore, SocketRole roleAfter)
         {
-            return RoleUpdated(roleBefore, roleAfter);
+            if (await GetPreEventTaskResult(ClientEventType.RoleUpdated)) return;
+            await RoleUpdated(roleBefore, roleAfter);
         }
 
         public event Func<SocketRole, SocketRole, Task> RoleUpdated;
 
-        private Task OnRoleDeleted(SocketRole role)
+        private async Task OnRoleDeleted(SocketRole role)
         {
-            return RoleDeleted(role);
+            if (await GetPreEventTaskResult(ClientEventType.RoleDeleted)) return;
+            await RoleDeleted(role);
         }
 
         public event Func<SocketRole, Task> RoleDeleted;
-        
-        private Task OnRoleCreated(SocketRole role)
+
+        private async Task OnRoleCreated(SocketRole role)
         {
-            return RoleCreated(role);
+            if (await GetPreEventTaskResult(ClientEventType.RoleCreated)) return;
+            await RoleCreated(role);
         }
 
         public event Func<SocketRole, Task> RoleCreated;
 
-        private Task OnRecipientRemoved(SocketGroupUser user)
+        private async Task OnRecipientRemoved(SocketGroupUser user)
         {
-            return RecipientRemoved(user);
+            if (await GetPreEventTaskResult(ClientEventType.RecipientRemoved)) return;
+            await RecipientRemoved(user);
         }
 
         public event Func<SocketGroupUser, Task> RecipientRemoved;
 
-        private Task OnRecipientAdded(SocketGroupUser user)
+        private async Task OnRecipientAdded(SocketGroupUser user)
         {
-            return RecipientAdded(user);
+            if (await GetPreEventTaskResult(ClientEventType.RecipientAdded)) return;
+            await RecipientAdded(user);
         }
 
         public event Func<SocketGroupUser, Task> RecipientAdded;
-        
-        private Task OnReactionsCleared(Cacheable<IUserMessage, ulong> cacheableMessage, ISocketMessageChannel channel)
+
+        private async Task OnReactionsCleared(Cacheable<IUserMessage, ulong> cacheableMessage, ISocketMessageChannel channel)
         {
-            return ReactionsCleared(cacheableMessage, channel);
+            if (await GetPreEventTaskResult(ClientEventType.ReactionsCleared)) return;
+            await ReactionsCleared(cacheableMessage, channel);
         }
 
         public event Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, Task> ReactionsCleared;
 
-        private Task OnReactionRemoved(Cacheable<IUserMessage, ulong> cacheableMessage, ISocketMessageChannel channel, SocketReaction reaction)
+        private async Task OnReactionRemoved(Cacheable<IUserMessage, ulong> cacheableMessage, ISocketMessageChannel channel, SocketReaction reaction)
         {
-            return ReactionRemoved(cacheableMessage, channel, reaction);
+            if (await GetPreEventTaskResult(ClientEventType.ReactionRemoved)) return;
+            await ReactionRemoved(cacheableMessage, channel, reaction);
         }
 
         public event Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, SocketReaction, Task> ReactionRemoved;
 
-        private Task OnReactionAdded(Cacheable<IUserMessage, ulong> cacheableMessage, ISocketMessageChannel channel, SocketReaction reaction)
+        private async Task OnReactionAdded(Cacheable<IUserMessage, ulong> cacheableMessage, ISocketMessageChannel channel, SocketReaction reaction)
         {
-            return ReactionAdded(cacheableMessage, channel, reaction);
+            if (await GetPreEventTaskResult(ClientEventType.ReactionAdded)) return;
+            await ReactionAdded(cacheableMessage, channel, reaction);
         }
 
         public event Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, SocketReaction, Task> ReactionAdded;
 
-        private Task OnMessageUpdated(Cacheable<IMessage, ulong> cacheableBefore, SocketMessage message, ISocketMessageChannel channel)
+        private async Task OnMessageUpdated(Cacheable<IMessage, ulong> cacheableBefore, SocketMessage message, ISocketMessageChannel channel)
         {
-            return MessageUpdated(cacheableBefore, message, channel);
+            if (await GetPreEventTaskResult(ClientEventType.MessageUpdated)) return;
+            await MessageUpdated(cacheableBefore, message, channel);
         }
 
         public event Func<Cacheable<IMessage, ulong>, SocketMessage, ISocketMessageChannel, Task> MessageUpdated;
 
-        private Task OnMessageReceived(SocketMessage message)
+        private async Task OnMessageReceived(SocketMessage message)
         {
-            return MessageReceived(message);
+            if (await GetPreEventTaskResult(ClientEventType.MessageReceived)) return;
+            await MessageReceived(message);
         }
 
         public event Func<SocketMessage, Task> MessageReceived;
-        
-        private Task OnMessageDeleted(Cacheable<IMessage, ulong> message, ISocketMessageChannel channel)
+
+        private async Task OnMessageDeleted(Cacheable<IMessage, ulong> message, ISocketMessageChannel channel)
         {
-            return MessageDeleted(message, channel);
+            if (await GetPreEventTaskResult(ClientEventType.MessageDeleted)) return;
+            await MessageDeleted(message, channel);
         }
 
         public event Func<Cacheable<IMessage, ulong>, ISocketMessageChannel, Task> MessageDeleted;
-        
-        private Task OnLoggedOut()
+
+        private async Task OnLoggedOut()
         {
-            return LoggedOut();
+            if (await GetPreEventTaskResult(ClientEventType.LoggedOut)) return;
+            await LoggedOut();
         }
 
         public event Func<Task> LoggedOut;
 
-        private Task OnLoggedIn()
+        private async Task OnLoggedIn()
         {
-            return LoggedIn();
+            if (await GetPreEventTaskResult(ClientEventType.LoggedIn)) return;
+            await LoggedIn();
         }
 
         public event Func<Task> LoggedIn;
 
-
-        private Task OnLog(LogMessage message)
+        private async Task OnLog(LogMessage message)
         {
-            return Log(message);
+            if (await GetPreEventTaskResult(ClientEventType.Log)) return;
+            await Log(message);
         }
 
         public event Func<LogMessage, Task> Log;
 
-
-        private Task OnLeftGuild(SocketGuild guild)
+        private async Task OnLeftGuild(SocketGuild guild)
         {
-            return LeftGuild(guild);
+            if (await GetPreEventTaskResult(ClientEventType.LeftGuild)) return;
+            await LeftGuild(guild);
         }
 
         public event Func<SocketGuild, Task> LeftGuild;
 
-        private Task OnJoinedGuild(SocketGuild guild)
+        private async Task OnJoinedGuild(SocketGuild guild)
         {
-            return JoinedGuild(guild);
+            if (await GetPreEventTaskResult(ClientEventType.JoinedGuild)) return;
+            await JoinedGuild(guild);
         }
 
         public event Func<SocketGuild, Task> JoinedGuild;
 
         public DiscordShardedClient Client { get; }
 
-        private Task OnGuildUpdated(SocketGuild guildBefore, SocketGuild guildAfter)
+        private async Task OnGuildUpdated(SocketGuild guildBefore, SocketGuild guildAfter)
         {
-            return GuildUpdated(guildBefore, guildAfter);
+            if (await GetPreEventTaskResult(ClientEventType.GuildUpdated)) return;
+            await GuildUpdated(guildBefore, guildAfter);
         }
 
         public event Func<SocketGuild, SocketGuild, Task> GuildUpdated;
 
-        private Task OnGuildUnavailable(SocketGuild guild)
+        private async Task OnGuildUnavailable(SocketGuild guild)
         {
-            return GuildUnavailable(guild);
+            if (await GetPreEventTaskResult(ClientEventType.GuildUnavailable)) return;
+            await GuildUnavailable(guild);
         }
 
         public event Func<SocketGuild, Task> GuildUnavailable;
 
-        private Task OnGuildMembersDownloaded(SocketGuild guild)
+        private async Task OnGuildMembersDownloaded(SocketGuild guild)
         {
-            return GuildMembersDownloaded(guild);
+            if (await GetPreEventTaskResult(ClientEventType.GuildMembersDownloaded)) return;
+            await GuildMembersDownloaded(guild);
         }
 
         public event Func<SocketGuild, Task> GuildMembersDownloaded;
 
-        private Task OnGuildMemberUpdated(SocketGuildUser userBefore, SocketGuildUser userAfter)
+        private async Task OnGuildMemberUpdated(SocketGuildUser userBefore, SocketGuildUser userAfter)
         {
-            return GuildMemberUpdated(userBefore, userAfter);
+            if (await GetPreEventTaskResult(ClientEventType.GuildMemberUpdated)) return;
+            await GuildMemberUpdated(userBefore, userAfter);
         }
 
         public event Func<SocketGuildUser, SocketGuildUser, Task> GuildMemberUpdated;
 
-        private Task OnGuildAvailable(SocketGuild guild)
+        private async Task OnGuildAvailable(SocketGuild guild)
         {
-            return GuildAvailable(guild);
+            if (await GetPreEventTaskResult(ClientEventType.GuildAvailable)) return;
+            await GuildAvailable(guild);
         }
 
         public event Func<SocketGuild, Task> GuildAvailable;
 
-        private Task OnCurrentUserUpdated(SocketSelfUser userBefore, SocketSelfUser userAfter)
+        private async Task OnCurrentUserUpdated(SocketSelfUser userBefore, SocketSelfUser userAfter)
         {
-            return CurrentUserUpdated(userBefore, userAfter);
+            if (await GetPreEventTaskResult(ClientEventType.CurrentUserUpdated)) return;
+            await CurrentUserUpdated(userBefore, userAfter);
         }
 
         public event Func<SocketSelfUser, SocketSelfUser, Task> CurrentUserUpdated;
 
-        private Task OnChannelCreated(SocketChannel channel)
+        private async Task OnChannelCreated(SocketChannel channel)
         {
-            return ChannelCreated(channel);
+            if (await GetPreEventTaskResult(ClientEventType.ChannelCreated)) return;
+            await ChannelCreated(channel);
         }
 
         public event Func<SocketChannel, Task> ChannelCreated;
 
-        private Task OnChannelDestroyed(SocketChannel channel)
+        private async Task OnChannelDestroyed(SocketChannel channel)
         {
-            return ChannelDestroyed(channel);
+            if (await GetPreEventTaskResult(ClientEventType.ChannelDestroyed)) return;
+            await ChannelDestroyed(channel);
         }
 
         public event Func<SocketChannel, Task> ChannelDestroyed;
-                
-        private Task OnChannelUpdated(SocketChannel channelBefore, SocketChannel channelAfter)
+
+        private async Task OnChannelUpdated(SocketChannel channelBefore, SocketChannel channelAfter)
         {
-            return ChannelUpdated(channelBefore, channelAfter);
+            if (await GetPreEventTaskResult(ClientEventType.ChannelUpdated)) return;
+            await ChannelUpdated(channelBefore, channelAfter);
         }
 
         public event Func<SocketChannel, SocketChannel, Task> ChannelUpdated;
