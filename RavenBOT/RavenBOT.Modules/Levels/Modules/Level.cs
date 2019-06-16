@@ -334,8 +334,6 @@ namespace RavenBOT.Modules.Levels.Modules
             };
 
             await ReplyAsync("", false, embed.Build());
-
-            //TODO: Rank
         }
 
         [Command("Rewards")]
@@ -378,8 +376,6 @@ namespace RavenBOT.Modules.Levels.Modules
                     Description = string.Join("\n", responses).FixLength(2047),
                     Color = Color.Blue
             }.Build());
-
-            //TODO: Rank
         }
 
         [Command("Leaderboard")]
