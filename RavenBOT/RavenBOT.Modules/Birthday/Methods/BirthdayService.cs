@@ -14,13 +14,6 @@ namespace RavenBOT.Modules.Birthday.Methods
 {
     public class BirthdayService : IServiceable
     {
-        public BirthdayService(DiscordShardedClient client, IDatabase database, Timer timer)
-        {
-            this.Client = client;
-            this.Database = database;
-            this.Timer = timer;
-
-        }
         public DiscordShardedClient Client { get; }
         public IDatabase Database { get; }
         public LocalManagementService LocalManagementService { get; }
