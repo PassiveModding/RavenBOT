@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace RavenBOT.Modules.ELO.Models
+namespace ELO.Models
 {
     public class GameResult
     {

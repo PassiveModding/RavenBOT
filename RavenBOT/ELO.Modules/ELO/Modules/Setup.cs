@@ -3,15 +3,14 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
+using ELO.Methods;
+using ELO.Models;
 using RavenBOT.Extensions;
-using RavenBOT.Modules.ELO.Methods;
-using RavenBOT.Modules.ELO.Models;
 
-namespace RavenBOT.Modules.ELO.Modules
+namespace ELO.Modules
 {
     [RequireContext(ContextType.Guild)]
     [RequireUserPermission(GuildPermission.Administrator)]
-    [Group("elo")]
     public class Setup : InteractiveBase<ShardedCommandContext>
     {
         public Setup(ELOService service)

@@ -1,10 +1,10 @@
 using System.Linq;
 using Discord.WebSocket;
-using RavenBOT.Modules.ELO.Models;
-using RavenBOT.Services;
-using RavenBOT.Services.Database;
+using ELO.Models;
+using RavenBOT.Common;
+using RavenBOT.Common.Interfaces;
 
-namespace RavenBOT.Modules.ELO.Methods
+namespace ELO.Methods
 {
     public partial class ELOService : IServiceable
     {

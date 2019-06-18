@@ -2,12 +2,11 @@ using System.Threading.Tasks;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
-using RavenBOT.Modules.ELO.Methods;
+using ELO.Methods;
 
-namespace RavenBOT.Modules.ELO.Modules
+namespace ELO.Modules
 {
     [RequireContext(ContextType.Guild)]
-    [Group("elo")]
     public class Info : InteractiveBase<ShardedCommandContext>
     {
         public Info(ELOService service)

@@ -2,10 +2,10 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord.WebSocket;
+using ELO.Models;
 using RavenBOT.Extensions;
-using RavenBOT.Modules.ELO.Models;
 
-namespace RavenBOT.Modules.ELO.Methods
+namespace ELO.Methods
 {
     public partial class ELOService
     {
