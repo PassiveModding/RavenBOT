@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
@@ -75,10 +75,10 @@ namespace RavenBOT.Modules.AutoMod.Modules
             config.BlockMassMentions = !config.BlockMassMentions;
             ModerationService.SaveModerationConfig(config);
             await ReplyAsync("Mass Mention Config: \n" +
-                             $"Block Mass Mentions: {config.BlockMassMentions}\n" +
-                             $"Channels Count: {config.MassMentionsIncludeChannels}\n" +
-                             $"Users Count: {config.MassMentionsIncludeUsers}\n" +
-                             $"Roles Count: {config.MassMentionsIncludeRoles}");
+                $"Block Mass Mentions: {config.BlockMassMentions}\n" +
+                $"Channels Count: {config.MassMentionsIncludeChannels}\n" +
+                $"Users Count: {config.MassMentionsIncludeUsers}\n" +
+                $"Roles Count: {config.MassMentionsIncludeRoles}");
         }
 
         [Command("MassMentionRoles")]
@@ -89,10 +89,10 @@ namespace RavenBOT.Modules.AutoMod.Modules
             config.MassMentionsIncludeRoles = !config.MassMentionsIncludeRoles;
             ModerationService.SaveModerationConfig(config);
             await ReplyAsync("Mass Mention Config: \n" +
-                             $"Block Mass Mentions: {config.BlockMassMentions}\n" +
-                             $"Channels Count: {config.MassMentionsIncludeChannels}\n" +
-                             $"Users Count: {config.MassMentionsIncludeUsers}\n" +
-                             $"Roles Count: {config.MassMentionsIncludeRoles}");
+                $"Block Mass Mentions: {config.BlockMassMentions}\n" +
+                $"Channels Count: {config.MassMentionsIncludeChannels}\n" +
+                $"Users Count: {config.MassMentionsIncludeUsers}\n" +
+                $"Roles Count: {config.MassMentionsIncludeRoles}");
         }
 
         [Command("MassMentionUsers")]
@@ -103,10 +103,10 @@ namespace RavenBOT.Modules.AutoMod.Modules
             config.MassMentionsIncludeUsers = !config.MassMentionsIncludeUsers;
             ModerationService.SaveModerationConfig(config);
             await ReplyAsync("Mass Mention Config: \n" +
-                             $"Block Mass Mentions: {config.BlockMassMentions}\n" +
-                             $"Channels Count: {config.MassMentionsIncludeChannels}\n" +
-                             $"Users Count: {config.MassMentionsIncludeUsers}\n" +
-                             $"Roles Count: {config.MassMentionsIncludeRoles}");
+                $"Block Mass Mentions: {config.BlockMassMentions}\n" +
+                $"Channels Count: {config.MassMentionsIncludeChannels}\n" +
+                $"Users Count: {config.MassMentionsIncludeUsers}\n" +
+                $"Roles Count: {config.MassMentionsIncludeRoles}");
         }
 
         [Command("MassMentionChannels")]
@@ -117,10 +117,10 @@ namespace RavenBOT.Modules.AutoMod.Modules
             config.MassMentionsIncludeChannels = !config.MassMentionsIncludeChannels;
             ModerationService.SaveModerationConfig(config);
             await ReplyAsync("Mass Mention Config: \n" +
-                             $"Block Mass Mentions: {config.BlockMassMentions}\n" +
-                             $"Channels Count: {config.MassMentionsIncludeChannels}\n" +
-                             $"Users Count: {config.MassMentionsIncludeUsers}\n" +
-                             $"Roles Count: {config.MassMentionsIncludeRoles}");
+                $"Block Mass Mentions: {config.BlockMassMentions}\n" +
+                $"Channels Count: {config.MassMentionsIncludeChannels}\n" +
+                $"Users Count: {config.MassMentionsIncludeUsers}\n" +
+                $"Roles Count: {config.MassMentionsIncludeRoles}");
         }
 
         [Command("BlockInvites")]
@@ -155,7 +155,7 @@ namespace RavenBOT.Modules.AutoMod.Modules
 
         [Command("Blacklist Add")]
         [Summary("Adds a word or message to the blacklist")]
-        public async Task BlacklistAdd([Remainder]string message)
+        public async Task BlacklistAdd([Remainder] string message)
         {
             if (message.Length < 3)
             {
@@ -167,43 +167,42 @@ namespace RavenBOT.Modules.AutoMod.Modules
             config.BlacklistSimple.Add(new BlacklistSet.BlacklistMessage
             {
                 Content = message,
-                Regex = false
+                    Regex = false
             });
-            
+
             ModerationService.SaveModerationConfig(config);
             await ReplyAsync("Added.");
         }
 
         [Command("Blacklist Remove")]
         [Summary("Removes a message or regex from the blacklist")]
-        public async Task BlacklistRemove([Remainder]string message)
+        public async Task BlacklistRemove([Remainder] string message)
         {
             var config = ModerationService.GetModerationConfig(Context.Guild.Id);
             config.BlacklistSimple = config.BlacklistSimple.Where(x => x.Content.Equals(message, StringComparison.InvariantCultureIgnoreCase)).ToList();
-            
+
             ModerationService.SaveModerationConfig(config);
             await ReplyAsync("Removed.");
         }
 
         [Command("Blacklist Regex Add")]
         [Summary("Adds a regex check to the blacklist")]
-        public async Task BlacklistRegexAdd([Remainder]string message)
+        public async Task BlacklistRegexAdd([Remainder] string message)
         {
             var config = ModerationService.GetModerationConfig(Context.Guild.Id);
             config.BlacklistSimple.Add(new BlacklistSet.BlacklistMessage
             {
                 Content = message,
-                Regex = true
+                    Regex = true
             });
-            
+
             ModerationService.SaveModerationConfig(config);
             await ReplyAsync("Added.");
         }
 
-        
         [Command("Blacklist Username Remove")]
         [Summary("Removes a message from the username blacklist")]
-        public async Task BlacklistUsernameRemove([Remainder]string name)
+        public async Task BlacklistUsernameRemove([Remainder] string name)
         {
             var config = ModerationService.GetModerationConfig(Context.Guild.Id);
             config.BlacklistedUsernames = config.BlacklistedUsernames.Where(x => x.Content.Equals(name, StringComparison.InvariantCultureIgnoreCase)).ToList();
@@ -213,13 +212,13 @@ namespace RavenBOT.Modules.AutoMod.Modules
 
         [Command("Blacklist Username Add")]
         [Summary("Adds a username to the blacklist")]
-        public async Task BlacklistUsernameAdd([Remainder]string name)
+        public async Task BlacklistUsernameAdd([Remainder] string name)
         {
             var config = ModerationService.GetModerationConfig(Context.Guild.Id);
             config.BlacklistedUsernames.Add(new BlacklistSet.BlacklistMessage
             {
                 Content = name,
-                Regex = false
+                    Regex = false
             });
             ModerationService.SaveModerationConfig(config);
             await ReplyAsync($"Added.");
@@ -227,13 +226,13 @@ namespace RavenBOT.Modules.AutoMod.Modules
 
         [Command("Blacklist Username Regex Add")]
         [Summary("Adds a regex check to the username blacklist")]
-        public async Task BlacklistUsernameRegexAdd([Remainder]string name)
+        public async Task BlacklistUsernameRegexAdd([Remainder] string name)
         {
             var config = ModerationService.GetModerationConfig(Context.Guild.Id);
             config.BlacklistedUsernames.Add(new BlacklistSet.BlacklistMessage
             {
                 Content = name,
-                Regex = true
+                    Regex = true
             });
             ModerationService.SaveModerationConfig(config);
             await ReplyAsync("Added.");
@@ -255,43 +254,44 @@ namespace RavenBOT.Modules.AutoMod.Modules
         public async Task ShowSettings()
         {
             var config = ModerationService.GetModerationConfig(Context.Guild.Id);
-            var blacklistSimpleSet = config.BlacklistSimple.Select(x => {
-                                if (x.Regex)
-                                {
-                                    return $"Regex Check: {x.Content}";
-                                }
+            var blacklistSimpleSet = config.BlacklistSimple.Select(x =>
+            {
+                if (x.Regex)
+                {
+                    return $"Regex Check: {x.Content}";
+                }
 
-                                return x.Content;
-                            }).ToList();
+                return x.Content;
+            }).ToList();
             var exemptlist = config.AutoModExempt.Select(x => Context.Guild.Roles.FirstOrDefault(r => r.Id == x)).Where(x => x != null).Select(x => x.Mention);
-                            
+
             await ReplyAsync("**AUTO-MOD SETTINGS**\n" +
-                            $"Block Invites: {config.BlockInvites}\n" +
-                            $"Block IP Addresses: {config.BlockIps}\n" +
-                            $"Block Mass Mentions: {config.BlockMassMentions}\n" +
-                            $"Maximum Mentions: {config.MaxMentions}\n" +
-                            $"Mass Mentions includes Users: {config.MassMentionsIncludeUsers}\n" +
-                            $"Mass Mentions includes Roles: {config.MassMentionsIncludeRoles}\n" +
-                            $"Mass Mentions includes Channels: {config.MassMentionsIncludeChannels}\n" +
-                            $"**TOXICITY SETTINGS (PERSPECTIVE)**\n" +
-                            $"Use Perspective: {config.UsePerspective}\n" +
-                            $"Max Toxicity Percent: {config.PerspectiveMax}%\n" +
-                            $"**ANTI-SPAM SETTINGS**\n" +
-                            $"Use Anti-Spam: {config.UseAntiSpam}\n" +
-                            $"Message Cache Size: {config.SpamSettings.CacheSize}\n" +
-                            $"Max Messages per x Second(s): {config.SpamSettings.MessagesPerTime} messages per {config.SpamSettings.SecondsToCheck} second(s)\n" +
-                            $"Max Identical Messages: {config.SpamSettings.MaxRepititions}\n" +
-                            $"**BLACKLIST SETTINGS**\n" +
-                            $"Use Blacklist: {config.UseBlacklist}\n" +
-                            $"Blacklisted Words: \n{string.Join("\n", blacklistSimpleSet)}\n" +
-                            $"\n*Complex Blacklist is currently disabled for ALL Servers as it is still being developed.*\n" +
-                            $"**BLACKLIST USERNAMES**\n" +
-                            $"Blacklist Usernames: {config.BlacklistUsernames}\n" +
-                            $"Blacklisted Usernames: \n{string.Join("\n", config.BlacklistedUsernames)}\n" +
-                            $"**AUTOMOD EXEMPT**\n" +
-                            $"All Admin Roles\n" +
-                            $"Automod Exempt Roles: \n" +
-                            $"{string.Join("\n", exemptlist)}".FixLength(2047));
+                $"Block Invites: {config.BlockInvites}\n" +
+                $"Block IP Addresses: {config.BlockIps}\n" +
+                $"Block Mass Mentions: {config.BlockMassMentions}\n" +
+                $"Maximum Mentions: {config.MaxMentions}\n" +
+                $"Mass Mentions includes Users: {config.MassMentionsIncludeUsers}\n" +
+                $"Mass Mentions includes Roles: {config.MassMentionsIncludeRoles}\n" +
+                $"Mass Mentions includes Channels: {config.MassMentionsIncludeChannels}\n" +
+                $"**TOXICITY SETTINGS (PERSPECTIVE)**\n" +
+                $"Use Perspective: {config.UsePerspective}\n" +
+                $"Max Toxicity Percent: {config.PerspectiveMax}%\n" +
+                $"**ANTI-SPAM SETTINGS**\n" +
+                $"Use Anti-Spam: {config.UseAntiSpam}\n" +
+                $"Message Cache Size: {config.SpamSettings.CacheSize}\n" +
+                $"Max Messages per x Second(s): {config.SpamSettings.MessagesPerTime} messages per {config.SpamSettings.SecondsToCheck} second(s)\n" +
+                $"Max Identical Messages: {config.SpamSettings.MaxRepititions}\n" +
+                $"**BLACKLIST SETTINGS**\n" +
+                $"Use Blacklist: {config.UseBlacklist}\n" +
+                $"Blacklisted Words: \n{string.Join("\n", blacklistSimpleSet)}\n" +
+                $"\n*Complex Blacklist is currently disabled for ALL Servers as it is still being developed.*\n" +
+                $"**BLACKLIST USERNAMES**\n" +
+                $"Blacklist Usernames: {config.BlacklistUsernames}\n" +
+                $"Blacklisted Usernames: \n{string.Join("\n", config.BlacklistedUsernames)}\n" +
+                $"**AUTOMOD EXEMPT**\n" +
+                $"All Admin Roles\n" +
+                $"Automod Exempt Roles: \n" +
+                $"{string.Join("\n", exemptlist)}".FixLength(2047));
         }
     }
 }

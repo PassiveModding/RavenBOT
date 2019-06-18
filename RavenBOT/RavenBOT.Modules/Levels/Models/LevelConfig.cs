@@ -9,7 +9,7 @@ namespace RavenBOT.Modules.Levels.Models
             GuildId = guildId;
         }
 
-        public LevelConfig() { }
+        public LevelConfig() {}
 
         public static string DocumentName(ulong guildId)
         {

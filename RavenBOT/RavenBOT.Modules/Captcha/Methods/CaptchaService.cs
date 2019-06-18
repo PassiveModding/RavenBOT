@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 using CaptchaGen.NetCore;
 using Discord;
 using Discord.WebSocket;
-using RavenBOT.Modules.Captcha.Models;
 using RavenBOT.Common;
 using RavenBOT.Common.Interfaces;
 using RavenBOT.Common.Services;
+using RavenBOT.Modules.Captcha.Models;
 
 namespace RavenBOT.Modules.Captcha.Methods
 {

@@ -57,12 +57,12 @@ namespace RavenBOT.Modules.Levels.Modules
             }).Where(x => x != null).ToList();
 
             var message = $"Enabled: {config.Enabled}\n" +
-                        $"Multiple Role rewards: {config.MultiRole}\n" +
-                        $"Reply with level ups: {config.ReplyLevelUps}\n" +
-                        $"Restriction Mode: {config.RestrictionMode}\n" +
-                        $"Restricted Channels:" + string.Join("\n", config.RestrictedChannels.Select(x => Context.Guild.GetTextChannel(x)?.Name ?? $"DELETED: [{x}]")) + 
-                        "\nNOTE: If there are deleted channels you can remove them by running the clearchannels command\n" +
-                        $"Role Rewards: \n{(responses.Any() ? string.Join("\n", responses) : "N/A" )}\n";
+                $"Multiple Role rewards: {config.MultiRole}\n" +
+                $"Reply with level ups: {config.ReplyLevelUps}\n" +
+                $"Restriction Mode: {config.RestrictionMode}\n" +
+                $"Restricted Channels:" + string.Join("\n", config.RestrictedChannels.Select(x => Context.Guild.GetTextChannel(x)?.Name ?? $"DELETED: [{x}]")) +
+                "\nNOTE: If there are deleted channels you can remove them by running the clearchannels command\n" +
+                $"Role Rewards: \n{(responses.Any() ? string.Join("\n", responses) : "N/A" )}\n";
 
             await ReplyAsync("", false, message.QuickEmbed());
         }
@@ -88,7 +88,7 @@ namespace RavenBOT.Modules.Levels.Modules
             LevelService.Database.Store(config, LevelConfig.DocumentName(Context.Guild.Id));
             await ReplyAsync($"Leveling will now be ignored in channels added with the `addchannel` command");
         }
-        
+
         [Command("AddChannel")]
         [Summary("Adds a blacklist or whitelist specific channel")]
         [RequireUserPermission(Discord.GuildPermission.Administrator)]
@@ -146,8 +146,8 @@ namespace RavenBOT.Modules.Levels.Modules
                 return;
             }
 
-            var message = string.Join("\n", config.RestrictedChannels.Select(x => Context.Guild.GetTextChannel(x)?.Name ?? $"DELETED: [{x}]")) + 
-                        "\nNOTE: If there are deleted channels you can remove them by running the clearchannels command";
+            var message = string.Join("\n", config.RestrictedChannels.Select(x => Context.Guild.GetTextChannel(x)?.Name ?? $"DELETED: [{x}]")) +
+                "\nNOTE: If there are deleted channels you can remove them by running the clearchannels command";
 
             await ReplyAsync("", false, message.QuickEmbed());
         }

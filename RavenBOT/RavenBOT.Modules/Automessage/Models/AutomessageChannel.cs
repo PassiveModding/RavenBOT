@@ -7,7 +7,7 @@ namespace RavenBOT.Modules.Automessage.Models
             ChannelId = channelId;
         }
 
-        public AutomessageChannel() { }
+        public AutomessageChannel() {}
 
         public static string DocumentName(ulong channelId)
         {

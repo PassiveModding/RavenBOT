@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -53,7 +53,7 @@ namespace RavenBOT.Extensions
 
             return message;
         }
-        
+
         public static int DamerauLavenshteinDistance(this string s, string t)
         {
             var bounds = new { Height = s.Length + 1, Width = t.Length + 1 };

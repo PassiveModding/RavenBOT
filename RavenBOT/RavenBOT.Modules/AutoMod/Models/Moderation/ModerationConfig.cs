@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -18,7 +18,7 @@ namespace RavenBOT.Modules.AutoMod.Models.Moderation
             PerspectiveMax = 95;
         }
 
-        public ModerationConfig() { }
+        public ModerationConfig() {}
 
         public ulong GuildId { get; set; }
 

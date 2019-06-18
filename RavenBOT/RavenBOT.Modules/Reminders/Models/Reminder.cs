@@ -29,7 +29,7 @@ namespace RavenBOT.Modules.Reminders.Models
             ReminderMessage = message;
         }
 
-        public Reminder() { }
+        public Reminder() {}
 
         public ulong GuildId { get; set; }
         public ulong UserId { get; set; }

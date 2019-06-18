@@ -1,4 +1,4 @@
-﻿namespace RavenBOT.Modules.Events.Models.Events
+namespace RavenBOT.Modules.Events.Models.Events
 {
     public class EventConfig
     {
@@ -14,7 +14,7 @@
             GuildId = guildId;
         }
 
-        public EventConfig() { }
+        public EventConfig() {}
 
         public ulong ChannelId { get; set; }
 

@@ -1,13 +1,13 @@
-using System.Net.Http;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
-using RavenBOT.Modules.RoleManagement.Models;
+using Newtonsoft.Json.Linq;
 using RavenBOT.Common;
 using RavenBOT.Common.Interfaces;
-using Newtonsoft.Json.Linq;
 using RavenBOT.Common.Services;
+using RavenBOT.Modules.RoleManagement.Models;
 
 namespace RavenBOT.Modules.RoleManagement.Methods
 {
@@ -35,7 +35,7 @@ namespace RavenBOT.Modules.RoleManagement.Methods
                 if (name.Equals($"{i}\U000020e3"))
                 {
                     return i;
-                }                
+                }
             }
 
             return -1;
@@ -73,7 +73,7 @@ namespace RavenBOT.Modules.RoleManagement.Methods
             {
                 return SubscriptionStatus.NotSubscribed;
             }
-            
+
             if (firstMatch.Value<JToken>("snippet").Value<JToken>("resourceId").Value<JToken>("channelId").ToString().Equals(subbedTo))
             {
                 return SubscriptionStatus.Subscribed;
@@ -84,7 +84,6 @@ namespace RavenBOT.Modules.RoleManagement.Methods
 
         private async Task RunReaction(Discord.Cacheable<Discord.IUserMessage, ulong> cache, ISocketMessageChannel channel, SocketReaction reaction, bool added)
         {
-
 
             var unicodeNumberResult = IsUnicodeNumberEmote(reaction.Emote.Name);
             if (unicodeNumberResult == -1)

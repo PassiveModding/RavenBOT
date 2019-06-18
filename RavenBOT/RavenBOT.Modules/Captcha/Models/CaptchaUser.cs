@@ -7,7 +7,7 @@ namespace RavenBOT.Modules.Captcha.Models
             return $"CaptchaUser-{userId}-{guildId}";
         }
 
-        public CaptchaUser() { }
+        public CaptchaUser() {}
 
         public CaptchaUser(ulong userId, ulong guildId, string captcha)
         {

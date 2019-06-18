@@ -79,17 +79,17 @@ namespace RavenBOT.Modules.Games.Modules
             {
                 Title = "SLOTS",
                 Description = $"➡️ {selections[0]}{selections[1]}{selections[2]} ⬅️\n\n" +
-                              $"BET: {bet} Points\n" +
-                              $"PAY: {payout} Points\n" +
-                              $"BAL: {guser.Points} Points",
+                $"BET: {bet} Points\n" +
+                $"PAY: {payout} Points\n" +
+                $"BAL: {guser.Points} Points",
                 ThumbnailUrl = Context.User.GetAvatarUrl(),
                 Color = Color.Blue,
                 Footer = new EmbedFooterBuilder
                 {
-                    Text = $"{Context.User.Username}#{Context.User.Discriminator}"
+                Text = $"{Context.User.Username}#{Context.User.Discriminator}"
                 }
             };
             await ReplyAsync("", false, embed.Build());
-        }  
+        }
     }
 }

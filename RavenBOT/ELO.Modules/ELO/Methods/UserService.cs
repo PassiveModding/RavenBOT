@@ -32,11 +32,11 @@ namespace RavenBOT.Modules.ELO.Methods
                             {
                                 comp.Ranks.Remove(match);
                                 Database.Store(comp, CompetitionConfig.DocumentName(comp.GuildId));
-                            }  
-                        }                    
-                    }              
+                            }
+                        }
+                    }
                 }
-                
+
                 if (comp.RegisteredRankId != 0)
                 {
                     if (!user.Roles.Any(x => x.Id == comp.RegisteredRankId))
@@ -48,7 +48,7 @@ namespace RavenBOT.Modules.ELO.Methods
                             {
                                 await user.AddRoleAsync(role);
                             }
-                        }                    
+                        }
                     }
                 }
             }
@@ -58,7 +58,7 @@ namespace RavenBOT.Modules.ELO.Methods
             {
                 if (user.Guild.CurrentUser.GuildPermissions.ManageNicknames)
                 {
-                    await user.ModifyAsync(x => x.Nickname = newName);                    
+                    await user.ModifyAsync(x => x.Nickname = newName);
                 }
             }
         }
@@ -66,7 +66,7 @@ namespace RavenBOT.Modules.ELO.Methods
         public string DoReplacements(CompetitionConfig comp, Player player)
         {
             return comp.NameFormat.Replace("{score}", player.Points.ToString(), StringComparison.InvariantCultureIgnoreCase)
-                            .Replace("{name}", player.DisplayName, StringComparison.InvariantCultureIgnoreCase).FixLength(32);
+                .Replace("{name}", player.DisplayName, StringComparison.InvariantCultureIgnoreCase).FixLength(32);
         }
     }
 }

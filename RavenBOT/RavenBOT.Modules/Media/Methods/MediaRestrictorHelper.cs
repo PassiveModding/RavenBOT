@@ -1,10 +1,10 @@
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord.WebSocket;
 using RavenBOT.Common;
 using RavenBOT.Common.Interfaces;
-using System.Text.RegularExpressions;
 using RavenBOT.Common.Services;
 
 namespace RavenBOT.Modules.Media.Methods
@@ -56,7 +56,7 @@ namespace RavenBOT.Modules.Media.Methods
             {
                 return;
             }
-            
+
             if (config.WhitelistedRoleIds.Any())
             {
                 //ensure the user isn't whitelisted before deleting messages

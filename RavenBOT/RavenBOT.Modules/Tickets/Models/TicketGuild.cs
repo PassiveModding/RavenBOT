@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace RavenBOT.Modules.Tickets.Models
 {
@@ -11,7 +11,7 @@ namespace RavenBOT.Modules.Tickets.Models
             TicketChannelId = 0;
         }
 
-        public TicketGuild() { }
+        public TicketGuild() {}
 
         public static string DocumentName(ulong guildId)
         {

@@ -14,7 +14,7 @@ namespace RavenBOT.Common.Interfaces.Database
             Value = value;
         }
 
-        public BaseEntity() { }
+        public BaseEntity() {}
 
         public string Id { get; set; }
         public T Value { get; set; }

@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;    
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
@@ -15,8 +15,8 @@ namespace RavenBOT.Modules.Games.Modules
     [Group("Games")]
     public class Trivia : InteractiveBase<ShardedCommandContext>
     {
-        public Random Random {get;}
-        public HttpClient HttpClient {get;}
+        public Random Random { get; }
+        public HttpClient HttpClient { get; }
 
         public Trivia(Random random, HttpClient client)
         {
@@ -25,18 +25,18 @@ namespace RavenBOT.Modules.Games.Modules
         }
 
         private readonly List<string> numlist = new List<string>
-                                                {
-                                                    "zero",
-                                                    "one",
-                                                    "two",
-                                                    "three",
-                                                    "four",
-                                                    "five",
-                                                    "six",
-                                                    "seven",
-                                                    "eight",
-                                                    "nine"
-                                                };
+        {
+            "zero",
+            "one",
+            "two",
+            "three",
+            "four",
+            "five",
+            "six",
+            "seven",
+            "eight",
+            "nine"
+        };
 
         [Command("TriviaSettings", RunMode = RunMode.Async)]
         [Summary("Displays possible trivia settings and categories")]
@@ -48,15 +48,15 @@ namespace RavenBOT.Modules.Games.Modules
             }
 
             await ReplyAsync($"**Trivia Command:**\n" +
-                                   $"`Trivia <Question_Count> <Category_Name> <Difficulty> <Type>`\n" +
-                                   $"**Example:**\n" +
-                                   $"`Trivia 10 \"General Knowledge\" Medium Multiple`\n" +
-                                   $"**Categories:**\n" +
-                                   $"{(categories == null ? "N/A" : string.Join("\n", categories.trivia_categories.Select(x => $"\"{x.name}\"")))}\n" +
-                                   $"**Difficulties:**\n" +
-                                   $"{string.Join("\n", Enum.GetNames(typeof(TriviaDifficulty)))}\n" +
-                                   $"**Types:**\n" +
-                                   $"{string.Join("\n", Enum.GetNames(typeof(TriviaType)))}");
+                $"`Trivia <Question_Count> <Category_Name> <Difficulty> <Type>`\n" +
+                $"**Example:**\n" +
+                $"`Trivia 10 \"General Knowledge\" Medium Multiple`\n" +
+                $"**Categories:**\n" +
+                $"{(categories == null ? "N/A" : string.Join("\n", categories.trivia_categories.Select(x => $"\"{x.name}\"")))}\n" +
+                $"**Difficulties:**\n" +
+                $"{string.Join("\n", Enum.GetNames(typeof(TriviaDifficulty)))}\n" +
+                $"**Types:**\n" +
+                $"{string.Join("\n", Enum.GetNames(typeof(TriviaType)))}");
         }
 
         [Command("Trivia", RunMode = RunMode.Async)]
@@ -114,14 +114,14 @@ namespace RavenBOT.Modules.Games.Modules
                 }
 
                 builder.Description = $"Category: **{question.category}**\n" +
-                                           $"Difficulty: **{question.difficulty}**\n" +
-                                           $"**{question.question}**\n" +
-                                           $"{possibleAnswersString}";
+                    $"Difficulty: **{question.difficulty}**\n" +
+                    $"**{question.question}**\n" +
+                    $"{possibleAnswersString}";
 
                 builder.Footer = new EmbedFooterBuilder
-                                     {
-                                         Text = $"Progress: {currentQuestionIndex}/{trivia.results.Count} | Correct: {totalCorrect}/{currentQuestionIndex}"
-                                     };
+                {
+                    Text = $"Progress: {currentQuestionIndex}/{trivia.results.Count} | Correct: {totalCorrect}/{currentQuestionIndex}"
+                };
 
                 var callBackData = new ReactionCallbackData("", builder.Build(), true, true, TimeSpan.FromMinutes(5));
                 index = 0;
@@ -131,16 +131,16 @@ namespace RavenBOT.Modules.Games.Modules
                     var newTotalCorrect = correct ? totalCorrect + 1 : totalCorrect;
                     var newResString = resString + $"{Format.Bold(question.question)} \n{(correct ? $":white_check_mark: {question.correct_answer}" : $":x: {Format.Strikethrough(answer)} {question.correct_answer}")}\n";
 
-                    callBackData.WithCallback(emotes[index], async (c, r) =>
+                    callBackData.WithCallback(emotes[index], async(c, r) =>
+                    {
+                        var rMessage = await c?.Channel?.GetMessageAsync(r?.MessageId ?? 0);
+                        if (rMessage != null)
                         {
-                            var rMessage = await c?.Channel?.GetMessageAsync(r?.MessageId ?? 0);
-                            if (rMessage != null)
-                            {
-                                await rMessage.DeleteAsync();
-                            }
+                            await rMessage.DeleteAsync();
+                        }
 
-                            await NextQuestionAsync(trivia, currentQuestionIndex + 1, newTotalCorrect, newResString);
-                        });
+                        await NextQuestionAsync(trivia, currentQuestionIndex + 1, newTotalCorrect, newResString);
+                    });
                     index++;
                 }
 
@@ -148,23 +148,23 @@ namespace RavenBOT.Modules.Games.Modules
                 return;
             }
 
-            await ReplyAsync($"Trivia Complete! You got {totalCorrect}/{trivia.results.Count} correct\n" + 
-                                   $"{resString}".FixLength(2000));
+            await ReplyAsync($"Trivia Complete! You got {totalCorrect}/{trivia.results.Count} correct\n" +
+                $"{resString}".FixLength(2000));
         }
 
-        private List<Emoji> emotes = new List<Emoji>
-                                                    {
-                                                        new Emoji("0\u20e3"),
-                                                        new Emoji("1\u20e3"),
-                                                        new Emoji("2\u20e3"),
-                                                        new Emoji("3\u20e3"),
-                                                        new Emoji("4\u20e3"),
-                                                        new Emoji("5\u20e3"),
-                                                        new Emoji("6\u20e3"),
-                                                        new Emoji("7\u20e3"),
-                                                        new Emoji("8\u20e3"),
-                                                        new Emoji("9\u20e3")
-                                                    };
+        private List < Emoji > emotes = new List < Emoji >
+        {
+            new Emoji("0\u20e3"),
+            new Emoji("1\u20e3"),
+            new Emoji("2\u20e3"),
+            new Emoji("3\u20e3"),
+            new Emoji("4\u20e3"),
+            new Emoji("5\u20e3"),
+            new Emoji("6\u20e3"),
+            new Emoji("7\u20e3"),
+            new Emoji("8\u20e3"),
+            new Emoji("9\u20e3")
+        };
 
         private async Task PopulateCategories()
         {
@@ -328,14 +328,14 @@ namespace RavenBOT.Modules.Games.Modules
                 if (resObject.response_code == 0)
                 {
                     resObject.results = resObject.results.Select(x => new TriviaResponse.Result
-                                                                          {
-                                                                              category = x.category.DecodeBase64(),
-                                                                              correct_answer = x.correct_answer.DecodeBase64(),
-                                                                              difficulty = x.difficulty.DecodeBase64(),
-                                                                              question = x.question.DecodeBase64(),
-                                                                              type = x.type.DecodeBase64(),
-                                                                              incorrect_answers = x.incorrect_answers.Select(ia => ia.DecodeBase64()).ToList()
-                                                                          }).ToList();
+                    {
+                        category = x.category.DecodeBase64(),
+                            correct_answer = x.correct_answer.DecodeBase64(),
+                            difficulty = x.difficulty.DecodeBase64(),
+                            question = x.question.DecodeBase64(),
+                            type = x.type.DecodeBase64(),
+                            incorrect_answers = x.incorrect_answers.Select(ia => ia.DecodeBase64()).ToList()
+                    }).ToList();
 
                     return resObject;
                 }

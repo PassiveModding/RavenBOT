@@ -18,7 +18,7 @@ namespace RavenBOT.Modules.Partner.Models
             GuildId = guildId;
         }
 
-        public PartnerConfig() { }
+        public PartnerConfig() {}
 
         public ulong GuildId { get; set; }
         public ulong ReceiverChannelId { get; set; } = 0;
@@ -45,7 +45,7 @@ namespace RavenBOT.Modules.Partner.Models
                 B = b;
             }
 
-            public RGB() { }
+            public RGB() {}
 
             /// <summary>
             ///     Gets or sets the blue value

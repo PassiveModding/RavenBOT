@@ -5,10 +5,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Discord.WebSocket;
-using RavenBOT.Modules.Levels.Models;
 using RavenBOT.Common;
 using RavenBOT.Common.Interfaces;
 using RavenBOT.Common.Services;
+using RavenBOT.Modules.Levels.Models;
 
 namespace RavenBOT.Modules.Levels.Methods
 {
@@ -150,12 +150,11 @@ namespace RavenBOT.Modules.Levels.Methods
                                 if (guild.RestrictedChannels.Contains(tChannel.Id))
                                 {
                                     return;
-                                } 
-                            }                              
+                                }
+                            }
                         }
-                     
-                    }
 
+                    }
 
                     user.UserXP += 10;
 

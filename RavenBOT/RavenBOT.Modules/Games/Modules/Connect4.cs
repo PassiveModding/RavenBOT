@@ -14,23 +14,23 @@ namespace RavenBOT.Modules.Games.Modules
         private List<Connect4Game> Connect4List = new List<Connect4Game>();
 
         private readonly List<string> numlist = new List<string>
-                                                    {
-                                                        "zero",
-                                                        "one",
-                                                        "two",
-                                                        "three",
-                                                        "four",
-                                                        "five",
-                                                        "six",
-                                                        "seven",
-                                                        "eight",
-                                                        "nine"
-                                                    };
+        {
+            "zero",
+            "one",
+            "two",
+            "three",
+            "four",
+            "five",
+            "six",
+            "seven",
+            "eight",
+            "nine"
+        };
 
         private string none = ":black_circle:";
         private string blue = ":large_blue_circle:";
         private string red = ":red_circle:";
-        
+
         [Command("Connect4", RunMode = RunMode.Async)]
         [Summary("Play connect 4 with another person")]
         public async Task Connect4Async(int bet = 0)
@@ -109,11 +109,10 @@ namespace RavenBOT.Modules.Games.Modules
                 return;
             }
 
-
             await ReplyAsync("", false, new EmbedBuilder
             {
                 Title = $"Connect4 Game (BET = {bet} Points)",
-                Description = "Get somebody to type `connect4 accept` to start"
+                    Description = "Get somebody to type `connect4 accept` to start"
             }.Build());
 
             await Connect4AcceptTask(bet, currentlobby);
@@ -210,9 +209,9 @@ namespace RavenBOT.Modules.Games.Modules
             }
 
             embed.Description += "Usage:\n" +
-                                 "`connect4 [column]`\n" +
-                                 $":large_blue_circle: - {Context.User.Mention} <-\n" +
-                                 $":red_circle: - {Context.Guild.GetUser(player2.UserId)?.Mention}";
+                "`connect4 [column]`\n" +
+                $":large_blue_circle: - {Context.User.Mention} <-\n" +
+                $":red_circle: - {Context.Guild.GetUser(player2.UserId)?.Mention}";
             embed.Footer = new EmbedFooterBuilder
             {
                 Text = $"it is {Context.User.Username}'s turn"
@@ -223,7 +222,7 @@ namespace RavenBOT.Modules.Games.Modules
             await Connect4PlayingTask(lines, gamemessage, player1, player2, bet, embed, currentLobby);
         }
 
-        public async Task Connect4PlayingTask(int[,] lines, IUserMessage gamemessage, GameUser player1, GameUser player2, int bet, EmbedBuilder embed, Connect4Game currentlobby)
+        public async Task Connect4PlayingTask(int[, ] lines, IUserMessage gamemessage, GameUser player1, GameUser player2, int bet, EmbedBuilder embed, Connect4Game currentlobby)
         {
             // LastX and LastY are used to check for horizontal and vertical wins
             var lastx = 0;
@@ -374,13 +373,13 @@ namespace RavenBOT.Modules.Games.Modules
                     }
 
                     embed.Description += "Usage:\n" +
-                                         "`connect4 [column]`\n" +
-                                         $":large_blue_circle: - {Context.User.Mention} {(currentplayer == 1 ? "" : "<-")}\n" +
-                                         $":red_circle: - {Context.Guild.GetUser(player2.UserId)?.Mention} {(currentplayer == 2 ? "" : "<-")}";
+                        "`connect4 [column]`\n" +
+                        $":large_blue_circle: - {Context.User.Mention} {(currentplayer == 1 ? "" : "<-")}\n" +
+                        $":red_circle: - {Context.Guild.GetUser(player2.UserId)?.Mention} {(currentplayer == 2 ? "" : "<-")}";
                     embed.Footer = new EmbedFooterBuilder
                     {
                         Text =
-                            $"it is {(currentplayer == 2 ? Context.Guild.GetUser(player1.UserId)?.Username : Context.Guild.GetUser(player2.UserId)?.Username)}'s turn"
+                        $"it is {(currentplayer == 2 ? Context.Guild.GetUser(player1.UserId)?.Username : Context.Guild.GetUser(player2.UserId)?.Username)}'s turn"
                     };
                     await gamemessage.ModifyAsync(x => x.Embed = embed.Build());
 
@@ -440,7 +439,6 @@ namespace RavenBOT.Modules.Games.Modules
                          [4,0][4,1][4,2][4,3][4,4][4,5][4,6]
                          [5,0][5,1][5,2][5,3][5,4][5,5][5,6]
                     */
-
 
                     // Checking Diagonally 
                     int colinit, rowinit;
@@ -605,18 +603,17 @@ namespace RavenBOT.Modules.Games.Modules
             GameService.SaveGameUser(gwinner);
             GameService.SaveGameUser(gloser);
 
-
             var embed2 = new EmbedBuilder
-                             {
-                                 Title = $"{winner.Username} Wins!",
-                                 Description = $"Winner: {winner.Username}\n" +
-                                               $"Balance: {gwinner.Points} \n" +
-                                               $"Payout: {payout}\n" +
-                                               $"WinLine: {winmethod}\n" +
-                                               $"Loser: {loser?.Username}\n" +
-                                               $"Balance: {gloser.Points}\n" +
-                                               $"Loss: {bet}"
-                             };
+            {
+                Title = $"{winner.Username} Wins!",
+                Description = $"Winner: {winner.Username}\n" +
+                $"Balance: {gwinner.Points} \n" +
+                $"Payout: {payout}\n" +
+                $"WinLine: {winmethod}\n" +
+                $"Loser: {loser?.Username}\n" +
+                $"Balance: {gloser.Points}\n" +
+                $"Loss: {bet}"
+            };
             return ReplyAsync("", false, embed2.Build());
         }
     }

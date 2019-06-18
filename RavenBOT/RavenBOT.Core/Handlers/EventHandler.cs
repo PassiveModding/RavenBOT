@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using RavenBOT.Extensions;
-using RavenBOT.Models;
+using RavenBOT.Common.Extensions;
 using RavenBOT.Common.Handlers;
 using RavenBOT.Common.Services;
-using RavenBOT.Common.Extensions;
 using RavenBOT.Core.TypeReaders.EmojiReader;
+using RavenBOT.Extensions;
+using RavenBOT.Models;
 
 namespace RavenBOT.Handlers
 {
@@ -158,7 +158,7 @@ namespace RavenBOT.Handlers
         }
 
         public async Task RegisterModulesAsync()
-        {           
+        {
             await CommandService.AddModulesAsync(Assembly.GetEntryAssembly(), Provider);
         }
 

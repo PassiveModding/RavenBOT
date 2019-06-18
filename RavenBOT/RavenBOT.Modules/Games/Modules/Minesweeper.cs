@@ -9,7 +9,7 @@ namespace RavenBOT.Modules.Games.Modules
     [Group("Games")]
     public class Minesweeper : InteractiveBase<ShardedCommandContext>
     {
-        public Random Random {get;}
+        public Random Random { get; }
 
         public Minesweeper(Random random)
         {
@@ -55,7 +55,7 @@ namespace RavenBOT.Modules.Games.Modules
                     return;
                 }
 
-                int[,,] minefield = new int[width, height, 2];
+                int[, , ] minefield = new int[width, height, 2];
 
                 // 0 = none
                 // -1 = mine
@@ -132,7 +132,7 @@ namespace RavenBOT.Modules.Games.Modules
             return MinefieldGameAsync(width, height, mine_count, false);
         }
 
-        public int[,,] RevealBlankSurrounds(int[,,] minefield, int width, int height)
+        public int[, , ] RevealBlankSurrounds(int[, , ] minefield, int width, int height)
         {
             // IIterate through each row and column
             for (int x = 0; x < width; x++)
@@ -167,31 +167,31 @@ namespace RavenBOT.Modules.Games.Modules
         }
 
         private readonly List<string> minefieldItems = new List<string>
-                                                 {
-                                                     "bomb",
-                                                     "black_large_square",
-                                                     "one",
-                                                     "two",
-                                                     "three",
-                                                     "four",
-                                                     "five",
-                                                     "six",
-                                                     "seven",
-                                                     "eight",
-                                                     "nine"
-                                                 };
-        
-        public int MinesNear(int[,,] field, int width, int height, int y, int x)
+        {
+            "bomb",
+            "black_large_square",
+            "one",
+            "two",
+            "three",
+            "four",
+            "five",
+            "six",
+            "seven",
+            "eight",
+            "nine"
+        };
+
+        public int MinesNear(int[, , ] field, int width, int height, int y, int x)
         {
             int mines = 0;
 
-            mines += MineAt(field, width, height, x - 1, y - 1); 
-            mines += MineAt(field, width, height, x - 1, y); 
-            mines += MineAt(field, width, height, x - 1, y + 1); 
-            mines += MineAt(field, width, height, x, y - 1); 
-            mines += MineAt(field, width, height, x, y + 1); 
-            mines += MineAt(field, width, height, x + 1, y - 1); 
-            mines += MineAt(field, width, height, x + 1, y); 
+            mines += MineAt(field, width, height, x - 1, y - 1);
+            mines += MineAt(field, width, height, x - 1, y);
+            mines += MineAt(field, width, height, x - 1, y + 1);
+            mines += MineAt(field, width, height, x, y - 1);
+            mines += MineAt(field, width, height, x, y + 1);
+            mines += MineAt(field, width, height, x + 1, y - 1);
+            mines += MineAt(field, width, height, x + 1, y);
             mines += MineAt(field, width, height, x + 1, y + 1);
 
             return mines;
@@ -207,11 +207,11 @@ namespace RavenBOT.Modules.Games.Modules
             return false;
         }
 
-        public int MineAt(int[,,] field, int width, int height, int x, int y)
+        public int MineAt(int[, , ] field, int width, int height, int x, int y)
         {
             // we need to check also that we're not out of array bounds as that would
             // be an error
-            if (y >= 0 && y < height && x >= 0 && x < width && field[x, y, 0] == -1) 
+            if (y >= 0 && y < height && x >= 0 && x < width && field[x, y, 0] == -1)
             {
                 return 1;
             }

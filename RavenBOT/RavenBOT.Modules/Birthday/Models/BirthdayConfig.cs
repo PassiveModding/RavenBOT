@@ -11,7 +11,7 @@ namespace RavenBOT.Modules.Birthday.Models
         {
             GuildId = guildId;
         }
-        public BirthdayConfig() { }
+        public BirthdayConfig() {}
 
         public ulong BirthdayRole { get; set; }
 

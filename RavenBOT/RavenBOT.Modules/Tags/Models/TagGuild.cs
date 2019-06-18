@@ -14,7 +14,7 @@ namespace RavenBOT.Modules.Tags.Models
             GuildId = guildId;
         }
 
-        public TagGuild() { }
+        public TagGuild() {}
 
         public ulong GuildId { get; set; }
 

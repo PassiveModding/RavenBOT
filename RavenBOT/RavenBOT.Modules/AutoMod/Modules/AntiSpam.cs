@@ -13,10 +13,10 @@ namespace RavenBOT.Modules.AutoMod.Modules
             config.UseAntiSpam = !config.UseAntiSpam;
             ModerationService.SaveModerationConfig(config);
             await ReplyAsync($"Use AntiSpam: {config.UseAntiSpam}\n" +
-                            $"Cache Size: {config.SpamSettings.CacheSize}\n" +
-                            $"Max Message Repititions per {config.SpamSettings.CacheSize} Messages: {config.SpamSettings.MaxRepititions}\n" + 
-                            $"Seconds to Check for Spam: {config.SpamSettings.SecondsToCheck}\n" +
-                            $"Messages per {config.SpamSettings.SecondsToCheck} Seconds: {config.SpamSettings.MessagesPerTime}");
+                $"Cache Size: {config.SpamSettings.CacheSize}\n" +
+                $"Max Message Repititions per {config.SpamSettings.CacheSize} Messages: {config.SpamSettings.MaxRepititions}\n" +
+                $"Seconds to Check for Spam: {config.SpamSettings.SecondsToCheck}\n" +
+                $"Messages per {config.SpamSettings.SecondsToCheck} Seconds: {config.SpamSettings.MessagesPerTime}");
         }
 
         [Command("SetAntiSpamCacheSize")]
@@ -33,9 +33,9 @@ namespace RavenBOT.Modules.AutoMod.Modules
             else
             {
                 await ReplyAsync($"Cache size must be greater than max repititions or messages per x seconds:\n" +
-                            $"Current Cache Size: {config.SpamSettings.CacheSize}\n" +
-                            $"Max Message Repititions per {config.SpamSettings.CacheSize} Messages: {config.SpamSettings.MaxRepititions}\n" + 
-                            $"Messages per {config.SpamSettings.SecondsToCheck} Seconds: {config.SpamSettings.MessagesPerTime}");
+                    $"Current Cache Size: {config.SpamSettings.CacheSize}\n" +
+                    $"Max Message Repititions per {config.SpamSettings.CacheSize} Messages: {config.SpamSettings.MaxRepititions}\n" +
+                    $"Messages per {config.SpamSettings.SecondsToCheck} Seconds: {config.SpamSettings.MessagesPerTime}");
             }
         }
 
@@ -53,7 +53,7 @@ namespace RavenBOT.Modules.AutoMod.Modules
             else
             {
                 await ReplyAsync($"Repitition count must be less than the cache size:\n" +
-                            $"Current Cache Size: {config.SpamSettings.CacheSize}");
+                    $"Current Cache Size: {config.SpamSettings.CacheSize}");
             }
         }
 
@@ -71,7 +71,7 @@ namespace RavenBOT.Modules.AutoMod.Modules
             else
             {
                 await ReplyAsync($"Message count must be less than the cache size:\n" +
-                            $"Current Cache Size: {config.SpamSettings.CacheSize}");
+                    $"Current Cache Size: {config.SpamSettings.CacheSize}");
             }
         }
 

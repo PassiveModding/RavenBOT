@@ -1,13 +1,13 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using RavenBOT.Modules.Tickets.Models;
 using RavenBOT.Common;
 using RavenBOT.Common.Interfaces;
+using RavenBOT.Modules.Tickets.Models;
 
 namespace RavenBOT.Modules.Tickets.Methods
 {
@@ -20,7 +20,7 @@ namespace RavenBOT.Modules.Tickets.Methods
         {
             Database = database;
             Client = client;
-            
+
             Client.ReactionAdded += ReactionAdded;
             Client.ReactionRemoved += ReactionRemoved;
         }

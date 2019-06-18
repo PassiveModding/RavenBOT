@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,11 +6,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
-using RavenBOT.Extensions;
-using RavenBOT.Modules.Events.Models.Events;
 using RavenBOT.Common;
 using RavenBOT.Common.Interfaces;
 using RavenBOT.Common.Services;
+using RavenBOT.Extensions;
+using RavenBOT.Modules.Events.Models.Events;
 
 namespace RavenBOT.Modules.Events.Methods
 {

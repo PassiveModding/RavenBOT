@@ -19,7 +19,7 @@ namespace RavenBOT.Modules.Moderator.Models
                 Action = action;
             }
 
-            public User() { }
+            public User() {}
 
             public enum TimedAction
             {

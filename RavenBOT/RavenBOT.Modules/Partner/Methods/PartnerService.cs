@@ -4,9 +4,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
-using RavenBOT.Modules.Partner.Models;
 using RavenBOT.Common;
 using RavenBOT.Common.Interfaces;
+using RavenBOT.Modules.Partner.Models;
 
 namespace RavenBOT.Modules.Partner.Methods
 {

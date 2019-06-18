@@ -16,7 +16,7 @@ namespace RavenBOT.Modules.Moderator.Models
             GuildId = guildId;
         }
 
-        public ActionConfig() { }
+        public ActionConfig() {}
 
         public ulong GuildId { get; set; }
 
@@ -62,7 +62,7 @@ namespace RavenBOT.Modules.Moderator.Models
                 Duration = length;
             }
 
-            public Log() { }
+            public Log() {}
 
             public ulong Target { get; set; }
             public ulong Moderator { get; set; }
@@ -97,7 +97,7 @@ namespace RavenBOT.Modules.Moderator.Models
                 GuildId = guildId;
             }
 
-            public ActionUser() { }
+            public ActionUser() {}
 
             public ulong UserId { get; set; }
             public ulong GuildId { get; set; }

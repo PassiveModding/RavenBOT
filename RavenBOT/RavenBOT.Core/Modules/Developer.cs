@@ -1,14 +1,14 @@
-﻿using System.Net.Http;
-using System.Linq;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using RavenBOT.Models;
-using RavenBOT.Common.Interfaces;
-using System.IO;
 using RavenBOT.Common.Handlers;
+using RavenBOT.Common.Interfaces;
+using RavenBOT.Models;
 
 namespace RavenBOT.Modules.Developer
 {
@@ -83,7 +83,7 @@ namespace RavenBOT.Modules.Developer
                 return;
             }
 
-            var file  = Context.Message.Attachments.FirstOrDefault();
+            var file = Context.Message.Attachments.FirstOrDefault();
             var stream = await _HttpClient.GetStreamAsync(file.Url);
             await Context.Channel.SendFileAsync(stream, file.Filename, "As Stream");
 
@@ -114,7 +114,6 @@ namespace RavenBOT.Modules.Developer
             Logger.SetLoggerConfig(originalConfig);
             await ReplyAsync($"Set Logger channel to {channel.Mention}");
         }
-
 
         /*
         [Command("MigrateToLiteDB", RunMode = RunMode.Async)]

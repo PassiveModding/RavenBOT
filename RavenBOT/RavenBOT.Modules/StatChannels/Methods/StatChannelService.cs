@@ -4,9 +4,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Discord.WebSocket;
-using RavenBOT.Modules.StatChannels.Models;
 using RavenBOT.Common;
 using RavenBOT.Common.Interfaces;
+using RavenBOT.Modules.StatChannels.Models;
 
 namespace RavenBOT.Modules.StatChannels.Methods
 {

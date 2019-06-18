@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using Discord;
 using Discord.WebSocket;
+using RavenBOT.Common.Interfaces;
 using RavenBOT.Extensions;
 using RavenBOT.Models;
-using RavenBOT.Common.Interfaces;
 
 namespace RavenBOT.Common.Handlers
 {

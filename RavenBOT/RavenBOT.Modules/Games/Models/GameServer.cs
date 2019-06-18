@@ -14,6 +14,6 @@ namespace RavenBOT.Modules.Games.Models
             GuildId = guildId;
         }
 
-        public GameServer() { }
+        public GameServer() {}
     }
 }

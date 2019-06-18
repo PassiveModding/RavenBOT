@@ -6,7 +6,7 @@ namespace RavenBOT.Modules.Greetings.Models
         {
             GuildId = guildId;
         }
-        public GoodbyeConfig() { }
+        public GoodbyeConfig() {}
 
         public ulong GoodbyeChannel { get; set; }
         public ulong GuildId { get; set; }

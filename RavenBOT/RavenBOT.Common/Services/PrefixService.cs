@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using RavenBOT.Common.Interfaces;
 
 namespace RavenBOT.Common.Services

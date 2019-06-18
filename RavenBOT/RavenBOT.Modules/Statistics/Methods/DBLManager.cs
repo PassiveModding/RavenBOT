@@ -1,8 +1,8 @@
 using Discord.WebSocket;
 using DiscordBotsList.Api.Adapter.Discord.Net;
-using RavenBOT.Modules.Statistics.Models;
 using RavenBOT.Common;
 using RavenBOT.Common.Interfaces;
+using RavenBOT.Modules.Statistics.Models;
 
 namespace RavenBOT.Modules.Statistics.Methods
 {

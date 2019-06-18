@@ -1,13 +1,13 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord.WebSocket;
-using RavenBOT.Modules.AutoMod.Models;
-using RavenBOT.Modules.AutoMod.Models.Moderation;
 using RavenBOT.Common;
 using RavenBOT.Common.Interfaces;
 using RavenBOT.Common.Services;
+using RavenBOT.Modules.AutoMod.Models;
+using RavenBOT.Modules.AutoMod.Models.Moderation;
 
 namespace RavenBOT.Modules.AutoMod.Methods
 {

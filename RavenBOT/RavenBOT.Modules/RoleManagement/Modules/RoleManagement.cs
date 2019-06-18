@@ -5,16 +5,16 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
+using Discord.WebSocket;
 using MoreLinq;
+using RavenBOT.Extensions;
 using RavenBOT.Modules.RoleManagement.Methods;
 using RavenBOT.Modules.RoleManagement.Models;
-using RavenBOT.Extensions;
-using Discord.WebSocket;
 
 namespace RavenBOT.Modules.RoleManagement.Modules
 {
     [Group("RoleManager")]
-    [RequireContext(ContextType.Guild)]        
+    [RequireContext(ContextType.Guild)]
     [RequireBotPermission(GuildPermission.ManageRoles)]
     public class RoleManagement : InteractiveBase<ShardedCommandContext>
     {
@@ -22,7 +22,7 @@ namespace RavenBOT.Modules.RoleManagement.Modules
         {
             Manager = manager;
         }
-        
+
         public RoleManager Manager { get; }
 
         [Command("CreateMessage")]
@@ -80,12 +80,12 @@ namespace RavenBOT.Modules.RoleManagement.Modules
         public async Task YoutubeExample()
         {
             var content = $"To verify your subscription status use the `verify subscription` command, followed by the display name of the channel you subscribed to and your own youtube channel id.\n" +
-                            $"eg. `verify subscription PassiveModding UCSEd2z_QfxQ_GJpDAAsvs4A`\n" +
-                            $"To find your channel ID, visit your channel and check the url for the following content:\n" +
-                            $"http://discord.passivenation.com/co3a0b1a2143.png\n" +
-                            $"NOTE: You must have your youtube subscriptions public when authenticating.\n" +
-                            "You can make them public by following the tutorial here:\n" +
-                            "https://support.google.com/youtube/answer/7280190?hl=en";
+                $"eg. `verify subscription PassiveModding UCSEd2z_QfxQ_GJpDAAsvs4A`\n" +
+                $"To find your channel ID, visit your channel and check the url for the following content:\n" +
+                $"http://discord.passivenation.com/co3a0b1a2143.png\n" +
+                $"NOTE: You must have your youtube subscriptions public when authenticating.\n" +
+                "You can make them public by following the tutorial here:\n" +
+                "https://support.google.com/youtube/answer/7280190?hl=en";
             await ReplyAsync("", false, content.QuickEmbed());
         }
 
@@ -147,18 +147,18 @@ namespace RavenBOT.Modules.RoleManagement.Modules
             {
                 case RoleManager.SubscriptionStatus.Error:
                     await ReplyAsync("There was an error configuring the subscription status.\n" +
-                                    "This may be because your youtube subscriptions are private. You can make them public by following the tutorial here:\n" +
-                                    "https://support.google.com/youtube/answer/7280190?hl=en");
+                        "This may be because your youtube subscriptions are private. You can make them public by following the tutorial here:\n" +
+                        "https://support.google.com/youtube/answer/7280190?hl=en");
                     await gUser.RemoveRoleAsync(role);
-                return;
+                    return;
                 case RoleManager.SubscriptionStatus.NotSubscribed:
                     await ReplyAsync("You are not subscribed.");
                     await gUser.RemoveRoleAsync(role);
-                return;
+                    return;
                 case RoleManager.SubscriptionStatus.Unknown:
                     await ReplyAsync("There was an error confirming your subscription status.");
                     await gUser.RemoveRoleAsync(role);
-                return;
+                    return;
             }
 
             await gUser.AddRoleAsync(role);
@@ -168,8 +168,8 @@ namespace RavenBOT.Modules.RoleManagement.Modules
                 channelConfig.AuthenticatedUserIds.Add(new YoutubeRoleConfig.SubReward.YoutubeSubscriber
                 {
                     UserId = Context.User.Id,
-                    YoutubeChannelId = userChannelId
-                });  
+                        YoutubeChannelId = userChannelId
+                });
                 Manager.SaveYTConfig(config);
             }
 
@@ -216,8 +216,8 @@ namespace RavenBOT.Modules.RoleManagement.Modules
             config.SubRewards.Add(displayName, new YoutubeRoleConfig.SubReward
             {
                 DisplayName = displayName,
-                YoutubeChannelId = subChannelId,
-                RewardedRoleId = role.Id
+                    YoutubeChannelId = subChannelId,
+                    RewardedRoleId = role.Id
             });
 
             Manager.SaveYTConfig(config);
@@ -228,7 +228,7 @@ namespace RavenBOT.Modules.RoleManagement.Modules
         [Command("SetYoutubeApiKey")]
         [Summary("Set the youtube api key for checking the subscription status of users.")]
         [RequireOwner]
-        public async Task SetYoutubeApiKeyAsync([Remainder]string key)
+        public async Task SetYoutubeApiKeyAsync([Remainder] string key)
         {
             var config = Manager.Database.Load<YoutubeConfig>(YoutubeConfig.DocumentName());
             if (config == null)
@@ -240,7 +240,6 @@ namespace RavenBOT.Modules.RoleManagement.Modules
             Manager.Database.Store(config, YoutubeConfig.DocumentName());
             await ReplyAsync("Key set.");
         }
-
 
         public string[] numberedEmotes = new string[]
         {

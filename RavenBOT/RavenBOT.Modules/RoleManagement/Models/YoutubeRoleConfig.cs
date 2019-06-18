@@ -11,7 +11,7 @@ namespace RavenBOT.Modules.RoleManagement.Models
 
         public class SubReward
         {
-            public ulong RewardedRoleId  { get; set; }
+            public ulong RewardedRoleId { get; set; }
             public string YoutubeChannelId { get; set; }
             public string DisplayName { get; set; }
             public List<YoutubeSubscriber> AuthenticatedUserIds { get; set; } = new List<YoutubeSubscriber>();

@@ -10,11 +10,11 @@ using RavenBOT.Modules.Games.Methods;
 namespace RavenBOT.Modules.Games.Modules
 {
     [Group("Games")]
-        public partial class Game : InteractiveBase<ShardedCommandContext>
+    public partial class Game : InteractiveBase<ShardedCommandContext>
     {
-        public GameService GameService {get;}
-        public Random Random {get;}
-        public HttpClient HttpClient {get;}
+        public GameService GameService { get; }
+        public Random Random { get; }
+        public HttpClient HttpClient { get; }
 
         public Game(GameService gameService, Random random, HttpClient client)
         {
@@ -40,7 +40,7 @@ namespace RavenBOT.Modules.Games.Modules
                 Color = Color.Blue,
                 Footer = new EmbedFooterBuilder
                 {
-                    Text = $"{Context.User.Username}#{Context.User.Discriminator}"
+                Text = $"{Context.User.Username}#{Context.User.Discriminator}"
                 }
             };
 
@@ -63,13 +63,13 @@ namespace RavenBOT.Modules.Games.Modules
             {
                 Title = $"{user.Username} Game Stats",
                 Description = $"Balance: {guser.Points} Points\n" +
-                              $"Total Bet: {guser.TotalBet} Points\n" +
-                              $"Total Paid Out: {guser.TotalWon} Points\n",
+                $"Total Bet: {guser.TotalBet} Points\n" +
+                $"Total Paid Out: {guser.TotalWon} Points\n",
                 ThumbnailUrl = user.GetAvatarUrl(),
                 Color = Color.Blue,
                 Footer = new EmbedFooterBuilder
                 {
-                    Text = $"{user.Username}#{user.Discriminator}"
+                Text = $"{user.Username}#{user.Discriminator}"
                 }
             };
 

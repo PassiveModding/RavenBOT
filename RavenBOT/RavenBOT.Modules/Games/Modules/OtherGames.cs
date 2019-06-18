@@ -9,7 +9,7 @@ namespace RavenBOT.Modules.Games.Modules
     [Group("Games")]
     public class OtherGames : InteractiveBase<ShardedCommandContext>
     {
-        public Random Random {get;}
+        public Random Random { get; }
         public OtherGames(Random random)
         {
             Random = random;
@@ -17,7 +17,7 @@ namespace RavenBOT.Modules.Games.Modules
 
         [Command("8ball")]
         [Summary("Ask the 8Ball a question")]
-        public async Task Ball([Remainder]string input = null)
+        public async Task Ball([Remainder] string input = null)
         {
             if (input == null)
             {
@@ -86,14 +86,13 @@ namespace RavenBOT.Modules.Games.Modules
                 if (pick == choice)
                     msg = "We both chose: " + GetRpsPick(pick) + " Draw, Try again";
                 else if (pick == 0 && choice == 1 ||
-                         pick == 1 && choice == 2 ||
-                         pick == 2 && choice == 0)
+                    pick == 1 && choice == 2 ||
+                    pick == 2 && choice == 0)
                     msg = "My Pick: " + GetRpsPick(choice) + "Beats Your Pick: " + GetRpsPick(pick) +
-                          "\nYou Lose! Try Again!";
+                    "\nYou Lose! Try Again!";
                 else
                     msg = "Your Pick: " + GetRpsPick(pick) + "Beats My Pick: " + GetRpsPick(choice) +
-                          "\nCongratulations! You win!";
-
+                    "\nCongratulations! You win!";
 
                 var embed = new EmbedBuilder
                 {
@@ -158,8 +157,7 @@ namespace RavenBOT.Modules.Games.Modules
             await ReplyAsync("", false, embed.Build());
         }
 
-        public string[] Dice =
-        {
+        public string[] Dice = {
             "https://www.wpclipart.com/recreation/games/dice/die_face_1.png",
             "https://www.wpclipart.com/recreation/games/dice/die_face_2.png",
             "https://www.wpclipart.com/recreation/games/dice/die_face_3.png",
@@ -168,8 +166,7 @@ namespace RavenBOT.Modules.Games.Modules
             "https://www.wpclipart.com/recreation/games/dice/die_face_6.png"
         };
 
-        public string[] Fortune =
-        {
+        public string[] Fortune = {
             "Today it's up to you to create the peacefulness you long for.",
             "A friend asks only for your time not your money.",
             "If you refuse to accept anything but the best, you very often get it.",
@@ -272,8 +269,7 @@ namespace RavenBOT.Modules.Games.Modules
             "Welcome the change coming into your life."
         };
 
-        public string[] Answers8Ball =
-        {
+        public string[] Answers8Ball = {
             "It is certain",
             "It is decidedly so",
             "Without a doubt",

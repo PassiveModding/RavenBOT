@@ -1,4 +1,4 @@
-﻿namespace RavenBOT.Modules.AutoMod.Models
+namespace RavenBOT.Modules.AutoMod.Models
 {
     public class PerspectiveSetup
     {

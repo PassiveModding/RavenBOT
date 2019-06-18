@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.ComponentModel;
 using Discord;
 using Discord.WebSocket;
@@ -23,7 +23,7 @@ namespace RavenBOT.Modules.Tickets.Models
             SetState(TicketState.open);
         }
 
-        public Ticket() { }
+        public Ticket() {}
 
         public static string DocumentName(ulong guildId, int ticketId)
         {

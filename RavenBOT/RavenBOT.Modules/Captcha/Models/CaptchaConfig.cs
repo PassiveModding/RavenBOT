@@ -7,7 +7,7 @@ namespace RavenBOT.Modules.Captcha.Models
             GuildId = guildId;
         }
 
-        public CaptchaConfig() { }
+        public CaptchaConfig() {}
 
         public ulong GuildId { get; set; }
 

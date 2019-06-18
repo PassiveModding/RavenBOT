@@ -350,7 +350,6 @@ namespace RavenBOT.Modules.Music.Modules
             await ReplyAsync("Resumed.");
         }
 
-
         [Command("ShowVolume")]
         [Alias("Volume")]
         [Summary("Displays the audio player's volume")]

@@ -15,7 +15,7 @@ namespace RavenBOT.Modules.Birthday.Models
             Birthday = birthday;
             ShowYear = showYear;
         }
-        public BirthdayModel() { }
+        public BirthdayModel() {}
 
         public ulong UserId { get; set; }
         public DateTime Birthday { get; set; }

@@ -1,6 +1,6 @@
-using RavenBOT.Modules.Games.Models;
 using RavenBOT.Common;
 using RavenBOT.Common.Interfaces;
+using RavenBOT.Modules.Games.Models;
 
 namespace RavenBOT.Modules.Games.Methods
 {

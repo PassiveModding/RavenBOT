@@ -13,7 +13,7 @@ namespace RavenBOT.Modules.Games.Models
             Points = 200;
         }
 
-        public GameUser() { }
+        public GameUser() {}
 
         public ulong UserId { get; set; }
         public ulong GuildId { get; set; }

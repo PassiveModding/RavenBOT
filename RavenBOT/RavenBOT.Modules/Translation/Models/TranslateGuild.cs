@@ -15,7 +15,7 @@ namespace RavenBOT.Modules.Translation.Models
             GuildId = guildId;
         }
 
-        public TranslateGuild() { }
+        public TranslateGuild() {}
 
         public ulong GuildId { get; set; }
 
