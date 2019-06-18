@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using RavenBOT.ELO.Modules.Bases;
+using RavenBOT.ELO.Modules.Methods;
+using RavenBOT.ELO.Modules.Models;
 using RavenBOT.Extensions;
 
 namespace RavenBOT.ELO.Modules.Modules

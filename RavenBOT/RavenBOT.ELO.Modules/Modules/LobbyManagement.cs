@@ -1,6 +1,8 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Discord.Commands;
+using RavenBOT.ELO.Modules.Bases;
+using RavenBOT.ELO.Modules.Preconditions;
 
 namespace RavenBOT.ELO.Modules.Modules
 {
@@ -28,11 +30,17 @@ namespace RavenBOT.ELO.Modules.Modules
             if (Context.Service.GetCompetition(Context.Guild.Id).BlockMultiQueueing)
             {
                 var lobbies = Context.Service.GetLobbies(Context.Guild.Id);
-                if (lobbies.Any(x => x.Queue.Contains(Context.User.Id)))
+                var lobbyMatches = lobbies.Where(x => x.Queue.Contains(Context.User.Id));
+                if (lobbyMatches.Any())
                 {
-                    await ReplyAsync("Lobby c")
+                    var guildChannels = lobbyMatches.Select(x => Context.Guild.GetTextChannel(x.ChannelId)?.Mention ?? $"[{x.ChannelId}]");
+                    await ReplyAsync($"MultiQueuing is not enabled in this server.\nPlease leave: {string.Join("\n", guildChannels)}");
+                    return;
                 }
             }
+
+            //TODO: Check if game is picking players.
+            //TODO: Create game on lobby full.
         }
     }
 }

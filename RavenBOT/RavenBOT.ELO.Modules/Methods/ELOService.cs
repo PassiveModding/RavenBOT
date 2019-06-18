@@ -1,8 +1,8 @@
-using System;
 using System.Linq;
 using Discord.WebSocket;
 using RavenBOT.Common;
 using RavenBOT.Common.Interfaces;
+using RavenBOT.ELO.Modules.Models;
 
 namespace RavenBOT.ELO.Modules.Methods
 {
@@ -13,6 +13,8 @@ namespace RavenBOT.ELO.Modules.Methods
             Database = database;
             Client = client;
         }
+
+        //TODO: Hook channel deleted event to automatically delete lobbies
 
         public IDatabase Database { get; }
         public DiscordShardedClient Client { get; }
@@ -45,7 +47,7 @@ namespace RavenBOT.ELO.Modules.Methods
 
         public Lobby[] GetLobbies(ulong guildId)
         {
-            return Database.Query<Lobby>().Where(x => x.GuildId == guildId).ToArray();
+            return Database.Query<Lobby>(x => x.GuildId == guildId).ToArray();
         }
 
         public Player GetPlayer(ulong guildId, ulong userId)

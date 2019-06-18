@@ -15,7 +15,6 @@ namespace RavenBOT.ELO.Modules.Models
         }
         public ulong GuildId { get; set; }
 
-        //TODO: Competition settings.
         public List<Rank> Ranks { get; set; } = new List<Rank>();
 
         public ulong RegisteredRankId { get; set; } = 0;

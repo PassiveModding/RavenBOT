@@ -2,6 +2,7 @@ using System;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
+using RavenBOT.ELO.Modules.Methods;
 
 namespace RavenBOT.ELO.Modules.Bases
 {
