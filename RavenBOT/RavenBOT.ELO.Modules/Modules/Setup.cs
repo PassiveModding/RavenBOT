@@ -1,23 +1,16 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
-using Discord.Addons.Interactive;
 using Discord.Commands;
-using ELO.Methods;
-using ELO.Models;
+using RavenBOT.ELO.Modules.Bases;
 using RavenBOT.Extensions;
 
-namespace ELO.Modules
+namespace RavenBOT.ELO.Modules.Modules
 {
     [RequireContext(ContextType.Guild)]
     [RequireUserPermission(GuildPermission.Administrator)]
-    public class Setup : InteractiveBase<ShardedCommandContext>
+    public class Setup : ELOBase
     {
-        public Setup(ELOService service)
-        {
-            Service = service;
-        }
-
         public ELOService Service { get; }
 
         [Command("Create Lobby")]

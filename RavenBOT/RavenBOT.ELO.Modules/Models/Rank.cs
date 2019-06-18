@@ -1,4 +1,4 @@
-namespace ELO.Models
+namespace RavenBOT.ELO.Modules.Models
 {
     public class Rank
     {

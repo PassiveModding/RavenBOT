@@ -1,10 +1,10 @@
+using System;
 using System.Linq;
 using Discord.WebSocket;
-using ELO.Models;
 using RavenBOT.Common;
 using RavenBOT.Common.Interfaces;
 
-namespace ELO.Methods
+namespace RavenBOT.ELO.Modules.Methods
 {
     public partial class ELOService : IServiceable
     {
@@ -41,6 +41,11 @@ namespace ELO.Methods
         public Lobby GetLobby(ulong guildId, ulong channelId)
         {
             return Database.Load<Lobby>(Lobby.DocumentName(guildId, channelId));
+        }
+
+        public Lobby[] GetLobbies(ulong guildId)
+        {
+            return Database.Query<Lobby>().Where(x => x.GuildId == guildId).ToArray();
         }
 
         public Player GetPlayer(ulong guildId, ulong userId)

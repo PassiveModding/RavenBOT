@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace ELO.Models
+namespace RavenBOT.ELO.Modules.Models
 {
     public class Lobby
     {

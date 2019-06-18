@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace ELO.Models
+namespace RavenBOT.ELO.Modules.Models
 {
     public class CompetitionConfig
     {
@@ -21,5 +21,7 @@ namespace ELO.Models
         public ulong RegisteredRankId { get; set; } = 0;
 
         public string NameFormat { get; set; } = "[{score}] {name}";
+
+        public bool BlockMultiQueueing { get; set; } = false;
     }
 }
