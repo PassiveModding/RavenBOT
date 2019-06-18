@@ -13,21 +13,19 @@ namespace RavenBOT.ELO.Modules.Modules
     [RequireUserPermission(GuildPermission.Administrator)]
     public class Setup : ELOBase
     {
-        public ELOService Service { get; }
-
         [Command("Create Lobby")]
         public async Task CreateLobbyAsync(int playersPerTeam = 5, Lobby.PickMode pickMode = Lobby.PickMode.Captains)
         {
-            if (Service.GetLobby(Context.Guild.Id, Context.Channel.Id) != null)
+            if (Context.Service.GetLobby(Context.Guild.Id, Context.Channel.Id) != null)
             {
                 await ReplyAsync("This channel is already a lobby. Remove the lobby before trying top create a new one here.");
                 return;
             }
 
-            var lobby = Service.CreateLobby(Context.Guild.Id, Context.Channel.Id);
+            var lobby = Context.Service.CreateLobby(Context.Guild.Id, Context.Channel.Id);
             lobby.PlayersPerTeam = playersPerTeam;
             lobby.TeamPickMode = pickMode;
-            Service.Database.Store(lobby, Lobby.DocumentName(Context.Guild.Id, Context.Channel.Id));
+            Context.Service.Database.Store(lobby, Lobby.DocumentName(Context.Guild.Id, Context.Channel.Id));
             await ReplyAsync("New Lobby has been created\n" +
                 $"Players per team: {playersPerTeam}\n" +
                 $"Pick Mode: {pickMode}");
@@ -36,7 +34,7 @@ namespace RavenBOT.ELO.Modules.Modules
         [Command("Set Player Count")]
         public async Task SetPlayerAsync(int playersPerTeam)
         {
-            var lobby = Service.GetLobby(Context.Guild.Id, Context.Channel.Id);
+            var lobby = Context.Service.GetLobby(Context.Guild.Id, Context.Channel.Id);
             if (lobby == null)
             {
                 await ReplyAsync("Channel is not a lobby.");
@@ -50,7 +48,7 @@ namespace RavenBOT.ELO.Modules.Modules
         [Command("Set Pick Mode")]
         public async Task SetPickModeAsync(Lobby.PickMode pickMode)
         {
-            var lobby = Service.GetLobby(Context.Guild.Id, Context.Channel.Id);
+            var lobby = Context.Service.GetLobby(Context.Guild.Id, Context.Channel.Id);
             if (lobby == null)
             {
                 await ReplyAsync("Channel is not a lobby.");
@@ -71,7 +69,7 @@ namespace RavenBOT.ELO.Modules.Modules
         [Command("SetCaptainMode")]
         public async Task SetCaptainModeAsync(Lobby.CaptainMode captainMode)
         {
-            var lobby = Service.GetLobby(Context.Guild.Id, Context.Channel.Id);
+            var lobby = Context.Service.GetLobby(Context.Guild.Id, Context.Channel.Id);
             if (lobby == null)
             {
                 await ReplyAsync("Channel is not a lobby.");
@@ -92,23 +90,23 @@ namespace RavenBOT.ELO.Modules.Modules
         [Command("SetRegisterRole")]
         public async Task SetRegisterRole(IRole role)
         {
-            var competition = Service.GetCompetition(Context.Guild.Id) ?? Service.CreateCompetition(Context.Guild.Id);
+            var competition = Context.Service.GetCompetition(Context.Guild.Id) ?? Context.Service.CreateCompetition(Context.Guild.Id);
             competition.RegisteredRankId = role.Id;
-            Service.Database.Store(competition, CompetitionConfig.DocumentName(Context.Guild.Id));
+            Context.Service.Database.Store(competition, CompetitionConfig.DocumentName(Context.Guild.Id));
             await ReplyAsync("Register role set.");
         }
 
         [Command("AddRank")]
         public async Task AddRank(IRole role, int points)
         {
-            var competition = Service.GetCompetition(Context.Guild.Id) ?? Service.CreateCompetition(Context.Guild.Id);
+            var competition = Context.Service.GetCompetition(Context.Guild.Id) ?? Context.Service.CreateCompetition(Context.Guild.Id);
             competition.Ranks = competition.Ranks.Where(x => x.RoleId != role.Id).ToList();
             competition.Ranks.Add(new Rank
             {
                 RoleId = role.Id,
                     Points = points
             });
-            Service.Database.Store(competition, CompetitionConfig.DocumentName(Context.Guild.Id));
+            Context.Service.Database.Store(competition, CompetitionConfig.DocumentName(Context.Guild.Id));
             await ReplyAsync("Rank added.");
         }
 
@@ -121,9 +119,9 @@ namespace RavenBOT.ELO.Modules.Modules
         [Command("RemoveRank")]
         public async Task RemoveRank(ulong roleId)
         {
-            var competition = Service.GetCompetition(Context.Guild.Id) ?? Service.CreateCompetition(Context.Guild.Id);
+            var competition = Context.Service.GetCompetition(Context.Guild.Id) ?? Context.Service.CreateCompetition(Context.Guild.Id);
             competition.Ranks = competition.Ranks.Where(x => x.RoleId != roleId).ToList();
-            Service.Database.Store(competition, CompetitionConfig.DocumentName(Context.Guild.Id));
+            Context.Service.Database.Store(competition, CompetitionConfig.DocumentName(Context.Guild.Id));
             await ReplyAsync("Rank Removed.");
         }
 
