@@ -24,6 +24,8 @@ namespace RavenBOT.Modules.Moderator.Models
         {
             Kick,
             Ban,
+            Mute,
+            SoftBan,
             None
         }
 

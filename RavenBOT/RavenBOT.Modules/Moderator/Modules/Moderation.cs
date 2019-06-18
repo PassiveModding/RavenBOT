@@ -85,7 +85,7 @@ namespace RavenBOT.Modules.Moderator.Modules
         [RequireBotPermission(Discord.GuildPermission.BanMembers)]
         [RequireUserPermission(Discord.GuildPermission.BanMembers)]
         [Summary("Bans a user based on their user ID")]
-        public async Task MaxWarnings(ulong userId, [Remainder] string reason = null)
+        public async Task HackBanAsync(ulong userId, [Remainder] string reason = null)
         {
             var gUser = Context.Guild.GetUser(userId);
             if (gUser != null)
@@ -223,9 +223,13 @@ namespace RavenBOT.Modules.Moderator.Modules
 
         [Command("warn")]
         [Summary("Warns a user")]
-        //TODO: check user permission level
         public async Task WarnUser(SocketGuildUser user, [Remainder] string reason = null)
         {
+            if (!await IsActionable(user, Context.User as SocketGuildUser))
+            {
+                return;
+            }
+
             //Log this to some config file?
             var config = ModHandler.GetActionConfig(Context.Guild.Id);
             var userConfig = ModHandler.GetActionUser(Context.Guild.Id, user.Id);
@@ -236,7 +240,7 @@ namespace RavenBOT.Modules.Moderator.Modules
             ModHandler.Save(config, ActionConfig.DocumentName(Context.Guild.Id));
 
             ModHandler.Save(userConfig, ActionConfig.ActionUser.DocumentName(user.Id, Context.Guild.Id));
-            //TODO: If reason is not set, generate ticket-like ID and have command where they can set the reason afterwards
+
             await ReplyAsync($"#{caseId} {user.Mention} was warned by {Context.User.Mention} for {reason ?? "N/A"}");
             if (warns > config.MaxWarnings)
             {
@@ -250,12 +254,21 @@ namespace RavenBOT.Modules.Moderator.Modules
                     await Context.Guild.AddBanAsync(user, 0, "Exceeded maximum warnings.");
                     await ReplyAsync($"{user.Mention} was banned for exceeding the max warning count");
                 }
+                else if (config.MaxWarningsAction == Models.ActionConfig.Action.SoftBan)
+                {
+                    await SoftBanUser(user, "Exceeded maximum warnings.");
+                    await ReplyAsync($"{user.Mention} was soft-banned for `{config.SoftBanLength.GetReadableLength()}` for exceeding the max warning count");
+                }
+                else if (config.MaxWarningsAction == Models.ActionConfig.Action.Mute)
+                {
+                    await MuteUser(user, "Exceeded maximum warnings");
+                    await ReplyAsync($"{user.Mention} was muted for `{config.SoftBanLength.GetReadableLength()}` for exceeding the max warning count");
+                }
             }
         }
 
         [Command("mute")]
         [Summary("Stops a user from being able to talk")]
-        //TODO: Mod permissions
         public async Task MuteUser(SocketGuildUser user, [Remainder] string reason = null)
         {
             await MuteUser(user, null, reason);
@@ -263,7 +276,6 @@ namespace RavenBOT.Modules.Moderator.Modules
 
         [Command("mute")]
         [Summary("Stops a user from being able to talk for the specified amount of time")]
-        //TODO: Mod permissions
         public async Task MuteUser(SocketGuildUser user, TimeSpan? time = null, [Remainder] string reason = null)
         {
             if (!await IsActionable(user, Context.User as SocketGuildUser))
@@ -271,7 +283,6 @@ namespace RavenBOT.Modules.Moderator.Modules
                 return;
             }
 
-            //TODO: accept time for user to be muted or get default from config
             //Log this to some config file?
             var config = ModHandler.GetActionConfig(Context.Guild.Id);
             var muteRole = await ModHandler.GetOrCreateMuteRole(config, Context.Guild);
