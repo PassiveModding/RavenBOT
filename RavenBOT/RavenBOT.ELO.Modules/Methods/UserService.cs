@@ -68,5 +68,40 @@ namespace RavenBOT.ELO.Modules.Methods
             return comp.NameFormat.Replace("{score}", player.Points.ToString(), StringComparison.InvariantCultureIgnoreCase)
                 .Replace("{name}", player.DisplayName, StringComparison.InvariantCultureIgnoreCase).FixLength(32);
         }
+
+        public (ulong, ulong) GetCaptains(Lobby lobby, GameResult game, Random rnd)
+        {
+            ulong cap1 = 0;
+            ulong cap2 = 0;
+            if (lobby.CaptainSortMode == Lobby.CaptainMode.RandomHighestRanked)
+            {
+                if (game.Queue.Count >= 4)
+                {
+                    var players = game.Queue.Select(x => GetPlayer(game.GuildId, x)).Where(x => x != null).OrderByDescending(x => x.Points).Take(4).OrderBy(x => rnd.Next()).ToList();
+                    cap1 = players[0].UserId;
+                    cap2 = players[1].UserId;
+                }
+                else
+                {
+                    var randomised = game.Queue.OrderBy(x => rnd.Next()).Take(2).ToList();
+                    cap1 = randomised[0];
+                    cap2 = randomised[1];
+                }
+            }
+            else if (lobby.CaptainSortMode == Lobby.CaptainMode.RandomHighestRanked)
+            {
+                var randomised = game.Queue.OrderBy(x => rnd.Next()).Take(2).ToList();
+                cap1 = randomised[0];
+                cap2 = randomised[1];
+            }
+            else// if (lobby.CaptainSortMode == Lobby.CaptainMode.HighestRanked)
+            {
+                var players = game.Queue.Select(x => GetPlayer(game.GuildId, x)).Where(x => x != null).OrderByDescending(x => x.Points).Take(2).ToList();
+                cap1 = players[0].UserId;
+                cap2 = players[1].UserId;
+            }
+
+            return (cap1, cap2);
+        }
     }
 }

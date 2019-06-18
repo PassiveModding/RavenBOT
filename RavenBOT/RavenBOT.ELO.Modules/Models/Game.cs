@@ -5,13 +5,26 @@ namespace RavenBOT.ELO.Modules.Models
 {
     public class GameResult
     {
-        public GameResult(int gameId)
+        public static string DocumentName(int gameId, ulong lobbyId, ulong guildId)
+        {
+            return $"GameResult-{gameId}-{lobbyId}-{guildId}";
+        }
+
+        public GameResult(int gameId, ulong lobbyId, ulong guildId)
         {
             GameId = gameId;
+            LobbyId = lobbyId;
+            GuildId = guildId;
         }
         public int GameId { get; set; }
+
+        public ulong LobbyId { get; set; }
+
+        public ulong GuildId { get; set; }
+
         public enum State
         {
+            Picking,
             Undecided,
             Draw,
             Decided,
@@ -28,6 +41,7 @@ namespace RavenBOT.ELO.Modules.Models
         public List<ulong> Queue { get; set; } = new List<ulong>();
         public class Team
         {
+            public ulong Captain { get; set; } = 0;
             public List<ulong> Players { get; set; } = new List<ulong>();
         }
     }

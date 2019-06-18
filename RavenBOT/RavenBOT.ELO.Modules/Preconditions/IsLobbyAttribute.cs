@@ -5,13 +5,13 @@ using RavenBOT.ELO.Modules.Bases;
 
 namespace RavenBOT.ELO.Modules.Preconditions
 {
-    public class IsRegistered : PreconditionAttribute
+    public class IsLobby : PreconditionAttribute
     {
         public override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)
         {
             if (!(context is ELOContext ec))
             {
-                return Task.FromResult(PreconditionResult.FromError("Invalid Context."));
+                return Task.FromResult(PreconditionResult.FromError("Context is not an ELOContext."));
             }
             
             if (context.Guild == null)
@@ -19,14 +19,14 @@ namespace RavenBOT.ELO.Modules.Preconditions
                 return Task.FromResult(PreconditionResult.FromError("Invalid Command Context."));
             }
 
-            var player = ec.Service.GetPlayer(context.Guild.Id, context.User.Id);
+            var lobby = ec.Service.GetLobby(context.Guild.Id, context.User.Id);
 
-            if (player == null)
+            if (lobby == null)
             {
-                return Task.FromResult(PreconditionResult.FromError("You are not registered for this server."));
+                return Task.FromResult(PreconditionResult.FromError("This channel is not a lobby."));
             }
 
-            ec.CurrentPlayer = player;
+            ec.CurrentLobby = lobby;
 
             return Task.FromResult(PreconditionResult.FromSuccess());
         }

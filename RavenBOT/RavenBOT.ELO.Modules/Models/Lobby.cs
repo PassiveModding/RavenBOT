@@ -25,6 +25,8 @@ namespace RavenBOT.ELO.Modules.Models
 
         public PickMode TeamPickMode { get; set; } = PickMode.Random;
 
+        public int CurrentGameCount { get; set; } = 0;
+
         public enum PickMode
         {
             Captains,
