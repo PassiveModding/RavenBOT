@@ -118,6 +118,15 @@ namespace RavenBOT.Modules.Moderator.Modules
             await ReplyAsync($"Max Warnings is now: {max}");
         }
 
+        [Command("MaxWarningsActions")]
+        [Summary("Displays the actions that can be taken when a user reaches max warnings")]
+        [RequireUserPermission(GuildPermission.Administrator)]
+        public async Task MaxWarningsActions()
+        {
+            var actions = Extensions.StringExtensions.ConvertEnumToDictionary<Models.ActionConfig.Action>();
+            await ReplyAsync(string.Join("\n", actions.Keys));
+        }
+
         [Command("MaxWarningsAction")]
         [Summary("Sets the action to take on users who receive too many warnings")]
         [RequireUserPermission(GuildPermission.Administrator)]
@@ -173,7 +182,6 @@ namespace RavenBOT.Modules.Moderator.Modules
             else
             {
                 action.Reason = $"**Original Reason**\n{action.Reason}**Updated Reason**\n{reason}";
-                //TODO: Show action in embed
                 await ReplyAsync("Appended reason to message.");
             }
 
@@ -301,14 +309,12 @@ namespace RavenBOT.Modules.Moderator.Modules
             ModHandler.Save(ModHandler.TimedActions, TimeTracker.DocumentName);
             var expiryTime = DateTime.UtcNow + time.Value;
             await ReplyAsync($"#{caseId} {user.Mention} has been muted for {time.Value.GetReadableLength()}, Expires at: {expiryTime.ToShortDateString()} {expiryTime.ToShortTimeString()}\n**Reason:** {reason ?? "N/A"}");
-            //TODO: Responses and query mutes + reasons
         }
 
         [Command("softban")]
         [Summary("Bans a user from the server temporarily")]
         [RequireBotPermission(Discord.GuildPermission.BanMembers)]
         [RequireUserPermission(Discord.GuildPermission.BanMembers)]
-        //TODO: Mod permissions
         public async Task SoftBanUser(SocketGuildUser user, [Remainder] string reason = null)
         {
             await SoftBanUser(user, null, reason);
@@ -318,7 +324,6 @@ namespace RavenBOT.Modules.Moderator.Modules
         [Summary("Bans a user from the server for the specified amount of time")]
         [RequireBotPermission(Discord.GuildPermission.BanMembers)]
         [RequireUserPermission(Discord.GuildPermission.BanMembers)]
-        //TODO: Mod permissions
         public async Task SoftBanUser(SocketGuildUser user, TimeSpan? time = null, [Remainder] string reason = null)
         {
             if (!await IsActionable(user, Context.User as SocketGuildUser))
