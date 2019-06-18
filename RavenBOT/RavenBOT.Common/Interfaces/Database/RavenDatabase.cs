@@ -155,6 +155,14 @@ namespace RavenBOT.Common.Interfaces.Database
             }
         }
 
+        public IEnumerable<T> Query<T>(Func<T, bool> queryFunc)
+        {
+            using(var session = DocumentStore.OpenSession())
+            {
+                return session.Query<T>().Where(x => queryFunc(x)).ToList();
+            }
+        }
+
         public IEnumerable<T> Query<T>()
         {
             using(var session = DocumentStore.OpenSession())

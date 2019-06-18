@@ -76,6 +76,13 @@ namespace RavenBOT.Common.Interfaces.Database
             }
         }
 
+        public IEnumerable<T> Query<T>(Func<T, bool> queryFunc)
+        {
+            var collection = GetCollection<T>();
+            var all = collection.Find(x => queryFunc(x.Value));
+            return all.Select(x => x.Value);
+        }
+
         public IEnumerable<T> Query<T>()
         {
             var collection = GetCollection<T>();
