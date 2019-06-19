@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Raven.Client.Documents.Operations;
+using Raven.Client.Documents.Queries;
 using RavenBOT.Common.Interfaces;
+using RavenBOT.Common.Interfaces.Database;
 
 namespace RavenBOT.Common.Services
 {
@@ -175,16 +178,18 @@ namespace RavenBOT.Common.Services
                 UpdateHistory("User Profile Generated");
             }
 
-            public string Prefix { get; }
+            public QuantifiableUserProfile(){}
+
+            public string Prefix { get; set; }
 
             //Note that ravenDB automatically uses the Id property for document names.
             public string Id { get; set; }
 
             public string ProfileType { get; set; }
 
-            public ulong UserId { get; }
+            public ulong UserId { get; set; }
 
-            public List<ILicense> Licenses { get; }
+            public List<ILicense> Licenses { get; set; }
 
             public int TotalUsed { get; set; }
 
@@ -266,17 +271,18 @@ namespace RavenBOT.Common.Services
                 UpdateHistory("User Profile Generated");
                 ExpireTime = DateTime.MinValue;
             }
+            public TimedUserProfile(){}
 
-            public string Prefix { get; }
+            public string Prefix { get; set; }
 
             //Note that ravenDB automatically uses the Id property for document names.
             public string Id { get; set; }
 
-            public ulong UserId { get; }
+            public ulong UserId { get; set; }
 
-            public string ProfileType { get; }
+            public string ProfileType { get; set; }
 
-            public List<ILicense> Licenses { get; }
+            public List<ILicense> Licenses { get; set; }
 
             public Dictionary<DateTime, string> UserHistory { get; set; }
 
@@ -338,12 +344,12 @@ namespace RavenBOT.Common.Services
 
         public interface IUserProfile
         {
-            string Prefix { get; }
-            string Id { get; }
-            ulong UserId { get; }
-            string ProfileType { get; }
-            List<ILicense> Licenses { get; }
-            Dictionary<DateTime, string> UserHistory { get; }
+            string Prefix { get; set; }
+            string Id { get; set; }
+            ulong UserId { get; set; }
+            string ProfileType { get; set; }
+            List<ILicense> Licenses { get; set; }
+            Dictionary<DateTime, string> UserHistory { get; set; }
             void UpdateHistory(string info);
             bool RedeemLicense(ILicense timedLicense);
         }
@@ -370,6 +376,7 @@ namespace RavenBOT.Common.Services
                 CreationDate = DateTime.UtcNow;
                 LicenseType = type;
             }
+            public TimedLicense(){}
 
             public string Id { get; set; }
 
@@ -377,7 +384,7 @@ namespace RavenBOT.Common.Services
             public string LicenseType { get; set; }
             public string Prefix { get; set; }
 
-            public TimeSpan Length { get; }
+            public TimeSpan Length { get; set; }
 
             public DateTime CreationDate { get; set; }
             public DateTime? RedemptionDate { get; set; }
@@ -395,6 +402,7 @@ namespace RavenBOT.Common.Services
                 CreationDate = DateTime.UtcNow;
                 LicenseType = type;
             }
+            public QuantifiableLicense(){}
 
             public string Id { get; set; }
 
