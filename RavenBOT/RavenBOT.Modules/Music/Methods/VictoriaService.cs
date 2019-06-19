@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System;
 using System.IO;
 using System.Linq;
@@ -75,7 +76,7 @@ namespace RavenBOT.Modules.Music.Methods
                 File.WriteAllText(ConfigPath, JsonConvert.SerializeObject(config, Formatting.Indented));
             }
 
-            DiscordClient.ShardConnected += Configure;
+            DiscordClient.ShardReady += Configure;
         }
 
         public async Task TrackFinished(LavaPlayer player, LavaTrack track, TrackEndReason reason)
@@ -109,9 +110,12 @@ namespace RavenBOT.Modules.Music.Methods
             }
         }
 
+        public List<int> ReadyShardIds { get; set; } = new List<int>();
+
         public async Task Configure(DiscordSocketClient sClient)
         {
-            if (!DiscordClient.Shards.All(x => x.ConnectionState == Discord.ConnectionState.Connected))
+            ReadyShardIds.Add(sClient.ShardId);
+            if (!DiscordClient.Shards.All(x => ReadyShardIds.Contains(x.ShardId)))
             {
                 return;
             }
