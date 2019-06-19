@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
@@ -14,16 +15,14 @@ namespace RavenBOT.Modules.Media.Modules
     public class NSFW : InteractiveBase<ShardedCommandContext>
     {
         public MediaHelper MediaHelper { get; }
-        public NsfwHelper NsfwHelper { get; }
         public Random Random { get; }
         public GfycatManager GfyManager { get; }
 
-        public NSFW(Random random, GfycatManager gfyManager, MediaHelper mediaHelper, NsfwHelper nsfwHelper)
+        public NSFW(Random random, GfycatManager gfyManager, MediaHelper mediaHelper)
         {
             Random = random;
             GfyManager = gfyManager;
             MediaHelper = mediaHelper;
-            NsfwHelper = nsfwHelper;
         }
 
         [Command("RedditPost", RunMode = RunMode.Async)]
@@ -86,34 +85,23 @@ namespace RavenBOT.Modules.Media.Modules
         [Summary("Search Rule34 Porn using tags")]
         public async Task R34Async(params string[] tags)
         {
-            var result = await NsfwHelper.HentaiAsync(NsfwHelper.NsfwType.Rule34, tags.ToList());
+            tags = !tags.Any() ? new [] { "boobs", "tits", "ass", "sexy", "neko" } : tags;
+            var url = $"http://gelbooru.com/index.php?page=dapi&s=post&q=index&limit=100&tags={string.Join("+", tags.Select(x => x.Replace(" ", "_")))}";
+
+            var get = await MediaHelper.Client.GetStringAsync(url).ConfigureAwait(false);
+            var matches = Regex.Matches(get, "file_url=\"(.*?)\" ");
+            var result = $"{matches[Random.Next(matches.Count)].Groups[1].Value}";
             if (result == null)
             {
                 await ReplyAsync("No Results.");
             }
             else
             {
-                var embed = new EmbedBuilder { ImageUrl = result, Title = "View On Site [R34]", Url = $"http://adult.passivenation.com/18217229/{result}", Footer = new EmbedFooterBuilder { Text = string.Join(", ", tags) } };
+                var embed = new EmbedBuilder { ImageUrl = result, Title = "View On Site [R34]", Url = result, Footer = new EmbedFooterBuilder { Text = string.Join(", ", tags) } };
                 await ReplyAsync(string.Empty, false, embed.Build());
             }
         }
 
-        [Command("Yandere", RunMode = RunMode.Async)]
-        [Summary("Search Yandere Porn using tags")]
-        public async Task YandereAsync(params string[] tags)
-        {
-            var result = await NsfwHelper.HentaiAsync(NsfwHelper.NsfwType.Yandere, tags.ToList());
-            if (result == null)
-            {
-                await ReplyAsync("No Results.");
-            }
-            else
-            {
-                var embed = new EmbedBuilder { ImageUrl = result, Title = "View On Site [Yandere]", Url = $"http://adult.passivenation.com/18217229/{result}", Footer = new EmbedFooterBuilder() };
-                embed.Footer.Text = string.Join(", ", tags);
-                await ReplyAsync(string.Empty, false, embed.Build());
-            }
-        }
 
         [Command("tits", RunMode = RunMode.Async)]
         [Alias("boobs", "rack")]
@@ -125,7 +113,7 @@ namespace RavenBOT.Modules.Media.Modules
 
             obj = JArray.Parse(await MediaHelper.Client.GetStringAsync($"http://api.oboobs.ru/boobs/{rnd}")) [0];
 
-            var builder = new EmbedBuilder { ImageUrl = $"http://media.oboobs.ru/{obj["preview"]}", Description = $"Tits Database Size: 10229\n Image Number: {rnd}", Title = "Tits", Url = $"http://adult.passivenation.com/18217229/http://media.oboobs.ru/{obj["preview"]}" };
+            var builder = new EmbedBuilder { ImageUrl = $"http://media.oboobs.ru/{obj["preview"]}", Description = $"Tits Database Size: 10229\n Image Number: {rnd}", Title = "Tits", Url = $"http://media.oboobs.ru/{obj["preview"]}" };
 
             await ReplyAsync(string.Empty, false, builder.Build());
         }
@@ -138,56 +126,8 @@ namespace RavenBOT.Modules.Media.Modules
             var rnd = Random.Next(0, 4222);
             obj = JArray.Parse(await MediaHelper.Client.GetStringAsync($"http://api.obutts.ru/butts/{rnd}")) [0];
 
-            var builder = new EmbedBuilder { ImageUrl = $"http://media.obutts.ru/{obj["preview"]}", Description = $"Ass Database Size: 4222\n Image Number: {rnd}", Title = "Ass", Url = $"http://adult.passivenation.com/18217229/http://media.obutts.ru/{obj["preview"]}" };
+            var builder = new EmbedBuilder { ImageUrl = $"http://media.obutts.ru/{obj["preview"]}", Description = $"Ass Database Size: 4222\n Image Number: {rnd}", Title = "Ass", Url = $"http://media.obutts.ru/{obj["preview"]}" };
             await ReplyAsync(string.Empty, false, builder.Build());
-        }
-
-        [Command("Cureninja", RunMode = RunMode.Async)]
-        [Summary("Search Cureninja Porn using tags")]
-        public async Task CureninjaAsync(params string[] tags)
-        {
-            var result = await NsfwHelper.HentaiAsync(NsfwHelper.NsfwType.Cureninja, tags.ToList());
-            if (result == null)
-            {
-                await ReplyAsync("No Results.");
-            }
-            else
-            {
-                var embed = new EmbedBuilder { ImageUrl = result, Title = "View On Site [Cureninja]", Url = $"http://adult.passivenation.com/18217229/{result}", Footer = new EmbedFooterBuilder { Text = string.Join(", ", tags) } };
-                await ReplyAsync(string.Empty, false, embed.Build());
-            }
-        }
-
-        [Command("Gelbooru", RunMode = RunMode.Async)]
-        [Summary("Search Gelbooru Porn using tags")]
-        public async Task GelbooruAsync(params string[] tags)
-        {
-            var result = await NsfwHelper.HentaiAsync(NsfwHelper.NsfwType.Gelbooru, tags.ToList());
-            if (result == null)
-            {
-                await ReplyAsync("No Results.");
-            }
-            else
-            {
-                var embed = new EmbedBuilder { ImageUrl = result, Title = "View On Site [Gelbooru]", Url = $"http://adult.passivenation.com/18217229/{result}", Footer = new EmbedFooterBuilder { Text = string.Join(", ", tags) } };
-                await ReplyAsync(string.Empty, false, embed.Build());
-            }
-        }
-
-        [Command("Konachan", RunMode = RunMode.Async)]
-        [Summary("Search Konachan Porn using tags")]
-        public async Task KonachanAsync(params string[] tags)
-        {
-            var result = await NsfwHelper.HentaiAsync(NsfwHelper.NsfwType.Konachan, tags.ToList());
-            if (result == null)
-            {
-                await ReplyAsync("No Results.");
-            }
-            else
-            {
-                var embed = new EmbedBuilder { ImageUrl = result, Title = "View On Site [Konachan]", Url = $"http://adult.passivenation.com/18217229/{result}", Footer = new EmbedFooterBuilder { Text = string.Join(", ", tags) } };
-                await ReplyAsync(string.Empty, false, embed.Build());
-            }
         }
     }
 }
