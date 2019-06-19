@@ -9,6 +9,7 @@ namespace RavenBOT.Modules
     public class DiscordScreenshare : InteractiveBase<ShardedCommandContext>
     {
         [Command("ScreenShare")]
+        [Summary("Allows you to create a screenshare directly within your discord server rather than a group chat.")]
         [RequireContext(ContextType.Guild)]
         public async Task MakeScreenshare()
         {
