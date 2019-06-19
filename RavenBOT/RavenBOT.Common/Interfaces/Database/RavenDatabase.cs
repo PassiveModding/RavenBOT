@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,6 +8,7 @@ using Newtonsoft.Json;
 using Raven.Client.Documents;
 using Raven.Client.ServerWide;
 using Raven.Client.ServerWide.Operations;
+using Raven.Embedded;
 
 namespace RavenBOT.Common.Interfaces.Database
 {
@@ -19,17 +21,17 @@ namespace RavenBOT.Common.Interfaces.Database
             public List<string> DatabaseUrls { get; set; } = new List<string>();
 
             public string CertificatePath { get; set; } = null;
+
+            public bool Embedded { get; set; } = true;
         }
 
-        private IDocumentStore DocumentStore { get; }
+        private IDocumentStore DocumentStore { get; set; }
         private RavenDatabaseConfig Config { get; }
         private static readonly string ConfigDirectory = Path.Combine(AppContext.BaseDirectory, "setup");
         private static readonly string ConfigPath = Path.Combine(ConfigDirectory, "RavenConfig.json");
 
-        public RavenDatabase()
+        public void StartServer(RavenDatabaseConfig config)
         {
-            Config = GetOrInitializeConfig();
-
             try
             {
                 if (Config.CertificatePath != null && File.Exists(Config.CertificatePath))
@@ -64,6 +66,39 @@ namespace RavenBOT.Common.Interfaces.Database
             DocumentStore.Initialize();
         }
 
+        public void StartEmbeddedServer(RavenDatabaseConfig config)
+        {
+            if (config.DatabaseUrls.Count > 1)
+            {
+                Console.WriteLine($"Embedded database defaulting to 127.0.0.1:8080");
+            }
+
+            var serverOptions = new ServerOptions()
+            {
+                //NOTE: This requires the runtime framework version to be set in the csproj when compiling
+                FrameworkVersion = "2.1.6",
+                ServerUrl = "http://127.0.0.1:8080"
+            };
+
+            EmbeddedServer.Instance.StartServer(serverOptions);
+            DocumentStore = EmbeddedServer.Instance.GetDocumentStore(config.DatabaseName);
+
+            Console.WriteLine($"RavenDB Server Url: {serverOptions.ServerUrl}");
+        }
+
+        public RavenDatabase()
+        {
+            Config = GetOrInitializeConfig();
+            if (Config.Embedded)
+            {
+                StartEmbeddedServer(Config);
+            }
+            else
+            {
+                StartServer(Config);
+            }
+        }
+
         public RavenDatabaseConfig GetOrInitializeConfig()
         {
             if (!Directory.Exists(ConfigDirectory))
@@ -87,6 +122,7 @@ namespace RavenBOT.Common.Interfaces.Database
                 if (string.IsNullOrWhiteSpace(databaseUrl))
                 {
                     databaseUrl = "http://127.0.0.1:8080";
+                    newConfig.Embedded = true;
                 }
 
                 newConfig.DatabaseUrls = new List<string>
@@ -155,11 +191,11 @@ namespace RavenBOT.Common.Interfaces.Database
             }
         }
 
-        public IEnumerable<T> Query<T>(Func<T, bool> queryFunc)
+        public IEnumerable<T> Query<T>(Expression<Func<T, bool>> queryFunc)
         {
             using(var session = DocumentStore.OpenSession())
             {
-                return session.Query<T>().Where(x => queryFunc(x)).ToList();
+                return session.Query<T>().Where(queryFunc).ToList();
             }
         }
 

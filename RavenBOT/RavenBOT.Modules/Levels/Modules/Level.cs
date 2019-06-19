@@ -316,7 +316,7 @@ namespace RavenBOT.Modules.Levels.Modules
                 return;
             }
 
-            var users = LevelService.Database.Query<LevelUser>().Where(x => x.GuildId == Context.Guild.Id).OrderByDescending(x => x.UserXP).ToList();
+            var users = LevelService.Database.Query<LevelUser>(x => x.GuildId == Context.Guild.Id).OrderByDescending(x => x.UserXP).ToList();
             int rank = users.IndexOf(users.Where(x => x.UserId == user.Id).FirstOrDefault()) + 1;
 
             var embed = new EmbedBuilder()
@@ -382,7 +382,7 @@ namespace RavenBOT.Modules.Levels.Modules
         [Summary("Displays users ranked from highest xp to lowest")]
         public async Task ShowLeaderboard()
         {
-            var users = LevelService.Database.Query<LevelUser>().Where(x => x.GuildId == Context.Guild.Id).OrderByDescending(x => x.UserXP).ToList();
+            var users = LevelService.Database.Query<LevelUser>(x => x.GuildId == Context.Guild.Id).OrderByDescending(x => x.UserXP).ToList();
             if (!users.Any())
             {
                 await ReplyAsync("There are no users with levelling in this server.");

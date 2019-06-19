@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using LiteDB;
 
 namespace RavenBOT.Common.Interfaces.Database
@@ -76,10 +77,11 @@ namespace RavenBOT.Common.Interfaces.Database
             }
         }
 
-        public IEnumerable<T> Query<T>(Func<T, bool> queryFunc)
+        public IEnumerable<T> Query<T>(Expression<Func<T, bool>> queryFunc)
         {
             var collection = GetCollection<T>();
-            var all = collection.Find(x => queryFunc(x.Value));
+            var func = queryFunc.Compile();
+            var all = collection.FindAll().Where(x => func(x.Value));
             return all.Select(x => x.Value);
         }
 
