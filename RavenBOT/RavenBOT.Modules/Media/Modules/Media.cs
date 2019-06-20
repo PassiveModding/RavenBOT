@@ -62,7 +62,7 @@ namespace RavenBOT.Modules.Media.Modules
         [Summary("Gets a random dog image from random.dog")]
         public async Task DogAsync()
         {
-            var woof = "http://random.dog/" + await MediaHelper.GetResponseStringAsync("https://random.dog/woof").ConfigureAwait(false);
+            var woof = "http://random.dog/" + await MediaHelper.Client.GetStringAsync("https://random.dog/woof").ConfigureAwait(false);
             var embed = new EmbedBuilder().WithImageUrl(woof).WithTitle("Woof").WithUrl(woof);
             await ReplyAsync("", false, embed.Build());
         }
