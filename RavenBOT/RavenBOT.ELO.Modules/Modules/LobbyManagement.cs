@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Discord;
 using Discord.Commands;
+using Discord.WebSocket;
 using RavenBOT.ELO.Modules.Bases;
 using RavenBOT.ELO.Modules.Models;
 using RavenBOT.ELO.Modules.Preconditions;
@@ -27,6 +29,7 @@ namespace RavenBOT.ELO.Modules.Modules
         {
             if (Context.CurrentLobby.Queue.Count >= Context.CurrentLobby.PlayersPerTeam * 2)
             {
+                //Queue will be reset after teams are completely picked.
                 await ReplyAsync("Queue is full, wait for teams to be chosen before joining.");
                 return;
             }
@@ -57,10 +60,14 @@ namespace RavenBOT.ELO.Modules.Modules
             if (Context.CurrentLobby.Queue.Count >= Context.CurrentLobby.PlayersPerTeam * 2)
             {
                 await ReplyAsync("Queue is full. Picking teams...");
-                var game = new GameResult(Context.CurrentLobby.CurrentGameCount + 1, Context.Channel.Id, Context.Guild.Id);
+                //Increment the game counter as there is now a new game.
+                Context.CurrentLobby.CurrentGameCount += 1;
+                var game = new GameResult(Context.CurrentLobby.CurrentGameCount, Context.Channel.Id, Context.Guild.Id);
                 game.Queue = Context.CurrentLobby.Queue;
                 Context.CurrentLobby.Queue = new List<ulong>();
                 
+
+                //Set team players/captains based on the team pick mode
                 switch (Context.CurrentLobby.TeamPickMode)
                 {
                     case Lobby.PickMode.Captains:
@@ -68,9 +75,6 @@ namespace RavenBOT.ELO.Modules.Modules
                         var captains = Context.Service.GetCaptains(Context.CurrentLobby, game, Random);
                         game.Team1.Captain = captains.Item1;
                         game.Team2.Captain = captains.Item2;
-                        //TODO: Ping team captains
-                        //TODO: Timer from when captains are mentioned to first pick time. Cancel game if command is not run.
-                        await ReplyAsync("Captains have been picked. Use the pick command to choose your players.");
                         break;
                     case Lobby.PickMode.Random:
                         game.GameState = GameResult.State.Undecided;
@@ -95,10 +99,28 @@ namespace RavenBOT.ELO.Modules.Modules
                         break;
                 }
 
-                //TODO: Announce team members.
+                if (Context.CurrentLobby.TeamPickMode == Lobby.PickMode.Captains)
+                {
+                    //TODO: Timer from when captains are mentioned to first pick time. Cancel game if command is not run.
+                    await ReplyAsync($"Captains have been picked. Use the `pick` or `p` command to choose your players.\nCaptain 1: <@{game.Team1.Captain}>\nCaptain 2: <@{game.Team2.Captain}>");
+                }
+                else
+                {
+                    var t1Users = GetMentionList(GetUserList(Context.Guild, game.Team1.Players));
+                    var t2Users = GetMentionList(GetUserList(Context.Guild, game.Team2.Players));
+                    var gameEmbed = new EmbedBuilder
+                    {
+                        Title = $"Game #{game.GameId} Started"
+                    };
+                
+                    gameEmbed.AddField("Team 1", $"Captain: {Context.Guild.GetUser(game.Team1.Captain)?.Mention ?? $"[{game.Team1.Captain}]"}\n{string.Join("\n", t1Users)}");
+                    gameEmbed.AddField("Team 2", $"Captain: {Context.Guild.GetUser(game.Team2.Captain)?.Mention ?? $"[{game.Team2.Captain}]"}\n{string.Join("\n", t2Users)}");
+                    await ReplyAsync("", false, gameEmbed.Build());
+                }
+
                 Context.Service.Database.Store(game, GameResult.DocumentName(game.GameId, game.LobbyId, game.GuildId));
             }
-            //TODO: Create game on lobby full.
+
             Context.Service.Database.Store(Context.CurrentLobby, Lobby.DocumentName(Context.Guild.Id, Context.Channel.Id));
         }
 
@@ -106,10 +128,184 @@ namespace RavenBOT.ELO.Modules.Modules
         [Alias("LeaveLobby", "Leave Lobby", "l")]
         public async Task LeaveLobbyAsync()
         {
+            if (Context.CurrentLobby.Queue.Contains(Context.User.Id))
+            {
+                var game = Context.GetCurrentGame();
+                if (game != null)
+                {
+                    if (game.GameState == GameResult.State.Picking)
+                    {
+                        await ReplyAsync("Lobby is currently picking teams. You cannot leave a queue while this is happening.");
+                        return;
+                    }
+                }
+                Context.CurrentLobby.Queue.Remove(Context.User.Id);
+                Context.Service.Database.Store(Context.CurrentLobby, Lobby.DocumentName(Context.Guild.Id, Context.Channel.Id));
+                await ReplyAsync("Removed.");
+            }
+            else
+            {
+                await ReplyAsync("You are not queued in this lobby.");
+            }
+        }
+
+        [Command("Pick")]
+        [Alias("p")]
+        public async Task PickPlayerAsync(params SocketGuildUser[] users)
+        {
+            var game = Context.GetCurrentGame();
+            if (game.GameState != GameResult.State.Picking)
+            {
+                await ReplyAsync("Lobby is currently not picking teams.");
+                return;
+            }
+
+            if (game.Team1.Captain != Context.User.Id && game.Team2.Captain != Context.User.Id)
+            {
+                await ReplyAsync("You are not a team captain.");
+                return;
+            }
+
+            
+            var userCount = users.Count();
+            if (userCount == 0)
+            {
+                await ReplyAsync("You must specify a player to join.");
+                return;
+            } 
+            else if (userCount > 2)
+            {
+                await ReplyAsync("Too many players specified.");
+                return;
+            }
+
+            //Ensure that two players are specified for the first pick.
+            //Or only one player if it is after the first pick.
+            if (game.Team1.Players.Count == 0 || game.Team2.Players.Count == 0)
+            {
+                if (userCount != 2)
+                {
+                    await ReplyAsync("Please specify two players to be added on the first pick.");
+                    return;
+                }
+            }
+            else
+            {
+                if (userCount != 1)
+                {
+                    await ReplyAsync("Please specify only one player to be added to your team.");
+                    return;
+                }
+            }
 
 
-            //TODO: Check if game is picking players.
-            //TODO: Create game on lobby full.
+            if (!users.All(user => game.Queue.Contains(user.Id)))
+            {
+                await ReplyAsync("A selected player is not queued for this game.");
+                return;
+            }
+            else if (users.Any(u => game.Team1.Players.Contains(u.Id) || game.Team2.Players.Contains(u.Id)))
+            {
+                await ReplyAsync("A selected player is already picked for a team.");
+                return;
+            }
+
+            if (game.Team1.Players.Count == 0)
+            {
+                if (game.Team1.Captain != Context.User.Id)
+                {
+                    await ReplyAsync("You are not the team 1 captain.");
+                    return;
+                }
+
+                game.Team1.Players.AddRange(users.Select(x => x.Id));
+                game.Team1.Players.Add(game.Team1.Captain);
+            }
+            else if (game.Team2.Players.Count == 0)
+            {
+                if (game.Team2.Captain != Context.User.Id)
+                {
+                    await ReplyAsync("You are not the team 2 captain.");
+                    return;
+                }
+
+                game.Team2.Players.AddRange(users.Select(x => x.Id));
+                game.Team2.Players.Add(game.Team2.Captain);
+            }
+            else
+            {
+                //After both teams have picked their first two players, alternate between teams
+                var user = users.First();
+
+                if (game.Team1.Players.Count > game.Team2.Players.Count)
+                {
+                    if (game.Team2.Captain != Context.User.Id)
+                    {
+                        await ReplyAsync("You are not the team 2 captain.");
+                        return;
+                    }
+
+                    game.Team2.Players.Add(user.Id);
+                }
+                else
+                {
+                    if (game.Team1.Captain != Context.User.Id)
+                    {
+                        await ReplyAsync("You are not the team 1 captain.");
+                        return;
+                    }
+
+                    game.Team1.Players.Add(user.Id);
+                }                
+            }
+
+            if (game.Team1.Players.Count + game.Team2.Players.Count >= game.Queue.Count)
+            {
+                //Teams have been filled.
+                //TODO: Announce game
+                game.GameState = GameResult.State.Undecided;
+                //TODO: Map selection
+
+                var gameEmbed = new EmbedBuilder
+                {
+                    Title = $"Game #{game.GameId} Started"
+                };
+                
+                var t1Users = GetMentionList(GetUserList(Context.Guild, game.Team1.Players));
+                var t2Users = GetMentionList(GetUserList(Context.Guild, game.Team2.Players));
+                gameEmbed.AddField("Team 1", $"Captain: {Context.Guild.GetUser(game.Team1.Captain)?.Mention ?? $"[{game.Team1.Captain}]"}\n{string.Join("\n", t1Users)}");
+                gameEmbed.AddField("Team 2", $"Captain: {Context.Guild.GetUser(game.Team2.Captain)?.Mention ?? $"[{game.Team2.Captain}]"}\n{string.Join("\n", t2Users)}");
+                await ReplyAsync("", false, gameEmbed.Build());
+
+            }
+            else
+            {
+                //Display players in each team and remaining players.
+                var gameEmbed = new EmbedBuilder
+                {
+                    Title = $"Player(s) picked."
+                };
+                
+                var t1Users = GetMentionList(GetUserList(Context.Guild, game.Team1.Players));
+                var t2Users = GetMentionList(GetUserList(Context.Guild, game.Team2.Players));
+                var remainingPlayers = GetMentionList(GetUserList(Context.Guild, game.Queue.Where(x => !game.Team1.Players.Contains(x) && !game.Team2.Players.Contains(x))));
+                gameEmbed.AddField("Team 1", $"Captain: {Context.Guild.GetUser(game.Team1.Captain)?.Mention ?? $"[{game.Team1.Captain}]"}\n{string.Join("\n", t1Users)}");
+                gameEmbed.AddField("Team 2", $"Captain: {Context.Guild.GetUser(game.Team2.Captain)?.Mention ?? $"[{game.Team2.Captain}]"}\n{string.Join("\n", t2Users)}");
+                gameEmbed.AddField("Remaining Players", string.Join("\n", remainingPlayers));
+                await ReplyAsync("", false, gameEmbed.Build());
+            }
+
+            Context.Service.Database.Store(game, GameResult.DocumentName(game.GameId, game.LobbyId, game.GuildId));
+        }
+
+        public SocketGuildUser[] GetUserList(SocketGuild guild, IEnumerable<ulong> userIds)
+        {
+            return userIds.Select(x => guild.GetUser(x)).ToArray();
+        }
+
+        public string[] GetMentionList(IEnumerable<SocketGuildUser> users)
+        {
+            return users.Select(x => x?.Mention ?? $"[{x.Id}]").ToArray();
         }
     }
 }
