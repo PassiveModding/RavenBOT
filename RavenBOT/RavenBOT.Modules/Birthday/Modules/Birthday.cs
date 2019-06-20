@@ -9,6 +9,7 @@ using RavenBOT.Modules.Birthday.Methods;
 namespace RavenBOT.Modules.Birthday.Modules
 {
     [Group("Birthday")]
+    [Summary("Handles automated birthday announcements and roles for users")]
     public class Birthday : InteractiveBase<ShardedCommandContext>
     {
         public BirthdayService BirthdayService { get; }
@@ -22,6 +23,7 @@ namespace RavenBOT.Modules.Birthday.Modules
         [Summary("Toggles the use of birthday announcements in the server")]
         [RequireUserPermission(Discord.GuildPermission.Administrator)]
         [RequireContext(ContextType.Guild)]
+        [Remarks("Requires admin permissions")]
         public async Task ToggleEnabled()
         {
             var model = BirthdayService.GetConfig(Context.Guild.Id);
@@ -37,6 +39,7 @@ namespace RavenBOT.Modules.Birthday.Modules
         [Summary("Sets the current channel as the birthday announcement channel")]
         [RequireUserPermission(Discord.GuildPermission.Administrator)]
         [RequireContext(ContextType.Guild)]
+        [Remarks("Requires admin permissions")]
         public async Task SetChannel()
         {
             var model = BirthdayService.GetConfig(Context.Guild.Id);
@@ -53,6 +56,7 @@ namespace RavenBOT.Modules.Birthday.Modules
         [Summary("Sets (or removes) the role users can receive when it is their birthday")]
         [RequireUserPermission(Discord.GuildPermission.Administrator)]
         [RequireContext(ContextType.Guild)]
+        [Remarks("Requires admin permissions")]
         public async Task SetBirthdayRole(IRole role = null)
         {
             var model = BirthdayService.GetConfig(Context.Guild.Id);

@@ -22,8 +22,8 @@ namespace RavenBOT.Modules.Tickets.Modules
         }
 
         [Command("SetChannel")]
-        [Summary("Sets the current channel for ticket updates")]
-        [Remarks("Administrators only.")]
+        [Summary("Sets the current channel for ticket updates")]            
+        [Remarks("Requires administrator permissions")]
         [RequireUserPermission(Discord.GuildPermission.Administrator)]
         public async Task SetChannel()
         {
@@ -48,7 +48,8 @@ namespace RavenBOT.Modules.Tickets.Modules
 
         [Command("ToggleVoting")]
         [Summary("Toggle the ability for users to vote on tickets")]
-        [RequireUserPermission(GuildPermission.Administrator)]
+        [RequireUserPermission(GuildPermission.Administrator)]    
+        [Remarks("Requires administrator permissions")]
         public async Task ToggleVotingAsync()
         {
             var guild = TicketService.GetTicketGuild(Context.Guild.Id);
@@ -225,7 +226,8 @@ namespace RavenBOT.Modules.Tickets.Modules
 
         [Command("ToggleStateNotifications")]
         [Summary("Toggles the notification of users when a ticket's state is changed")]
-        [RequireUserPermission(GuildPermission.Administrator)]
+        [RequireUserPermission(GuildPermission.Administrator)]    
+        [Remarks("Requires administrator permissions")]
         public async Task ToggleStateNotifications()
         {
             var guild = TicketService.GetTicketGuild(Context.Guild.Id);
@@ -237,7 +239,7 @@ namespace RavenBOT.Modules.Tickets.Modules
 
         [Command("AddCreatorRole")]
         [Summary("Adds a creator role to the ticket config")]
-        [Remarks("Creator roles whitelist the use of the open ticket command to specific role(s)")]
+        [Remarks("Creator roles whitelist the use of the open ticket command to specific role(s), requires admin permissions")]
         [RequireUserPermission(GuildPermission.Administrator)]
         public async Task AddCreatorRole(IRole role)
         {
@@ -255,7 +257,7 @@ namespace RavenBOT.Modules.Tickets.Modules
 
         [Command("AddManagerRole")]
         [Summary("Adds a manager role to the ticket config")]
-        [Remarks("Manager roles limit the use of ticket clone/solve/hold/re-open commands to specific role(s) + admins")]
+        [Remarks("Manager roles limit the use of ticket clone/solve/hold/re-open commands to specific role(s) + admins, requires admin permissions")]
         [RequireUserPermission(GuildPermission.Administrator)]
         public async Task AddManagerRole(IRole role)
         {
@@ -273,7 +275,8 @@ namespace RavenBOT.Modules.Tickets.Modules
 
         [Command("RemoveManagerRole")]
         [Summary("Removes a manager role from the ticket config")]
-        [RequireUserPermission(GuildPermission.Administrator)]
+        [RequireUserPermission(GuildPermission.Administrator)]    
+        [Remarks("Requires administrator permissions")]
         public async Task RemoveManagerRole(ulong roleId)
         {
             var guild = TicketService.GetTicketGuild(Context.Guild.Id);
@@ -285,7 +288,8 @@ namespace RavenBOT.Modules.Tickets.Modules
 
         [Command("RemoveManagerRole")]
         [Summary("Removes a manager role from the ticket config")]
-        [RequireUserPermission(GuildPermission.Administrator)]
+        [RequireUserPermission(GuildPermission.Administrator)]    
+        [Remarks("Requires administrator permissions")]
         public async Task RemoveManagerRole(IRole role)
         {
             await RemoveManagerRole(role.Id);
@@ -293,7 +297,8 @@ namespace RavenBOT.Modules.Tickets.Modules
 
         [Command("RemoveCreatorRole")]
         [Summary("Removes a creator role from the ticket config")]
-        [RequireUserPermission(GuildPermission.Administrator)]
+        [RequireUserPermission(GuildPermission.Administrator)]    
+        [Remarks("Requires administrator permissions")]
         public async Task RemoveCreatorRole(ulong roleId)
         {
             var guild = TicketService.GetTicketGuild(Context.Guild.Id);
@@ -305,7 +310,8 @@ namespace RavenBOT.Modules.Tickets.Modules
 
         [Command("RemoveCreatorRole")]
         [Summary("Removes a creator role from the ticket config")]
-        [RequireUserPermission(GuildPermission.Administrator)]
+        [RequireUserPermission(GuildPermission.Administrator)]    
+        [Remarks("Requires administrator permissions")]
         public async Task RemoveCreatorRole(IRole role)
         {
             await RemoveCreatorRole(role.Id);
@@ -313,7 +319,8 @@ namespace RavenBOT.Modules.Tickets.Modules
 
         [Command("CreatorRoles")]
         [Summary("Shows all ticket creator roles for the server")]
-        [RequireUserPermission(GuildPermission.Administrator)]
+        [RequireUserPermission(GuildPermission.Administrator)]    
+        [Remarks("Requires administrator permissions")]
         public async Task CreatorRoles()
         {
             var guild = TicketService.GetTicketGuild(Context.Guild.Id);
@@ -332,7 +339,8 @@ namespace RavenBOT.Modules.Tickets.Modules
 
         [Command("ManagerRoles")]
         [Summary("Shows all ticket manager roles for the server")]
-        [RequireUserPermission(GuildPermission.Administrator)]
+        [RequireUserPermission(GuildPermission.Administrator)]    
+        [Remarks("Requires administrator permissions")]
         public async Task ManagerRoles()
         {
             var guild = TicketService.GetTicketGuild(Context.Guild.Id);

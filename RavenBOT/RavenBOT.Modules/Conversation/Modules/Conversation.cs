@@ -9,6 +9,7 @@ namespace RavenBOT.Modules.Conversation.Modules
 {
     [Group("Conversation")]
     [RequireOwner]
+    [Remarks("Requires bot owner permissions")]
     public class Conversation : InteractiveBase<ShardedCommandContext>
     {
         public Conversation(ConversationService service)

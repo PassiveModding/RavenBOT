@@ -10,7 +10,8 @@ namespace RavenBOT.Modules.Partner.Modules
 {
     [Group("Partner")]
     [RequireContext(ContextType.Guild)]
-    [RequireUserPermission(Discord.GuildPermission.Administrator)]
+    [RequireUserPermission(Discord.GuildPermission.Administrator)]    
+    [Remarks("Requires administrator permissions")]
     public class Partner : InteractiveBase<ShardedCommandContext>
     {
         public Partner(PartnerService partnerService)
@@ -122,7 +123,8 @@ namespace RavenBOT.Modules.Partner.Modules
         }
 
         [Command("Trigger")]
-        [RequireOwner]
+        [RequireOwner]    
+        [Remarks("Requires bot owner permissions")]
         [Summary("DEV: Triggers a partner event")]
         public async Task TriggerEvent()
         {

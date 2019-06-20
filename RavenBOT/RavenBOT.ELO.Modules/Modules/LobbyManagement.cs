@@ -23,6 +23,11 @@ namespace RavenBOT.ELO.Modules.Modules
 
         public Random Random { get; }
 
+        //TODO: Lobby info
+        //TODO: Queue
+        //TODO: Replace command
+        //TODO: Map stuff
+
         [Command("Join")]
         [Alias("JoinLobby", "Join Lobby", "j")]
         public async Task JoinLobbyAsync()

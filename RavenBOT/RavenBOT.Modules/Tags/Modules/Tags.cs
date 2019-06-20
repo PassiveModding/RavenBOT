@@ -23,7 +23,8 @@ namespace RavenBOT.Modules.Tags.Modules
         [Priority(100)]
         [Command("Add")]
         [Summary("Adds a new tag with the given name and message")]
-        [RequireUserPermission(Discord.GuildPermission.Administrator)]
+        [RequireUserPermission(Discord.GuildPermission.Administrator)]    
+        [Remarks("Requires administrator permissions")]
         public async Task AddTag([Summary("Wrap this in quotations if you want it to use spaces")] string name, [Remainder] string response)
         {
             var config = TagManager.GetTagGuild(Context.Guild.Id);
@@ -42,7 +43,8 @@ namespace RavenBOT.Modules.Tags.Modules
         [Priority(100)]
         [Command("Remove")]
         [Summary("Removes the specified tag")]
-        [RequireUserPermission(Discord.GuildPermission.Administrator)]
+        [RequireUserPermission(Discord.GuildPermission.Administrator)]    
+        [Remarks("Requires administrator permissions")]
         public async Task RemoveTag([Remainder] string name)
         {
             var config = TagManager.GetTagGuild(Context.Guild.Id);

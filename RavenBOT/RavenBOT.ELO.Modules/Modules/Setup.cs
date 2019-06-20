@@ -130,5 +130,7 @@ namespace RavenBOT.ELO.Modules.Modules
         {
             await RemoveRank(role.Id);
         }
+
+        //TODO: Ranks list
     }
 }

@@ -90,7 +90,8 @@ namespace RavenBOT.Modules.Translation.Modules
         [RequireContext(ContextType.Guild)]
         [Command("Role Whitelist")]
         [Summary("Displays the role whitelist for translations")]
-        [RequireUserPermission(GuildPermission.Administrator)]
+        [RequireUserPermission(GuildPermission.Administrator)]    
+        [Remarks("Requires administrator permissions")]
         public async Task ShowWhitelist()
         {
             var config = TranslateService.GetTranslateGuild(Context.Guild.Id);
@@ -113,7 +114,8 @@ namespace RavenBOT.Modules.Translation.Modules
         [RequireContext(ContextType.Guild)]
         [Command("Whitelist Role")]
         [Summary("adds a role to the translation whitelist.")]
-        [RequireUserPermission(GuildPermission.Administrator)]
+        [RequireUserPermission(GuildPermission.Administrator)]    
+        [Remarks("Requires administrator permissions")]
         public async Task AddWhitelistedRole(IRole role)
         {
             var config = TranslateService.GetTranslateGuild(Context.Guild.Id);
@@ -127,7 +129,8 @@ namespace RavenBOT.Modules.Translation.Modules
         [RequireContext(ContextType.Guild)]
         [Command("Whitelist Remove Role")]
         [Summary("adds a role to the translation whitelist.")]
-        [RequireUserPermission(GuildPermission.Administrator)]
+        [RequireUserPermission(GuildPermission.Administrator)]    
+        [Remarks("Requires administrator permissions")]
         public async Task RemoveWhitelistRole(IRole role)
         {
             await RemoveWhitelistRole(role.Id);
@@ -137,7 +140,8 @@ namespace RavenBOT.Modules.Translation.Modules
         [RequireContext(ContextType.Guild)]
         [Command("Whitelist Remove Role")]
         [Summary("adds a role to the translation whitelist via ID.")]
-        [RequireUserPermission(GuildPermission.Administrator)]
+        [RequireUserPermission(GuildPermission.Administrator)]    
+        [Remarks("Requires administrator permissions")]
         public async Task RemoveWhitelistRole(ulong roleId)
         {
             var config = TranslateService.GetTranslateGuild(Context.Guild.Id);
@@ -150,7 +154,8 @@ namespace RavenBOT.Modules.Translation.Modules
         [RequireContext(ContextType.Guild)]
         [Command("Toggle Reactions")]
         [Summary("Toggles Translate Reactions in the server")]
-        [RequireUserPermission(GuildPermission.Administrator)]
+        [RequireUserPermission(GuildPermission.Administrator)]    
+        [Remarks("Requires administrator permissions")]
         public async Task ToggleReactions()
         {
             var config = TranslateService.GetTranslateGuild(Context.Guild.Id);
@@ -163,7 +168,8 @@ namespace RavenBOT.Modules.Translation.Modules
         [RequireContext(ContextType.Guild)]
         [Command("Toggle DM Translations")]
         [Summary("Toggles wether to direct message users translations rather then sending them to the channel")]
-        [RequireUserPermission(GuildPermission.Administrator)]
+        [RequireUserPermission(GuildPermission.Administrator)]    
+        [Remarks("Requires administrator permissions")]
         public async Task ToggleDmReactions()
         {
             var config = TranslateService.GetTranslateGuild(Context.Guild.Id);
@@ -175,7 +181,8 @@ namespace RavenBOT.Modules.Translation.Modules
         [Priority(100)]
         [RequireContext(ContextType.Guild)]
         [Command("RemoveEmote")]
-        [RequireUserPermission(GuildPermission.Administrator)]
+        [RequireUserPermission(GuildPermission.Administrator)]    
+        [Remarks("Requires administrator permissions")]
         public async Task AddPair(Emoji emote)
         {
             var config = TranslateService.GetTranslateGuild(Context.Guild.Id);
@@ -193,7 +200,8 @@ namespace RavenBOT.Modules.Translation.Modules
         [RequireContext(ContextType.Guild)]
         [Command("AddPair")]
         [Summary("Adds a pair for reaction translations")]
-        [RequireUserPermission(GuildPermission.Administrator)]
+        [RequireUserPermission(GuildPermission.Administrator)]    
+        [Remarks("Requires administrator permissions")]
         public async Task AddPair(LanguageMap.LanguageCode code, Emoji emote)
         {
             await AddPair(emote, code);
@@ -225,7 +233,8 @@ namespace RavenBOT.Modules.Translation.Modules
         [RequireContext(ContextType.Guild)]
         [Command("AddPair")]
         [Summary("Adds a pair for reaction translations")]
-        [RequireUserPermission(GuildPermission.Administrator)]
+        [RequireUserPermission(GuildPermission.Administrator)]    
+        [Remarks("Requires administrator permissions")]
         public async Task AddPair(Emoji emote, LanguageMap.LanguageCode code)
         {
             var config = TranslateService.GetTranslateGuild(Context.Guild.Id);
@@ -268,7 +277,8 @@ namespace RavenBOT.Modules.Translation.Modules
         [RequireContext(ContextType.Guild)]
         [RequireUserPermission(GuildPermission.Administrator)]
         [Command("Redeem")]
-        [Summary("Redeems a translation license")]
+        [Summary("Redeems a translation license")]    
+        [Remarks("Requires administrator permissions")]
         public async Task RedeemUses([Remainder] string key = "")
         {
             if (string.IsNullOrWhiteSpace(key))
@@ -308,7 +318,8 @@ namespace RavenBOT.Modules.Translation.Modules
         [RequireContext(ContextType.Guild)]
         [RequireUserPermission(GuildPermission.Administrator)]
         [Command("History")]
-        [Summary("Shows translation history")]
+        [Summary("Shows translation history")]    
+        [Remarks("Requires administrator permissions")]
         public async Task ServerHistory()
         {
             var profile = TranslateService.License.GetQuantifiableUser(TranslateService.TranslateType, Context.Guild.Id);
@@ -325,7 +336,8 @@ namespace RavenBOT.Modules.Translation.Modules
         [RequireContext(ContextType.Guild)]
         [RequireUserPermission(GuildPermission.Administrator)]
         [Command("Settings")]
-        [Summary("Shows settings")]
+        [Summary("Shows settings")]    
+        [Remarks("Requires administrator permissions")]
         public async Task Settings()
         {
             var profile = TranslateService.License.GetQuantifiableUser(TranslateService.TranslateType, Context.Guild.Id);
@@ -341,7 +353,8 @@ namespace RavenBOT.Modules.Translation.Modules
         }
 
         [Priority(100)]
-        [RequireOwner]
+        [RequireOwner]    
+        [Remarks("Requires bot owner permissions")]
         [Command("GenerateLicenses")]
         public async Task GenerateLicenses(int quantity, int uses)
         {
@@ -353,7 +366,8 @@ namespace RavenBOT.Modules.Translation.Modules
         }
 
         [Priority(100)]
-        [RequireOwner]
+        [RequireOwner]    
+        [Remarks("Requires bot owner permissions")]
         [Command("SetApiKey")]
         public async Task SetApiKey(string apiKey = null)
         {
@@ -364,7 +378,8 @@ namespace RavenBOT.Modules.Translation.Modules
         }
 
         [Priority(100)]
-        [RequireOwner]
+        [RequireOwner]    
+        [Remarks("Requires bot owner permissions")]
         [Command("ToggleTranslation")]
         [Summary("DEV: Toggles translation services for all services")]
         public async Task ToggleTranslation()
@@ -376,7 +391,8 @@ namespace RavenBOT.Modules.Translation.Modules
         }
 
         [Priority(100)]
-        [RequireOwner]
+        [RequireOwner]    
+        [Remarks("Requires bot owner permissions")]
         [Command("SetStoreUrl")]
         public async Task SetStoreUrl(string storeUrl = null)
         {

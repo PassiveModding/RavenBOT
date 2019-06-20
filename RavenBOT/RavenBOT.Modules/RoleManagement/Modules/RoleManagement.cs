@@ -15,7 +15,8 @@ namespace RavenBOT.Modules.RoleManagement.Modules
 {
     [Group("RoleManager")]
     [RequireContext(ContextType.Guild)]
-    [RequireBotPermission(GuildPermission.ManageRoles)]
+    [RequireBotPermission(GuildPermission.ManageRoles)]    
+    [Remarks("Requires that the bot can manager roles")]
     public class RoleManagement : InteractiveBase<ShardedCommandContext>
     {
         public RoleManagement(RoleManager manager)
@@ -27,7 +28,8 @@ namespace RavenBOT.Modules.RoleManagement.Modules
 
         [Command("CreateMessage")]
         [Summary("Creates an embedded message which users can react to in order to receive the specified role.")]
-        [RequireUserPermission(GuildPermission.Administrator)]
+        [RequireUserPermission(GuildPermission.Administrator)]    
+        [Remarks("Requires administrator permissions")]
         public async Task RoleMessageAsync(params IRole[] roles)
         {
             if (!roles.Any())
@@ -178,7 +180,8 @@ namespace RavenBOT.Modules.RoleManagement.Modules
         }
 
         [Command("RemoveYoutubeSub")]
-        [RequireUserPermission(GuildPermission.Administrator)]
+        [RequireUserPermission(GuildPermission.Administrator)]    
+        [Remarks("Requires administrator permissions")]
         public async Task SubRoleRemove(string displayName)
         {
             var config = Manager.GetYTConfig(Context.Guild.Id);
@@ -202,7 +205,8 @@ namespace RavenBOT.Modules.RoleManagement.Modules
         }
 
         [Command("SetYoutubeSub")]
-        [RequireUserPermission(GuildPermission.Administrator)]
+        [RequireUserPermission(GuildPermission.Administrator)]    
+        [Remarks("Requires administrator permissions")]
         public async Task SubRoleCreate(string displayName, string subChannelId, IRole role)
         {
             var config = Manager.GetOrCreateYTConfig(Context.Guild.Id);
@@ -227,7 +231,8 @@ namespace RavenBOT.Modules.RoleManagement.Modules
 
         [Command("SetYoutubeApiKey")]
         [Summary("Set the youtube api key for checking the subscription status of users.")]
-        [RequireOwner]
+        [RequireOwner]    
+        [Remarks("Requires bot owner permissions")]
         public async Task SetYoutubeApiKeyAsync([Remainder] string key)
         {
             var config = Manager.Database.Load<YoutubeConfig>(YoutubeConfig.DocumentName());

@@ -7,7 +7,8 @@ using RavenBOT.Modules.Statistics.Models;
 namespace RavenBOT.Modules.Statistics.Modules
 {
     [Group("Stats")]
-    [RequireOwner]
+    [RequireOwner]    
+    [Remarks("Requires bot owner permissions")]
     public class Statistics : InteractiveBase<ShardedCommandContext>
     {
         public Statistics(GraphManager graphManager, DBLManager dblManager, GrafanaManager grafanaManager)

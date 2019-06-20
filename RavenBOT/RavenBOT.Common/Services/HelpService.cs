@@ -177,6 +177,8 @@ namespace RavenBOT.Common.Services
 
                 page.Title = moduleName;
                 page.Description = pageContent.ToString();
+                //TODO: Add module specific preconditions in additional field
+                //Otherwise apply those preconditions to all relevant command precondition descriptions
                 pages.Add(new Tuple<int, PaginatedMessage.Page>(pageIndex, page));
                 pageIndex++;
             }

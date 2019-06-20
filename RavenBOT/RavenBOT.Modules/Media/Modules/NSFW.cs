@@ -12,6 +12,7 @@ namespace RavenBOT.Modules.Media.Modules
 {
     [Group("nsfw")]
     [RequireNsfw]
+    [Remarks("Can only be run in channels marked as NSFW")]
     public class NSFW : InteractiveBase<ShardedCommandContext>
     {
         public MediaHelper MediaHelper { get; }

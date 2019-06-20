@@ -9,6 +9,7 @@ namespace RavenBOT.Modules.Events.Modules
     [Group("events")]
     [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
+    [Remarks("Requires admin permissions")]
     public class Events : InteractiveBase<ShardedCommandContext>
     {
         public EventService EventService { get; }

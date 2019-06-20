@@ -13,6 +13,8 @@ namespace RavenBOT.Modules.AutoMod.Modules
     [Group("automod")]
     [RequireUserPermission(Discord.GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
+    [Summary("Handles automated moderation for servers")]
+    [Remarks("Commands are limited to server administrators")]
     public partial class Moderation : InteractiveBase<ShardedCommandContext>
     {
         public ModerationService ModerationService { get; }

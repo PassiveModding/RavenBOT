@@ -9,6 +9,8 @@ namespace RavenBOT.Modules.Automessage.Modules
     [Group("Automessage")]
     [RequireContext(ContextType.Guild)]
     [RequireUserPermission(Discord.GuildPermission.Administrator)]
+    [Summary("Handles automated messaging to specific discord channels")]
+    [Remarks("Commands are limited to server administrators")]
     public class AutoMessage : InteractiveBase<ShardedCommandContext>
     {
         public AutoMessage(AutomessageHandler automessageHandler)

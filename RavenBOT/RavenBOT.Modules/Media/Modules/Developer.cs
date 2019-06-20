@@ -9,6 +9,7 @@ namespace RavenBOT.Modules.Media.Modules
 {
     [Group("Media")]
     [RequireOwner]
+    [Remarks("Requires bot owner permissions")]
     public class Developer : InteractiveBase<ShardedCommandContext>
     {
         public IDatabase Database { get; }
