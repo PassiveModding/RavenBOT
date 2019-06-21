@@ -4,7 +4,6 @@
 <p align="center">
    <a href="https://discord.me/passive"><img src="https://img.shields.io/badge/Invite-PassiveModding-7289DA.svg?longCache=true&style=flat-square&logo=discord"/></a>
    <br/>
-   <a href="https://www.buymeacoffee.com/Passive" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/black_img.png" alt="Buy Me A Coffee" style="height: auto !important;width: auto !important;" ></a>
 </p>
 </p>
 
