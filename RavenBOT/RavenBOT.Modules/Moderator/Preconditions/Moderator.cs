@@ -5,10 +5,12 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using RavenBOT.Modules.Moderator.Methods;
+using RavenBOT.Common.Attributes;
 
 namespace RavenBOT.Modules.Moderator.Preconditions
 {
-    public class Moderator : PreconditionAttribute
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
+    public class Moderator : PreconditionBase
     {
         public override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)
         {
@@ -40,5 +42,9 @@ namespace RavenBOT.Modules.Moderator.Preconditions
             //As the user is not an admin and there are no mod roles configures, return an error.
             return Task.FromResult(PreconditionResult.FromError("You must be an administrator or moderator to run this command."));
         }
+
+        public override string Name() => $"Require Moderator Precondition";
+
+        public override string PreviewText() => $"Requires the user has a moderator role or administrator permissions";
     }
 }

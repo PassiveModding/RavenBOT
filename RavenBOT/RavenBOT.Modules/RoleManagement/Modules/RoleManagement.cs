@@ -7,6 +7,7 @@ using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
 using MoreLinq;
+using RavenBOT.Common.Attributes;
 using RavenBOT.Extensions;
 using RavenBOT.Modules.RoleManagement.Methods;
 using RavenBOT.Modules.RoleManagement.Models;
@@ -14,7 +15,7 @@ using RavenBOT.Modules.RoleManagement.Models;
 namespace RavenBOT.Modules.RoleManagement.Modules
 {
     [Group("RoleManager")]
-    [RequireContext(ContextType.Guild)]
+    [RavenRequireContext(ContextType.Guild)]
     [RequireBotPermission(GuildPermission.ManageRoles)]    
     [Remarks("Requires that the bot can manager roles")]
     public class RoleManagement : InteractiveBase<ShardedCommandContext>
@@ -28,7 +29,7 @@ namespace RavenBOT.Modules.RoleManagement.Modules
 
         [Command("CreateMessage")]
         [Summary("Creates an embedded message which users can react to in order to receive the specified role.")]
-        [RequireUserPermission(GuildPermission.Administrator)]    
+        [RavenRequireUserPermission(GuildPermission.Administrator)]    
         [Remarks("Requires administrator permissions")]
         public async Task RoleMessageAsync(params IRole[] roles)
         {
@@ -180,7 +181,7 @@ namespace RavenBOT.Modules.RoleManagement.Modules
         }
 
         [Command("RemoveYoutubeSub")]
-        [RequireUserPermission(GuildPermission.Administrator)]    
+        [RavenRequireUserPermission(GuildPermission.Administrator)]    
         [Remarks("Requires administrator permissions")]
         public async Task SubRoleRemove(string displayName)
         {
@@ -205,7 +206,7 @@ namespace RavenBOT.Modules.RoleManagement.Modules
         }
 
         [Command("SetYoutubeSub")]
-        [RequireUserPermission(GuildPermission.Administrator)]    
+        [RavenRequireUserPermission(GuildPermission.Administrator)]    
         [Remarks("Requires administrator permissions")]
         public async Task SubRoleCreate(string displayName, string subChannelId, IRole role)
         {
@@ -231,7 +232,7 @@ namespace RavenBOT.Modules.RoleManagement.Modules
 
         [Command("SetYoutubeApiKey")]
         [Summary("Set the youtube api key for checking the subscription status of users.")]
-        [RequireOwner]    
+        [RavenRequireOwner]    
         [Remarks("Requires bot owner permissions")]
         public async Task SetYoutubeApiKeyAsync([Remainder] string key)
         {

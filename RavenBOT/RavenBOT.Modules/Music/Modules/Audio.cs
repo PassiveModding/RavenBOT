@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
+using RavenBOT.Common.Attributes;
 using RavenBOT.Common.Handlers;
 using RavenBOT.Extensions;
 using RavenBOT.Modules.Music.Methods;
@@ -362,7 +363,7 @@ namespace RavenBOT.Modules.Music.Modules
 
         [Command("Stats")]
         [Summary("Lavalink server stats")]
-        [RequireOwner]
+        [RavenRequireOwner]
         public async Task Stats()
         {
             var stats = LavaShardClient.ServerStats;

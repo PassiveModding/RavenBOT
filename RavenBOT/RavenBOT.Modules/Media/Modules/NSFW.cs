@@ -6,12 +6,13 @@ using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using Newtonsoft.Json.Linq;
+using RavenBOT.Common.Attributes;
 using RavenBOT.Modules.Media.Methods;
 
 namespace RavenBOT.Modules.Media.Modules
 {
     [Group("nsfw")]
-    [RequireNsfw]
+    [RavenRequireNsfw]
     [Remarks("Can only be run in channels marked as NSFW")]
     public class NSFW : InteractiveBase<ShardedCommandContext>
     {

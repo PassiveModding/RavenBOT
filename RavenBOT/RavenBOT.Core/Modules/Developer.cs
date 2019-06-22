@@ -6,13 +6,14 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using RavenBOT.Common.Attributes;
 using RavenBOT.Common.Handlers;
 using RavenBOT.Common.Interfaces;
 using RavenBOT.Models;
 
 namespace RavenBOT.Modules.Developer
 {
-    [RequireOwner]
+    [RavenRequireOwner]
     [Group("Developer")]
     public class Developer : ModuleBase<SocketCommandContext>
     {
@@ -92,9 +93,9 @@ namespace RavenBOT.Modules.Developer
         }
 
         [Command("SetLoggerChannel")]
-        [RequireContext(ContextType.Guild)]
-        [RequireBotPermission(ChannelPermission.SendMessages)]
-        [RequireUserPermission(GuildPermission.Administrator)]
+        [RavenRequireContext(ContextType.Guild)]
+        [RavenRequireBotPermission(ChannelPermission.SendMessages)]
+        [RavenRequireUserPermission(GuildPermission.Administrator)]
         public async Task SetLoggerChannelAsync(SocketTextChannel channel = null)
         {
             var originalConfig = Logger.GetLoggerConfig();

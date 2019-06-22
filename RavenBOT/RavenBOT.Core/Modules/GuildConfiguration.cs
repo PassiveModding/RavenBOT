@@ -4,12 +4,13 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
+using RavenBOT.Common.Attributes;
 using RavenBOT.Common.Services;
 
 namespace RavenBOT.Modules.Guild
 {
-    [RequireContext(ContextType.Guild)]
-    [RequireUserPermission(GuildPermission.Administrator)]
+    [RavenRequireContext(ContextType.Guild)]
+    [RavenRequireUserPermission(GuildPermission.Administrator)]
     [Group("config")]
     public class GuildConfiguration : InteractiveBase<SocketCommandContext>
     {

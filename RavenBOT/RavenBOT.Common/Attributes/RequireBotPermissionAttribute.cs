@@ -3,10 +3,10 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 
-namespace RavenBOT.Common.Attributes.Preconditions
+namespace RavenBOT.Common.Attributes
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
-    public class RequireBotPermissionAttribute : PreconditionBase
+    public class RavenRequireBotPermissionAttribute : PreconditionBase
     {
 /// <summary>
         ///     Gets the specified <see cref="Discord.GuildPermission" /> of the precondition.
@@ -27,7 +27,7 @@ namespace RavenBOT.Common.Attributes.Preconditions
         ///     The <see cref="Discord.GuildPermission"/> that the bot must have. Multiple permissions can be specified
         ///     by ORing the permissions together.
         /// </param>
-        public RequireBotPermissionAttribute(GuildPermission permission)
+        public RavenRequireBotPermissionAttribute(GuildPermission permission)
         {
             GuildPermission = permission;
             ChannelPermission = null;
@@ -39,7 +39,7 @@ namespace RavenBOT.Common.Attributes.Preconditions
         ///     The <see cref="Discord.ChannelPermission"/> that the bot must have. Multiple permissions can be
         ///     specified by ORing the permissions together.
         /// </param>
-        public RequireBotPermissionAttribute(ChannelPermission permission)
+        public RavenRequireBotPermissionAttribute(ChannelPermission permission)
         {
             ChannelPermission = permission;
             GuildPermission = null;

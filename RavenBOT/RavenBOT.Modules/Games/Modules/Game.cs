@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
-using RavenBOT.Common.Attributes.Preconditions;
+using RavenBOT.Common.Attributes;
 using RavenBOT.Modules.Games.Methods;
 
 namespace RavenBOT.Modules.Games.Modules

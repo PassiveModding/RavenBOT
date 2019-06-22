@@ -2,12 +2,14 @@ using System;
 using System.Threading.Tasks;
 using Discord.Commands;
 using Microsoft.Extensions.DependencyInjection;
+using RavenBOT.Common.Attributes;
 using RavenBOT.Extensions;
 using RavenBOT.Modules.Music.Methods;
 
 namespace RavenBOT.Modules.Music.Preconditions
 {
-    public class InAudioChannel : PreconditionAttribute
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
+    public class InAudioChannel : PreconditionBase
     {
         public bool PlayerCheck { get; }
 
@@ -35,5 +37,9 @@ namespace RavenBOT.Modules.Music.Preconditions
 
             return Task.FromResult(PreconditionResult.FromSuccess());
         }
+
+        public override string PreviewText() => $"Requires that the user is in an audio channel {(PlayerCheck ? "Also requires music to be playing" : null)}";
+
+        public override string Name() => $"Require Audio Channel Precondition";
     }
 }

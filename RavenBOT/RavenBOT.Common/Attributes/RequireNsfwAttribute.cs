@@ -3,10 +3,10 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 
-namespace RavenBOT.Common.Attributes.Preconditions
+namespace RavenBOT.Common.Attributes
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
-    public class RequireNsfwAttribute : PreconditionBase
+    public class RavenRequireNsfwAttribute : PreconditionBase
     {
         public override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)
         {

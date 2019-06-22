@@ -2,12 +2,13 @@ using System;
 using System.Threading.Tasks;
 using Discord.Addons.Interactive;
 using Discord.Commands;
+using RavenBOT.Common.Attributes;
 using RavenBOT.Extensions;
 using RavenBOT.Modules.Reminders.Methods;
 
 namespace RavenBOT.Modules.Reminders.Modules
 {
-    [RequireContext(ContextType.Guild)]
+    [RavenRequireContext(ContextType.Guild)]
     public class Reminders : InteractiveBase<ShardedCommandContext>
     {
         public ReminderHandler ReminderHandler { get; }

@@ -2,13 +2,14 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Discord.Addons.Interactive;
 using Discord.Commands;
+using RavenBOT.Common.Attributes;
 using RavenBOT.Modules.Conversation.Methods;
 using RavenBOT.Modules.Conversation.Models;
 
 namespace RavenBOT.Modules.Conversation.Modules
 {
     [Group("Conversation")]
-    [RequireOwner]
+    [RavenRequireOwner]
     [Remarks("Requires bot owner permissions")]
     public class Conversation : InteractiveBase<ShardedCommandContext>
     {

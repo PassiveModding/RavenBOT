@@ -2,14 +2,15 @@ using System.Threading.Tasks;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
+using RavenBOT.Common.Attributes;
 using RavenBOT.Modules.StatChannels.Methods;
 
 namespace RavenBOT.Modules.StatChannels.Modules
 {
     [Group("Tracking")]
-    [RequireUserPermission(Discord.GuildPermission.Administrator)]
-    [RequireBotPermission(Discord.GuildPermission.ManageChannels)]
-    [RequireContext(ContextType.Guild)]    
+    [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
+    [RavenRequireBotPermission(Discord.GuildPermission.ManageChannels)]
+    [RavenRequireContext(ContextType.Guild)]    
     [Remarks("Requires administrator permissions & bot manage channels permissions")]
     public class StatChannel : InteractiveBase<ShardedCommandContext>
     {

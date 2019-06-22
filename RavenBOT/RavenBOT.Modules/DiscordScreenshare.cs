@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
+using RavenBOT.Common.Attributes;
 using RavenBOT.Extensions;
 
 namespace RavenBOT.Modules
@@ -10,7 +11,7 @@ namespace RavenBOT.Modules
     {
         [Command("ScreenShare")]
         [Summary("Allows you to create a screenshare directly within your discord server rather than a group chat.")]
-        [RequireContext(ContextType.Guild)]
+        [RavenRequireContext(ContextType.Guild)]
         public async Task MakeScreenshare()
         {
             if (!(Context.User is SocketGuildUser user))

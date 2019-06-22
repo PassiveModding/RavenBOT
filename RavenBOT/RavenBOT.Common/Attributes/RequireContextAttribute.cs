@@ -3,10 +3,10 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 
-namespace RavenBOT.Common.Attributes.Preconditions
+namespace RavenBOT.Common.Attributes
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
-    public class RequireContextAttribute : PreconditionBase
+    public class RavenRequireContextAttribute : PreconditionBase
     {
         /// <summary>
         ///     Gets the context required to execute the command.
@@ -25,7 +25,7 @@ namespace RavenBOT.Common.Attributes.Preconditions
         ///     }
         /// </code>
         /// </example>
-        public RequireContextAttribute(ContextType contexts)
+        public RavenRequireContextAttribute(ContextType contexts)
         {
             Contexts = contexts;
         }

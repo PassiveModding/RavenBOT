@@ -1,13 +1,14 @@
 using System.Threading.Tasks;
 using Discord.Addons.Interactive;
 using Discord.Commands;
+using RavenBOT.Common.Attributes;
 using RavenBOT.Modules.Statistics.Methods;
 using RavenBOT.Modules.Statistics.Models;
 
 namespace RavenBOT.Modules.Statistics.Modules
 {
     [Group("Stats")]
-    [RequireOwner]    
+    [RavenRequireOwner]    
     [Remarks("Requires bot owner permissions")]
     public class Statistics : InteractiveBase<ShardedCommandContext>
     {

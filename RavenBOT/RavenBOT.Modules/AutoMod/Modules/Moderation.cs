@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
+using RavenBOT.Common.Attributes;
 using RavenBOT.Extensions;
 using RavenBOT.Modules.AutoMod.Methods;
 using RavenBOT.Modules.AutoMod.Models.Moderation;
@@ -11,8 +12,8 @@ using RavenBOT.Modules.AutoMod.Models.Moderation;
 namespace RavenBOT.Modules.AutoMod.Modules
 {
     [Group("automod")]
-    [RequireUserPermission(Discord.GuildPermission.Administrator)]
-    [RequireContext(ContextType.Guild)]
+    [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
+    [RavenRequireContext(ContextType.Guild)]
     [Summary("Handles automated moderation for servers")]
     [Remarks("Commands are limited to server administrators")]
     public partial class Moderation : InteractiveBase<ShardedCommandContext>
@@ -241,7 +242,7 @@ namespace RavenBOT.Modules.AutoMod.Modules
         }
 
         [Command("SetToxicityToken")]
-        [RequireOwner]
+        [RavenRequireOwner]
         [Summary("DEV: Sets the perspective.api token")]
         public Task ToxicityToken(string token = null)
         {

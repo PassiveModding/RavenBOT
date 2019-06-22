@@ -5,6 +5,7 @@ using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using Newtonsoft.Json;
+using RavenBOT.Common.Attributes;
 using RavenBOT.Extensions;
 using RavenBOT.Modules.Media.Methods;
 using RavenBOT.Modules.Media.Models;
@@ -68,7 +69,7 @@ namespace RavenBOT.Modules.Media.Modules
         }
 
         [Command("UrbanDictionary")]
-        [RequireNsfw]
+        [RavenRequireNsfw]
         [Summary("Search Urban Dictionary for the specified term")]
         [Remarks("This command is restricted to NSFW channels")]
         public async Task UrbanAsync([Remainder] string word)

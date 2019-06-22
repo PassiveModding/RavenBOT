@@ -2,13 +2,14 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
+using RavenBOT.Common.Attributes;
 using RavenBOT.Modules.Events.Methods;
 
 namespace RavenBOT.Modules.Events.Modules
 {
     [Group("events")]
-    [RequireUserPermission(GuildPermission.Administrator)]
-    [RequireContext(ContextType.Guild)]
+    [RavenRequireUserPermission(GuildPermission.Administrator)]
+    [RavenRequireContext(ContextType.Guild)]
     [Remarks("Requires admin permissions")]
     public class Events : InteractiveBase<ShardedCommandContext>
     {

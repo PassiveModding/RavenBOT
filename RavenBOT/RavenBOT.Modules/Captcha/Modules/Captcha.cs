@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using Discord.Addons.Interactive;
 using Discord.Commands;
+using RavenBOT.Common.Attributes;
 using RavenBOT.Modules.Captcha.Methods;
 using RavenBOT.Modules.Captcha.Models;
 
@@ -101,8 +102,8 @@ namespace RavenBOT.Modules.Captcha.Modules
 
         [Command("SetChannel")]
         [Summary("Sets where captcha auth messages will be sent if the user cannot receive messages")]
-        [RequireUserPermission(Discord.GuildPermission.Administrator)]
-        [RequireContext(ContextType.Guild)]
+        [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
+        [RavenRequireContext(ContextType.Guild)]
         [Remarks("Requires admin permissions")]
         public async Task SetCaptchaChannel()
         {
@@ -115,8 +116,8 @@ namespace RavenBOT.Modules.Captcha.Modules
 
         [Command("UseCaptcha")]
         [Summary("Toggles the use of captcha verification")]
-        [RequireUserPermission(Discord.GuildPermission.Administrator)]
-        [RequireContext(ContextType.Guild)]
+        [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
+        [RavenRequireContext(ContextType.Guild)]
         [Remarks("Requires admin permissions")]
         public async Task ToggleCaptcha()
         {
@@ -130,8 +131,8 @@ namespace RavenBOT.Modules.Captcha.Modules
 
         [Command("MaxCaptchaWarnings")]
         [Summary("Toggles the max amount of captcha fails before action is taken")]
-        [RequireUserPermission(Discord.GuildPermission.Administrator)]
-        [RequireContext(ContextType.Guild)]
+        [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
+        [RavenRequireContext(ContextType.Guild)]
         [Remarks("Requires admin permissions")]
         public async Task SetCaptchaWarnings(int count = 3)
         {
@@ -149,8 +150,8 @@ namespace RavenBOT.Modules.Captcha.Modules
 
         [Command("CaptchaActions")]
         [Summary("Displays possible actions to take when a user fails too many captchas")]
-        [RequireUserPermission(Discord.GuildPermission.Administrator)]
-        [RequireContext(ContextType.Guild)]
+        [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
+        [RavenRequireContext(ContextType.Guild)]
         [Remarks("Requires admin permissions")]
         public async Task ShowCaptchaActions()
         {
@@ -160,8 +161,8 @@ namespace RavenBOT.Modules.Captcha.Modules
 
         [Command("SetCaptchaAction")]
         [Summary("Sets what happens when a user fails too many captchas")]
-        [RequireUserPermission(Discord.GuildPermission.Administrator)]
-        [RequireContext(ContextType.Guild)]
+        [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
+        [RavenRequireContext(ContextType.Guild)]
         [Remarks("Requires admin permissions")]
         public async Task SetCaptchaAction(CaptchaConfig.Action action = CaptchaConfig.Action.Kick)
         {
@@ -173,8 +174,8 @@ namespace RavenBOT.Modules.Captcha.Modules
 
         [Command("CaptchaSettings")]
         [Summary("Displays captcha settings")]
-        [RequireUserPermission(Discord.GuildPermission.Administrator)]
-        [RequireContext(ContextType.Guild)]
+        [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
+        [RavenRequireContext(ContextType.Guild)]
         [Remarks("Requires admin permissions")]
         public async Task CaptchaSettings()
         {

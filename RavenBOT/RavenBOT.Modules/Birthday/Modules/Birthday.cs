@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
+using RavenBOT.Common.Attributes;
 using RavenBOT.Modules.Birthday.Methods;
 
 namespace RavenBOT.Modules.Birthday.Modules
@@ -21,8 +22,8 @@ namespace RavenBOT.Modules.Birthday.Modules
         [Priority(100)]
         [Command("Toggle")]
         [Summary("Toggles the use of birthday announcements in the server")]
-        [RequireUserPermission(Discord.GuildPermission.Administrator)]
-        [RequireContext(ContextType.Guild)]
+        [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
+        [RavenRequireContext(ContextType.Guild)]
         [Remarks("Requires admin permissions")]
         public async Task ToggleEnabled()
         {
@@ -37,8 +38,8 @@ namespace RavenBOT.Modules.Birthday.Modules
         [Priority(100)]
         [Command("SetChannel")]
         [Summary("Sets the current channel as the birthday announcement channel")]
-        [RequireUserPermission(Discord.GuildPermission.Administrator)]
-        [RequireContext(ContextType.Guild)]
+        [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
+        [RavenRequireContext(ContextType.Guild)]
         [Remarks("Requires admin permissions")]
         public async Task SetChannel()
         {
@@ -54,8 +55,8 @@ namespace RavenBOT.Modules.Birthday.Modules
         [Command("SetRole")]
         [Alias("SetBirthdayRole")]
         [Summary("Sets (or removes) the role users can receive when it is their birthday")]
-        [RequireUserPermission(Discord.GuildPermission.Administrator)]
-        [RequireContext(ContextType.Guild)]
+        [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
+        [RavenRequireContext(ContextType.Guild)]
         [Remarks("Requires admin permissions")]
         public async Task SetBirthdayRole(IRole role = null)
         {

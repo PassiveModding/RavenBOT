@@ -1,13 +1,14 @@
 using System.Threading.Tasks;
 using Discord.Addons.Interactive;
 using Discord.Commands;
+using RavenBOT.Common.Attributes;
 using RavenBOT.Modules.Greetings.Methods;
 
 namespace RavenBOT.Modules.Greetings.Modules
 {
     [Group("Greetings")]
-    [RequireUserPermission(Discord.GuildPermission.Administrator)]
-    [RequireContext(ContextType.Guild)]
+    [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
+    [RavenRequireContext(ContextType.Guild)]
     [Remarks("Requires admin permissions")]
     public class Greetings : InteractiveBase<ShardedCommandContext>
     {

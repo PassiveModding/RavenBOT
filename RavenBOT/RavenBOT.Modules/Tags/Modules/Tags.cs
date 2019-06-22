@@ -4,13 +4,14 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
+using RavenBOT.Common.Attributes;
 using RavenBOT.Extensions;
 using RavenBOT.Modules.Tags.Methods;
 
 namespace RavenBOT.Modules.Tags.Modules
 {
     [Group("Tags")]
-    [RequireContext(ContextType.Guild)]
+    [RavenRequireContext(ContextType.Guild)]
     public class Tags : InteractiveBase<ShardedCommandContext>
     {
         public Tags(TagManager tagManager)
@@ -23,7 +24,7 @@ namespace RavenBOT.Modules.Tags.Modules
         [Priority(100)]
         [Command("Add")]
         [Summary("Adds a new tag with the given name and message")]
-        [RequireUserPermission(Discord.GuildPermission.Administrator)]    
+        [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]    
         [Remarks("Requires administrator permissions")]
         public async Task AddTag([Summary("Wrap this in quotations if you want it to use spaces")] string name, [Remainder] string response)
         {
@@ -43,7 +44,7 @@ namespace RavenBOT.Modules.Tags.Modules
         [Priority(100)]
         [Command("Remove")]
         [Summary("Removes the specified tag")]
-        [RequireUserPermission(Discord.GuildPermission.Administrator)]    
+        [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]    
         [Remarks("Requires administrator permissions")]
         public async Task RemoveTag([Remainder] string name)
         {

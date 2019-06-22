@@ -4,14 +4,15 @@ using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
+using RavenBOT.Common.Attributes;
 using RavenBOT.Extensions;
 using RavenBOT.Modules.Media.Methods;
 
 namespace RavenBOT.Modules.Media.Modules
 {
     [Group("Media Channel")]
-    [RequireContext(ContextType.Guild)]
-    [RequireUserPermission(GuildPermission.Administrator)]
+    [RavenRequireContext(ContextType.Guild)]
+    [RavenRequireUserPermission(GuildPermission.Administrator)]
     [Remarks("Requires admin permissions")]
     public class MediaRestrictor : InteractiveBase<ShardedCommandContext>
     {
