@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
+using MoreLinq;
+using RavenBOT.Common.Attributes;
 using RavenBOT.Common.Extensions;
 using RavenBOT.Extensions;
 using RavenBOT.Models;
@@ -150,7 +152,8 @@ namespace RavenBOT.Common.Services
                     }
                     if (command.Preconditions.Any())
                     {
-                        commandContent.AppendLine($"[Preconditions]{string.Join(" ", command.Preconditions.Select(x => x.GetType().Name))}");
+
+                        commandContent.AppendLine($"[Preconditions]\n{GetPreconditionSummaries(command.Preconditions)}");
                     }
                     if (command.Aliases.Count > 1)
                     {
@@ -179,6 +182,17 @@ namespace RavenBOT.Common.Services
                 page.Description = pageContent.ToString();
                 //TODO: Add module specific preconditions in additional field
                 //Otherwise apply those preconditions to all relevant command precondition descriptions
+
+                var modPreconditons = commandGroup.Item2.SelectMany(x => x.Preconditions.DistinctBy(p => (p as PreconditionBase)?.PreviewText()));
+                if (modPreconditons.Any())
+                {
+                    page.Fields.Add(new EmbedFieldBuilder
+                    {
+                        Name = "Module Preconditions", 
+                        Value = GetPreconditionSummaries(modPreconditons) ?? "N/A"
+                    });
+                }
+
                 pages.Add(new Tuple<int, PaginatedMessage.Page>(pageIndex, page));
                 pageIndex++;
             }
@@ -216,6 +230,23 @@ namespace RavenBOT.Common.Services
             pager.Pages = overviewPages;
 
             return pager;
+        }
+
+        public string GetPreconditionSummaries(IEnumerable<PreconditionAttribute> preconditions)
+        {
+            var preconditionString = string.Join("\n", preconditions.Select(x => 
+                {
+                    if (x is PreconditionBase preBase)
+                    {
+                        return $"__{preBase.Name()}__ {preBase.PreviewText()}";
+                    }
+                    else
+                    {
+                        return x.GetType().Name;
+                    }
+                }).Distinct().ToArray()).FixLength();
+
+            return preconditionString;
         }
 
         public async Task<bool> CheckPreconditionsAsync(ShardedCommandContext context, CommandInfo command, DeveloperSettings.Settings settings)
