@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
+using MoreLinq;
 using RavenBOT.Common.Services;
 using RavenBOT.Extensions;
 using RavenBOT.Modules.Translation.Methods;
@@ -24,7 +25,7 @@ namespace RavenBOT.Modules.Translation.Modules
         [RequireContext(ContextType.Guild)]
         [Command("Translate", RunMode = RunMode.Async)]
         [Summary("Translate from one language to another")]
-        public async Task Translate(LanguageMap.LanguageCode languageCode, [Remainder] string message)
+        public async Task Translate(string languageCode, [Remainder] string message)
         {
             var config = TranslateService.GetTranslateGuild(Context.Guild.Id);
             //Ensure whitelist isn't enforced unless the list is populated
@@ -51,6 +52,7 @@ namespace RavenBOT.Modules.Translation.Modules
             await ReplyAsync("", false, embed.Build());
         }
 
+        /*
         [Priority(100)]
         [Command("languages", RunMode = RunMode.Async)]
         [Summary("A list of available languages codes to convert between")]
@@ -82,6 +84,21 @@ namespace RavenBOT.Modules.Translation.Modules
             embed2.AddField("X", "`xh` - Xhosa\n");
             embed2.AddField("Y", "`yi` - Yiddish\n`yo` - Yoruba\n");
             embed2.AddField("Z", "`zu` - Zulu\n");
+            await Context.User.SendMessageAsync("", false, embed2.Build());
+            await ReplyAsync("DM Sent.");
+        }*/
+
+        [Command("languages", RunMode = RunMode.Async)]
+        [Summary("A list of available languages codes to convert between")]
+        public async Task TranslateListAsync()
+        {
+            var embed2 = new EmbedBuilder();
+            foreach (var languageGroup in TranslateService.Translator.GetAvailableLanguages().GroupBy(x => x.BaseCulture.Name.ToCharArray().First()).OrderBy(x => x.Key))
+            {
+                var resContent = languageGroup.Select(x => $"`{x.BaseCulture.Name}` - **{x.BaseCulture.DisplayName}** {x.BaseCulture.NativeName}").ToArray();
+                embed2.AddField(languageGroup.Key.ToString(), string.Join("\n", resContent));
+            }
+
             await Context.User.SendMessageAsync("", false, embed2.Build());
             await ReplyAsync("DM Sent.");
         }
@@ -183,7 +200,7 @@ namespace RavenBOT.Modules.Translation.Modules
         [Command("RemoveEmote")]
         [RequireUserPermission(GuildPermission.Administrator)]    
         [Remarks("Requires administrator permissions")]
-        public async Task AddPair(Emoji emote)
+        public async Task RemovePair(Emoji emote)
         {
             var config = TranslateService.GetTranslateGuild(Context.Guild.Id);
 
@@ -202,7 +219,7 @@ namespace RavenBOT.Modules.Translation.Modules
         [Summary("Adds a pair for reaction translations")]
         [RequireUserPermission(GuildPermission.Administrator)]    
         [Remarks("Requires administrator permissions")]
-        public async Task AddPair(LanguageMap.LanguageCode code, Emoji emote)
+        public async Task AddPair(string code, Emoji emote)
         {
             await AddPair(emote, code);
         }
@@ -214,7 +231,7 @@ namespace RavenBOT.Modules.Translation.Modules
         public Task ListAsync()
         {
             var config = TranslateService.GetTranslateGuild(Context.Guild.Id);
-            var fields = config.CustomPairs.Select(x => new EmbedFieldBuilder { Name = x.Language.ToString(), Value = string.Join("\n", x.EmoteMatches), IsInline = true }).ToList();
+            var fields = config.CustomPairs.Select(x => new EmbedFieldBuilder { Name = x.LanguageString, Value = string.Join("\n", x.EmoteMatches), IsInline = true }).ToList();
             var embed = new EmbedBuilder { Fields = fields };
             return ReplyAsync("", false, embed.Build());
         }
@@ -224,7 +241,7 @@ namespace RavenBOT.Modules.Translation.Modules
         [Summary("List Default paired languages")]
         public Task ListDefaultAsync()
         {
-            var fields = LanguageMap.DefaultMap.OrderByDescending(x => x.EmoteMatches.Count).Select(x => new EmbedFieldBuilder { Name = x.Language.ToString(), Value = string.Join("\n", x.EmoteMatches), IsInline = true }).ToList();
+            var fields = LanguageMap.DefaultMap.OrderByDescending(x => x.EmoteMatches.Count).Select(x => new EmbedFieldBuilder { Name = x.LanguageString, Value = string.Join("\n", x.EmoteMatches), IsInline = true }).ToList();
             var embed = new EmbedBuilder { Fields = fields };
             return ReplyAsync("", false, embed.Build());
         }
@@ -235,10 +252,16 @@ namespace RavenBOT.Modules.Translation.Modules
         [Summary("Adds a pair for reaction translations")]
         [RequireUserPermission(GuildPermission.Administrator)]    
         [Remarks("Requires administrator permissions")]
-        public async Task AddPair(Emoji emote, LanguageMap.LanguageCode code)
+        public async Task AddPair(Emoji emote, string code)
         {
+            if (!TranslateService.Translator.IsValidLanguageCode(code))
+            {
+                await ReplyAsync("Language code is not valid.");
+                return;
+            }
+
             var config = TranslateService.GetTranslateGuild(Context.Guild.Id);
-            var match = config.CustomPairs.FirstOrDefault(x => x.Language == code);
+            var match = config.CustomPairs.FirstOrDefault(x => x.LanguageString.Equals(code, StringComparison.InvariantCultureIgnoreCase));
 
             if (match != null)
             {
@@ -255,7 +278,7 @@ namespace RavenBOT.Modules.Translation.Modules
                 config.CustomPairs.Add(new LanguageMap.TranslationSet()
                 {
                     EmoteMatches = new List<string> { emote.Name },
-                        Language = code
+                    LanguageString = code
                 });
             }
 
@@ -380,6 +403,18 @@ namespace RavenBOT.Modules.Translation.Modules
         [Priority(100)]
         [RequireOwner]    
         [Remarks("Requires bot owner permissions")]
+        [Command("SetApiType")]
+        public async Task SetApiType(TranslateConfig.ApiKey apiKeyType)
+        {
+            var config = TranslateService.GetTranslateConfig();
+            config.ApiKeyType = apiKeyType;
+            await ReplyAsync("This will take effect after a restart.");
+            TranslateService.SaveTranslateConfig(config);
+        }
+
+        [Priority(100)]
+        [RequireOwner]    
+        [Remarks("Requires bot owner permissions")]
         [Command("ToggleTranslation")]
         [Summary("DEV: Toggles translation services for all services")]
         public async Task ToggleTranslation()
@@ -388,6 +423,27 @@ namespace RavenBOT.Modules.Translation.Modules
             config.Enabled = !config.Enabled;
             await ReplyAsync($"Translation Enabled: {config.Enabled}\nNOTE: API Key needs to be set in order for translations to run.");
             TranslateService.SaveTranslateConfig(config);
+        }
+
+        [Priority(100)]
+        [RequireOwner]    
+        [Remarks("Requires bot owner permissions")]
+        [Command("ResetReactionTranslationKeys")]
+        [Summary("DEV: Resets reaction translation configurations")]
+        public async Task ResetReactionTranslationKeys()
+        {
+            var configs =TranslateService.Database.Query<TranslateGuild>();
+            var newConfigs = new List<TranslateGuild>();
+            foreach (var config in configs)
+            {
+                config.ReactionTranslations = false;
+                config.CustomPairs = new List<LanguageMap.TranslationSet>();
+                newConfigs.Add(config);
+            }
+
+            TranslateService.Database.StoreMany(newConfigs, x => TranslateGuild.DocumentName(x.GuildId));
+
+            await ReplyAsync($"Configs have been reset.");
         }
 
         [Priority(100)]

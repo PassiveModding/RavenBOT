@@ -30,12 +30,12 @@ namespace RavenBOT.Modules.Translation.Modules
                 await PagedReplyAsync(res, new ReactionList
                 {
                     Backward = true,
-                        First = false,
-                        Forward = true,
-                        Info = false,
-                        Jump = true,
-                        Last = false,
-                        Trash = true
+                    First = false,
+                    Forward = true,
+                    Info = false,
+                    Jump = true,
+                    Last = false,
+                    Trash = true
                 });
             }
             else

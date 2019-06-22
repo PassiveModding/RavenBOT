@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using System.Text.RegularExpressions;
 using Discord;
 using Google.Cloud.Translation.V2;
 using RavenBOT.Extensions;
@@ -8,32 +10,6 @@ namespace RavenBOT.Modules.Translation.Methods
 {
     public partial class TranslateService
     {
-        public static string LanguageCodeToString(LanguageMap.LanguageCode? code)
-        {
-            if (code == null)
-            {
-                return null;
-            }
-
-            var language = code.ToString();
-            if (language == "zh_CN")
-            {
-                language = "zh-CN";
-            }
-
-            if (language == "zh_TW")
-            {
-                language = "zh-TW";
-            }
-
-            if (language == "_is")
-            {
-                language = "is";
-            }
-
-            return language;
-        }
-
         public string TranslateType = "Translate";
 
         public class TranslateResponse
@@ -57,10 +33,22 @@ namespace RavenBOT.Modules.Translation.Methods
             public Result ResponseResult { get; set; }
             public TranslationResult TranslateResult { get; set; }
 
+            public class TranslationResult 
+            {
+                public TranslateConfig.ApiKey ApiType { get; set; }
+                public string SourceLanguage { get; set; }
+
+                public string DestinationLanguage { get; set; }
+
+                public string SourceText { get; set; }
+
+                public string TranslatedText { get; set; }
+            }
+
             public int RemainingUses { get; set; } = 0;
         }
 
-        public EmbedBuilder TranslateEmbed(ulong guildId, IEmbed embed, LanguageMap.LanguageCode code)
+        public EmbedBuilder TranslateEmbed(ulong guildId, IEmbed embed, string code)
         {
             if (embed.Type != EmbedType.Rich)
             {
@@ -153,10 +141,19 @@ namespace RavenBOT.Modules.Translation.Methods
                 builder.Fields.Add(newField);
             }
 
+            if (Config.ApiKeyType == TranslateConfig.ApiKey.Yandex)
+            {
+                if (builder.Fields.Count < 25 && builder.Length < 5900)
+                {
+                    builder.AddField("Yandex", "[Powered by Yandex](http://translate.yandex.com/)");
+                }                
+            }
+
+
             return builder;
         }
 
-        public TranslateResponse Translate(ulong guildId, string inputText, LanguageMap.LanguageCode languageCode)
+        public TranslateResponse Translate(ulong guildId, string inputText, string languageCode)
         {
             if (string.IsNullOrWhiteSpace(inputText))
             {
@@ -172,7 +169,7 @@ namespace RavenBOT.Modules.Translation.Methods
 
             try
             {
-                var response = TranslateText(inputText, LanguageCodeToString(languageCode));
+                var response = TranslateText(inputText, languageCode);
                 if (response != null)
                 {
                     guildConfig.UseNoLog(inputText.Length);
@@ -189,16 +186,70 @@ namespace RavenBOT.Modules.Translation.Methods
             return new TranslateResponse(TranslateResponse.Result.TranslationError);;
         }
 
-        private TranslationResult TranslateText(string inputText, string languageCode)
+        private TranslateResponse.TranslationResult TranslateText(string inputText, string languageCode)
         {
-            if (TranslationClient == null)
+            try
             {
+                var result = Translator.TranslateText(inputText, languageCode);
+                if (result != null)
+                {
+                    return result;
+                } 
+
+                return null;               
+            }
+            catch (Exception e)
+            {
+                Logger.Log(e.ToString(), LogSeverity.Error);
                 return null;
             }
+        }
 
-            var response = TranslationClient.TranslateText(inputText, languageCode);
+        public static string FixTranslatedString(string value)
+        {            
+            var translationString = value;
 
-            return response;
+            try
+            {
+                //Used to fix links that are created using the []() firmat.
+                translationString = translationString.Replace("] (", "](");
+
+                //Fixed user mentions
+                var matchUser = Regex.Matches(translationString, @"(<@!?) (\d+)>");
+                if (matchUser.Any())
+                {
+                    foreach (Match match in matchUser)
+                    {
+                        translationString = translationString.Replace(match.Value, $"{match.Groups[1].Value}{match.Groups[2].Value}>");
+                    }
+                }
+
+                //fixed role mentions
+                var matchRole = Regex.Matches(translationString, @"<@ & (\d+)>");
+                if (matchRole.Any())
+                {
+                    foreach (Match match in matchRole)
+                    {
+                        translationString = translationString.Replace(match.Value, $"<@&{match.Groups[1].Value}>");
+                    }
+                }
+
+                //Fixed channel mentions
+                var matchChannel = Regex.Matches(translationString, @"<# (\d+)>");
+                if (matchChannel.Any())
+                {
+                    foreach (Match match in matchChannel)
+                    {
+                        translationString = translationString.Replace(match.Value, $"<#{match.Groups[1].Value}>");
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+
+            return translationString;
         }
     }
 }

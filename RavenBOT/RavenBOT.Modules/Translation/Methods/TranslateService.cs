@@ -17,13 +17,13 @@ namespace RavenBOT.Modules.Translation.Methods
 {
     public partial class TranslateService : IServiceable
     {
-        public TranslationClient TranslationClient { get; }
-
+        public ITranslator Translator { get; }
         public IDatabase Database { get; }
         public LicenseService License { get; }
         public LogHandler Logger { get; }
         public DiscordShardedClient Client { get; }
         public LocalManagementService LocalManagementService { get; }
+        public TranslateConfig Config { get; }
 
         public TranslateService(IDatabase database, LicenseService license, LogHandler logger, DiscordShardedClient client, LocalManagementService localManagementService)
         {
@@ -32,18 +32,28 @@ namespace RavenBOT.Modules.Translation.Methods
             Logger = logger;
             Client = client;
             LocalManagementService = localManagementService;
-            var config = GetTranslateConfig();
-            if (config.APIKey != null && config.Enabled)
+            Config = GetTranslateConfig();
+            if (Config.APIKey != null && Config.Enabled)
             {
-                //NOTE: Should throw if invalid key is provided
-                TranslationClient = TranslationClient.CreateFromApiKey(config.APIKey);
-            }
+                if (Config.ApiKeyType == TranslateConfig.ApiKey.Google)
+                {
+                    Translator = new GoogleTranslator(Config.APIKey);
+                }
+                else if (Config.ApiKeyType == TranslateConfig.ApiKey.Yandex)
+                {
+                    Translator = new YandexTranslator(Config.APIKey);
+                }
+                else
+                {
+                    throw new NotImplementedException("The specified api type is not implemented");
+                }
 
-            Client.ReactionAdded += ReactionAdded;
+                Client.ReactionAdded += ReactionAdded;
+            }
         }
 
         //Contains the message IDs of translated messages.
-        private readonly Dictionary<ulong, List<LanguageMap.LanguageCode>> Translated = new Dictionary<ulong, List<LanguageMap.LanguageCode>>();
+        private readonly Dictionary<ulong, List<string>> Translated = new Dictionary<ulong, List<string>>();
 
         public LanguageMap.TranslationSet GetCode(TranslateGuild config, SocketReaction reaction)
         {
@@ -110,18 +120,18 @@ namespace RavenBOT.Modules.Translation.Methods
                 return;
             }
 
-            if (Translated.ContainsKey(message.Id) && Translated[message.Id].Contains(languageType.Language))
+            if (Translated.ContainsKey(message.Id) && Translated[message.Id].Any(x => x.Equals(languageType.LanguageString, StringComparison.InvariantCultureIgnoreCase)))
             {
                 return;
             }
 
-            var response = Translate(channel.GuildId, message.Content, languageType.Language);
+            var response = Translate(channel.GuildId, message.Content, languageType.LanguageString);
 
             var embed = message.Embeds.FirstOrDefault(x => x.Type == EmbedType.Rich);
             EmbedBuilder translatedEmbed = null;
             if (embed != null)
             {
-                var embedResponse = TranslateEmbed(channel.GuildId, embed, languageType.Language);
+                var embedResponse = TranslateEmbed(channel.GuildId, embed, languageType.LanguageString);
                 translatedEmbed = embedResponse;
             }
 
@@ -137,34 +147,34 @@ namespace RavenBOT.Modules.Translation.Methods
                 if (translatedEmbed != null)
                 {
                     await dmChannel.SendMessageAsync(response?.TranslateResult?.TranslatedText ?? "", false, translatedEmbed?.Build()).ConfigureAwait(false);
-                    Logger.Log($"Translated Embed to {languageType.Language}");
+                    Logger.Log($"Translated Embed to {languageType.LanguageString}");
                 }
                 else
                 {
                     await dmChannel.SendMessageAsync("", false, GetTranslationEmbed(response).Build()).ConfigureAwait(false);
-                    Logger.Log($"**Translated {response.TranslateResult.DetectedSourceLanguage}=>{response.TranslateResult.TargetLanguage}**\n{response?.TranslateResult?.OriginalText} \nto\n {response?.TranslateResult?.TranslatedText}");
+                    Logger.Log($"**Translated {response.TranslateResult.SourceLanguage}=>{response.TranslateResult.DestinationLanguage}**\n{response?.TranslateResult?.SourceText} \nto\n {response?.TranslateResult?.TranslatedText}");
                 }
             }
             else
             {
                 if (Translated.ContainsKey(message.Id))
                 {
-                    Translated[message.Id].Add(languageType.Language);
+                    Translated[message.Id].Add(languageType.LanguageString);
                 }
                 else
                 {
-                    Translated.Add(message.Id, new List<LanguageMap.LanguageCode>() { languageType.Language });
+                    Translated.Add(message.Id, new List<string>() { languageType.LanguageString });
                 }
 
                 if (translatedEmbed != null)
                 {
                     await channel.SendMessageAsync(response?.TranslateResult?.TranslatedText ?? "", false, translatedEmbed?.Build()).ConfigureAwait(false);
-                    Logger.Log($"Translated Embed to {languageType.Language}");
+                    Logger.Log($"Translated Embed to {languageType.LanguageString}");
                 }
                 else
                 {
                     await channel.SendMessageAsync("", false, GetTranslationEmbed(response).Build()).ConfigureAwait(false);
-                    Logger.Log($"**Translated {response.TranslateResult.DetectedSourceLanguage}=>{response.TranslateResult.TargetLanguage}**\n{response?.TranslateResult?.OriginalText} \nto\n {response?.TranslateResult?.TranslatedText}");
+                    Logger.Log($"**Translated {response.TranslateResult.SourceLanguage}=>{response.TranslateResult.DestinationLanguage}**\n{response?.TranslateResult?.SourceText} \nto\n {response?.TranslateResult?.TranslatedText}");
                 }
             }
 
@@ -177,45 +187,15 @@ namespace RavenBOT.Modules.Translation.Methods
                 return null;
             }
 
-            var translationString = result.TranslateResult.TranslatedText;
-
-            try
-            {
-                var matchUser = Regex.Matches(translationString, @"(<@!?) (\d+)>");
-                if (matchUser.Any())
-                {
-                    foreach (Match match in matchUser)
-                    {
-                        translationString = translationString.Replace(match.Value, $"{match.Groups[1].Value}{match.Groups[2].Value}>");
-                    }
-                }
-
-                var matchRole = Regex.Matches(translationString, @"<@ & (\d+)>");
-                if (matchRole.Any())
-                {
-                    foreach (Match match in matchRole)
-                    {
-                        translationString = translationString.Replace(match.Value, $"<@&{match.Groups[1].Value}>");
-                    }
-                }
-
-                var matchChannel = Regex.Matches(translationString, @"<# (\d+)>");
-                if (matchChannel.Any())
-                {
-                    foreach (Match match in matchChannel)
-                    {
-                        translationString = translationString.Replace(match.Value, $"<#{match.Groups[1].Value}>");
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
-
             var embed = new EmbedBuilder();
-            embed.AddField($"Original Message [{result.TranslateResult.SpecifiedSourceLanguage ?? result.TranslateResult.DetectedSourceLanguage}]", result.TranslateResult.OriginalText.FixLength());
-            embed.AddField($"Translated Message [{result.TranslateResult.TargetLanguage}]", translationString.FixLength());
+            embed.AddField($"Original Message [{result.TranslateResult.SourceLanguage}]", result.TranslateResult.SourceText.FixLength());
+            embed.AddField($"Translated Message [{result.TranslateResult.DestinationLanguage}]", result.TranslateResult.TranslatedText.FixLength());
+
+            if (Config.ApiKeyType == TranslateConfig.ApiKey.Yandex)
+            {
+                embed.AddField("Yandex", $"[Powered by Yandex](http://translate.yandex.com/)");
+            }
+
             embed.Color = Color.Green;
             embed.Footer = new EmbedFooterBuilder
             {
@@ -231,6 +211,7 @@ namespace RavenBOT.Modules.Translation.Methods
             {
                 message = messageCacheable.Value;
             }
+            //This should work however there is a bug in d.net that is not fixed in the current d.net 2.1.1 implementation
             /*else if (reaction.Message.IsSpecified)
             {
                 message = reaction.Message.Value;
