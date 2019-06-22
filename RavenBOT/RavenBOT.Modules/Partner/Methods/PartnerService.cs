@@ -63,7 +63,7 @@ namespace RavenBOT.Modules.Partner.Methods
                 .Select(x => new GroupedConfig
                 {
                     Guild = Client.GetGuild(x.GuildId),
-                        Config = x
+                    Config = x
                 })
                 .Where(x => x.Guild != null)
                 .ToList();

@@ -27,6 +27,8 @@ namespace RavenBOT.ELO.Modules.Models
 
         public int CurrentGameCount { get; set; } = 0;
 
+        //TODO: Specific announcement channel per lobby
+
         public enum PickMode
         {
             Captains,
