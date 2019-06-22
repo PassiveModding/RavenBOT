@@ -49,7 +49,7 @@ namespace RavenBOT.Common.Attributes.Preconditions
     ///     and will not persist with restarts.
     /// </remarks>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, Inherited = false)]
-    public sealed class RateLimitAttribute : PreconditionAttribute
+    public sealed class RateLimitAttribute : PreconditionBase
     {
         private readonly bool applyPerGuild;
 
@@ -154,6 +154,10 @@ namespace RavenBOT.Common.Attributes.Preconditions
 
             return Task.FromResult(PreconditionResult.FromError($"You are currently in Timeout for {(timeout.FirstInvoke - DateTime.UtcNow + invokeLimitPeriod).GetReadableLength()}"));
         }
+
+        public override string PreviewText() => $"Limits command usage to {invokeLimit} uses per {invokeLimitPeriod.GetReadableLength()}";
+
+        public override string Name() => $"RateLimit Precondition";
 
         /// <summary>
         ///     The command timeout.
