@@ -185,19 +185,37 @@ namespace RavenBOT.Modules.Captcha.Methods
                     return;
                 }
 
-                Stream imageStream = CaptchaGen.NetCore.ImageFactory.BuildImage(captchaDoc.Captcha, 100, 150, 25, 10, ImageFormatType.Jpeg);
-
                 try
                 {
-                    await user.SendFileAsync(imageStream, "captcha.jpg", $"Please run the Verify command in order to speak in {user.Guild.Name}. ie. `lithium.moderation.Verify {user.Guild.Id} <code>`");
+                    Stream imageStream = CaptchaGen.NetCore.ImageFactory.BuildImage(captchaDoc.Captcha, 100, 150, 25, 10, ImageFormatType.Jpeg);
+
+                    try
+                    {
+                        await user.SendFileAsync(imageStream, "captcha.jpg", $"Please run the Verify command in order to speak in {user.Guild.Name}. ie. `Verify {user.Guild.Id} {captchaDoc.Captcha}`");
+                    }
+                    catch
+                    {
+                        var guildChannel = user.Guild.GetTextChannel(config.ChannelId);
+                        if (guildChannel != null)
+                        {
+                            await guildChannel.SendFileAsync(imageStream, "captcha.jpg", $"{user.Mention} Please run the Verify command in order to speak in {user.Guild.Name}. ie. `Verify {user.Guild.Id} {captchaDoc.Captcha}`");
+                        }
+                    }                    
                 }
                 catch
                 {
-                    var guildChannel = user.Guild.GetTextChannel(config.ChannelId);
-                    if (guildChannel != null)
+                    try
                     {
-                        await guildChannel.SendFileAsync(imageStream, "captcha.jpg", $"{user.Mention} Please run the Verify command in order to speak in {user.Guild.Name}. ie. `lithium.moderation.Verify {user.Guild.Id} <code>`");
+                        await user.SendMessageAsync($"Please run the Verify command in order to speak in {user.Guild.Name}. ie. `Verify {user.Guild.Id} {captchaDoc.Captcha}`");
                     }
+                    catch
+                    {
+                        var guildChannel = user.Guild.GetTextChannel(config.ChannelId);
+                        if (guildChannel != null)
+                        {
+                            await guildChannel.SendMessageAsync($"Please run the Verify command in order to speak in {user.Guild.Name}. ie. `Verify {user.Guild.Id} {captchaDoc.Captcha}`");
+                        }
+                    } 
                 }
             }
         }
