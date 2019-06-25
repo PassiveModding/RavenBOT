@@ -1,10 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using RavenBOT.Common.Attributes;
+using RavenBOT.Common.Services;
 using RavenBOT.Extensions;
 using RavenBOT.Modules.Tags.Methods;
 
@@ -14,12 +16,42 @@ namespace RavenBOT.Modules.Tags.Modules
     [RavenRequireContext(ContextType.Guild)]
     public class Tags : InteractiveBase<ShardedCommandContext>
     {
-        public Tags(TagManager tagManager)
+        public Tags(TagManager tagManager, HelpService helpService)
         {
             TagManager = tagManager;
+            HelpService = helpService;
         }
 
         public TagManager TagManager { get; }
+        public HelpService HelpService { get; }
+
+        [Priority(100)]
+        [Command("Help")]
+        public async Task HelpAsync()
+        {
+            var res = await HelpService.PagedHelpAsync(Context, true, new List<string>
+            {
+                "Tags"
+            }, "This module allows you to set custom messages to be displayed with a command.");
+
+            if (res != null)
+            {
+                await PagedReplyAsync(res, new ReactionList
+                {
+                    Backward = true,
+                        First = false,
+                        Forward = true,
+                        Info = false,
+                        Jump = true,
+                        Last = false,
+                        Trash = true
+                });
+            }
+            else
+            {
+                await ReplyAsync("N/A");
+            }
+        }
 
         [Priority(100)]
         [Command("Add")]

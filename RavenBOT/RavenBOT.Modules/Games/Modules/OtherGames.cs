@@ -1,19 +1,12 @@
 using System;
 using System.Threading.Tasks;
 using Discord;
-using Discord.Addons.Interactive;
 using Discord.Commands;
 
 namespace RavenBOT.Modules.Games.Modules
 {
-    [Group("Games")]
-    public class OtherGames : InteractiveBase<ShardedCommandContext>
+    public partial class Game
     {
-        public Random Random { get; }
-        public OtherGames(Random random)
-        {
-            Random = random;
-        }
 
         [Command("8ball")]
         [Summary("Ask the 8Ball a question")]

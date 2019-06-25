@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using RavenBOT.Common;
 using RavenBOT.Common.Interfaces;
 using RavenBOT.Modules.Games.Models;
@@ -48,5 +49,7 @@ namespace RavenBOT.Modules.Games.Methods
         {
             Database.Store(user, GameUser.DocumentName(user.UserId, user.GuildId));
         }
+
+        public List<Connect4Game> Connect4List = new List<Connect4Game>();
     }
 }

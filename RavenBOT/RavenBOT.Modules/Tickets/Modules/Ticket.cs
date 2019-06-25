@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
@@ -5,6 +6,7 @@ using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
 using RavenBOT.Common.Attributes;
+using RavenBOT.Common.Services;
 using RavenBOT.Extensions;
 using RavenBOT.Modules.Tickets.Methods;
 using RavenBOT.Modules.Tickets.Models;
@@ -16,10 +18,39 @@ namespace RavenBOT.Modules.Tickets.Modules
     public class Ticket : InteractiveBase<ShardedCommandContext>
     {
         private TicketService TicketService { get; }
+        public HelpService HelpService { get; }
 
-        public Ticket(TicketService ticketService)
+        public Ticket(TicketService ticketService, HelpService helpService)
         {
             TicketService = ticketService;
+            HelpService = helpService;
+        }
+
+        [Command("Help")]
+        public async Task HelpAsync()
+        {
+            var res = await HelpService.PagedHelpAsync(Context, true, new List<string>
+            {
+                "ticket"
+            }, "This module handles support tickets for your server.");
+
+            if (res != null)
+            {
+                await PagedReplyAsync(res, new ReactionList
+                {
+                    Backward = true,
+                        First = false,
+                        Forward = true,
+                        Info = false,
+                        Jump = true,
+                        Last = false,
+                        Trash = true
+                });
+            }
+            else
+            {
+                await ReplyAsync("N/A");
+            }
         }
 
         [Command("SetChannel")]

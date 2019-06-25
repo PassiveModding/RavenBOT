@@ -1,7 +1,9 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using RavenBOT.Common.Attributes;
+using RavenBOT.Common.Services;
 using RavenBOT.Modules.Greetings.Methods;
 
 namespace RavenBOT.Modules.Greetings.Modules
@@ -13,9 +15,39 @@ namespace RavenBOT.Modules.Greetings.Modules
     public class Greetings : InteractiveBase<ShardedCommandContext>
     {
         public GreetingsService GreetingsService { get; }
-        public Greetings(GreetingsService greetingsService)
+        public HelpService HelpService { get; }
+
+        public Greetings(GreetingsService greetingsService, HelpService helpService)
         {
             GreetingsService = greetingsService;
+            HelpService = helpService;
+        }
+
+        [Command("Help")]
+        public async Task HelpAsync()
+        {
+            var res = await HelpService.PagedHelpAsync(Context, true, new List<string>
+            {
+                "Greetings"
+            }, "This module allows you to configure automatic messages when a user joins or leaves the server.");
+
+            if (res != null)
+            {
+                await PagedReplyAsync(res, new ReactionList
+                {
+                    Backward = true,
+                        First = false,
+                        Forward = true,
+                        Info = false,
+                        Jump = true,
+                        Last = false,
+                        Trash = true
+                });
+            }
+            else
+            {
+                await ReplyAsync("N/A");
+            }
         }
 
         [Command("ToggleWelcome")]

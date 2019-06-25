@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
@@ -7,6 +8,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using MoreLinq;
 using RavenBOT.Common.Attributes;
+using RavenBOT.Common.Services;
 using RavenBOT.Extensions;
 using RavenBOT.Modules.Moderator.Methods;
 using RavenBOT.Modules.Moderator.Models;
@@ -20,10 +22,39 @@ namespace RavenBOT.Modules.Moderator.Modules
     public partial class Moderation : InteractiveBase<ShardedCommandContext>
     {
         public ModerationHandler ModHandler { get; }
+        public HelpService HelpService { get; }
 
-        public Moderation(ModerationHandler modHandler)
+        public Moderation(ModerationHandler modHandler, HelpService helpService)
         {
             ModHandler = modHandler;
+            HelpService = helpService;
+        }
+
+        [Command("Help")]
+        public async Task HelpAsync()
+        {
+            var res = await HelpService.PagedHelpAsync(Context, true, new List<string>
+            {
+                "mod"
+            }, "This module handles relevant moderator commands such as kicking/banning etc.");
+
+            if (res != null)
+            {
+                await PagedReplyAsync(res, new ReactionList
+                {
+                    Backward = true,
+                        First = false,
+                        Forward = true,
+                        Info = false,
+                        Jump = true,
+                        Last = false,
+                        Trash = true
+                });
+            }
+            else
+            {
+                await ReplyAsync("N/A");
+            }
         }
 
         public async Task<bool> IsActionable(SocketGuildUser target, SocketGuildUser currentUser)

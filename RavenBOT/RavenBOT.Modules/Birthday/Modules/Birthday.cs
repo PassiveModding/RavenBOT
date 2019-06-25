@@ -1,10 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using RavenBOT.Common.Attributes;
+using RavenBOT.Common.Services;
 using RavenBOT.Modules.Birthday.Methods;
 
 namespace RavenBOT.Modules.Birthday.Modules
@@ -14,17 +16,45 @@ namespace RavenBOT.Modules.Birthday.Modules
     public class Birthday : InteractiveBase<ShardedCommandContext>
     {
         public BirthdayService BirthdayService { get; }
-        public Birthday(BirthdayService birthdayService)
+        public HelpService HelpService { get; }
+
+        public Birthday(BirthdayService birthdayService, HelpService helpService)
         {
             BirthdayService = birthdayService;
+            HelpService = helpService;
         }
 
-        [Priority(100)]
+        [Command("Help")]
+        public async Task HelpAsync()
+        {
+            var res = await HelpService.PagedHelpAsync(Context, true, new List<string>
+            {
+                "birthday"
+            }, "This module handles birthday announcements and roles for users in your server.");
+
+            if (res != null)
+            {
+                await PagedReplyAsync(res, new ReactionList
+                {
+                    Backward = true,
+                        First = false,
+                        Forward = true,
+                        Info = false,
+                        Jump = true,
+                        Last = false,
+                        Trash = true
+                });
+            }
+            else
+            {
+                await ReplyAsync("N/A");
+            }
+        }
+
         [Command("Toggle")]
         [Summary("Toggles the use of birthday announcements in the server")]
         [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
         [RavenRequireContext(ContextType.Guild)]
-        [Remarks("Requires admin permissions")]
         public async Task ToggleEnabled()
         {
             var model = BirthdayService.GetConfig(Context.Guild.Id);
@@ -35,12 +65,10 @@ namespace RavenBOT.Modules.Birthday.Modules
                 $"NOTE: You need to run the setchannel and setrole command in order for this to work");
         }
 
-        [Priority(100)]
         [Command("SetChannel")]
         [Summary("Sets the current channel as the birthday announcement channel")]
         [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
         [RavenRequireContext(ContextType.Guild)]
-        [Remarks("Requires admin permissions")]
         public async Task SetChannel()
         {
             var model = BirthdayService.GetConfig(Context.Guild.Id);
@@ -51,7 +79,6 @@ namespace RavenBOT.Modules.Birthday.Modules
                 $"Channel has been set to: {Context.Channel.Name}");
         }
 
-        [Priority(100)]
         [Command("SetRole")]
         [Alias("SetBirthdayRole")]
         [Summary("Sets (or removes) the role users can receive when it is their birthday")]
@@ -68,7 +95,6 @@ namespace RavenBOT.Modules.Birthday.Modules
                 $"Birthday Role: {role?.Mention ?? "N/A"}");
         }
 
-        [Priority(100)]
         [Command("SetUTCOffset")]
         [Summary("Sets the timezone for the current user")]
         public async Task SetTimeZone(double offset = 0)

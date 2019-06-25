@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -7,24 +8,26 @@ using Discord.Addons.Interactive;
 using Discord.Commands;
 using Newtonsoft.Json.Linq;
 using RavenBOT.Common.Attributes;
+using RavenBOT.Common.Services;
 using RavenBOT.Modules.Media.Methods;
 
 namespace RavenBOT.Modules.Media.Modules
 {
     [Group("nsfw")]
     [RavenRequireNsfw]
-    [Remarks("Can only be run in channels marked as NSFW")]
     public class NSFW : InteractiveBase<ShardedCommandContext>
     {
         public MediaHelper MediaHelper { get; }
+        public HelpService HelpService { get; }
         public Random Random { get; }
         public GfycatManager GfyManager { get; }
 
-        public NSFW(Random random, GfycatManager gfyManager, MediaHelper mediaHelper)
+        public NSFW(Random random, GfycatManager gfyManager, MediaHelper mediaHelper, HelpService helpService)
         {
             Random = random;
             GfyManager = gfyManager;
             MediaHelper = mediaHelper;
+            HelpService = helpService;
         }
 
         [Command("RedditPost", RunMode = RunMode.Async)]
@@ -130,6 +133,33 @@ namespace RavenBOT.Modules.Media.Modules
 
             var builder = new EmbedBuilder { ImageUrl = $"http://media.obutts.ru/{obj["preview"]}", Description = $"Ass Database Size: 4222\n Image Number: {rnd}", Title = "Ass", Url = $"http://media.obutts.ru/{obj["preview"]}" };
             await ReplyAsync(string.Empty, false, builder.Build());
+        }
+
+        [Command("Help")]
+        public async Task HelpAsync()
+        {
+            var res = await HelpService.PagedHelpAsync(Context, true, new List<string>
+            {
+                "nsfw"
+            });
+
+            if (res != null)
+            {
+                await PagedReplyAsync(res, new ReactionList
+                {
+                    Backward = true,
+                        First = false,
+                        Forward = true,
+                        Info = false,
+                        Jump = true,
+                        Last = false,
+                        Trash = true
+                });
+            }
+            else
+            {
+                await ReplyAsync("N/A");
+            }
         }
     }
 }

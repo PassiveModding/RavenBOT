@@ -1,7 +1,9 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using RavenBOT.Common.Attributes;
+using RavenBOT.Common.Services;
 using RavenBOT.Modules.Automessage.Methods;
 using RavenBOT.Modules.Automessage.Models;
 
@@ -11,15 +13,43 @@ namespace RavenBOT.Modules.Automessage.Modules
     [RavenRequireContext(ContextType.Guild)]
     [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
     [Summary("Handles automated messaging to specific discord channels")]
-    [Remarks("Commands are limited to server administrators")]
     public class AutoMessage : InteractiveBase<ShardedCommandContext>
     {
-        public AutoMessage(AutomessageHandler automessageHandler)
+        public AutoMessage(AutomessageHandler automessageHandler, HelpService helper)
         {
             AutomessageHandler = automessageHandler;
+            HelpService = helper;
         }
 
         public AutomessageHandler AutomessageHandler { get; }
+        public HelpService HelpService { get; }
+
+        [Command("Help")]
+        public async Task HelpAsync()
+        {
+            var res = await HelpService.PagedHelpAsync(Context, true, new List<string>
+            {
+                "Automessage"
+            }, "This module handles automated messages to the specified channels");
+
+            if (res != null)
+            {
+                await PagedReplyAsync(res, new ReactionList
+                {
+                    Backward = true,
+                        First = false,
+                        Forward = true,
+                        Info = false,
+                        Jump = true,
+                        Last = false,
+                        Trash = true
+                });
+            }
+            else
+            {
+                await ReplyAsync("N/A");
+            }
+        }
 
         [Command("AddChannel")]
         [Summary("Adds the current channel as an auto-message chanel")]

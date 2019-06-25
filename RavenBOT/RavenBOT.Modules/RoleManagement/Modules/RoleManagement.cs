@@ -8,6 +8,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using MoreLinq;
 using RavenBOT.Common.Attributes;
+using RavenBOT.Common.Services;
 using RavenBOT.Extensions;
 using RavenBOT.Modules.RoleManagement.Methods;
 using RavenBOT.Modules.RoleManagement.Models;
@@ -20,12 +21,41 @@ namespace RavenBOT.Modules.RoleManagement.Modules
     [Remarks("Requires that the bot can manager roles")]
     public class RoleManagement : InteractiveBase<ShardedCommandContext>
     {
-        public RoleManagement(RoleManager manager)
+        public RoleManagement(RoleManager manager, HelpService helpService)
         {
             Manager = manager;
+            HelpService = helpService;
         }
 
         public RoleManager Manager { get; }
+        public HelpService HelpService { get; }
+
+        [Command("Help")]
+        public async Task HelpAsync()
+        {
+            var res = await HelpService.PagedHelpAsync(Context, true, new List<string>
+            {
+                "rolemanager"
+            }, "This module handles the giving of roles to users through message reactions and youtube subscriptions");
+
+            if (res != null)
+            {
+                await PagedReplyAsync(res, new ReactionList
+                {
+                    Backward = true,
+                        First = false,
+                        Forward = true,
+                        Info = false,
+                        Jump = true,
+                        Last = false,
+                        Trash = true
+                });
+            }
+            else
+            {
+                await ReplyAsync("N/A");
+            }
+        }
 
         [Command("CreateMessage")]
         [Summary("Creates an embedded message which users can react to in order to receive the specified role.")]

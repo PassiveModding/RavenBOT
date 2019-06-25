@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
@@ -13,32 +12,8 @@ using RavenBOT.Extensions;
 
 namespace RavenBOT.Modules.Games.Modules
 {
-    [Group("Games")]
-    public class Trivia : InteractiveBase<ShardedCommandContext>
+    public partial class Game
     {
-        public Random Random { get; }
-        public HttpClient HttpClient { get; }
-
-        public Trivia(Random random, HttpClient client)
-        {
-            Random = random;
-            HttpClient = client;
-        }
-
-        private readonly List<string> numlist = new List<string>
-        {
-            "zero",
-            "one",
-            "two",
-            "three",
-            "four",
-            "five",
-            "six",
-            "seven",
-            "eight",
-            "nine"
-        };
-
         [Command("TriviaSettings", RunMode = RunMode.Async)]
         [Summary("Displays possible trivia settings and categories")]
         public async Task TriviaSettingsAsync()

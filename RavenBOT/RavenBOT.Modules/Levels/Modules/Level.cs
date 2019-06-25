@@ -6,6 +6,7 @@ using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
 using RavenBOT.Common.Attributes;
+using RavenBOT.Common.Services;
 using RavenBOT.Extensions;
 using RavenBOT.Modules.Levels.Methods;
 using RavenBOT.Modules.Levels.Models;
@@ -14,14 +15,44 @@ namespace RavenBOT.Modules.Levels.Modules
 {
     [Group("Level")]
     [RavenRequireContext(ContextType.Guild)]
-    public class Level : InteractiveBase<ShardedCommandContext>
+    public partial class Level : InteractiveBase<ShardedCommandContext>
     {
-        public Level(LevelService levelService)
+        public Level(LevelService levelService, HelpService helpService)
         {
             LevelService = levelService;
+            HelpService = helpService;
+            levelService.Client.UserJoined += UserJoinedAsync;
         }
 
         public LevelService LevelService { get; }
+        public HelpService HelpService { get; }
+
+        [Command("Help")]
+        public async Task HelpAsync()
+        {
+            var res = await HelpService.PagedHelpAsync(Context, true, new List<string>
+            {
+                "Level"
+            }, "This module allows users to gain xp and roles for chatting and inviting users to the server");
+
+            if (res != null)
+            {
+                await PagedReplyAsync(res, new ReactionList
+                {
+                    Backward = true,
+                        First = false,
+                        Forward = true,
+                        Info = false,
+                        Jump = true,
+                        Last = false,
+                        Trash = true
+                });
+            }
+            else
+            {
+                await ReplyAsync("N/A");
+            }
+        }
 
         [Command("Toggle")]
         [Summary("Toggles leveling in the server")]

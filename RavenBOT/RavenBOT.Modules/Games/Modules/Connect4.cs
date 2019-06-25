@@ -11,8 +11,6 @@ namespace RavenBOT.Modules.Games.Modules
 {
     public partial class Game
     {
-        private List<Connect4Game> Connect4List = new List<Connect4Game>();
-
         private readonly List<string> numlist = new List<string>
         {
             "zero",
@@ -57,7 +55,7 @@ namespace RavenBOT.Modules.Games.Modules
         {
             // If there is an error, we need to ensure that the current channel can still initiate new games.
             await ReplyAsync(e.ToString().FixLength());
-            var currentlobby = Connect4List.FirstOrDefault(x => x.ChannelId == Context.Channel.Id);
+            var currentlobby = GameService.Connect4List.FirstOrDefault(x => x.ChannelId == Context.Channel.Id);
             if (currentlobby != null)
             {
                 currentlobby.GameRunning = false;
@@ -67,7 +65,7 @@ namespace RavenBOT.Modules.Games.Modules
         public async Task Connect4InitializeTask(int bet = 0)
         {
             // Here we check whether or not there is currently a game running the the current lobby as there is no simple way to differentiate games at the moment (will add later)
-            var currentlobby = Connect4List.FirstOrDefault(x => x.ChannelId == Context.Channel.Id);
+            var currentlobby = GameService.Connect4List.FirstOrDefault(x => x.ChannelId == Context.Channel.Id);
             if (currentlobby != null)
             {
                 // We quit if there is a game already running
@@ -83,11 +81,11 @@ namespace RavenBOT.Modules.Games.Modules
             else
             {
                 // Add a lobby in the case that there hasn't been a game played in the cureent one yet.
-                Connect4List.Add(new Connect4Game(Context.Channel.Id)
+                GameService.Connect4List.Add(new Connect4Game(Context.Channel.Id)
                 {
                     GameRunning = true
                 });
-                currentlobby = Connect4List.FirstOrDefault(x => x.ChannelId == Context.Channel.Id);
+                currentlobby = GameService.Connect4List.FirstOrDefault(x => x.ChannelId == Context.Channel.Id);
             }
 
             // Filter out invalid bets to make sure that games are played fairly
@@ -584,7 +582,7 @@ namespace RavenBOT.Modules.Games.Modules
         public Task Connect4WinAsync(ulong winnerID, ulong loserID, int bet, string winmethod)
         {
             // make sure we allow other connect4 games to be played in the current channel now.
-            var currentlobby = Connect4List.FirstOrDefault(x => x.ChannelId == Context.Channel.Id);
+            var currentlobby = GameService.Connect4List.FirstOrDefault(x => x.ChannelId == Context.Channel.Id);
             currentlobby.GameRunning = false;
 
             // Get the users and modify their scores and stats.

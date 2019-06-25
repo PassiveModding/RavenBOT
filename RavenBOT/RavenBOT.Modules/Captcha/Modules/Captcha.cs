@@ -1,7 +1,9 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using RavenBOT.Common.Attributes;
+using RavenBOT.Common.Services;
 using RavenBOT.Modules.Captcha.Methods;
 using RavenBOT.Modules.Captcha.Models;
 
@@ -11,9 +13,39 @@ namespace RavenBOT.Modules.Captcha.Modules
     public class Captcha : InteractiveBase<ShardedCommandContext>
     {
         public CaptchaService CaptchaService { get; }
-        public Captcha(CaptchaService captchaService)
+        public HelpService HelpService { get; }
+
+        public Captcha(CaptchaService captchaService, HelpService helpService)
         {
             CaptchaService = captchaService;
+            HelpService = helpService;
+        }
+
+        [Command("Help")]
+        public async Task HelpAsync()
+        {
+            var res = await HelpService.PagedHelpAsync(Context, true, new List<string>
+            {
+                "captcha"
+            }, "This module handles automatic verification of users by requiring them to solve a captcha before receiving permissions to speak in your server");
+
+            if (res != null)
+            {
+                await PagedReplyAsync(res, new ReactionList
+                {
+                    Backward = true,
+                        First = false,
+                        Forward = true,
+                        Info = false,
+                        Jump = true,
+                        Last = false,
+                        Trash = true
+                });
+            }
+            else
+            {
+                await ReplyAsync("N/A");
+            }
         }
 
         [Command("Verify")]

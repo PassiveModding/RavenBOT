@@ -13,8 +13,7 @@ namespace RavenBOT.Modules.Media.Modules
     [Group("Media Channel")]
     [RavenRequireContext(ContextType.Guild)]
     [RavenRequireUserPermission(GuildPermission.Administrator)]
-    [Remarks("Requires admin permissions")]
-    public class MediaRestrictor : InteractiveBase<ShardedCommandContext>
+    public partial class MediaRestrictor : InteractiveBase<ShardedCommandContext>
     {
         public MediaRestrictor(MediaRestrictorHelper helper)
         {

@@ -35,18 +35,6 @@ namespace RavenBOT.Modules.Conversation.Modules
             await ReplyAsync("Set.");
         }
 
-        /*
-        [Command("SetAgentName")]
-        [Summary("Sets the dialogflow agent name")]
-        public async Task SetAgentName(string name)
-        {
-            var currentConfig = Service.Database.Load<ConversationConfig>(ConversationConfig.DocumentName()) ?? new ConversationConfig();
-            currentConfig.AgentName = name;
-            Service.Database.Store(currentConfig, ConversationConfig.DocumentName());
-            await ReplyAsync("Set.");
-        }
-        */
-
         [Command("Initialize")]
         [Summary("Attempts to initialize the dialogflow agent")]
         public async Task InitializeAgent()

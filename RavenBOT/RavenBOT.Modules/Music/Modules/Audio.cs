@@ -10,6 +10,7 @@ using Discord.Commands;
 using Newtonsoft.Json;
 using RavenBOT.Common.Attributes;
 using RavenBOT.Common.Handlers;
+using RavenBOT.Common.Services;
 using RavenBOT.Extensions;
 using RavenBOT.Modules.Music.Methods;
 using RavenBOT.Modules.Music.Preconditions;
@@ -28,11 +29,13 @@ namespace RavenBOT.Modules.Music.Modules
 
         public VictoriaService Vic { get; }
         public LogHandler Logger { get; }
+        public HelpService HelpService { get; }
 
-        public Audio(VictoriaService vic, LogHandler logger)
+        public Audio(VictoriaService vic, LogHandler logger, HelpService helpService)
         {
             Vic = vic;
             Logger = logger;
+            HelpService = helpService;
             RestClient = vic.RestClient;
             LavaShardClient = vic.Client;
         }
@@ -41,6 +44,33 @@ namespace RavenBOT.Modules.Music.Modules
         {
             player = LavaShardClient.GetPlayer(Context.Guild.Id);
             base.BeforeExecute(command);
+        }
+
+        [Command("Help")]
+        public async Task HelpAsync()
+        {
+            var res = await HelpService.PagedHelpAsync(Context, true, new List<string>
+            {
+                "music"
+            }, "This module handles music commands and setup.");
+
+            if (res != null)
+            {
+                await PagedReplyAsync(res, new ReactionList
+                {
+                    Backward = true,
+                        First = false,
+                        Forward = true,
+                        Info = false,
+                        Jump = true,
+                        Last = false,
+                        Trash = true
+                });
+            }
+            else
+            {
+                await ReplyAsync("N/A");
+            }
         }
 
         [Command("Join"), InAudioChannel]

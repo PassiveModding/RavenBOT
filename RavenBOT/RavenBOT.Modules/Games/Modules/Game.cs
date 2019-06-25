@@ -1,10 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using RavenBOT.Common.Attributes;
+using RavenBOT.Common.Services;
 using RavenBOT.Modules.Games.Methods;
 
 namespace RavenBOT.Modules.Games.Modules
@@ -13,14 +15,43 @@ namespace RavenBOT.Modules.Games.Modules
     public partial class Game : InteractiveBase<ShardedCommandContext>
     {
         public GameService GameService { get; }
+        public HelpService HelpService { get; }
         public Random Random { get; }
         public HttpClient HttpClient { get; }
 
-        public Game(GameService gameService, Random random, HttpClient client)
+        public Game(GameService gameService, HelpService helpService, Random random, HttpClient client)
         {
             GameService = gameService;
+            HelpService = helpService;
             Random = random;
             HttpClient = client;
+        }
+
+        [Command("Help")]
+        public async Task HelpAsync()
+        {
+            var res = await HelpService.PagedHelpAsync(Context, true, new List<string>
+            {
+                "games"
+            }, "This module contains fun games to play");
+
+            if (res != null)
+            {
+                await PagedReplyAsync(res, new ReactionList
+                {
+                    Backward = true,
+                        First = false,
+                        Forward = true,
+                        Info = false,
+                        Jump = true,
+                        Last = false,
+                        Trash = true
+                });
+            }
+            else
+            {
+                await ReplyAsync("N/A");
+            }
         }
 
         [Command("DailyReward", RunMode = RunMode.Async)]

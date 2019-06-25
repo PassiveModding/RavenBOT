@@ -1,8 +1,10 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using RavenBOT.Common.Attributes;
+using RavenBOT.Common.Services;
 using RavenBOT.Modules.Events.Methods;
 
 namespace RavenBOT.Modules.Events.Modules
@@ -14,10 +16,39 @@ namespace RavenBOT.Modules.Events.Modules
     public class Events : InteractiveBase<ShardedCommandContext>
     {
         public EventService EventService { get; }
+        public HelpService HelpService { get; }
 
-        public Events(EventService eventService)
+        public Events(EventService eventService, HelpService helpService)
         {
             EventService = eventService;
+            HelpService = helpService;
+        }
+
+        [Command("Help")]
+        public async Task HelpAsync()
+        {
+            var res = await HelpService.PagedHelpAsync(Context, true, new List<string>
+            {
+                "events"
+            }, "This module allows you to configure logging for your server for almost any change that can occur.");
+
+            if (res != null)
+            {
+                await PagedReplyAsync(res, new ReactionList
+                {
+                    Backward = true,
+                        First = false,
+                        Forward = true,
+                        Info = false,
+                        Jump = true,
+                        Last = false,
+                        Trash = true
+                });
+            }
+            else
+            {
+                await ReplyAsync("N/A");
+            }
         }
 
         [Command("ToggleLogging")]

@@ -1,20 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Discord.Addons.Interactive;
 using Discord.Commands;
 
 namespace RavenBOT.Modules.Games.Modules
 {
-    [Group("Games")]
-    public class Minesweeper : InteractiveBase<ShardedCommandContext>
+    public partial class Game
     {
-        public Random Random { get; }
-
-        public Minesweeper(Random random)
-        {
-            Random = random;
-        }
 
         [Command("MinesweeperQuick")]
         [Summary("Generates a minesweeper game with revealed blanks")]

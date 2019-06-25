@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using static RavenBOT.Modules.Levels.Modules.Invites;
 
 namespace RavenBOT.Modules.Levels.Models
 {
@@ -14,6 +13,6 @@ namespace RavenBOT.Modules.Levels.Models
 
         public bool Enabled { get; set; } = false;
 
-        public Dictionary<string, TrackedInvite> TrackedInvites { get; set; } = new Dictionary<string, TrackedInvite>();
+        public Dictionary<string, Modules.Level.TrackedInvite> TrackedInvites { get; set; } = new Dictionary<string, Modules.Level.TrackedInvite>();
     }
 }

@@ -18,9 +18,39 @@ namespace RavenBOT.Modules.Translation.Modules
     public class Translation : InteractiveBase<ShardedCommandContext>
     {
         public TranslateService TranslateService { get; }
-        public Translation(TranslateService translateService)
+        public HelpService HelpService { get; }
+
+        public Translation(TranslateService translateService, HelpService helpService)
         {
             TranslateService = translateService;
+            HelpService = helpService;
+        }
+
+        [Command("Help")]
+        public async Task HelpAsync()
+        {
+            var res = await HelpService.PagedHelpAsync(Context, true, new List<string>
+            {
+                "translate"
+            }, $"You can follow a video tutorial for the translation module here: https://www.youtube.com/watch?v=CjHSXNurCMQ");
+
+            if (res != null)
+            {
+                await PagedReplyAsync(res, new ReactionList
+                {
+                    Backward = true,
+                    First = false,
+                    Forward = true,
+                    Info = false,
+                    Jump = true,
+                    Last = false,
+                    Trash = true
+                });
+            }
+            else
+            {
+                await ReplyAsync("N/A");
+            }
         }
 
         [RavenRequireContext(ContextType.Guild)]

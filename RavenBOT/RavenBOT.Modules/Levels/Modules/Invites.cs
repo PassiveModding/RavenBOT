@@ -10,20 +10,8 @@ using RavenBOT.Modules.Levels.Models;
 
 namespace RavenBOT.Modules.Levels.Modules
 {
-    [Group("Level")]
-    [RavenRequireContext(ContextType.Guild)]
-    [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
-    [RavenRequireBotPermission(Discord.GuildPermission.ManageGuild)]
-    public class Invites : InteractiveBase<ShardedCommandContext>
+    public partial class Level
     {
-        public Invites(LevelService levelService)
-        {
-            LevelService = levelService;
-            levelService.Client.UserJoined += UserJoinedAsync;
-        }
-
-        public LevelService LevelService { get; }
-
         public async Task UserJoinedAsync(SocketGuildUser user)
         {
             var _ = Task.Run(async () =>
@@ -105,6 +93,9 @@ namespace RavenBOT.Modules.Levels.Modules
 
         [Command("ToggleInviteXP")]
         [Summary("Allows users to earn 100xp for every user that is invited through one of their invites.")]
+        [RavenRequireContext(ContextType.Guild)]
+        [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
+        [RavenRequireBotPermission(Discord.GuildPermission.ManageGuild)]
         public async Task AllowInviteExp()
         {
             var guildConfig = LevelService.TryGetLevelConfig(Context.Guild.Id);

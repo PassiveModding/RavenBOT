@@ -1,10 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using RavenBOT.Common.Attributes;
+using RavenBOT.Common.Services;
 using RavenBOT.Modules.Partner.Methods;
 
 namespace RavenBOT.Modules.Partner.Modules
@@ -16,12 +18,41 @@ namespace RavenBOT.Modules.Partner.Modules
     [Remarks("Requires administrator permissions")]
     public class Partner : InteractiveBase<ShardedCommandContext>
     {
-        public Partner(PartnerService partnerService)
+        public Partner(PartnerService partnerService, HelpService helpService)
         {
             Manager = partnerService;
+            HelpService = helpService;
         }
 
         public PartnerService Manager { get; }
+        public HelpService HelpService { get; }
+
+        [Command("Help")]
+        public async Task HelpAsync()
+        {
+            var res = await HelpService.PagedHelpAsync(Context, true, new List<string>
+            {
+                "Partner"
+            }, "This module handles automatic messages advertising your server to other servers.");
+
+            if (res != null)
+            {
+                await PagedReplyAsync(res, new ReactionList
+                {
+                    Backward = true,
+                        First = false,
+                        Forward = true,
+                        Info = false,
+                        Jump = true,
+                        Last = false,
+                        Trash = true
+                });
+            }
+            else
+            {
+                await ReplyAsync("N/A");
+            }
+        }
 
         [Command("Toggle")]
         [Summary("Toggles the user of partner messages")]

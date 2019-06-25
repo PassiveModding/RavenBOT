@@ -1,10 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using RavenBOT.Common.Attributes;
+using RavenBOT.Common.Services;
 using RavenBOT.Extensions;
 using RavenBOT.Modules.AutoMod.Methods;
 using RavenBOT.Modules.AutoMod.Models.Moderation;
@@ -15,14 +17,42 @@ namespace RavenBOT.Modules.AutoMod.Modules
     [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
     [RavenRequireContext(ContextType.Guild)]
     [Summary("Handles automated moderation for servers")]
-    [Remarks("Commands are limited to server administrators")]
     public partial class Moderation : InteractiveBase<ShardedCommandContext>
     {
         public ModerationService ModerationService { get; }
+        public HelpService HelpService { get; }
 
-        public Moderation(ModerationService moderationService)
+        public Moderation(ModerationService moderationService, HelpService helpService)
         {
             ModerationService = moderationService;
+            HelpService = helpService;
+        }
+
+        [Command("Help")]
+        public async Task HelpAsync()
+        {
+            var res = await HelpService.PagedHelpAsync(Context, true, new List<string>
+            {
+                "automod"
+            }, "This module handles automated moderation for spam, blacklisted words, tocix chat, ip addresses, explicit usernames, invites, mass mentions and more");
+
+            if (res != null)
+            {
+                await PagedReplyAsync(res, new ReactionList
+                {
+                    Backward = true,
+                        First = false,
+                        Forward = true,
+                        Info = false,
+                        Jump = true,
+                        Last = false,
+                        Trash = true
+                });
+            }
+            else
+            {
+                await ReplyAsync("N/A");
+            }
         }
 
         [Command("AutomodExempt")]
