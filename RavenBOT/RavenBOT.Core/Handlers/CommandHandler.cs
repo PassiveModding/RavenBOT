@@ -1,4 +1,8 @@
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
@@ -9,8 +13,6 @@ namespace RavenBOT.Handlers
     //Command handling section of the event handler
     public partial class EventHandler
     {
-        private List<string> ModulePrefixes { get; set; }
-
         private async Task MessageReceivedAsync(SocketMessage discordMessage)
         {
             if (!(discordMessage is SocketUserMessage message))

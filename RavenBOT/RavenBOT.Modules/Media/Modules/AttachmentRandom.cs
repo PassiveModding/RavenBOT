@@ -13,7 +13,7 @@ using RavenBOT.Modules.Media.Models;
 namespace RavenBOT.Modules.Media.Modules
 {
     [RavenRequireContext(ContextType.Guild)]
-    [RequireBotPermission(GuildPermission.AttachFiles)]
+    [RavenRequireBotPermission(GuildPermission.AttachFiles)]
     [Group("Media Files")]
     //TODO: Moderator permissions instead of admin
     //TODO: Custom permissions to access files but mod to add/remove etc.

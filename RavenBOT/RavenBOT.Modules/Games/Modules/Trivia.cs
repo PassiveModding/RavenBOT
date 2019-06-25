@@ -8,6 +8,7 @@ using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using Newtonsoft.Json;
+using RavenBOT.Common.Attributes;
 using RavenBOT.Extensions;
 
 namespace RavenBOT.Modules.Games.Modules
@@ -61,7 +62,7 @@ namespace RavenBOT.Modules.Games.Modules
 
         [Command("Trivia", RunMode = RunMode.Async)]
         [Summary("Play a game of trivia")]
-        [RequireContext(ContextType.Guild)]
+        [RavenRequireContext(ContextType.Guild)]
         public async Task TriviaAsync(int questions = 10, string categoryName = null, TriviaDifficulty difficulty = TriviaDifficulty.none, TriviaType type = TriviaType.none)
         {
             TriviaCategories.TriviaCategory category = null;

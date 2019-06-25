@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using RavenBOT.Common.Attributes;
 using RavenBOT.Common.Extensions;
 using RavenBOT.Common.Handlers;
 using RavenBOT.Common.Services;
@@ -46,7 +47,6 @@ namespace RavenBOT.Handlers
             client.MessageReceived += MessageReceivedAsync;
             commandService.CommandExecuted += CommandExecutedAsync;
             client.JoinedGuild += JoinedGuildAsync;
-            ModulePrefixes = new List<string>();
             //commandService.CommandExecuted += async (cI, c, r) => await CommandExecutedAsync(cI, c, r);
         }
 
@@ -154,7 +154,36 @@ namespace RavenBOT.Handlers
             await Client.LoginAsync(TokenType.Bot, BotConfig.Token);
             await Client.StartAsync();
             await RegisterModulesAsync();
-            ModulePrefixes = CommandService.Modules.Select(x => x.Group ?? "").Distinct().ToList();
+            var preconditionWarnings = new List<string>();
+            foreach (var command in  CommandService.Commands)
+            {
+                foreach (var precondition in command.Preconditions)
+                {
+                    if (!(precondition is PreconditionBase preBase))
+                    {
+                        preconditionWarnings.Add($"CMD: {command.Aliases.First()} - {precondition}");
+                    }
+                }
+            }
+
+            foreach (var module in CommandService.Modules)
+            {
+                foreach (var precondition in module.Preconditions)
+                {
+                    if (!(precondition is PreconditionBase preBase))
+                    {
+                        preconditionWarnings.Add($"MDL: {module.Aliases.First()} - {precondition}");
+                    }
+                }
+            }
+
+            if (preconditionWarnings.Any())
+            {
+                var warnString = "The following commands/modules have preconditions that do not " + 
+                                 $"inherit {typeof(PreconditionBase)} and will not display in the help commands\n" +
+                                 string.Join("\n", preconditionWarnings);
+                Logger.Log(warnString, LogSeverity.Warning);
+            }
         }
 
         public async Task RegisterModulesAsync()

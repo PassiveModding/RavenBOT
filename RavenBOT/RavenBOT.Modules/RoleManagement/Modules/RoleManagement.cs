@@ -16,7 +16,7 @@ namespace RavenBOT.Modules.RoleManagement.Modules
 {
     [Group("RoleManager")]
     [RavenRequireContext(ContextType.Guild)]
-    [RequireBotPermission(GuildPermission.ManageRoles)]    
+    [RavenRequireBotPermission(GuildPermission.ManageRoles)]    
     [Remarks("Requires that the bot can manager roles")]
     public class RoleManagement : InteractiveBase<ShardedCommandContext>
     {
