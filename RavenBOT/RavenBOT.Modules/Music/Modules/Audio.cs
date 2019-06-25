@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -6,6 +7,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
+using Newtonsoft.Json;
 using RavenBOT.Common.Attributes;
 using RavenBOT.Common.Handlers;
 using RavenBOT.Extensions;
@@ -298,15 +300,34 @@ namespace RavenBOT.Modules.Music.Modules
 
         [Command("Configure")]
         [Summary("Reconfigured Victoria Sharded Client and Rest client based on the config file")]
-        [RequireOwner]
+        [RavenRequireOwner]
         public Task Configure()
         {
             return Vic.Configure();
         }
 
+        [Command("Setup")]
+        [Summary("Creates a new victoria config for music.")]
+        [RavenRequireOwner]
+        public async Task SetupMusicAsync(string host, int port, string password)
+        {
+            var config = new VictoriaService.VictoriaConfig();
+            config.MainConfig.Host = host;
+            config.RestConfig.Host = config.MainConfig.Host;
+
+            config.MainConfig.Port = port;
+            config.RestConfig.Port = config.MainConfig.Port;
+
+            config.MainConfig.Password = password;
+            config.RestConfig.Password = config.MainConfig.Password;
+
+            File.WriteAllText(Vic.ConfigPath, JsonConvert.SerializeObject(config, Formatting.Indented));
+            await ReplyAsync("Victoria config created. Run the Configure command to setup music.");
+        }
+
         [Command("SetAuthorization")]
         [Summary("Sets the authorization header for genius lyrics")]
-        [RequireOwner]
+        [RavenRequireOwner]
         public Task SetGeniusAuth([Remainder] string auth)
         {
             var doc = Vic.Database.Load<VictoriaService.GeniusConfig>(VictoriaService.GeniusConfig.DocumentName());

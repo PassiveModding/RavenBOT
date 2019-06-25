@@ -29,7 +29,7 @@ namespace RavenBOT.Modules.Music.Methods
         public LogHandler Logger { get; }
         private DiscordShardedClient DiscordClient { get; }
 
-        private readonly string ConfigPath = Path.Combine(AppContext.BaseDirectory, "setup", "Victoria.json");
+        public readonly string ConfigPath = Path.Combine(AppContext.BaseDirectory, "setup", "Victoria.json");
 
         public class VictoriaConfig
         {
@@ -58,26 +58,12 @@ namespace RavenBOT.Modules.Music.Methods
             Logger = logger;
             if (!File.Exists(ConfigPath))
             {
-                var config = new VictoriaConfig();
-                Console.WriteLine("Audio Client Setup");
-                Console.WriteLine("Input Lavalink Host URL");
-                config.MainConfig.Host = Console.ReadLine();
-                config.RestConfig.Host = config.MainConfig.Host;
-
-                Console.WriteLine("Input Lavalink Port");
-                config.MainConfig.Port = int.Parse(Console.ReadLine());
-                config.RestConfig.Port = config.MainConfig.Port;
-
-                Console.WriteLine("Input Lavalink Password");
-                config.MainConfig.Password = Console.ReadLine();
-                config.RestConfig.Password = config.MainConfig.Password;
-
-                Console.WriteLine("Further audio settings can be configured in Victoria.json in the setup directory");
-
-                File.WriteAllText(ConfigPath, JsonConvert.SerializeObject(config, Formatting.Indented));
+                Logger.Log("Victoria config not found. Unable to initialize music module correctly.", LogSeverity.Warning);
             }
-
-            checker.AllShardsReady += Configure;
+            else
+            {
+                checker.AllShardsReady += Configure;
+            }
         }
 
         public async Task TrackFinished(LavaPlayer player, LavaTrack track, TrackEndReason reason)
