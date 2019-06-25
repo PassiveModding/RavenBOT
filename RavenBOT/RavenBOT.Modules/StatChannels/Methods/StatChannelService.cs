@@ -6,17 +6,22 @@ using System.Threading.Tasks;
 using Discord.WebSocket;
 using RavenBOT.Common;
 using RavenBOT.Common.Interfaces;
+using RavenBOT.Common.Services;
 using RavenBOT.Modules.StatChannels.Models;
 
 namespace RavenBOT.Modules.StatChannels.Methods
 {
     public class StatChannelService : IServiceable
     {
-        public StatChannelService(IDatabase database, DiscordShardedClient client)
+        public StatChannelService(IDatabase database, ShardChecker checker, DiscordShardedClient client)
         {
             Database = database;
             Client = client;
-            Timer = new Timer(TimerEvent, null, TimeSpan.FromMinutes(1), TimeSpan.FromSeconds(10));
+            checker.AllShardsReady += () =>
+            {
+                Timer = new Timer(TimerEvent, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
+                return Task.CompletedTask;
+            };
             Client.UserJoined += UserJoined;
             Client.UserLeft += UserLeft;
         }
@@ -112,7 +117,7 @@ namespace RavenBOT.Modules.StatChannels.Methods
 
         public IDatabase Database { get; }
         public DiscordShardedClient Client { get; }
-        public Timer Timer { get; }
+        public Timer Timer { get; set; }
 
         public StatConfig GetConfig(ulong guildId)
         {

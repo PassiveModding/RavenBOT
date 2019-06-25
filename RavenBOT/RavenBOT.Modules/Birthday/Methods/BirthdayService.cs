@@ -17,16 +17,20 @@ namespace RavenBOT.Modules.Birthday.Methods
         public DiscordShardedClient Client { get; }
         public IDatabase Database { get; }
         public LocalManagementService LocalManagementService { get; }
-        public Timer Timer { get; }
+        public Timer Timer { get; set; }
 
         public bool Running { get; set; } = false;
 
-        public BirthdayService(DiscordShardedClient client, IDatabase database, LocalManagementService localManagementService)
+        public BirthdayService(DiscordShardedClient client, ShardChecker checker, IDatabase database, LocalManagementService localManagementService)
         {
             Client = client;
             Database = database;
             LocalManagementService = localManagementService;
-            Timer = new Timer(TimerEvent, null, TimeSpan.FromMinutes(0), TimeSpan.FromHours(1));
+            checker.AllShardsReady += () =>
+            {
+                Timer = new Timer(TimerEvent, null, TimeSpan.FromMinutes(0), TimeSpan.FromHours(1));
+                return Task.CompletedTask;
+            };
         }
 
         public void TimerEvent(object _)

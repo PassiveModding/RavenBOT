@@ -6,6 +6,7 @@ using Discord;
 using Discord.WebSocket;
 using RavenBOT.Common;
 using RavenBOT.Common.Interfaces;
+using RavenBOT.Common.Services;
 using RavenBOT.Modules.Moderator.Models;
 
 namespace RavenBOT.Modules.Moderator.Methods
@@ -18,8 +19,8 @@ namespace RavenBOT.Modules.Moderator.Methods
 
         public DiscordShardedClient Client { get; }
 
-        public Timer Timer { get; }
-        public ModerationHandler(IDatabase database, DiscordShardedClient client)
+        public Timer Timer { get; set; }
+        public ModerationHandler(IDatabase database, ShardChecker checker, DiscordShardedClient client)
         {
             Database = database;
             Client = client;
@@ -31,7 +32,11 @@ namespace RavenBOT.Modules.Moderator.Methods
                 Database.Store(TimedActions, TimeTracker.DocumentName);
             }
 
-            Timer = new Timer(TimerEvent, null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
+            checker.AllShardsReady += () =>
+            {
+                Timer = new Timer(TimerEvent, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
+                return Task.CompletedTask;
+            };
         }
 
         /// <summary>

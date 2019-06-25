@@ -18,17 +18,16 @@ namespace RavenBOT.Modules.Partner.Methods
         {
             Database = database;
             Client = client;
-            checker.AllShardsReady += ShardsReady;
+            checker.AllShardsReady += () =>
+            {
+                Timer = new Timer(TimerEvent, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
+                return Task.CompletedTask;
+            };
             //Timer = new Timer(TimerEvent, null, TimeSpan.FromSeconds(0), TimeSpan.FromHours(1));
 
             Random = new Random();
         }
-
-        public async Task ShardsReady()
-        {
-            Timer = new Timer(TimerEvent, null, TimeSpan.FromSeconds(0), TimeSpan.FromHours(1));
-        }
-
+        
         public IDatabase Database { get; }
         public DiscordShardedClient Client { get; }
         public Timer Timer { get; set; }

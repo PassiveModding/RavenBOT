@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 using RavenBOT.Common;
@@ -17,18 +18,21 @@ namespace RavenBOT.Modules.Reminders.Methods
         private IDatabase Database { get; }
         private DiscordShardedClient Client { get; }
         public LocalManagementService LocalManagementService { get; }
-        private Timer Timer { get; }
+        private Timer Timer { get; set; }
 
         private List<Reminder> Reminders { get; set; }
 
-        public ReminderHandler(IDatabase database, DiscordShardedClient client, LocalManagementService localManagementService)
+        public ReminderHandler(IDatabase database, ShardChecker checker, DiscordShardedClient client, LocalManagementService localManagementService)
         {
             Database = database;
             Client = client;
             LocalManagementService = localManagementService;
             Reminders = Database.Query<Reminder>().ToList();
-
-            Timer = new Timer(TimerEvent, null, TimeSpan.FromMinutes(0), TimeSpan.FromMinutes(1));
+            checker.AllShardsReady += () =>
+            {
+                Timer = new Timer(TimerEvent, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
+                return Task.CompletedTask;
+            };
         }
 
         //NOTE: Reminder ID is discarded and re-set here
