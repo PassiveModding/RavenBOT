@@ -54,7 +54,7 @@ namespace RavenBOT.Modules.Media.Modules
             await ReplyAsync($"{selectedPost.Title}\nhttps://reddit.com{selectedPost.Permalink}", false, new EmbedBuilder()
             {
                 //Note that non gfycat urls will be returned as normal even with this function
-                ImageUrl = await GfyManager.GetGfyCatUrl(selectedPost.Url.ToString())
+                ImageUrl = MediaHelper.FixImgurUrl(await GfyManager.GetGfyCatUrl(selectedPost.Url.ToString()))
             }.Build());
         }
 

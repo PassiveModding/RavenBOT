@@ -18,5 +18,21 @@ namespace RavenBOT.Modules.Media.Methods
             Client = new HttpClient();
             Reddit = new Reddit();
         }
+
+        public string FixImgurUrl(string original)
+        {
+            if (!original.Contains("imgur.com", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return original;
+            }
+
+            if (original.EndsWith(".gifv", StringComparison.InvariantCultureIgnoreCase))
+            {
+                original = original.Replace(".gifv", ".gif", StringComparison.InvariantCultureIgnoreCase);
+                return original;
+            }
+
+            return original;
+        }
     }
 }
