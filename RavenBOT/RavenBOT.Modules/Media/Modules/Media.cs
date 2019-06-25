@@ -71,7 +71,6 @@ namespace RavenBOT.Modules.Media.Modules
         [Command("UrbanDictionary")]
         [RavenRequireNsfw]
         [Summary("Search Urban Dictionary for the specified term")]
-        [Remarks("This command is restricted to NSFW channels")]
         public async Task UrbanAsync([Remainder] string word)
         {
             var res = await MediaHelper.Client.GetStringAsync($"http://api.urbandictionary.com/v0/define?term={word}").ConfigureAwait(false);

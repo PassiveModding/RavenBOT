@@ -11,7 +11,6 @@ namespace RavenBOT.Modules.Greetings.Modules
     [Group("Greetings")]
     [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
     [RavenRequireContext(ContextType.Guild)]
-    [Remarks("Requires admin permissions")]
     public class Greetings : InteractiveBase<ShardedCommandContext>
     {
         public GreetingsService GreetingsService { get; }

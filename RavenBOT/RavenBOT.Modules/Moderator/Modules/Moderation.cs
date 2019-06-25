@@ -18,7 +18,6 @@ namespace RavenBOT.Modules.Moderator.Modules
     [Group("mod")]
     [Preconditions.Moderator]
     [RavenRequireContext(ContextType.Guild)]
-    [Remarks("Requires moderator/administrator permissions")]
     public partial class Moderation : InteractiveBase<ShardedCommandContext>
     {
         public ModerationHandler ModHandler { get; }
@@ -75,7 +74,6 @@ namespace RavenBOT.Modules.Moderator.Modules
 
         [Command("AddMod")]
         [RavenRequireUserPermission(GuildPermission.Administrator)]
-        [Remarks("Requires administrator permissions")]
         public async Task AddModeratorAsync(IRole role)
         {
             var modConfig = ModHandler.GetOrCreateModeratorConfig(Context.Guild.Id);
@@ -87,7 +85,6 @@ namespace RavenBOT.Modules.Moderator.Modules
 
         [Command("DelMod")]
         [RavenRequireUserPermission(GuildPermission.Administrator)]
-        [Remarks("Requires administrator permissions")]
         public async Task RemoveModeratorAsync(IRole role)
         {
             await RemoveModeratorAsync(role.Id);
@@ -108,7 +105,6 @@ namespace RavenBOT.Modules.Moderator.Modules
 
         [Command("DelMod")]
         [RavenRequireUserPermission(GuildPermission.Administrator)]
-        [Remarks("Requires administrator permissions")]
         public async Task RemoveModeratorAsync(ulong roleId)
         {
             var modConfig = ModHandler.GetOrCreateModeratorConfig(Context.Guild.Id);
@@ -120,7 +116,6 @@ namespace RavenBOT.Modules.Moderator.Modules
         [Command("HackBan")]
         [RavenRequireBotPermission(Discord.GuildPermission.BanMembers)]
         [RavenRequireUserPermission(Discord.GuildPermission.BanMembers)]
-        [Remarks("Requires ban user permissions")]
         [Summary("Bans a user based on their user ID")]
         public async Task HackBanAsync(ulong userId, [Remainder] string reason = null)
         {
@@ -147,7 +142,6 @@ namespace RavenBOT.Modules.Moderator.Modules
         [Command("SetMaxWarnings")]
         [Summary("Sets the most warnings a user can receive before an action is taken")]
         [RavenRequireUserPermission(GuildPermission.Administrator)]
-        [Remarks("Requires administrator permissions")]
         public async Task MaxWarnings(int max)
         {
             var config = ModHandler.GetActionConfig(Context.Guild.Id);
@@ -159,7 +153,6 @@ namespace RavenBOT.Modules.Moderator.Modules
         [Command("MaxWarningsActions")]
         [Summary("Displays the actions that can be taken when a user reaches max warnings")]
         [RavenRequireUserPermission(GuildPermission.Administrator)]
-        [Remarks("Requires administrator permissions")]
         public async Task MaxWarningsActions()
         {
             var actions = Extensions.StringExtensions.ConvertEnumToDictionary<Models.ActionConfig.Action>();
@@ -169,7 +162,6 @@ namespace RavenBOT.Modules.Moderator.Modules
         [Command("MaxWarningsAction")]
         [Summary("Sets the action to take on users who receive too many warnings")]
         [RavenRequireUserPermission(GuildPermission.Administrator)]
-        [Remarks("Requires administrator permissions")]
         public async Task MaxWarningsAction(ActionConfig.Action action)
         {
             var config = ModHandler.GetActionConfig(Context.Guild.Id);
@@ -181,7 +173,6 @@ namespace RavenBOT.Modules.Moderator.Modules
         [Command("SetDefaultSoftBanTime")]
         [Summary("Sets the default amount of time for a softban")]
         [RavenRequireUserPermission(GuildPermission.Administrator)]
-        [Remarks("Requires administrator permissions")]
         public async Task DefaultSoftBanTime(TimeSpan time)
         {
             var config = ModHandler.GetActionConfig(Context.Guild.Id);
@@ -193,7 +184,6 @@ namespace RavenBOT.Modules.Moderator.Modules
         [Command("SetDefaultMuteTime")]
         [Summary("Sets the default amount of time for mutes")]
         [RavenRequireUserPermission(GuildPermission.Administrator)]
-        [Remarks("Requires administrator permissions")]
         public async Task DefaultMuteTime(TimeSpan time)
         {
             var config = ModHandler.GetActionConfig(Context.Guild.Id);
@@ -234,7 +224,6 @@ namespace RavenBOT.Modules.Moderator.Modules
         [Summary("Bans a user")]
         [RavenRequireBotPermission(Discord.GuildPermission.BanMembers)]
         [RavenRequireUserPermission(Discord.GuildPermission.BanMembers)]
-        [Remarks("Requires ban user permissions")]
         public async Task BanUser(SocketGuildUser user, [Remainder] string reason = null)
         {
             if (!await IsActionable(user, Context.User as SocketGuildUser))
@@ -256,7 +245,6 @@ namespace RavenBOT.Modules.Moderator.Modules
         [Summary("Kicks a user from the server")]
         [RavenRequireBotPermission(Discord.GuildPermission.KickMembers)]
         [RavenRequireUserPermission(Discord.GuildPermission.KickMembers)]
-        [Remarks("Requires kick user permissions")]
         public async Task KickUser(SocketGuildUser user, [Remainder] string reason = null)
         {
             if (!await IsActionable(user, Context.User as SocketGuildUser))
@@ -359,7 +347,6 @@ namespace RavenBOT.Modules.Moderator.Modules
         [Summary("Bans a user from the server temporarily")]
         [RavenRequireBotPermission(Discord.GuildPermission.BanMembers)]
         [RavenRequireUserPermission(Discord.GuildPermission.BanMembers)]
-        [Remarks("Requires ban user permissions")]
         public async Task SoftBanUser(SocketGuildUser user, [Remainder] string reason = null)
         {
             await SoftBanUser(user, null, reason);
@@ -369,7 +356,6 @@ namespace RavenBOT.Modules.Moderator.Modules
         [Summary("Bans a user from the server for the specified amount of time")]
         [RavenRequireBotPermission(Discord.GuildPermission.BanMembers)]
         [RavenRequireUserPermission(Discord.GuildPermission.BanMembers)]
-        [Remarks("Requires ban user permissions")]
         public async Task SoftBanUser(SocketGuildUser user, TimeSpan? time = null, [Remainder] string reason = null)
         {
             if (!await IsActionable(user, Context.User as SocketGuildUser))

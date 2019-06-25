@@ -9,7 +9,6 @@ namespace RavenBOT.Modules.Statistics.Modules
 {
     [Group("Stats")]
     [RavenRequireOwner]    
-    [Remarks("Requires bot owner permissions")]
     public class Statistics : InteractiveBase<ShardedCommandContext>
     {
         public Statistics(GraphManager graphManager, DBLManager dblManager, GrafanaManager grafanaManager)

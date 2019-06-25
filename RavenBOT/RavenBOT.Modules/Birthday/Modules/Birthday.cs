@@ -84,7 +84,6 @@ namespace RavenBOT.Modules.Birthday.Modules
         [Summary("Sets (or removes) the role users can receive when it is their birthday")]
         [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
         [RavenRequireContext(ContextType.Guild)]
-        [Remarks("Requires admin permissions")]
         public async Task SetBirthdayRole(IRole role = null)
         {
             var model = BirthdayService.GetConfig(Context.Guild.Id);

@@ -15,7 +15,6 @@ namespace RavenBOT.Modules.Partner.Modules
     [RavenRequireContext(ContextType.Guild)]
     [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]    
     [RavenRequireBotPermission(Discord.GuildPermission.ManageGuild)]
-    [Remarks("Requires administrator permissions")]
     public class Partner : InteractiveBase<ShardedCommandContext>
     {
         public Partner(PartnerService partnerService, HelpService helpService)
@@ -157,8 +156,7 @@ namespace RavenBOT.Modules.Partner.Modules
 
         [Command("Trigger")]
         [RavenRequireOwner]    
-        [Remarks("Requires bot owner permissions")]
-        [Summary("DEV: Triggers a partner event")]
+        [Summary("Triggers a partner event")]
         public async Task TriggerEvent()
         {
             await Manager.PartnerEvent();

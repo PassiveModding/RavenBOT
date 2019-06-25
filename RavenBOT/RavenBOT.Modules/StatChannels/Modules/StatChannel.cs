@@ -11,7 +11,6 @@ namespace RavenBOT.Modules.StatChannels.Modules
     [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
     [RavenRequireBotPermission(Discord.GuildPermission.ManageChannels)]
     [RavenRequireContext(ContextType.Guild)]    
-    [Remarks("Requires administrator permissions & bot manage channels permissions")]
     public class StatChannel : InteractiveBase<ShardedCommandContext>
     {
         public StatChannel(StatChannelService service)

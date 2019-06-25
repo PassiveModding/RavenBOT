@@ -57,7 +57,6 @@ namespace RavenBOT.Modules.Levels.Modules
         [Command("Toggle")]
         [Summary("Toggles leveling in the server")]
         [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
-        [Remarks("Requires admin permissions")]
         public async Task ToggleLevelingAsync()
         {
             var config = LevelService.GetOrCreateLevelConfig(Context.Guild.Id);
@@ -69,7 +68,6 @@ namespace RavenBOT.Modules.Levels.Modules
         [Command("ShowSettings")]
         [Summary("Displays all available level settings")]
         [RavenRequireUserPermission(GuildPermission.Administrator)]
-        [Remarks("Requires admin permissions")]
         public async Task ShowSettings()
         {
             var config = LevelService.TryGetLevelConfig(Context.Guild.Id);
@@ -104,7 +102,6 @@ namespace RavenBOT.Modules.Levels.Modules
         [Command("ToggleWhitelist")]
         [Summary("Toggles the whitelisting of specific channels for leveling")]
         [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
-        [Remarks("Requires admin permissions")]
         public async Task ToggleWhitelist()
         {
             var config = LevelService.GetOrCreateLevelConfig(Context.Guild.Id);
@@ -116,7 +113,6 @@ namespace RavenBOT.Modules.Levels.Modules
         [Command("ToggleBlacklist")]
         [Summary("Toggles the Blacklisting of specific channels for leveling")]
         [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
-        [Remarks("Requires admin permissions")]
         public async Task ToggleBlacklist()
         {
             var config = LevelService.GetOrCreateLevelConfig(Context.Guild.Id);
@@ -128,7 +124,6 @@ namespace RavenBOT.Modules.Levels.Modules
         [Command("AddChannel")]
         [Summary("Adds a blacklist or whitelist specific channel")]
         [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
-        [Remarks("Requires admin permissions")]
         public async Task AddChannel()
         {
             var config = LevelService.GetOrCreateLevelConfig(Context.Guild.Id);
@@ -151,7 +146,6 @@ namespace RavenBOT.Modules.Levels.Modules
         [Command("ClearChannels")]
         [Summary("Clears all blacklist or whitelist specific channels")]
         [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
-        [Remarks("Requires admin permissions")]
         public async Task RemoveChannels()
         {
             var config = LevelService.GetOrCreateLevelConfig(Context.Guild.Id);
@@ -169,7 +163,6 @@ namespace RavenBOT.Modules.Levels.Modules
         [Command("ShowChannnels")]
         [Summary("Shows all blacklist or whitelist specific channels")]
         [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
-        [Remarks("Requires admin permissions")]
         public async Task ShowChannnels()
         {
             var config = LevelService.GetOrCreateLevelConfig(Context.Guild.Id);
@@ -194,7 +187,6 @@ namespace RavenBOT.Modules.Levels.Modules
         [Command("RemoveChannel")]
         [Summary("Removes a blacklist or whitelist specific channel")]
         [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
-        [Remarks("Requires admin permissions")]
         public async Task RemoveChannel()
         {
             var config = LevelService.GetOrCreateLevelConfig(Context.Guild.Id);
@@ -212,7 +204,6 @@ namespace RavenBOT.Modules.Levels.Modules
         [Command("SetLogChannel")]
         [Summary("Sets the channel for level logging")]
         [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
-        [Remarks("Requires admin permissions")]
         public async Task Enable()
         {
             var config = LevelService.TryGetLevelConfig(Context.Guild.Id);
@@ -230,7 +221,6 @@ namespace RavenBOT.Modules.Levels.Modules
         [Command("DisableLogChannel")]
         [Summary("Disables the level log channel")]
         [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
-        [Remarks("Requires admin permissions")]
         public async Task DisableLogChannel()
         {
             var config = LevelService.TryGetLevelConfig(Context.Guild.Id);
@@ -248,7 +238,6 @@ namespace RavenBOT.Modules.Levels.Modules
         [Command("ToggleMessages")]
         [Summary("Toggles the use of level up messages")]
         [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
-        [Remarks("Requires admin permissions")]
         public async Task ToggleLevelUpNotifications()
         {
             var config = LevelService.TryGetLevelConfig(Context.Guild.Id);
@@ -266,7 +255,6 @@ namespace RavenBOT.Modules.Levels.Modules
         [Command("ToggleMultiRole")]
         [Summary("Toggles whether users keep all level roles or just the highest")]
         [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
-        [Remarks("Requires admin permissions")]
         public async Task ToggleMultiRole()
         {
             var config = LevelService.TryGetLevelConfig(Context.Guild.Id);
@@ -284,7 +272,6 @@ namespace RavenBOT.Modules.Levels.Modules
         [Command("AddRoleReward")]
         [Summary("Adds a role for a user to earn")]
         [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
-        [Remarks("Requires admin permissions")]
         public async Task AddRole(IRole role, int level)
         {
             var config = LevelService.TryGetLevelConfig(Context.Guild.Id);
@@ -314,7 +301,6 @@ namespace RavenBOT.Modules.Levels.Modules
 
         [Command("AddRoleReward")]
         [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
-        [Remarks("Requires admin permissions")]
         public async Task AddRole(int level, IRole role)
         {
             await AddRole(role, level);
@@ -322,7 +308,6 @@ namespace RavenBOT.Modules.Levels.Modules
 
         [Command("RemoveRoleReward")]
         [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
-        [Remarks("Requires admin permissions")]
         public async Task RemoveRole(IRole role)
         {
             await RemoveRole(role.Id);
@@ -331,7 +316,6 @@ namespace RavenBOT.Modules.Levels.Modules
         [Command("RemoveRoleReward")]
         [Summary("Removes a role from the role rewards")]
         [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
-        [Remarks("Requires admin permissions")]
         public async Task RemoveRole(ulong roleId)
         {
             var config = LevelService.TryGetLevelConfig(Context.Guild.Id);
@@ -478,7 +462,6 @@ namespace RavenBOT.Modules.Levels.Modules
         [Command("ResetUser")]
         [Summary("Resets the specified user's level stats")]
         [RavenRequireUserPermission(GuildPermission.Administrator)]
-        [Remarks("Requires admin permissions")]
         public async Task ResetLeaderboard(SocketGuildUser user)
         {
             if (user.Hierarchy >= (Context.User as SocketGuildUser).Hierarchy)
@@ -508,7 +491,6 @@ namespace RavenBOT.Modules.Levels.Modules
         [Command("ResetLeaderboard")]
         [Summary("Resets all level stats for users in the server")]
         [RavenRequireUserPermission(GuildPermission.Administrator)]
-        [Remarks("Requires admin permissions")]
         public async Task ResetLeaderboard(string confirm = null)
         {
             if (confirm == null)
@@ -531,7 +513,6 @@ namespace RavenBOT.Modules.Levels.Modules
         [Command("RebaseXPViaRewards")]
         [Summary("Sets user xp based on the current level role they have.")]
         [RavenRequireUserPermission(GuildPermission.Administrator)]
-        [Remarks("Requires admin permissions")]
         public async Task RebaseXp()
         {
             var users = LevelService.Database.Query<LevelUser>().Where(x => x.GuildId == Context.Guild.Id).ToList();
