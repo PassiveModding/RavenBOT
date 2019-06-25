@@ -12,6 +12,7 @@ namespace RavenBOT.Modules.Partner.Modules
     [Group("Partner")]
     [RavenRequireContext(ContextType.Guild)]
     [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]    
+    [RavenRequireBotPermission(Discord.GuildPermission.ManageGuild)]
     [Remarks("Requires administrator permissions")]
     public class Partner : InteractiveBase<ShardedCommandContext>
     {
@@ -50,7 +51,7 @@ namespace RavenBOT.Modules.Partner.Modules
             config.ImageUrl = url;
             Manager.SavePartnerConfig(config);
             var embed = await config.GetEmbedAsync(Context.Guild);
-            await ReplyAsync("Image Set", false, embed.Build());
+            await ReplyAsync("Image Set", false, embed.Item2.Build());
         }
 
         [Command("ToggleThumbnail")]
@@ -61,7 +62,7 @@ namespace RavenBOT.Modules.Partner.Modules
             config.UseThumb = !config.UseThumb;
             Manager.SavePartnerConfig(config);
             var embed = await config.GetEmbedAsync(Context.Guild);
-            await ReplyAsync($"Show thumbnail: {config.UseThumb}", false, embed.Build());
+            await ReplyAsync($"Show thumbnail: {config.UseThumb}", false, embed.Item2.Build());
         }
 
         [Command("SetColor")]
@@ -79,7 +80,7 @@ namespace RavenBOT.Modules.Partner.Modules
             config.Color = new Models.PartnerConfig.RGB(r, g, b);
             Manager.SavePartnerConfig(config);
             var embed = await config.GetEmbedAsync(Context.Guild);
-            await ReplyAsync($"Color set.", false, embed.Build());
+            await ReplyAsync($"Color set.", false, embed.Item2.Build());
         }
 
         [Command("SetMessage")]
@@ -108,7 +109,7 @@ namespace RavenBOT.Modules.Partner.Modules
             config.Message = message;
             Manager.SavePartnerConfig(config);
             var embed = await config.GetEmbedAsync(Context.Guild);
-            await ReplyAsync("Message Set", false, embed.Build());
+            await ReplyAsync("Message Set", false, embed.Item2.Build());
         }
 
         [Command("Settings")]
@@ -120,7 +121,7 @@ namespace RavenBOT.Modules.Partner.Modules
                 $"Show Thumbnail: {config.UseThumb}\n" +
                 $"Color: R-{config.Color?.R} G-{config.Color?.G} B-{config.Color?.B}\n" +
                 $"Receiver Channel: {Context.Guild.GetChannel(config.ReceiverChannelId)?.Name ?? "N/A"}\n" +
-                $"Image Url: {config.ImageUrl ?? "N/A"}", false, (await config.GetEmbedAsync(Context.Guild))?.Build());
+                $"Image Url: {config.ImageUrl ?? "N/A"}", false, (await config.GetEmbedAsync(Context.Guild)).Item2?.Build());
         }
 
         [Command("Trigger")]

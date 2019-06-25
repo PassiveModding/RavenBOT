@@ -68,14 +68,21 @@ namespace RavenBOT.Modules.Partner.Models
             try
             {
                 IInviteMetadata inviteData = null;
-                var currentInvites = await guild.GetInvitesAsync();
-                currentInvites = currentInvites.Where(x => x.MaxUses == 0 && x.MaxAge == 0 && !x.IsRevoked && !x.IsTemporary).ToList();
-                if (currentInvites.Any())
+                if (guild.CurrentUser.GuildPermissions.ManageGuild)
                 {
-                    inviteData = currentInvites.First();
-                }
+                    var currentInvites = await guild.GetInvitesAsync();
+                    currentInvites = currentInvites.Where(x => x.MaxUses == 0 && x.MaxAge == 0 && !x.IsRevoked && !x.IsTemporary).ToList();
+                    if (currentInvites.Any())
+                    {
+                        inviteData = currentInvites.First();
+                    }
 
-                return inviteData;
+                    return inviteData;                    
+                }
+                else
+                {
+                    return null;
+                }
             }
             catch (Exception e)
             {
@@ -85,7 +92,7 @@ namespace RavenBOT.Modules.Partner.Models
 
         }
 
-        public async Task<EmbedBuilder> GetEmbedAsync(SocketGuild guild)
+        public async Task<(bool, EmbedBuilder)> GetEmbedAsync(SocketGuild guild)
         {
             var builder = new EmbedBuilder();
             builder.Description = Message ?? "";
@@ -108,10 +115,10 @@ namespace RavenBOT.Modules.Partner.Models
             builder.Fields.Add(new EmbedFieldBuilder
             {
                 Name = "Invite",
-                    Value = invite?.Url ?? "N/A This server does not have a non-expiring invite available"
+                Value = invite?.Url ?? "N/A This server does not have a non-expiring invite available or the bot does not have manage server permissions."
             });
 
-            return builder;
+            return (invite != null, builder);
         }
     }
 }

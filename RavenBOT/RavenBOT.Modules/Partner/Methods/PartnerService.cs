@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -6,25 +7,31 @@ using Discord;
 using Discord.WebSocket;
 using RavenBOT.Common;
 using RavenBOT.Common.Interfaces;
+using RavenBOT.Common.Services;
 using RavenBOT.Modules.Partner.Models;
 
 namespace RavenBOT.Modules.Partner.Methods
 {
     public class PartnerService : IServiceable
     {
-        public PartnerService(IDatabase database, DiscordShardedClient client)
+        public PartnerService(IDatabase database, ShardChecker checker, DiscordShardedClient client)
         {
             Database = database;
             Client = client;
-
-            Timer = new Timer(TimerEvent, null, TimeSpan.FromSeconds(0), TimeSpan.FromHours(1));
+            checker.AllShardsReady += ShardsReady;
+            //Timer = new Timer(TimerEvent, null, TimeSpan.FromSeconds(0), TimeSpan.FromHours(1));
 
             Random = new Random();
         }
 
+        public async Task ShardsReady()
+        {
+            Timer = new Timer(TimerEvent, null, TimeSpan.FromSeconds(0), TimeSpan.FromHours(1));
+        }
+
         public IDatabase Database { get; }
         public DiscordShardedClient Client { get; }
-        public Timer Timer { get; }
+        public Timer Timer { get; set; }
         public Random Random { get; }
 
         public void TimerEvent(object _)
@@ -72,6 +79,11 @@ namespace RavenBOT.Modules.Partner.Methods
             foreach (var group in randomised)
             {
                 var embedToSend = await group.Config.GetEmbedAsync(group.Guild);
+                if (!embedToSend.Item1)
+                {
+                    continue;
+                }
+
                 var receiver = sorted.FirstOrDefault(x => x.Config.GuildId != group.Config.GuildId);
                 if (receiver == null)
                 {
@@ -93,7 +105,7 @@ namespace RavenBOT.Modules.Partner.Methods
 
                 try
                 {
-                    await receiverChannel.SendMessageAsync("", false, embedToSend.Build());
+                    await receiverChannel.SendMessageAsync("", false, embedToSend.Item2.Build());
                     group.Config.ServerCount++;
                     group.Config.UserCount += receiver.Guild.MemberCount;
                     Database.Store(group.Config, PartnerConfig.DocumentName(group.Config.GuildId));
