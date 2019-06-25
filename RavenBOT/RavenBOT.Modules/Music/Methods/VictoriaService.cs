@@ -16,6 +16,7 @@ using RavenBOT.Common.Handlers;
 using RavenBOT.Common.Interfaces;
 using Victoria;
 using Victoria.Entities;
+using RavenBOT.Common.Services;
 
 namespace RavenBOT.Modules.Music.Methods
 {
@@ -49,7 +50,7 @@ namespace RavenBOT.Modules.Music.Methods
             public string Password { get; set; }
         }
 
-        public VictoriaService(DiscordShardedClient client, IDatabase database, HttpClient httpClient, LogHandler logger)
+        public VictoriaService(DiscordShardedClient client, ShardChecker checker, IDatabase database, HttpClient httpClient, LogHandler logger)
         {
             DiscordClient = client;
             Database = database;
@@ -76,7 +77,7 @@ namespace RavenBOT.Modules.Music.Methods
                 File.WriteAllText(ConfigPath, JsonConvert.SerializeObject(config, Formatting.Indented));
             }
 
-            DiscordClient.ShardReady += Configure;
+            checker.AllShardsReady += Configure;
         }
 
         public async Task TrackFinished(LavaPlayer player, LavaTrack track, TrackEndReason reason)
@@ -112,14 +113,8 @@ namespace RavenBOT.Modules.Music.Methods
 
         public List<int> ReadyShardIds { get; set; } = new List<int>();
 
-        public async Task Configure(DiscordSocketClient sClient)
+        public async Task Configure()
         {
-            ReadyShardIds.Add(sClient.ShardId);
-            if (!DiscordClient.Shards.All(x => ReadyShardIds.Contains(x.ShardId)))
-            {
-                return;
-            }
-
             Logger.Log("Victoria Initializing...");
             var config = JsonConvert.DeserializeObject<VictoriaConfig>(File.ReadAllText(ConfigPath));
 
@@ -130,7 +125,6 @@ namespace RavenBOT.Modules.Music.Methods
 
             Client.Log += Log;
             Client.OnTrackFinished += TrackFinished;
-
         }
 
         public async Task Log(LogMessage message)

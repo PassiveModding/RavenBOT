@@ -301,7 +301,7 @@ namespace RavenBOT.Modules.Music.Modules
         [RequireOwner]
         public Task Configure()
         {
-            return Vic.Configure(Context.Client.GetShardFor(Context.Guild));
+            return Vic.Configure();
         }
 
         [Command("SetAuthorization")]
