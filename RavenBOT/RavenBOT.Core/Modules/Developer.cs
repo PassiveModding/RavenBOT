@@ -116,6 +116,14 @@ namespace RavenBOT.Modules.Developer
             await ReplyAsync($"Set Logger channel to {channel.Mention}");
         }
 
+        [Command("TestDownloadUsers")]
+        public async Task TestDownload()
+        {
+            await ReplyAsync($"{Context.Guild.MemberCount}\n{Context.Guild.DownloadedMemberCount}\n{Context.Guild.Users.Count()}");
+            await Context.Guild.DownloadUsersAsync();
+            await ReplyAsync($"{Context.Guild.MemberCount}\n{Context.Guild.DownloadedMemberCount}\n{Context.Guild.Users.Count()}");
+        }
+
         /*
         [Command("MigrateToLiteDB", RunMode = RunMode.Async)]
         public async Task MigrateDB()

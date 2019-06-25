@@ -4,7 +4,6 @@ namespace RavenBOT.Common.Extensions
 {
     public static class CommandExtensions
     {
-
         public static string ParameterInformation(this ParameterInfo parameter)
         {
             var initial = parameter.Name + (parameter.Summary == null ? "" : $"({parameter.Summary})");

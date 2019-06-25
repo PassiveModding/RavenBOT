@@ -1,7 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using Discord.Commands;
-using RavenBOT.ELO.Modules.Bases;
 
 namespace RavenBOT.ELO.Modules.Preconditions
 {
