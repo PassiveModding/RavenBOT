@@ -17,14 +17,16 @@ namespace RavenBOT.Modules.Captcha.Methods
     {
         private IDatabase Database { get; }
         private DiscordShardedClient Client { get; }
+        public PrefixService PrefixService { get; }
         public LocalManagementService LocalManagementService { get; }
         private Random Random { get; }
 
-        public CaptchaService(IDatabase database, DiscordShardedClient client, LocalManagementService localManagementService)
+        public CaptchaService(IDatabase database, DiscordShardedClient client, PrefixService prefixService, LocalManagementService localManagementService)
         {
             Database = database;
 
             Client = client;
+            PrefixService = prefixService;
             LocalManagementService = localManagementService;
             Client.ChannelCreated += ChannelCreated;
             Client.UserJoined += UserJoined;
@@ -191,14 +193,14 @@ namespace RavenBOT.Modules.Captcha.Methods
 
                     try
                     {
-                        await user.SendFileAsync(imageStream, "captcha.jpg", $"Please run the Verify command in order to speak in {user.Guild.Name}. ie. `Verify {user.Guild.Id} {captchaDoc.Captcha}`");
+                        await user.SendFileAsync(imageStream, "captcha.jpg", $"Please run the Verify command in order to speak in {user.Guild.Name}. ie. `{PrefixService.GetPrefix(0)}Captcha Verify {user.Guild.Id} {captchaDoc.Captcha}`");
                     }
                     catch
                     {
                         var guildChannel = user.Guild.GetTextChannel(config.ChannelId);
                         if (guildChannel != null)
                         {
-                            await guildChannel.SendFileAsync(imageStream, "captcha.jpg", $"{user.Mention} Please run the Verify command in order to speak in {user.Guild.Name}. ie. `Verify {user.Guild.Id} {captchaDoc.Captcha}`");
+                            await guildChannel.SendFileAsync(imageStream, "captcha.jpg", $"{user.Mention} Please run the Verify command in order to speak in {user.Guild.Name}. ie. `{PrefixService.GetPrefix(user.Guild.Id)}Captcha Verify {user.Guild.Id} {captchaDoc.Captcha}`");
                         }
                     }                    
                 }
@@ -206,14 +208,14 @@ namespace RavenBOT.Modules.Captcha.Methods
                 {
                     try
                     {
-                        await user.SendMessageAsync($"Please run the Verify command in order to speak in {user.Guild.Name}. ie. `Verify {user.Guild.Id} {captchaDoc.Captcha}`");
+                        await user.SendMessageAsync($"Please run the Verify command in order to speak in {user.Guild.Name}. ie. `{PrefixService.GetPrefix(0)}Captcha Verify {user.Guild.Id} {captchaDoc.Captcha}`");
                     }
                     catch
                     {
                         var guildChannel = user.Guild.GetTextChannel(config.ChannelId);
                         if (guildChannel != null)
                         {
-                            await guildChannel.SendMessageAsync($"Please run the Verify command in order to speak in {user.Guild.Name}. ie. `Verify {user.Guild.Id} {captchaDoc.Captcha}`");
+                            await guildChannel.SendMessageAsync($"Please run the Verify command in order to speak in {user.Guild.Name}. ie. `{PrefixService.GetPrefix(user.Guild.Id)}Captcha Verify {user.Guild.Id} {captchaDoc.Captcha}`");
                         }
                     } 
                 }
