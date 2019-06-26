@@ -95,7 +95,8 @@ namespace RavenBOT.Modules.Conversation.Methods
             var messageContent = message.Content;
             foreach (var usermention in message.MentionedUsers)
             {
-                messageContent = messageContent.Replace(usermention.Mention, usermention.Username);
+                messageContent = messageContent.Replace($"<@{usermention.Id}>", usermention.Username);
+                messageContent = messageContent.Replace($"<@!{usermention.Id}>", usermention.Username);
             }
             foreach (var rolemention in message.MentionedRoles)
             {
