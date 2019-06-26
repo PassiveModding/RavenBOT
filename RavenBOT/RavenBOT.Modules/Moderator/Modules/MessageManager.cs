@@ -4,6 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
+using Discord.WebSocket;
+using MoreLinq;
+using RavenBOT.Common.Attributes;
+using RavenBOT.Extensions;
 
 namespace RavenBOT.Modules.Moderator.Modules
 {
@@ -115,6 +119,32 @@ namespace RavenBOT.Modules.Moderator.Modules
             }
 
             await ReplyAsync($"Cleared Messages (Count = {messages.Count})");
+        }
+
+        [Command("Announce", RunMode = RunMode.Async)]
+        [RavenRequireUserPermission(GuildPermission.ManageRoles)]
+        [Summary("Enabled role mentions, sends messages and then disables again")]
+        public async Task Announce(params IRole[] roles)
+        {
+            //Ensure the bot is only editing roles which aren't already mentionable and are actually able to be edited (are lower than the bot's heirachal role).
+            var unmentionable = roles.Where(x => !x.IsMentionable && x.Position < Context.Guild.CurrentUser.Hierarchy).DistinctBy(x => x.Id).ToList();
+            foreach (var role in unmentionable)
+            {
+                await role.ModifyAsync(x => x.Mentionable = true);
+            }
+
+            await ReplyAsync("Roles can now be mentioned until you send your next message.");
+            try
+            {
+                await NextMessageAsync();
+            }
+            finally
+            {
+                foreach (var role in unmentionable)
+                {
+                    await role.ModifyAsync(x => x.Mentionable = false);
+                }                
+            }
         }
     }
 }
