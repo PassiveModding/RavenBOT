@@ -145,7 +145,7 @@ namespace RavenBOT.Modules.Captcha.Modules
             await ReplyAsync($"Captcha channel set to the current channel.");
         }
 
-        [Command("UseCaptcha")]
+        [Command("Toggle")]
         [Summary("Toggles the use of captcha verification")]
         [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
         [RavenRequireContext(ContextType.Guild)]
@@ -159,7 +159,7 @@ namespace RavenBOT.Modules.Captcha.Modules
                 "Note: Please ensure you set a captcha channel (using the `SetChannel` command) as the bot will message there in the event that it cannot dm the user directly");
         }
 
-        [Command("MaxCaptchaWarnings")]
+        [Command("MaxWarnings")]
         [Summary("Toggles the max amount of captcha fails before action is taken")]
         [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
         [RavenRequireContext(ContextType.Guild)]
@@ -177,7 +177,7 @@ namespace RavenBOT.Modules.Captcha.Modules
             }
         }
 
-        [Command("CaptchaActions")]
+        [Command("Actions")]
         [Summary("Displays possible actions to take when a user fails too many captchas")]
         [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
         [RavenRequireContext(ContextType.Guild)]
@@ -187,7 +187,7 @@ namespace RavenBOT.Modules.Captcha.Modules
                 "`Ban`\n`Kick`\n`None`");
         }
 
-        [Command("SetCaptchaAction")]
+        [Command("SetAction")]
         [Summary("Sets what happens when a user fails too many captchas")]
         [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
         [RavenRequireContext(ContextType.Guild)]
@@ -199,7 +199,7 @@ namespace RavenBOT.Modules.Captcha.Modules
             await ReplyAsync($"Max Failure Action: {action}");
         }
 
-        [Command("CaptchaSettings")]
+        [Command("Settings")]
         [Summary("Displays captcha settings")]
         [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
         [RavenRequireContext(ContextType.Guild)]
@@ -211,7 +211,7 @@ namespace RavenBOT.Modules.Captcha.Modules
                 $"Temp Role: {Context.Guild.GetRole(config.CaptchaTempRole)?.Mention ?? "N/A"}\n" +
                 $"Max Captcha Failures: {config.MaxFailures}\n" +
                 $"Max Captcha Failures Action: {config.MaxFailuresAction}\n" +
-                $"Captcha hannel: {Context.Guild.GetTextChannel(config.ChannelId)?.Mention ?? "N/A, it is recommended that you set this asap"}");
+                $"Captcha channel: {Context.Guild.GetTextChannel(config.ChannelId)?.Mention ?? "N/A, it is recommended that you set this asap"}");
         }
     }
 }
