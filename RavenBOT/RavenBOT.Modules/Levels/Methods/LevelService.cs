@@ -210,7 +210,7 @@ namespace RavenBOT.Modules.Levels.Methods
 
         public List<(LevelConfig.LevelReward, SocketRole)> GetRoles(int level, LevelConfig config, SocketGuild guild)
         {
-            var roles = config.RewardRoles.Where(x => x.LevelRequirement < level).ToList();
+            var roles = config.RewardRoles.Where(x => x.LevelRequirement <= level).ToList();
 
             if (roles.Any())
             {
