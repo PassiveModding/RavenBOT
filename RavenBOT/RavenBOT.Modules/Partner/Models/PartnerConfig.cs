@@ -68,7 +68,7 @@ namespace RavenBOT.Modules.Partner.Models
             try
             {
                 IInviteMetadata inviteData = null;
-                if (guild.CurrentUser.GuildPermissions.ManageGuild)
+                if (guild.CurrentUser?.GuildPermissions.ManageGuild == true)
                 {
                     var currentInvites = await guild.GetInvitesAsync();
                     currentInvites = currentInvites.Where(x => x.MaxUses == 0 && x.MaxAge == 0 && !x.IsRevoked && !x.IsTemporary).ToList();
