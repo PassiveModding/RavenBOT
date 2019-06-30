@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Discord.WebSocket;
+using MoreLinq;
 using RavenBOT.Common;
 using RavenBOT.Common.Interfaces;
 using RavenBOT.Common.Services;
@@ -167,7 +168,16 @@ namespace RavenBOT.Modules.Levels.Methods
                         {
                             var roles = GetRoles(user.UserLevel, guild, tChannel.Guild);
                             var gUser = tChannel.Guild.GetUser(message.Author.Id);
-                            await gUser?.AddRolesAsync(roles);
+                            if (config.Item2.MultiRole)
+                            {
+                                await gUser?.AddRolesAsync(roles.Select(x => x.Item2).ToArray());
+                            }
+                            else
+                            {
+                                var maxRole = roles.MaxBy(x => x.Item1.LevelRequirement).First();
+                                await gUser?.RemoveRolesAsync(roles.Where(x => x.Item1.RoleId != maxRole.Item1.RoleId).Select(x => x.Item2).ToArray());
+                                await gUser?.AddRoleAsync(maxRole.Item2);
+                            }
                         }
 
                         var messageContent = $"**{message.Author.Mention} is now level {user.UserLevel}** XP: {user.UserXP} Next Level At {RequiredExp(user.UserLevel)} XP";
@@ -198,17 +208,17 @@ namespace RavenBOT.Modules.Levels.Methods
 
         }
 
-        public List<SocketRole> GetRoles(int level, LevelConfig config, SocketGuild guild)
+        public List<(LevelConfig.LevelReward, SocketRole)> GetRoles(int level, LevelConfig config, SocketGuild guild)
         {
             var roles = config.RewardRoles.Where(x => x.LevelRequirement < level).ToList();
 
             if (roles.Any())
             {
-                var gRoles = roles.Select(x => guild.GetRole(x.RoleId)).Where(x => x != null).ToList();
+                var gRoles = roles.Select(x => (x, guild.GetRole(x.RoleId))).Where(x => x.Item2 != null).ToList();
                 return gRoles;
             }
 
-            return new List<SocketRole>();
+            return new List<(LevelConfig.LevelReward, SocketRole)>();
         }
 
         public int RequiredExp(int level)
