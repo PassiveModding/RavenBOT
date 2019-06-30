@@ -1,12 +1,16 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Discord;
+using Discord.Commands;
 using Discord.WebSocket;
 using RavenBOT.Common;
+using RavenBOT.Common.Extensions;
 using RavenBOT.Common.Interfaces;
 using RavenBOT.Common.Services;
+using RavenBOT.Extensions;
 using RavenBOT.Modules.Moderator.Models;
 
 namespace RavenBOT.Modules.Moderator.Methods
@@ -105,6 +109,7 @@ namespace RavenBOT.Modules.Moderator.Methods
                             continue;
                         }
 
+                        //TODO: Use context free log to track unmutes and softban removals
                         if (user.Action == TimeTracker.User.TimedAction.Mute)
                         {
                             //Remove mute role from user.
@@ -148,7 +153,7 @@ namespace RavenBOT.Modules.Moderator.Methods
             {
                 config = new ModeratorConfig
                 {
-                GuildId = guildId
+                    GuildId = guildId
                 };
                 SaveModeratorConfig(config);
             }
@@ -183,6 +188,144 @@ namespace RavenBOT.Modules.Moderator.Methods
             }
 
             return config;
+        }
+  
+        public async Task LogMessageAsync(ShardedCommandContext context, string message, ulong actionedUserId, string reason = null, bool logRecentMessages = true)
+        {
+            var embed = new EmbedBuilder();
+            var gUser = context.Guild.GetUser(actionedUserId);
+            if (gUser != null)
+            {
+                await LogMessageAsync(context, message, gUser, reason, logRecentMessages);
+                return;
+            }
+
+            embed.Author = new EmbedAuthorBuilder
+            {
+                Name = $"User: [{actionedUserId}]"
+            };
+
+            await LogMessageFinalAsync(embed, context, actionedUserId, message, reason, logRecentMessages);       
+        }
+
+        private async Task ContextFreeLogMessageFinalAsync(SocketGuild guild, IUser moderator, IUser target, string message, string reason = null)
+        {
+            var config = GetActionConfig(guild.Id);
+            if (config.LogChannelId == 0)
+            {
+                //TODO: Optionally also send message to churrent channel
+                return;
+            }
+
+            var logChannel = guild.GetTextChannel(config.LogChannelId);
+            if (logChannel == null)
+            {
+                return;
+            }
+
+            var fields = new List<EmbedFieldBuilder>()
+            {                
+                new EmbedFieldBuilder
+                {
+                    Name = "Action",
+                    Value = message?.FixLength(1023) ?? "N/A"
+                },
+                new EmbedFieldBuilder
+                {
+                    Name = "Reason",
+                    Value = reason?.FixLength(1023) ?? "N/A"
+                },
+                new EmbedFieldBuilder
+                {
+                    Name = "Moderator",
+                    Value = $"{moderator.Username}#{moderator.Discriminator} ({moderator.Id}/{moderator.Mention})"
+                }
+            };
+
+            var embed = new EmbedBuilder();
+            embed.Fields = fields;
+            embed = embed.WithCurrentTimestamp();
+
+            await logChannel.SendMessageAsync("", false, embed.Build());
+        }        
+
+        private async Task LogMessageFinalAsync(EmbedBuilder embed, ShardedCommandContext context, ulong actionedUserId, string message, string reason = null, bool logRecentMessages = false)
+        {
+            var config = GetActionConfig(context.Guild.Id);
+            if (config.LogChannelId == 0)
+            {
+                //TODO: Optionally also send message to churrent channel
+                return;
+            }
+
+            var logChannel = context.Guild.GetTextChannel(config.LogChannelId);
+            if (logChannel == null)
+            {
+                return;
+            }
+
+            var fields = new List<EmbedFieldBuilder>()
+            {
+                new EmbedFieldBuilder
+                {
+                    Name = "Action",
+                    Value = message?.FixLength(1023) ?? context.Message.Content?.FixLength(1023)
+                },
+                new EmbedFieldBuilder
+                {
+                    Name = "Reason",
+                    Value = reason?.FixLength(1023) ?? "N/A"
+                },
+                new EmbedFieldBuilder
+                {
+                    Name = "Moderator",
+                    Value = $"{context.User.Username}#{context.User.Discriminator} ({context.User.Id}/{context.User.Mention})"
+                }
+            };
+
+            if (actionedUserId != 0 && logRecentMessages)
+            {
+                var messages = await context.Channel.GetFlattenedMessagesAsync(25);
+                if (messages.Any(x => x.Author.Id == actionedUserId))
+                {
+                    var chatLog = string.Join("\n", messages.Select(x => {
+                        if (x.Author.Id == actionedUserId)
+                        {
+                            return $"**{x.Author.Username}#{x.Author.Discriminator}**: {x.Content}";
+                        }
+                        else
+                        {
+                            return $"*{x.Author.Username}#{x.Author.Discriminator}*: {x.Content}";
+                        }
+                        
+                    }));
+                    fields.Add(new EmbedFieldBuilder
+                    {
+                        Name = "Chat Log",
+                        Value = chatLog.FixLength(1023)
+                    });
+                }
+            }
+
+            embed.Fields = fields;
+            embed = embed.WithCurrentTimestamp();
+
+            await logChannel.SendMessageAsync("", false, embed.Build());
+        }
+
+        public async Task LogMessageAsync(ShardedCommandContext context, string message, SocketGuildUser actionedUser, string reason = null, bool logRecentMessages = true)
+        {
+            var embed = new EmbedBuilder();
+            if (actionedUser != null)
+            {
+                embed.Author = new EmbedAuthorBuilder
+                {
+                    IconUrl = actionedUser.GetAvatarUrl(),
+                    Name = actionedUser.Nickname ?? $"{actionedUser.Username}#{actionedUser.Discriminator}"
+                };
+            }
+
+            await LogMessageFinalAsync(embed, context, actionedUser?.Id ?? 0, message, reason, logRecentMessages);
         }
 
         public void Save<T>(T document, string name = null)

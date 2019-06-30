@@ -137,6 +137,15 @@ namespace RavenBOT.Modules.Moderator.Modules
             await Context.Guild.AddBanAsync(userId, 0, reason);
 
             await ReplyAsync($"#{caseId} Hackbanned user with ID {userId}");
+
+            if (gUser != null)
+            {
+                await ModHandler.LogMessageAsync(Context, $"#{caseId} Hackbanned user with ID {userId}", gUser, reason);
+            }
+            else
+            {
+                await ModHandler.LogMessageAsync(Context, $"#{caseId} Hackbanned user with ID {userId}", userId, reason);
+            }
         }
 
         [Command("SetMaxWarnings")]
@@ -192,6 +201,17 @@ namespace RavenBOT.Modules.Moderator.Modules
             await ReplyAsync($"By Default users will be muted for {time.GetReadableLength()}");
         }
 
+        [Command("SetLogChannel")]
+        [Summary("Sets the log channel for mod actions")]
+        [RavenRequireUserPermission(GuildPermission.Administrator)]
+        public async Task SetLogChannelAsync()
+        {
+            var config = ModHandler.GetActionConfig(Context.Guild.Id);
+            config.LogChannelId = Context.Channel.Id;
+            ModHandler.Save(config, ActionConfig.DocumentName(Context.Guild.Id));
+            await ReplyAsync($"Log channel set to the current channel.");
+        }
+
         [Command("SetReason")]
         [Summary("Sets the reason for a specific moderation case")]
         public async Task SetReason(int caseId, [Remainder] string reason)
@@ -206,15 +226,19 @@ namespace RavenBOT.Modules.Moderator.Modules
             }
 
             //Check if reason is updated or list needs to be re-updated
-            if (action.Reason == null)
+            if (action.Reason == null || action.Reason.Equals("N/A"))
             {
                 action.Reason = reason;
                 await ReplyAsync("Reason set.");
+
+                await ModHandler.LogMessageAsync(Context, $"#{caseId} reason was set", null, reason);
             }
             else
             {
                 action.Reason = $"**Original Reason**\n{action.Reason}**Updated Reason**\n{reason}";
                 await ReplyAsync("Appended reason to message.");
+                //TODO: Get user if possible.
+                await ModHandler.LogMessageAsync(Context, $"#{caseId} reason was updated", null, reason);
             }
 
             ModHandler.Save(config, ActionConfig.DocumentName(Context.Guild.Id));
@@ -239,6 +263,7 @@ namespace RavenBOT.Modules.Moderator.Modules
             await ReplyAsync($"#{caseId} {user.Mention} was banned by {Context.User.Mention} for {reason ?? "N/A"}");
 
             ModHandler.Save(config, ActionConfig.DocumentName(Context.Guild.Id));
+            await ModHandler.LogMessageAsync(Context, $"#{caseId} {user.Mention} was kicked by {Context.User.Mention} for {reason ?? "N/A"}", user, reason);
         }
 
         [Command("kick")]
@@ -252,13 +277,13 @@ namespace RavenBOT.Modules.Moderator.Modules
                 return;
             }
 
-            //Log this to some config file?
             await user.KickAsync(reason);
             var config = ModHandler.GetActionConfig(Context.Guild.Id);
             var caseId = config.AddLogAction(user.Id, Context.User.Id, ActionConfig.Log.LogAction.Kick, reason);
             await ReplyAsync($"#{caseId} {user.Mention} was kicked by {Context.User.Mention} for {reason ?? "N/A"}");
 
             ModHandler.Save(config, ActionConfig.DocumentName(Context.Guild.Id));
+            await ModHandler.LogMessageAsync(Context, $"#{caseId} {user.Mention} was kicked by {Context.User.Mention}", user, reason);
         }
 
         [Command("warn")]
@@ -282,6 +307,9 @@ namespace RavenBOT.Modules.Moderator.Modules
             ModHandler.Save(userConfig, ActionConfig.ActionUser.DocumentName(user.Id, Context.Guild.Id));
 
             await ReplyAsync($"#{caseId} {user.Mention} was warned by {Context.User.Mention} for {reason ?? "N/A"}");
+            await ModHandler.LogMessageAsync(Context, $"#{caseId} {user.Mention} was warned by {Context.User.Mention}", user, reason);
+
+            //TODO: Separate actions for below.
             if (warns > config.MaxWarnings)
             {
                 if (config.MaxWarningsAction == Models.ActionConfig.Action.Kick)
@@ -341,6 +369,8 @@ namespace RavenBOT.Modules.Moderator.Modules
             ModHandler.Save(ModHandler.TimedActions, TimeTracker.DocumentName);
             var expiryTime = DateTime.UtcNow + time.Value;
             await ReplyAsync($"#{caseId} {user.Mention} has been muted for {time.Value.GetReadableLength()}, Expires at: {expiryTime.ToShortDateString()} {expiryTime.ToShortTimeString()}\n**Reason:** {reason ?? "N/A"}");
+
+            await ModHandler.LogMessageAsync(Context, $"#{caseId} {user.Mention} has been muted for {time.Value.GetReadableLength()}, Expires at: {expiryTime.ToShortDateString()} {expiryTime.ToShortTimeString()}", user, reason);
         }
 
         [Command("softban")]
@@ -364,23 +394,25 @@ namespace RavenBOT.Modules.Moderator.Modules
             }
 
             var config = ModHandler.GetActionConfig(Context.Guild.Id);
-            await Context.Guild.AddBanAsync(user, 0, reason);
-
+            
             if (time == null)
             {
-                time = config.MuteLength;
+                time = config.SoftBanLength;
             }
+            var expiryTime = DateTime.UtcNow + time.Value;
+
+            await ReplyAsync($"You have been SoftBanned in {Context.Guild.Name} for {time.Value.GetReadableLength()}, Expires at: {expiryTime.ToShortDateString()} {expiryTime.ToShortTimeString()} \n**Reason:** {reason ?? "N/A"}");
+
+            await Context.Guild.AddBanAsync(user, 0, reason);
 
             ModHandler.TimedActions.Users.Add(new Models.TimeTracker.User(user.Id, Context.Guild.Id, Models.TimeTracker.User.TimedAction.SoftBan, time.Value));
             ModHandler.Save(ModHandler.TimedActions, TimeTracker.DocumentName);
-            var caseId = config.AddLogAction(user.Id, Context.User.Id, ActionConfig.Log.LogAction.Mute, reason);
+            var caseId = config.AddLogAction(user.Id, Context.User.Id, ActionConfig.Log.LogAction.SoftBan, reason);
 
             ModHandler.Save(config, ActionConfig.DocumentName(Context.Guild.Id));
 
-            var expiryTime = DateTime.UtcNow + time.Value;
             await ReplyAsync($"#{caseId} {user.Mention} has been SoftBanned for {time.Value.GetReadableLength()}, Expires at: {expiryTime.ToShortDateString()} {expiryTime.ToShortTimeString()} \n**Reason:** {reason ?? "N/A"}");
-
-            //TODO: Message user?
+            await ModHandler.LogMessageAsync(Context, $"#{caseId} {user.Mention} has been SoftBanned for {time.Value.GetReadableLength()}, Expires at: {expiryTime.ToShortDateString()} {expiryTime.ToShortTimeString()}", user, reason);
         }
     }
 }

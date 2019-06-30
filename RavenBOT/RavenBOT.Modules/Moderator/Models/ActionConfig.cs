@@ -47,6 +47,8 @@ namespace RavenBOT.Modules.Moderator.Models
 
         public TimeSpan MuteLength { get; set; } = TimeSpan.FromHours(1);
 
+        public ulong LogChannelId { get; set; }
+
         public List<Log> LogActions { get; set; } = new List<Log>();
 
         public class Log

@@ -13,10 +13,10 @@ namespace RavenBOT.Modules.Moderator.Modules
 {
     public partial class Moderation
     {
-        public List<IMessage> GetmessagesAsync(int count = 100)
+        public async Task<List<IMessage>> GetmessagesAsync(int count = 100)
         {
-            var msgs = Context.Channel.GetMessagesAsync(count).Flatten();
-            return msgs.Where(x => x.Timestamp.UtcDateTime + TimeSpan.FromDays(14) > DateTime.UtcNow).ToList().Result;
+            var msgs = await Context.Channel.GetMessagesAsync(count).FlattenAsync();
+            return msgs.Where(x => x.Timestamp.UtcDateTime + TimeSpan.FromDays(14) > DateTime.UtcNow).ToList();
         }
 
         [Command("prune")]
@@ -37,9 +37,10 @@ namespace RavenBOT.Modules.Moderator.Modules
                 await Context.Message.DeleteAsync().ConfigureAwait(false);
                 var limit = count < 100 ? count : 100;
                 //var enumerable = await Context.Channel.GetMessagesAsync(limit).Flatten().ConfigureAwait(false);
-                var enumerable = GetmessagesAsync(limit);
+                var enumerable = await GetmessagesAsync(limit);
                 try
                 {
+                    await ModHandler.LogMessageAsync(Context, $"Cleared **{enumerable.Count}** Messages in {Context.Channel.Name}", null);
                     await (Context.Channel as ITextChannel).DeleteMessagesAsync(enumerable).ConfigureAwait(false);
                 }
                 catch
@@ -54,14 +55,15 @@ namespace RavenBOT.Modules.Moderator.Modules
         [Command("prune")]
         [Alias("purge", "pruneuser", "clear")]
         [Summary("removes messages from a user in the last 100 messages")]
-        public async Task Prune(IUser user)
+        public async Task Prune(SocketGuildUser user)
         {
             await Context.Message.DeleteAsync().ConfigureAwait(false);
             //var enumerable = await Context.Channel.GetMessagesAsync().Flatten().ConfigureAwait(false);
-            var enumerable = GetmessagesAsync();
+            var enumerable = await GetmessagesAsync();
             var newlist = enumerable.Where(x => x.Author == user).ToList();
             try
             {
+                await ModHandler.LogMessageAsync(Context, $"Cleared **{newlist.Count}** Messages in {Context.Channel.Name} for {user.Mention}", user);
                 await (Context.Channel as ITextChannel).DeleteMessagesAsync(newlist).ConfigureAwait(false);
             }
             catch
@@ -77,10 +79,11 @@ namespace RavenBOT.Modules.Moderator.Modules
         public async Task Prune(ulong userID)
         {
             await Context.Message.DeleteAsync().ConfigureAwait(false);
-            var enumerable = GetmessagesAsync();
+            var enumerable = await GetmessagesAsync();
             var newlist = enumerable.Where(x => x.Author.Id == userID).ToList();
             try
             {
+                await ModHandler.LogMessageAsync(Context, $"Cleared **{newlist.Count}** Messages in {Context.Channel.Name} for user with ID: {userID}", userID);
                 await (Context.Channel as ITextChannel).DeleteMessagesAsync(newlist).ConfigureAwait(false);
             }
             catch
@@ -97,7 +100,7 @@ namespace RavenBOT.Modules.Moderator.Modules
         public async Task Prune(IRole role)
         {
             await Context.Message.DeleteAsync().ConfigureAwait(false);
-            var enumerable = GetmessagesAsync();
+            var enumerable = await GetmessagesAsync();
 
             var messages = enumerable.ToList().Where(x =>
             {
@@ -111,6 +114,7 @@ namespace RavenBOT.Modules.Moderator.Modules
 
             try
             {
+                await ModHandler.LogMessageAsync(Context, $"Cleared **{messages.Count}** Messages in {Context.Channel.Name} for {role.Mention}", null);
                 await (Context.Channel as ITextChannel).DeleteMessagesAsync(messages).ConfigureAwait(false);
             }
             catch
