@@ -2,8 +2,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Discord.Commands;
 using Discord.WebSocket;
+using RavenBOT.Common;
 using RavenBOT.ELO.Modules.Bases;
-using RavenBOT.Extensions;
 
 namespace RavenBOT.ELO.Modules.Modules
 {

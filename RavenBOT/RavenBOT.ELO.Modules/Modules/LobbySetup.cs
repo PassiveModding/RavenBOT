@@ -1,11 +1,9 @@
-using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
+using RavenBOT.Common;
 using RavenBOT.ELO.Modules.Bases;
-using RavenBOT.ELO.Modules.Methods;
 using RavenBOT.ELO.Modules.Models;
-using RavenBOT.Extensions;
 
 namespace RavenBOT.ELO.Modules.Modules
 {
@@ -63,7 +61,7 @@ namespace RavenBOT.ELO.Modules.Modules
         [Command("PickModes")]
         public async Task DisplayPickModesAsync()
         {
-            var pickDict = StringExtensions.ConvertEnumToDictionary<Lobby.PickMode>();
+            var pickDict = Extensions.ConvertEnumToDictionary<Lobby.PickMode>();
             await ReplyAsync($"{string.Join("\n", pickDict.Keys)}");
         }
 
@@ -84,7 +82,7 @@ namespace RavenBOT.ELO.Modules.Modules
         [Command("CaptainModes")]
         public async Task DisplayCaptainModesAsync()
         {
-            var capDict = StringExtensions.ConvertEnumToDictionary<Lobby.CaptainMode>();
+            var capDict = Extensions.ConvertEnumToDictionary<Lobby.CaptainMode>();
             await ReplyAsync($"{string.Join("\n", capDict.Keys)}");
         }
     }
