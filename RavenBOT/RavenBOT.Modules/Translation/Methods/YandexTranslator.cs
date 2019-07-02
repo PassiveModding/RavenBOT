@@ -1,7 +1,7 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Net.Http;
 using Newtonsoft.Json.Linq;
 
@@ -43,7 +43,7 @@ namespace RavenBOT.Modules.Translation.Methods
             var response = Client.GetAsync($"https://translate.yandex.net/api/v1.5/tr.json/getLangs?key={ApiKey}&ui=en").Result;
             if (!response.IsSuccessStatusCode)
             {
-                AvailableLanguages = new SpecificCulture[]{};
+                AvailableLanguages = new SpecificCulture[] {};
             }
 
             var jResponse = JToken.Parse(response.Content.ReadAsStringAsync().Result);
@@ -108,7 +108,6 @@ namespace RavenBOT.Modules.Translation.Methods
             {
                 throw new Exception("Invalid Source Language Code.");
             }
-
 
             source = Uri.EscapeDataString(source);
             var response = Client.GetAsync($"https://translate.yandex.net/api/v1.5/tr.json/translate?key={ApiKey}&text={source}&lang={sourceLanguage}-{targetLanguage}").Result;

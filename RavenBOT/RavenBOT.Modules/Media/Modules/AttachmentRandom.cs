@@ -5,9 +5,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
-using RavenBOT.Common.Attributes;
-using RavenBOT.Common.Interfaces;
-using RavenBOT.Extensions;
+using RavenBOT.Common;
 using RavenBOT.Modules.Media.Models;
 
 namespace RavenBOT.Modules.Media.Modules
@@ -29,20 +27,20 @@ namespace RavenBOT.Modules.Media.Modules
         [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
         public async Task AddFileAsync(string key)
         {
-            if (!Context.Message.Attachments.Any(x => x.Size/1024/1024 <= 8))
+            if (!Context.Message.Attachments.Any(x => x.Size / 1024 / 1024 <= 8))
             {
                 await ReplyAsync("You must attach a file when using this command and ensure that it is less than 8mb in size.");
                 return;
             }
 
-            var config  = Database.Load<AttachmentRandomConfig>(AttachmentRandomConfig.DocumentName(Context.Guild.Id, key));
+            var config = Database.Load<AttachmentRandomConfig>(AttachmentRandomConfig.DocumentName(Context.Guild.Id, key));
 
             if (config == null)
             {
-                config = new AttachmentRandomConfig(Context.Guild.Id, key);                
+                config = new AttachmentRandomConfig(Context.Guild.Id, key);
             }
 
-            config.AttachmentUrls.AddRange(Context.Message.Attachments.Where(x => x.Size/1024/1024 <= 8).Select(x => x.Url).ToArray());
+            config.AttachmentUrls.AddRange(Context.Message.Attachments.Where(x => x.Size / 1024 / 1024 <= 8).Select(x => x.Url).ToArray());
             Database.Store(config, AttachmentRandomConfig.DocumentName(Context.Guild.Id, key));
             await ReplyAsync("Attachment(s) added.");
         }
@@ -51,18 +49,18 @@ namespace RavenBOT.Modules.Media.Modules
         [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
         public async Task RemoveFilesAsync(string key)
         {
-            if (!Context.Message.Attachments.Any(x => x.Size/1024/1024 <= 8))
+            if (!Context.Message.Attachments.Any(x => x.Size / 1024 / 1024 <= 8))
             {
                 await ReplyAsync("You must attach a file when using this command and ensure that it is less than 8mb in size.");
                 return;
             }
 
-            var configExists  = Database.Exists<AttachmentRandomConfig>(AttachmentRandomConfig.DocumentName(Context.Guild.Id, key));
+            var configExists = Database.Exists<AttachmentRandomConfig>(AttachmentRandomConfig.DocumentName(Context.Guild.Id, key));
 
             if (configExists == false)
             {
                 await ReplyAsync("Unknown key.");
-                return;             
+                return;
             }
             else
             {
@@ -74,14 +72,14 @@ namespace RavenBOT.Modules.Media.Modules
 
         [Command("RemoveUrl")]
         [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
-        public async Task RemoveFilesAsync(string key, [Remainder]string url)
+        public async Task RemoveFilesAsync(string key, [Remainder] string url)
         {
-            var config  = Database.Load<AttachmentRandomConfig>(AttachmentRandomConfig.DocumentName(Context.Guild.Id, key));
+            var config = Database.Load<AttachmentRandomConfig>(AttachmentRandomConfig.DocumentName(Context.Guild.Id, key));
 
             if (config == null)
             {
                 await ReplyAsync("Key not found.");
-                return;          
+                return;
             }
 
             config.AttachmentUrls.RemoveAll(n => n.Equals(url, StringComparison.InvariantCultureIgnoreCase));
@@ -99,12 +97,12 @@ namespace RavenBOT.Modules.Media.Modules
         [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
         public async Task ShowKeysAsync()
         {
-            var config  = Database.Query<AttachmentRandomConfig>(x => x.GuildId == Context.Guild.Id).ToArray();
+            var config = Database.Query<AttachmentRandomConfig>(x => x.GuildId == Context.Guild.Id).ToArray();
 
             if (!config.Any())
             {
                 await ReplyAsync("None found.");
-                return;          
+                return;
             }
 
             await ReplyAsync("", false, string.Join("\n", config.Select(x => x.Key)).QuickEmbed());
@@ -114,12 +112,12 @@ namespace RavenBOT.Modules.Media.Modules
         [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
         public async Task ShowUrlsAsync(string key)
         {
-            var config  = Database.Load<AttachmentRandomConfig>(AttachmentRandomConfig.DocumentName(Context.Guild.Id, key));
+            var config = Database.Load<AttachmentRandomConfig>(AttachmentRandomConfig.DocumentName(Context.Guild.Id, key));
 
             if (config == null)
             {
                 await ReplyAsync("Key not found.");
-                return;          
+                return;
             }
 
             await ReplyAsync("", false, new EmbedBuilder()
@@ -133,22 +131,21 @@ namespace RavenBOT.Modules.Media.Modules
         [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
         public async Task GetImageAsync(string key)
         {
-            var config  = Database.Load<AttachmentRandomConfig>(AttachmentRandomConfig.DocumentName(Context.Guild.Id, key));
+            var config = Database.Load<AttachmentRandomConfig>(AttachmentRandomConfig.DocumentName(Context.Guild.Id, key));
 
             if (config == null)
             {
                 await ReplyAsync("Key not found.");
-                return;          
+                return;
             }
 
             var selection = config.AttachmentUrls.OrderBy(x => Random.Next()).FirstOrDefault();
-            
-            
+
             var response = await Client.GetAsync(selection);
             if (!response.IsSuccessStatusCode)
             {
                 await ReplyAsync($"Error, attachment <{selection}> not found.");
-                return;     
+                return;
             }
 
             var contentDir = selection.LastIndexOf("\\");
@@ -157,7 +154,7 @@ namespace RavenBOT.Modules.Media.Modules
                 selection = selection.Substring(contentDir);
             }
 
-            using (var stream = await response.Content.ReadAsStreamAsync())
+            using(var stream = await response.Content.ReadAsStreamAsync())
             {
                 await Context.Channel.SendFileAsync(stream, selection);
             }

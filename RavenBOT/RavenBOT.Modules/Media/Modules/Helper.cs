@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Discord.Addons.Interactive;
 using Discord.Commands;
-using RavenBOT.Common.Services;
+using RavenBOT.Common;
 
 namespace RavenBOT.Modules.Media.Modules
 {

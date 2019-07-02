@@ -7,8 +7,6 @@ using CaptchaGen.NetCore;
 using Discord;
 using Discord.WebSocket;
 using RavenBOT.Common;
-using RavenBOT.Common.Interfaces;
-using RavenBOT.Common.Services;
 using RavenBOT.Modules.Captcha.Models;
 
 namespace RavenBOT.Modules.Captcha.Methods
@@ -202,7 +200,7 @@ namespace RavenBOT.Modules.Captcha.Methods
                         {
                             await guildChannel.SendFileAsync(imageStream, "captcha.jpg", $"{user.Mention} Please run the Verify command in order to speak in {user.Guild.Name}. ie. `{PrefixService.GetPrefix(user.Guild.Id)}Captcha Verify {user.Guild.Id} {captchaDoc.Captcha}`");
                         }
-                    }                    
+                    }
                 }
                 catch
                 {
@@ -217,7 +215,7 @@ namespace RavenBOT.Modules.Captcha.Methods
                         {
                             await guildChannel.SendMessageAsync($"Please run the Verify command in order to speak in {user.Guild.Name}. ie. `{PrefixService.GetPrefix(user.Guild.Id)}Captcha Verify {user.Guild.Id} {captchaDoc.Captcha}`");
                         }
-                    } 
+                    }
                 }
             }
         }

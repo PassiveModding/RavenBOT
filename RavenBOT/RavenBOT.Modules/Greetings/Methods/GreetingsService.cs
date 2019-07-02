@@ -2,9 +2,6 @@ using System.Globalization;
 using System.Threading.Tasks;
 using Discord.WebSocket;
 using RavenBOT.Common;
-using RavenBOT.Common.Interfaces;
-using RavenBOT.Common.Services;
-using RavenBOT.Extensions;
 using RavenBOT.Modules.Greetings.Models;
 
 namespace RavenBOT.Modules.Greetings.Methods

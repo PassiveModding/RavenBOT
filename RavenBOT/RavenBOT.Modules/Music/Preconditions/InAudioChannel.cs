@@ -2,8 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Discord.Commands;
 using Microsoft.Extensions.DependencyInjection;
-using RavenBOT.Common.Attributes;
-using RavenBOT.Extensions;
+using RavenBOT.Common;
 using RavenBOT.Modules.Music.Methods;
 
 namespace RavenBOT.Modules.Music.Preconditions

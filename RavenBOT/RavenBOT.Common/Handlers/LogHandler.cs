@@ -1,11 +1,8 @@
 using System;
 using Discord;
 using Discord.WebSocket;
-using RavenBOT.Common.Interfaces;
-using RavenBOT.Extensions;
-using RavenBOT.Models;
 
-namespace RavenBOT.Common.Handlers
+namespace RavenBOT.Common
 {
     public class LogHandler
     {

@@ -5,15 +5,14 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord.Addons.Interactive;
 using Discord.Commands;
-using RavenBOT.Common.Attributes;
-using RavenBOT.Common.Services;
+using RavenBOT.Common;
 using RavenBOT.Modules.Partner.Methods;
 
 namespace RavenBOT.Modules.Partner.Modules
 {
     [Group("Partner")]
     [RavenRequireContext(ContextType.Guild)]
-    [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]    
+    [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
     [RavenRequireBotPermission(Discord.GuildPermission.ManageGuild)]
     public class Partner : InteractiveBase<ShardedCommandContext>
     {
@@ -155,7 +154,7 @@ namespace RavenBOT.Modules.Partner.Modules
         }
 
         [Command("Trigger")]
-        [RavenRequireOwner]    
+        [RavenRequireOwner]
         [Summary("Triggers a partner event")]
         public async Task TriggerEvent()
         {

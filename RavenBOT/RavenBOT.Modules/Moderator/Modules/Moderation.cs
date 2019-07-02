@@ -7,9 +7,7 @@ using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
 using MoreLinq;
-using RavenBOT.Common.Attributes;
-using RavenBOT.Common.Services;
-using RavenBOT.Extensions;
+using RavenBOT.Common;
 using RavenBOT.Modules.Moderator.Methods;
 using RavenBOT.Modules.Moderator.Models;
 
@@ -164,7 +162,7 @@ namespace RavenBOT.Modules.Moderator.Modules
         [RavenRequireUserPermission(GuildPermission.Administrator)]
         public async Task MaxWarningsActions()
         {
-            var actions = Extensions.StringExtensions.ConvertEnumToDictionary<Models.ActionConfig.Action>();
+            var actions = Extensions.ConvertEnumToDictionary<Models.ActionConfig.Action>();
             await ReplyAsync(string.Join("\n", actions.Keys));
         }
 
@@ -394,7 +392,7 @@ namespace RavenBOT.Modules.Moderator.Modules
             }
 
             var config = ModHandler.GetActionConfig(Context.Guild.Id);
-            
+
             if (time == null)
             {
                 time = config.SoftBanLength;

@@ -6,9 +6,7 @@ using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using MoreLinq;
-using RavenBOT.Common.Attributes;
-using RavenBOT.Common.Services;
-using RavenBOT.Extensions;
+using RavenBOT.Common;
 using RavenBOT.Modules.Translation.Methods;
 using RavenBOT.Modules.Translation.Models;
 
@@ -39,12 +37,12 @@ namespace RavenBOT.Modules.Translation.Modules
                 await PagedReplyAsync(res, new ReactionList
                 {
                     Backward = true,
-                    First = false,
-                    Forward = true,
-                    Info = false,
-                    Jump = true,
-                    Last = false,
-                    Trash = true
+                        First = false,
+                        Forward = true,
+                        Info = false,
+                        Jump = true,
+                        Last = false,
+                        Trash = true
                 });
             }
             else
@@ -138,7 +136,7 @@ namespace RavenBOT.Modules.Translation.Modules
         [RavenRequireContext(ContextType.Guild)]
         [Command("Role Whitelist")]
         [Summary("Displays the role whitelist for translations")]
-        [RavenRequireUserPermission(GuildPermission.Administrator)]    
+        [RavenRequireUserPermission(GuildPermission.Administrator)]
         public async Task ShowWhitelist()
         {
             var config = TranslateService.GetTranslateGuild(Context.Guild.Id);
@@ -161,7 +159,7 @@ namespace RavenBOT.Modules.Translation.Modules
         [RavenRequireContext(ContextType.Guild)]
         [Command("Whitelist Role")]
         [Summary("adds a role to the translation whitelist.")]
-        [RavenRequireUserPermission(GuildPermission.Administrator)]    
+        [RavenRequireUserPermission(GuildPermission.Administrator)]
         public async Task AddWhitelistedRole(IRole role)
         {
             var config = TranslateService.GetTranslateGuild(Context.Guild.Id);
@@ -175,7 +173,7 @@ namespace RavenBOT.Modules.Translation.Modules
         [RavenRequireContext(ContextType.Guild)]
         [Command("Whitelist Remove Role")]
         [Summary("adds a role to the translation whitelist.")]
-        [RavenRequireUserPermission(GuildPermission.Administrator)]    
+        [RavenRequireUserPermission(GuildPermission.Administrator)]
         public async Task RemoveWhitelistRole(IRole role)
         {
             await RemoveWhitelistRole(role.Id);
@@ -185,7 +183,7 @@ namespace RavenBOT.Modules.Translation.Modules
         [RavenRequireContext(ContextType.Guild)]
         [Command("Whitelist Remove Role")]
         [Summary("adds a role to the translation whitelist via ID.")]
-        [RavenRequireUserPermission(GuildPermission.Administrator)]    
+        [RavenRequireUserPermission(GuildPermission.Administrator)]
         public async Task RemoveWhitelistRole(ulong roleId)
         {
             var config = TranslateService.GetTranslateGuild(Context.Guild.Id);
@@ -198,7 +196,7 @@ namespace RavenBOT.Modules.Translation.Modules
         [RavenRequireContext(ContextType.Guild)]
         [Command("Toggle Reactions")]
         [Summary("Toggles Translate Reactions in the server")]
-        [RavenRequireUserPermission(GuildPermission.Administrator)]    
+        [RavenRequireUserPermission(GuildPermission.Administrator)]
         public async Task ToggleReactions()
         {
             var config = TranslateService.GetTranslateGuild(Context.Guild.Id);
@@ -211,7 +209,7 @@ namespace RavenBOT.Modules.Translation.Modules
         [RavenRequireContext(ContextType.Guild)]
         [Command("Toggle DM Translations")]
         [Summary("Toggles wether to direct message users translations rather then sending them to the channel")]
-        [RavenRequireUserPermission(GuildPermission.Administrator)]    
+        [RavenRequireUserPermission(GuildPermission.Administrator)]
         public async Task ToggleDmReactions()
         {
             var config = TranslateService.GetTranslateGuild(Context.Guild.Id);
@@ -223,7 +221,7 @@ namespace RavenBOT.Modules.Translation.Modules
         [Priority(100)]
         [RavenRequireContext(ContextType.Guild)]
         [Command("RemoveEmote")]
-        [RavenRequireUserPermission(GuildPermission.Administrator)]    
+        [RavenRequireUserPermission(GuildPermission.Administrator)]
         public async Task RemovePair(Emoji emote)
         {
             var config = TranslateService.GetTranslateGuild(Context.Guild.Id);
@@ -241,7 +239,7 @@ namespace RavenBOT.Modules.Translation.Modules
         [RavenRequireContext(ContextType.Guild)]
         [Command("AddPair")]
         [Summary("Adds a pair for reaction translations")]
-        [RavenRequireUserPermission(GuildPermission.Administrator)]    
+        [RavenRequireUserPermission(GuildPermission.Administrator)]
         public async Task AddPair(string code, Emoji emote)
         {
             await AddPair(emote, code);
@@ -273,7 +271,7 @@ namespace RavenBOT.Modules.Translation.Modules
         [RavenRequireContext(ContextType.Guild)]
         [Command("AddPair")]
         [Summary("Adds a pair for reaction translations")]
-        [RavenRequireUserPermission(GuildPermission.Administrator)]    
+        [RavenRequireUserPermission(GuildPermission.Administrator)]
         public async Task AddPair(Emoji emote, string code)
         {
             if (!TranslateService.Translator.IsValidLanguageCode(code))
@@ -300,7 +298,7 @@ namespace RavenBOT.Modules.Translation.Modules
                 config.CustomPairs.Add(new LanguageMap.TranslationSet()
                 {
                     EmoteMatches = new List<string> { emote.Name },
-                    LanguageString = code
+                        LanguageString = code
                 });
             }
 
@@ -322,7 +320,7 @@ namespace RavenBOT.Modules.Translation.Modules
         [RavenRequireContext(ContextType.Guild)]
         [RavenRequireUserPermission(GuildPermission.Administrator)]
         [Command("Redeem")]
-        [Summary("Redeems a translation license")]    
+        [Summary("Redeems a translation license")]
         public async Task RedeemUses([Remainder] string key = "")
         {
             if (string.IsNullOrWhiteSpace(key))
@@ -362,7 +360,7 @@ namespace RavenBOT.Modules.Translation.Modules
         [RavenRequireContext(ContextType.Guild)]
         [RavenRequireUserPermission(GuildPermission.Administrator)]
         [Command("History")]
-        [Summary("Shows translation history")]    
+        [Summary("Shows translation history")]
         public async Task ServerHistory()
         {
             var profile = TranslateService.License.GetQuantifiableUser(TranslateService.TranslateType, Context.Guild.Id);
@@ -379,7 +377,7 @@ namespace RavenBOT.Modules.Translation.Modules
         [RavenRequireContext(ContextType.Guild)]
         [RavenRequireUserPermission(GuildPermission.Administrator)]
         [Command("Settings")]
-        [Summary("Shows settings")]    
+        [Summary("Shows settings")]
         public async Task Settings()
         {
             var profile = TranslateService.License.GetQuantifiableUser(TranslateService.TranslateType, Context.Guild.Id);
@@ -395,7 +393,7 @@ namespace RavenBOT.Modules.Translation.Modules
         }
 
         [Priority(100)]
-        [RavenRequireOwner]    
+        [RavenRequireOwner]
         [Command("GenerateLicenses")]
         public async Task GenerateLicenses(int quantity, int uses)
         {
@@ -407,7 +405,7 @@ namespace RavenBOT.Modules.Translation.Modules
         }
 
         [Priority(100)]
-        [RavenRequireOwner]    
+        [RavenRequireOwner]
         [Command("SetApiKey")]
         public async Task SetApiKey(string apiKey = null)
         {
@@ -418,7 +416,7 @@ namespace RavenBOT.Modules.Translation.Modules
         }
 
         [Priority(100)]
-        [RavenRequireOwner]    
+        [RavenRequireOwner]
         [Command("SetApiType")]
         public async Task SetApiType(TranslateConfig.ApiKey apiKeyType)
         {
@@ -429,7 +427,7 @@ namespace RavenBOT.Modules.Translation.Modules
         }
 
         [Priority(100)]
-        [RavenRequireOwner]    
+        [RavenRequireOwner]
         [Command("ToggleTranslation")]
         [Summary("Toggles translation services for all services")]
         public async Task ToggleTranslation()
@@ -441,12 +439,12 @@ namespace RavenBOT.Modules.Translation.Modules
         }
 
         [Priority(100)]
-        [RavenRequireOwner]    
+        [RavenRequireOwner]
         [Command("ResetReactionTranslationKeys")]
         [Summary("Resets reaction translation configurations")]
         public async Task ResetReactionTranslationKeys()
         {
-            var configs =TranslateService.Database.Query<TranslateGuild>();
+            var configs = TranslateService.Database.Query<TranslateGuild>();
             var newConfigs = new List<TranslateGuild>();
             foreach (var config in configs)
             {
@@ -461,7 +459,7 @@ namespace RavenBOT.Modules.Translation.Modules
         }
 
         [Priority(100)]
-        [RavenRequireOwner]    
+        [RavenRequireOwner]
         [Command("SetStoreUrl")]
         public async Task SetStoreUrl(string storeUrl = null)
         {

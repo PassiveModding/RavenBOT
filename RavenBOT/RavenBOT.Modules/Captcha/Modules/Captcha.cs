@@ -2,8 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Discord.Addons.Interactive;
 using Discord.Commands;
-using RavenBOT.Common.Attributes;
-using RavenBOT.Common.Services;
+using RavenBOT.Common;
 using RavenBOT.Modules.Captcha.Methods;
 using RavenBOT.Modules.Captcha.Models;
 

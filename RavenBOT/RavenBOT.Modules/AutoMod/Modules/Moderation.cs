@@ -5,9 +5,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
-using RavenBOT.Common.Attributes;
-using RavenBOT.Common.Services;
-using RavenBOT.Extensions;
+using RavenBOT.Common;
 using RavenBOT.Modules.AutoMod.Methods;
 using RavenBOT.Modules.AutoMod.Models.Moderation;
 

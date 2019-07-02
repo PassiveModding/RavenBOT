@@ -3,7 +3,7 @@ using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.Commands.Builders;
 
-namespace RavenBOT.Common.Bases
+namespace RavenBOT.Common
 {
     /// <summary>
     /// Interactive base extension which implements module prefixes without the additional space delimiter.

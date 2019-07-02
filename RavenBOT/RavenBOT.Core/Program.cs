@@ -8,12 +8,8 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using RavenBOT.Common;
-using RavenBOT.Common.Interfaces;
 using RavenBOT.Common.Interfaces.Database;
-using RavenBOT.Models;
 using EventHandler = RavenBOT.Handlers.EventHandler;
-using RavenBOT.Common.Handlers;
-using RavenBOT.Common.Services;
 
 namespace RavenBOT
 {

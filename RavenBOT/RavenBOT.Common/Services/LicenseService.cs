@@ -1,12 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Raven.Client.Documents.Operations;
-using Raven.Client.Documents.Queries;
-using RavenBOT.Common.Interfaces;
-using RavenBOT.Common.Interfaces.Database;
 
-namespace RavenBOT.Common.Services
+namespace RavenBOT.Common
 {
     public class LicenseService
     {

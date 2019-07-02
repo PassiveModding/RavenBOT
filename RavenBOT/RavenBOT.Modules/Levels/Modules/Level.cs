@@ -5,9 +5,7 @@ using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
-using RavenBOT.Common.Attributes;
-using RavenBOT.Common.Services;
-using RavenBOT.Extensions;
+using RavenBOT.Common;
 using RavenBOT.Modules.Levels.Methods;
 using RavenBOT.Modules.Levels.Models;
 

@@ -5,8 +5,6 @@ using Discord;
 using Discord.WebSocket;
 using Newtonsoft.Json.Linq;
 using RavenBOT.Common;
-using RavenBOT.Common.Interfaces;
-using RavenBOT.Common.Services;
 using RavenBOT.Modules.RoleManagement.Models;
 
 namespace RavenBOT.Modules.RoleManagement.Methods

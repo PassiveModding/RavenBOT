@@ -8,7 +8,8 @@ namespace RavenBOT.Modules.Translation.Methods
         {
             BaseCulture = culture;
             string specName = "(none)";
-            try { specName = CultureInfo.CreateSpecificCulture(BaseCulture.Name).Name; } catch { }
+            try { specName = CultureInfo.CreateSpecificCulture(BaseCulture.Name).Name; }
+            catch {}
             SpecificName = specName;
         }
         public CultureInfo BaseCulture { get; }

@@ -5,9 +5,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
-using RavenBOT.Common.Attributes;
-using RavenBOT.Common.Services;
-using RavenBOT.Extensions;
+using RavenBOT.Common;
 using RavenBOT.Modules.Tags.Methods;
 
 namespace RavenBOT.Modules.Tags.Modules
@@ -56,7 +54,7 @@ namespace RavenBOT.Modules.Tags.Modules
         [Priority(100)]
         [Command("Add")]
         [Summary("Adds a new tag with the given name and message")]
-        [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]    
+        [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
         public async Task AddTag([Summary("Wrap this in quotations if you want it to use spaces")] string name, [Remainder] string response)
         {
             var config = TagManager.GetTagGuild(Context.Guild.Id);
@@ -75,7 +73,7 @@ namespace RavenBOT.Modules.Tags.Modules
         [Priority(100)]
         [Command("Remove")]
         [Summary("Removes the specified tag")]
-        [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]    
+        [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
         public async Task RemoveTag([Remainder] string name)
         {
             var config = TagManager.GetTagGuild(Context.Guild.Id);

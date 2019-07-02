@@ -1,15 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Text;
-using System.Threading.Tasks;
 using Discord;
-using Newtonsoft.Json.Linq;
 
-namespace RavenBOT.Extensions
+namespace RavenBOT.Common
 {
-    public static class StringExtensions
+    public static partial class Extensions
     {
         public static string FixLength(this string value, int length = 1023)
         {

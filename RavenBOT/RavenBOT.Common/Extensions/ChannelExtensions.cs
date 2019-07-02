@@ -1,13 +1,11 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 
-namespace RavenBOT.Common.Extensions
+namespace RavenBOT.Common
 {
-    public static class ChannelExtensions
+    public static partial class Extensions
     {        
         public static async Task<IMessage[]> GetFlattenedMessagesAsync(this ISocketMessageChannel channel, int count = 100)
         {

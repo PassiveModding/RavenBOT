@@ -1,7 +1,7 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using Google.Cloud.Translation.V2;
 
 namespace RavenBOT.Modules.Translation.Methods
@@ -41,8 +41,8 @@ namespace RavenBOT.Modules.Translation.Methods
             var gCultureResponse = TranslationClient.ListLanguages();
 
             AvailableLanguages = cultures
-                        .Where(c => gCultureResponse.Any(g => g.Code.Equals(c.BaseCulture.Name, StringComparison.InvariantCultureIgnoreCase) || g.Code.Equals(c.SpecificName, StringComparison.InvariantCultureIgnoreCase)))
-                        .ToArray();
+                .Where(c => gCultureResponse.Any(g => g.Code.Equals(c.BaseCulture.Name, StringComparison.InvariantCultureIgnoreCase) || g.Code.Equals(c.SpecificName, StringComparison.InvariantCultureIgnoreCase)))
+                .ToArray();
         }
 
         public TranslateService.TranslateResponse.TranslationResult TranslateText(string source, string targetLanguage)
@@ -74,7 +74,7 @@ namespace RavenBOT.Modules.Translation.Methods
             {
                 return null;
             }
-            
+
             if (!IsValidLanguageCode(targetLanguage))
             {
                 throw new Exception("Invalid Target Language Code.");

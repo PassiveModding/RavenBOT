@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Discord.WebSocket;
 
-namespace RavenBOT.Common.Services
+namespace RavenBOT.Common
 {
     public class ShardChecker : IServiceable
     {

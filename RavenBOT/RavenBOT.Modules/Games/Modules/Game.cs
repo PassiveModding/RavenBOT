@@ -5,8 +5,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
-using RavenBOT.Common.Attributes;
-using RavenBOT.Common.Services;
+using RavenBOT.Common;
 using RavenBOT.Modules.Games.Methods;
 
 namespace RavenBOT.Modules.Games.Modules
@@ -56,7 +55,7 @@ namespace RavenBOT.Modules.Games.Modules
 
         [Command("DailyReward", RunMode = RunMode.Async)]
         [Summary("Get 200 free coins")]
-        [RateLimit(2, 23, Measure.Hours)]        
+        [RateLimit(2, 23, Measure.Hours)]
         public async Task DailyRewardAsync()
         {
             var guildobj = GameService.GetGameServer(Context.Guild.Id);

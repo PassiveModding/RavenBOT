@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
+using RavenBOT.Common;
 using RavenBOT.Modules.Moderator.Methods;
-using RavenBOT.Common.Attributes;
 
 namespace RavenBOT.Modules.Moderator.Preconditions
 {

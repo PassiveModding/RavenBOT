@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace RavenBOT.Common.Interfaces
+namespace RavenBOT.Common
 {
     public interface IDatabase
     {

@@ -1,16 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
-using Google.Cloud.Translation.V2;
 using RavenBOT.Common;
-using RavenBOT.Common.Handlers;
-using RavenBOT.Common.Interfaces;
-using RavenBOT.Common.Services;
-using RavenBOT.Extensions;
 using RavenBOT.Modules.Translation.Models;
 
 namespace RavenBOT.Modules.Translation.Methods

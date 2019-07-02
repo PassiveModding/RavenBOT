@@ -6,13 +6,8 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using RavenBOT.Common.Attributes;
-using RavenBOT.Common.Extensions;
-using RavenBOT.Common.Handlers;
-using RavenBOT.Common.Services;
+using RavenBOT.Common;
 using RavenBOT.Core.TypeReaders.EmojiReader;
-using RavenBOT.Extensions;
-using RavenBOT.Models;
 
 namespace RavenBOT.Handlers
 {

@@ -7,8 +7,6 @@ using System.Threading.Tasks;
 using Discord.WebSocket;
 using MoreLinq;
 using RavenBOT.Common;
-using RavenBOT.Common.Interfaces;
-using RavenBOT.Common.Services;
 using RavenBOT.Modules.Levels.Models;
 
 namespace RavenBOT.Modules.Levels.Methods
@@ -208,7 +206,7 @@ namespace RavenBOT.Modules.Levels.Methods
 
         }
 
-        public List<(LevelConfig.LevelReward, SocketRole)> GetRoles(int level, LevelConfig config, SocketGuild guild)
+        public List < (LevelConfig.LevelReward, SocketRole) > GetRoles(int level, LevelConfig config, SocketGuild guild)
         {
             var roles = config.RewardRoles.Where(x => x.LevelRequirement <= level).ToList();
 
@@ -218,7 +216,7 @@ namespace RavenBOT.Modules.Levels.Methods
                 return gRoles;
             }
 
-            return new List<(LevelConfig.LevelReward, SocketRole)>();
+            return new List < (LevelConfig.LevelReward, SocketRole) > ();
         }
 
         public int RequiredExp(int level)

@@ -1,4 +1,4 @@
-namespace RavenBOT.Models
+namespace RavenBOT.Common
 {
     public class LoggerConfig
     {

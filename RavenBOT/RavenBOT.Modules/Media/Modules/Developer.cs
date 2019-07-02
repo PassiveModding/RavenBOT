@@ -2,8 +2,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
-using RavenBOT.Common.Attributes;
-using RavenBOT.Common.Interfaces;
+using RavenBOT.Common;
 using RavenBOT.Modules.Media.Methods;
 
 namespace RavenBOT.Modules.Media.Modules

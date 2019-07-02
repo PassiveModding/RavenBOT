@@ -1,8 +1,8 @@
 using Discord.Commands;
 
-namespace RavenBOT.Common.Extensions
+namespace RavenBOT.Common
 {
-    public static class CommandExtensions
+    public static partial class Extensions
     {
         public static string ParameterInformation(this ParameterInfo parameter)
         {

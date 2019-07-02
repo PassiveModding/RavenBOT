@@ -1,8 +1,6 @@
 using System.Collections.Generic;
-using RavenBOT.Common;
-using RavenBOT.Common.Interfaces;
 
-namespace RavenBOT.Models
+namespace RavenBOT.Common
 {
     public class DeveloperSettings : IServiceable
     {

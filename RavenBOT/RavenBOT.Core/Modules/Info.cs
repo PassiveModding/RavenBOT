@@ -8,10 +8,7 @@ using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
 using Newtonsoft.Json.Linq;
-using RavenBOT.Common.Attributes;
-using RavenBOT.Common.Services;
-using RavenBOT.Extensions;
-using RavenBOT.Models;
+using RavenBOT.Common;
 
 namespace RavenBOT.Modules
 {

@@ -2,8 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Discord.Addons.Interactive;
 using Discord.Commands;
-using RavenBOT.Common.Attributes;
-using RavenBOT.Common.Services;
+using RavenBOT.Common;
 using RavenBOT.Modules.Automessage.Methods;
 using RavenBOT.Modules.Automessage.Models;
 

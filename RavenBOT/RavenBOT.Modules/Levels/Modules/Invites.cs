@@ -1,10 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
-using RavenBOT.Common.Attributes;
+using RavenBOT.Common;
 using RavenBOT.Modules.Levels.Methods;
 using RavenBOT.Modules.Levels.Models;
 
@@ -14,7 +13,7 @@ namespace RavenBOT.Modules.Levels.Modules
     {
         public async Task UserJoinedAsync(SocketGuildUser user)
         {
-            var _ = Task.Run(async () =>
+            var _ = Task.Run(async() =>
             {
                 if (!user.Guild.CurrentUser.GuildPermissions.ManageGuild)
                 {
@@ -76,7 +75,7 @@ namespace RavenBOT.Modules.Levels.Modules
                 levelUser.Item1.UserXP += 100;
                 LevelService.Database.Store(levelUser.Item1, LevelUser.DocumentName(levelUser.Item1.UserId, levelUser.Item1.GuildId));
 
-                LevelService.Database.Store(guildObj, LevelInviteTracker.DocumentName(user.Guild.Id));                
+                LevelService.Database.Store(guildObj, LevelInviteTracker.DocumentName(user.Guild.Id));
             });
 
         }
@@ -89,7 +88,6 @@ namespace RavenBOT.Modules.Levels.Modules
 
             public List<ulong> TrackedUsers { get; set; } = new List<ulong>();
         }
-
 
         [Command("ToggleInviteXP")]
         [Summary("Allows users to earn 100xp for every user that is invited through one of their invites.")]
@@ -104,7 +102,7 @@ namespace RavenBOT.Modules.Levels.Modules
                 await ReplyAsync("Leveling must be enabled before enabling invite levels.");
                 return;
             }
-            
+
             var guildObj = LevelService.Database.Load<LevelInviteTracker>(LevelInviteTracker.DocumentName(Context.Guild.Id));
             if (guildObj == null)
             {

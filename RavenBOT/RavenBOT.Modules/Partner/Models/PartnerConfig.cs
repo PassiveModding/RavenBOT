@@ -77,7 +77,7 @@ namespace RavenBOT.Modules.Partner.Models
                         inviteData = currentInvites.First();
                     }
 
-                    return inviteData;                    
+                    return inviteData;
                 }
                 else
                 {
@@ -92,7 +92,7 @@ namespace RavenBOT.Modules.Partner.Models
 
         }
 
-        public async Task<(bool, EmbedBuilder)> GetEmbedAsync(SocketGuild guild)
+        public async Task < (bool, EmbedBuilder) > GetEmbedAsync(SocketGuild guild)
         {
             var builder = new EmbedBuilder();
             builder.Description = Message ?? "";
@@ -115,7 +115,7 @@ namespace RavenBOT.Modules.Partner.Models
             builder.Fields.Add(new EmbedFieldBuilder
             {
                 Name = "Invite",
-                Value = invite?.Url ?? "N/A This server does not have a non-expiring invite available or the bot does not have manage server permissions."
+                    Value = invite?.Url ?? "N/A This server does not have a non-expiring invite available or the bot does not have manage server permissions."
             });
 
             return (invite != null, builder);

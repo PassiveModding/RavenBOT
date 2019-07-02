@@ -7,9 +7,9 @@ using Discord;
 using Discord.WebSocket;
 using MoreLinq;
 
-namespace RavenBOT.Extensions
+namespace RavenBOT.Common
 {
-    public static class GuildExtensions
+    public static partial class Extensions
     {
         public static async Task<IVoiceChannel> GetVoiceChannel(this IUser user)
         {

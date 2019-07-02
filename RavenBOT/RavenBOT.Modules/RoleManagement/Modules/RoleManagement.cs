@@ -7,9 +7,7 @@ using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
 using MoreLinq;
-using RavenBOT.Common.Attributes;
-using RavenBOT.Common.Services;
-using RavenBOT.Extensions;
+using RavenBOT.Common;
 using RavenBOT.Modules.RoleManagement.Methods;
 using RavenBOT.Modules.RoleManagement.Models;
 
@@ -17,7 +15,7 @@ namespace RavenBOT.Modules.RoleManagement.Modules
 {
     [Group("RoleManager")]
     [RavenRequireContext(ContextType.Guild)]
-    [RavenRequireBotPermission(GuildPermission.ManageRoles)]    
+    [RavenRequireBotPermission(GuildPermission.ManageRoles)]
     public class RoleManagement : InteractiveBase<ShardedCommandContext>
     {
         public RoleManagement(RoleManager manager, HelpService helpService)
@@ -58,7 +56,7 @@ namespace RavenBOT.Modules.RoleManagement.Modules
 
         [Command("CreateMessage")]
         [Summary("Creates an embedded message which users can react to in order to receive the specified role.")]
-        [RavenRequireUserPermission(GuildPermission.Administrator)]    
+        [RavenRequireUserPermission(GuildPermission.Administrator)]
         public async Task RoleMessageAsync(params IRole[] roles)
         {
             if (!roles.Any())
@@ -209,7 +207,7 @@ namespace RavenBOT.Modules.RoleManagement.Modules
         }
 
         [Command("RemoveYoutubeSub")]
-        [RavenRequireUserPermission(GuildPermission.Administrator)]    
+        [RavenRequireUserPermission(GuildPermission.Administrator)]
         public async Task SubRoleRemove(string displayName)
         {
             var config = Manager.GetYTConfig(Context.Guild.Id);
@@ -233,7 +231,7 @@ namespace RavenBOT.Modules.RoleManagement.Modules
         }
 
         [Command("SetYoutubeSub")]
-        [RavenRequireUserPermission(GuildPermission.Administrator)]    
+        [RavenRequireUserPermission(GuildPermission.Administrator)]
         public async Task SubRoleCreate(string displayName, string subChannelId, IRole role)
         {
             var config = Manager.GetOrCreateYTConfig(Context.Guild.Id);
@@ -258,7 +256,7 @@ namespace RavenBOT.Modules.RoleManagement.Modules
 
         [Command("SetYoutubeApiKey")]
         [Summary("Set the youtube api key for checking the subscription status of users.")]
-        [RavenRequireOwner]    
+        [RavenRequireOwner]
         public async Task SetYoutubeApiKeyAsync([Remainder] string key)
         {
             var config = Manager.Database.Load<YoutubeConfig>(YoutubeConfig.DocumentName());

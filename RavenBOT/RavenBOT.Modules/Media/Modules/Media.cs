@@ -5,8 +5,7 @@ using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using Newtonsoft.Json;
-using RavenBOT.Common.Attributes;
-using RavenBOT.Extensions;
+using RavenBOT.Common;
 using RavenBOT.Modules.Media.Methods;
 using RavenBOT.Modules.Media.Models;
 

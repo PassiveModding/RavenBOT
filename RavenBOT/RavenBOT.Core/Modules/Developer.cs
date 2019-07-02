@@ -6,10 +6,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using RavenBOT.Common.Attributes;
-using RavenBOT.Common.Handlers;
-using RavenBOT.Common.Interfaces;
-using RavenBOT.Models;
+using RavenBOT.Common;
 
 namespace RavenBOT.Modules.Developer
 {

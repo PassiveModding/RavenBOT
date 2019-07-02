@@ -1,13 +1,10 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 using RavenBOT.Common;
-using RavenBOT.Common.Interfaces;
-using RavenBOT.Common.Services;
 using RavenBOT.Modules.Partner.Models;
 
 namespace RavenBOT.Modules.Partner.Methods
@@ -27,7 +24,7 @@ namespace RavenBOT.Modules.Partner.Methods
 
             Random = new Random();
         }
-        
+
         public IDatabase Database { get; }
         public DiscordShardedClient Client { get; }
         public Timer Timer { get; set; }
@@ -69,7 +66,7 @@ namespace RavenBOT.Modules.Partner.Methods
                 .Select(x => new GroupedConfig
                 {
                     Guild = Client.GetGuild(x.GuildId),
-                    Config = x
+                        Config = x
                 })
                 .Where(x => x.Guild != null)
                 .ToList();

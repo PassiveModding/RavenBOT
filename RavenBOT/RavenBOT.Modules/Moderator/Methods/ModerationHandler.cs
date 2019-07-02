@@ -7,10 +7,6 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using RavenBOT.Common;
-using RavenBOT.Common.Extensions;
-using RavenBOT.Common.Interfaces;
-using RavenBOT.Common.Services;
-using RavenBOT.Extensions;
 using RavenBOT.Modules.Moderator.Models;
 
 namespace RavenBOT.Modules.Moderator.Methods
@@ -153,7 +149,7 @@ namespace RavenBOT.Modules.Moderator.Methods
             {
                 config = new ModeratorConfig
                 {
-                    GuildId = guildId
+                GuildId = guildId
                 };
                 SaveModeratorConfig(config);
             }
@@ -189,7 +185,7 @@ namespace RavenBOT.Modules.Moderator.Methods
 
             return config;
         }
-  
+
         public async Task LogMessageAsync(ShardedCommandContext context, string message, ulong actionedUserId, string reason = null, bool logRecentMessages = true)
         {
             var embed = new EmbedBuilder();
@@ -205,7 +201,7 @@ namespace RavenBOT.Modules.Moderator.Methods
                 Name = $"User: [{actionedUserId}]"
             };
 
-            await LogMessageFinalAsync(embed, context, actionedUserId, message, reason, logRecentMessages);       
+            await LogMessageFinalAsync(embed, context, actionedUserId, message, reason, logRecentMessages);
         }
 
         private async Task ContextFreeLogMessageFinalAsync(SocketGuild guild, IUser moderator, IUser target, string message, string reason = null)
@@ -224,21 +220,21 @@ namespace RavenBOT.Modules.Moderator.Methods
             }
 
             var fields = new List<EmbedFieldBuilder>()
-            {                
+            {
                 new EmbedFieldBuilder
                 {
-                    Name = "Action",
-                    Value = message?.FixLength(1023) ?? "N/A"
+                Name = "Action",
+                Value = message?.FixLength(1023) ?? "N/A"
                 },
                 new EmbedFieldBuilder
                 {
-                    Name = "Reason",
-                    Value = reason?.FixLength(1023) ?? "N/A"
+                Name = "Reason",
+                Value = reason?.FixLength(1023) ?? "N/A"
                 },
                 new EmbedFieldBuilder
                 {
-                    Name = "Moderator",
-                    Value = $"{moderator.Username}#{moderator.Discriminator} ({moderator.Id}/{moderator.Mention})"
+                Name = "Moderator",
+                Value = $"{moderator.Username}#{moderator.Discriminator} ({moderator.Id}/{moderator.Mention})"
                 }
             };
 
@@ -247,7 +243,7 @@ namespace RavenBOT.Modules.Moderator.Methods
             embed = embed.WithCurrentTimestamp();
 
             await logChannel.SendMessageAsync("", false, embed.Build());
-        }        
+        }
 
         private async Task LogMessageFinalAsync(EmbedBuilder embed, ShardedCommandContext context, ulong actionedUserId, string message, string reason = null, bool logRecentMessages = false)
         {
@@ -268,18 +264,18 @@ namespace RavenBOT.Modules.Moderator.Methods
             {
                 new EmbedFieldBuilder
                 {
-                    Name = "Action",
-                    Value = message?.FixLength(1023) ?? context.Message.Content?.FixLength(1023)
+                Name = "Action",
+                Value = message?.FixLength(1023) ?? context.Message.Content?.FixLength(1023)
                 },
                 new EmbedFieldBuilder
                 {
-                    Name = "Reason",
-                    Value = reason?.FixLength(1023) ?? "N/A"
+                Name = "Reason",
+                Value = reason?.FixLength(1023) ?? "N/A"
                 },
                 new EmbedFieldBuilder
                 {
-                    Name = "Moderator",
-                    Value = $"{context.User.Username}#{context.User.Discriminator} ({context.User.Id}/{context.User.Mention})"
+                Name = "Moderator",
+                Value = $"{context.User.Username}#{context.User.Discriminator} ({context.User.Id}/{context.User.Mention})"
                 }
             };
 
@@ -288,7 +284,8 @@ namespace RavenBOT.Modules.Moderator.Methods
                 var messages = await context.Channel.GetFlattenedMessagesAsync(25);
                 if (messages.Any(x => x.Author.Id == actionedUserId))
                 {
-                    var chatLog = string.Join("\n", messages.Select(x => {
+                    var chatLog = string.Join("\n", messages.Select(x =>
+                    {
                         if (x.Author.Id == actionedUserId)
                         {
                             return $"**{x.Author.Username}#{x.Author.Discriminator}**: {x.Content}";
@@ -297,12 +294,12 @@ namespace RavenBOT.Modules.Moderator.Methods
                         {
                             return $"*{x.Author.Username}#{x.Author.Discriminator}*: {x.Content}";
                         }
-                        
+
                     }));
                     fields.Add(new EmbedFieldBuilder
                     {
                         Name = "Chat Log",
-                        Value = chatLog.FixLength(1023)
+                            Value = chatLog.FixLength(1023)
                     });
                 }
             }
@@ -320,8 +317,8 @@ namespace RavenBOT.Modules.Moderator.Methods
             {
                 embed.Author = new EmbedAuthorBuilder
                 {
-                    IconUrl = actionedUser.GetAvatarUrl(),
-                    Name = actionedUser.Nickname ?? $"{actionedUser.Username}#{actionedUser.Discriminator}"
+                IconUrl = actionedUser.GetAvatarUrl(),
+                Name = actionedUser.Nickname ?? $"{actionedUser.Username}#{actionedUser.Discriminator}"
                 };
             }
 

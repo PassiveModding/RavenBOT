@@ -5,8 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Discord.WebSocket;
 using RavenBOT.Common;
-using RavenBOT.Common.Interfaces;
-using RavenBOT.Common.Services;
 using RavenBOT.Modules.StatChannels.Models;
 
 namespace RavenBOT.Modules.StatChannels.Methods

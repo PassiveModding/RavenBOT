@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
-using RavenBOT.Extensions;
 
-namespace RavenBOT.Common.Attributes
+namespace RavenBOT.Common
 {
     /// <summary> Used to set behavior of the rate limit </summary>
     [Flags]

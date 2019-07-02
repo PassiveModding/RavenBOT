@@ -7,8 +7,7 @@ using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using Newtonsoft.Json.Linq;
-using RavenBOT.Common.Attributes;
-using RavenBOT.Common.Services;
+using RavenBOT.Common;
 using RavenBOT.Modules.Media.Methods;
 
 namespace RavenBOT.Modules.Media.Modules
@@ -106,7 +105,6 @@ namespace RavenBOT.Modules.Media.Modules
                 await ReplyAsync(string.Empty, false, embed.Build());
             }
         }
-
 
         [Command("tits", RunMode = RunMode.Async)]
         [Alias("boobs", "rack")]

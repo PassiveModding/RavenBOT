@@ -6,8 +6,7 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using MoreLinq;
-using RavenBOT.Common.Attributes;
-using RavenBOT.Extensions;
+using RavenBOT.Common;
 
 namespace RavenBOT.Modules.Moderator.Modules
 {
@@ -147,7 +146,7 @@ namespace RavenBOT.Modules.Moderator.Modules
                 foreach (var role in unmentionable)
                 {
                     await role.ModifyAsync(x => x.Mentionable = false);
-                }                
+                }
             }
         }
     }

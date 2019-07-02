@@ -7,12 +7,8 @@ using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using MoreLinq;
-using RavenBOT.Common.Attributes;
-using RavenBOT.Common.Extensions;
-using RavenBOT.Extensions;
-using RavenBOT.Models;
 
-namespace RavenBOT.Common.Services
+namespace RavenBOT.Common
 {
     public class HelpService
     {

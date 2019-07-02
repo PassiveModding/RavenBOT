@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 
-namespace RavenBOT.Common.Attributes
+namespace RavenBOT.Common
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
     public class RavenRequireOwnerAttribute : PreconditionBase

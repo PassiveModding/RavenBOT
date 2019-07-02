@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -12,11 +12,8 @@ using HtmlAgilityPack;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RavenBOT.Common;
-using RavenBOT.Common.Handlers;
-using RavenBOT.Common.Interfaces;
 using Victoria;
 using Victoria.Entities;
-using RavenBOT.Common.Services;
 
 namespace RavenBOT.Modules.Music.Methods
 {

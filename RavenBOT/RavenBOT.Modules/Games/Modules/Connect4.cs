@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
-using RavenBOT.Extensions;
+using RavenBOT.Common;
 using RavenBOT.Modules.Games.Models;
 
 namespace RavenBOT.Modules.Games.Modules

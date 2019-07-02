@@ -5,7 +5,7 @@ using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
-using RavenBOT.Extensions;
+using RavenBOT.Common;
 
 namespace RavenBOT.Modules.Info.Modules
 {

@@ -6,21 +6,45 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 using RavenBOT.Common;
-using RavenBOT.Common.Interfaces;
-using RavenBOT.Common.Services;
-using RavenBOT.Extensions;
 using RavenBOT.Modules.Reminders.Models;
 
 namespace RavenBOT.Modules.Reminders.Methods
 {
     public class ReminderHandler : IServiceable
     {
-        private IDatabase Database { get; }
+        public IDatabase Database { get; }
         private DiscordShardedClient Client { get; }
         public LocalManagementService LocalManagementService { get; }
-        private Timer Timer { get; set; }
+        private System.Threading.Timer Timer { get; set; }
 
         private List<Reminder> Reminders { get; set; }
+
+        public List<PersistentReminderTimer> PersistentReminders { get; set; }
+
+        public class PersistentReminderTimer
+        {
+            public PersistentReminder Reminder { get; set; }
+            public Timer Timer { get; set; }
+        }
+
+        public TimeSpan GetTimerFirstRunTime(PersistentReminder reminder)
+        {
+            var day = new TimeSpan(24, 0, 0);
+            var now = TimeSpan.Parse(DateTime.UtcNow.ToString("HH:mm"));
+            TimeSpan timeLeftUntilFirstRun = (day - now) + reminder.ActivationTime + TimeSpan.FromHours(reminder.GMTAdjustment);
+            if (timeLeftUntilFirstRun.TotalHours > 24)
+                timeLeftUntilFirstRun -= day;
+            return timeLeftUntilFirstRun;
+        }
+
+        public PersistentReminderTimer MakeTimer(PersistentReminder reminder)
+        {
+            return new PersistentReminderTimer
+            {
+                Reminder = reminder,
+                    Timer = new Timer(c => ExecutePersistentReminder(reminder), null, GetTimerFirstRunTime(reminder), new TimeSpan(24, 00, 00))
+            };
+        }
 
         public ReminderHandler(IDatabase database, ShardChecker checker, DiscordShardedClient client, LocalManagementService localManagementService)
         {
@@ -28,19 +52,91 @@ namespace RavenBOT.Modules.Reminders.Methods
             Client = client;
             LocalManagementService = localManagementService;
             Reminders = Database.Query<Reminder>().ToList();
+            PersistentReminders = Database.Query<PersistentReminder>().Select(MakeTimer).ToList();
+
             checker.AllShardsReady += () =>
             {
-                Timer = new Timer(TimerEvent, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
+                Timer = new System.Threading.Timer(TimerEvent, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
                 return Task.CompletedTask;
             };
+        }
+        public void ExecutePersistentReminder(PersistentReminder reminder)
+        {
+            var _ = Task.Run(async() =>
+            {
+                if (!LocalManagementService.LastConfig.IsAcceptable(reminder.GuildId))
+                {
+                    return;
+                }
+
+                var channel = Client.GetGuild(reminder.GuildId)?.GetTextChannel(reminder.ChannelId);
+                var user = Client.GetUser(reminder.UserId);
+                if (user == null)
+                {
+                    //Filter out any reminders that contain this user.
+                    PersistentReminders = PersistentReminders.Where(x =>
+                    {
+                        if (x.Reminder.UserId != reminder.UserId)
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            x.Timer.Dispose();
+                            return false;
+                        }
+                    }).ToList();
+                    return;
+                }
+
+                if (channel == null)
+                {
+                    //DM User if available.
+                    var dmChannel = await user.GetOrCreateDMChannelAsync();
+                    if (dmChannel != null)
+                    {
+                        await dmChannel.SendMessageAsync(reminder.ReminderMessage).ConfigureAwait(false);
+                    }
+                    return;
+                }
+
+                await channel.SendMessageAsync($"{user.Mention}", false, new EmbedBuilder()
+                {
+                    Description = $"{reminder.ReminderMessage}".FixLength(1024),
+                        Color = Color.Green
+                }.Build()).ConfigureAwait(false);
+            });
         }
 
         //NOTE: Reminder ID is discarded and re-set here
         public void AddReminder(Reminder reminder)
         {
-            reminder.ReminderNumber = Reminders.Any() ? Reminders.Max(x => x.ReminderNumber) + 1 : 1;;
+            reminder.ReminderNumber = Reminders.Any() ? Reminders.Max(x => x.ReminderNumber) + 1 : 1;
             Reminders.Add(reminder);
             Database.Store(reminder, Reminder.DocumentName(reminder.GuildId, reminder.ReminderNumber));
+        }
+
+        public PersistentReminder AddReminder(PersistentReminder reminder)
+        {
+            reminder.ReminderNumber = PersistentReminders.Any() ? PersistentReminders.Where(x => x.Reminder.UserId == reminder.UserId).Max(x => x.Reminder.ReminderNumber) + 1 : 1;
+            PersistentReminders.Add(MakeTimer(reminder));
+            Database.Store(reminder, Reminder.DocumentName(reminder.GuildId, reminder.ReminderNumber));
+            return reminder;
+        }
+
+        public void RemoveReminder(PersistentReminder reminder)
+        {
+            PersistentReminders = PersistentReminders.Where(x =>
+            {
+                if (x.Reminder.UserId == reminder.UserId && x.Reminder.ReminderNumber == reminder.ReminderNumber)
+                {
+                    x.Timer.Dispose();
+                    return false;
+                }
+
+                return true;
+            }).ToList();
+            Database.Remove<PersistentReminder>(PersistentReminder.DocumentName(reminder.GuildId, reminder.UserId, reminder.ReminderNumber));
         }
 
         public void RemoveReminder(Reminder reminder)

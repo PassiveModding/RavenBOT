@@ -7,8 +7,7 @@ using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using Newtonsoft.Json;
-using RavenBOT.Common.Attributes;
-using RavenBOT.Extensions;
+using RavenBOT.Common;
 
 namespace RavenBOT.Modules.Games.Modules
 {

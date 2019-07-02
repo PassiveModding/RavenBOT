@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Discord.Commands;
 
-namespace RavenBOT.Common.Attributes
+namespace RavenBOT.Common
 {
     //[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, Inherited = false)]
 

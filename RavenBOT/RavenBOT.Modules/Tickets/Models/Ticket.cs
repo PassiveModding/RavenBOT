@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using Discord;
 using Discord.WebSocket;
-using RavenBOT.Extensions;
+using RavenBOT.Common;
 
 namespace RavenBOT.Modules.Tickets.Models
 {

@@ -1,6 +1,6 @@
 using Discord.Commands;
 
-namespace RavenBOT.Models
+namespace RavenBOT.Common
 {
     public class LogContext
     {

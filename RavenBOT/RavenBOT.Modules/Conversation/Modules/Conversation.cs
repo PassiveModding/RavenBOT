@@ -2,7 +2,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Discord.Addons.Interactive;
 using Discord.Commands;
-using RavenBOT.Common.Attributes;
+using RavenBOT.Common;
 using RavenBOT.Modules.Conversation.Methods;
 using RavenBOT.Modules.Conversation.Models;
 

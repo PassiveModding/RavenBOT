@@ -7,9 +7,6 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 using RavenBOT.Common;
-using RavenBOT.Common.Interfaces;
-using RavenBOT.Common.Services;
-using RavenBOT.Extensions;
 using RavenBOT.Modules.Events.Models.Events;
 
 namespace RavenBOT.Modules.Events.Methods

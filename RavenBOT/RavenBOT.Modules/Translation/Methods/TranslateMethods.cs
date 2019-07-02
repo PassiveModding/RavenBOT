@@ -2,8 +2,7 @@ using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Discord;
-using Google.Cloud.Translation.V2;
-using RavenBOT.Extensions;
+using RavenBOT.Common;
 using RavenBOT.Modules.Translation.Models;
 
 namespace RavenBOT.Modules.Translation.Methods
@@ -33,7 +32,7 @@ namespace RavenBOT.Modules.Translation.Methods
             public Result ResponseResult { get; set; }
             public TranslationResult TranslateResult { get; set; }
 
-            public class TranslationResult 
+            public class TranslationResult
             {
                 public TranslateConfig.ApiKey ApiType { get; set; }
                 public string SourceLanguage { get; set; }
@@ -146,9 +145,8 @@ namespace RavenBOT.Modules.Translation.Methods
                 if (builder.Fields.Count < 25 && builder.Length < 5900)
                 {
                     builder.AddField("Yandex", "[Powered by Yandex](http://translate.yandex.com/)");
-                }                
+                }
             }
-
 
             return builder;
         }
@@ -194,9 +192,9 @@ namespace RavenBOT.Modules.Translation.Methods
                 if (result != null)
                 {
                     return result;
-                } 
+                }
 
-                return null;               
+                return null;
             }
             catch (Exception e)
             {
@@ -206,7 +204,7 @@ namespace RavenBOT.Modules.Translation.Methods
         }
 
         public static string FixTranslatedString(string value)
-        {            
+        {
             var translationString = value;
 
             try

@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
-using RavenBOT.Common.Attributes;
+using RavenBOT.Common;
 using RavenBOT.Modules.StatChannels.Methods;
 
 namespace RavenBOT.Modules.StatChannels.Modules
@@ -10,7 +10,7 @@ namespace RavenBOT.Modules.StatChannels.Modules
     [Group("Tracking")]
     [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
     [RavenRequireBotPermission(Discord.GuildPermission.ManageChannels)]
-    [RavenRequireContext(ContextType.Guild)]    
+    [RavenRequireContext(ContextType.Guild)]
     public class StatChannel : InteractiveBase<ShardedCommandContext>
     {
         public StatChannel(StatChannelService service)

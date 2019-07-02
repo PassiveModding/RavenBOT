@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Discord.Commands;
 
-namespace RavenBOT.Common.Services
+namespace RavenBOT.Common
 {
     public class ModuleService
     {

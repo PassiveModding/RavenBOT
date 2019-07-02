@@ -1,7 +1,7 @@
 using System;
 using Discord;
 
-namespace RavenBOT.Models
+namespace RavenBOT.Common
 {
     public class BotLogObject
     {

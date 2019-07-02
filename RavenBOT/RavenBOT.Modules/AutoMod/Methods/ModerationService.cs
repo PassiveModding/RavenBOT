@@ -4,8 +4,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord.WebSocket;
 using RavenBOT.Common;
-using RavenBOT.Common.Interfaces;
-using RavenBOT.Common.Services;
 using RavenBOT.Modules.AutoMod.Models;
 using RavenBOT.Modules.AutoMod.Models.Moderation;
 
