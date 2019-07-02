@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace RavenBOT.ELO.Modules.Models
@@ -49,20 +50,39 @@ namespace RavenBOT.ELO.Modules.Models
         /// <returns></returns>
         public Dictionary<string, int> AdditionalProperties { get; set; } = new Dictionary<string, int>();
 
-        public void SetValue(string key, int count)
-        {
-            AdditionalProperties[key] = count;
-        }
-
-        public void UpdateValue(string key, int modifier)
+  
+        public void UpdateValue(string key, ModifyState state, int modifier)
         {
             if (AdditionalProperties.TryGetValue(key, out int value))
             {
-                AdditionalProperties[key] = value + modifier;
+                AdditionalProperties[key] = ModifyValue(state, value, modifier);
             }
             else
             {
-                AdditionalProperties.Add(key, modifier);
+                AdditionalProperties.Add(key, ModifyValue(state, 0, modifier));
+            }
+        }
+
+        
+        public enum ModifyState
+        {
+            Add,
+            Subtract,
+            Set
+        }
+
+        public static int ModifyValue(ModifyState state, int currentAmount, int modifyAmount)
+        {
+            switch (state)
+            {
+                case ModifyState.Add:
+                    return currentAmount + modifyAmount;
+                case ModifyState.Subtract:
+                    return currentAmount - Math.Abs(modifyAmount);
+                case ModifyState.Set:
+                    return modifyAmount;
+                default:
+                    throw new ArgumentException("Provided modifystate is not valid.");
             }
         }
     }

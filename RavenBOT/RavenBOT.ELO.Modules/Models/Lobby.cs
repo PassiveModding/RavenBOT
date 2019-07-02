@@ -47,6 +47,6 @@ namespace RavenBOT.ELO.Modules.Models
 
         //TODO: Allow for votes on maps, reduce change of repeate games on the same map.
         public List<string> Maps { get; set; } = new List<string>();
-        public string LastMap = null;
+        public List<string> MapHistory { get; set; } = new List<string>();
     }
 }
