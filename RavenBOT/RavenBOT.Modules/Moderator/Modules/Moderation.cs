@@ -146,6 +146,21 @@ namespace RavenBOT.Modules.Moderator.Modules
             }
         }
 
+        [Command("Settings")]
+        [Summary("Displays the currently configured moderation settings")]
+        [RavenRequireUserPermission(GuildPermission.Administrator)]
+        public async Task ShowSettingsAsync()
+        {
+            var config = ModHandler.GetActionConfig(Context.Guild.Id);
+            var res = $"Max Warnings: {config.MaxWarnings}\n" +
+                        $"Max Warnings Action: {config.MaxWarningsAction}\n"+
+                        $"Default Mute Time: {config.MuteLength.GetReadableLength()}\n"+
+                        $"Muted Role: {Context.Guild.GetRole(config.MuteRole)?.Mention ?? "N/A"}\n"+
+                        $"Default Soft Ban Time: {config.SoftBanLength.GetReadableLength()}\n"+
+                        $"Log Channel: {Context.Guild.GetTextChannel(config.LogChannelId)?.Mention ?? "N/A"}";
+            await ReplyAsync("", false, res.QuickEmbed());
+        }
+
         [Command("SetMaxWarnings")]
         [Summary("Sets the most warnings a user can receive before an action is taken")]
         [RavenRequireUserPermission(GuildPermission.Administrator)]
