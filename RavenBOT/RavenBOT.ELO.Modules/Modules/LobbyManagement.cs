@@ -312,5 +312,9 @@ namespace RavenBOT.ELO.Modules.Modules
         {
             return users.Select(x => x?.Mention ?? $"[{x.Id}]").ToArray();
         }
+
+        //TODO: if more than x maps are added to the lobby, announce 3 (or so) and allow users to vote on them to pick
+        //Would have 1 minute timeout, then either picks the most voted map or randomly chooses from the most voted.
+        //Would need to have a way of reducing the amount of repeats as well.
     }
 }
