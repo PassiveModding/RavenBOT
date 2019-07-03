@@ -103,6 +103,29 @@ namespace RavenBOT.Common
             return user.GuildPermissions.Administrator;
         }
 
+        public static string GetUserDisplayName(this SocketGuild guild, ulong userId)
+        {
+            var gUser = guild.GetUser(userId);
+            if (gUser == null)
+            {
+                return $"[{userId}]";
+            }
+
+            return GetDisplayName(gUser);
+        }
+
+        public static string GetDisplayName(this SocketGuildUser user)
+        {
+            if (user == null)
+            {
+                return null;
+            }
+            else
+            {
+                return $"{(user.Nickname != null ? $"{user.Nickname} ( {user.Username}#{user.Discriminator} )" : $"{user.Username}#{user.Discriminator}")}";
+            }
+        }
+
         public static string GetMentionList(this IGuild guild, IEnumerable<ulong> roleIds)
         {
             var builder = new StringBuilder();

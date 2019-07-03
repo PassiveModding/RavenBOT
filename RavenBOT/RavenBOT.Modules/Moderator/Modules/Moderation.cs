@@ -54,6 +54,132 @@ namespace RavenBOT.Modules.Moderator.Modules
             }
         }
 
+        //TODO: Display logactiontypes command
+
+        [Command("ModLog")]
+        [Summary("Displays moderation log items")]
+        public async Task ModLogAsync(SocketGuildUser user = null)
+        {
+            var config = ModHandler.GetActionConfig(Context.Guild.Id);
+            EmbedFieldBuilder[] matchedLogs;
+            string headerText;
+            if (user != null)
+            {
+                matchedLogs = config.LogActions.Where(x => x.Target == user.Id).Select(a => new EmbedFieldBuilder
+                    {
+                        Name = $"#{a.CaseId} {a.Action} - {a.TimeStamp.ToShortDateString()} {a.TimeStamp.ToShortTimeString()}",
+                        Value = $"**Moderator**\n" +
+                                $"{Context.Guild.GetUser(a.Moderator)?.Mention ?? Context.Guild.GetUserDisplayName(a.Moderator)}\n" +
+                                $"{ModeratorTime(a.Duration)}" +
+                                $"**Reason**\n" +
+                                $"{a.Reason ?? "N/A"}".FixLength(1023)
+                                
+                    }).ToArray();
+                headerText = $"{user.GetDisplayName()} ModLog";
+            }
+            else
+            {
+                matchedLogs  = config.LogActions.Select(a => new EmbedFieldBuilder
+                    {
+                        Name = $"#{a.CaseId} {a.Action}- {Context.Guild.GetUserDisplayName(a.Target)} {a.TimeStamp.ToShortDateString()} {a.TimeStamp.ToShortTimeString()}",
+                        Value = $"**Moderator**\n" +
+                                $"{Context.Guild.GetUser(a.Moderator)?.Mention ?? Context.Guild.GetUserDisplayName(a.Moderator)}\n" +
+                                $"**User**\n" +
+                                $"{Context.Guild.GetUser(a.Target)?.Mention ?? Context.Guild.GetUserDisplayName(a.Target)}\n" +
+                                $"{ModeratorTime(a.Duration)}" +
+                                $"**Reason**\n" +
+                                $"{a.Reason ?? "N/A"}"
+                                
+                    }).ToArray();
+                headerText = $"Full Mod Log";
+            }
+
+            await SendModLogMessage(matchedLogs, headerText);
+        }
+
+        [Command("ModLog")]
+        [Summary("Displays moderation log items for the specified action type")]
+        public async Task ModLogAsync(ActionConfig.Log.LogAction actionType, SocketGuildUser user = null)
+        {
+            var config = ModHandler.GetActionConfig(Context.Guild.Id);
+            EmbedFieldBuilder[] matchedLogs;
+            string headerText;
+            if (user != null)
+            {
+                matchedLogs = config.LogActions.Where(x => x.Action == actionType && x.Target == user.Id).Select(a => new EmbedFieldBuilder
+                    {
+                        Name = $"#{a.CaseId} - {a.TimeStamp.ToShortDateString()} {a.TimeStamp.ToShortTimeString()}",
+                        Value = $"**Moderator**\n" +
+                                $"{Context.Guild.GetUser(a.Moderator)?.Mention ?? Context.Guild.GetUserDisplayName(a.Moderator)}\n" +
+                                $"{ModeratorTime(a.Duration)}" +
+                                $"**Reason**\n" +
+                                $"{a.Reason ?? "N/A"}".FixLength(1023)
+                                
+                    }).ToArray();
+                headerText = $"{actionType}(s) for {user.GetDisplayName()}";
+            }
+            else
+            {
+                matchedLogs  = config.LogActions.Where(x => x.Action == actionType).Select(a => new EmbedFieldBuilder
+                    {
+                        Name = $"#{a.CaseId} - {Context.Guild.GetUserDisplayName(a.Target)} {a.TimeStamp.ToShortDateString()} {a.TimeStamp.ToShortTimeString()}",
+                        Value = 
+                                $"**Moderator**\n" +
+                                $"{Context.Guild.GetUser(a.Moderator)?.Mention ?? Context.Guild.GetUserDisplayName(a.Moderator)}\n" +
+                                $"**User**\n" +
+                                $"{Context.Guild.GetUser(a.Target)?.Mention ?? Context.Guild.GetUserDisplayName(a.Target)}\n" +
+                                $"{ModeratorTime(a.Duration)}" +
+                                $"**Reason**\n" +
+                                $"{a.Reason ?? "N/A"}".FixLength(1023)                                
+                    }).ToArray();
+                headerText = $"{actionType}(s)";
+            }
+
+            await SendModLogMessage(matchedLogs, headerText);
+        }
+
+        private async Task SendModLogMessage(EmbedFieldBuilder[] fields, string header)
+        {
+            if (!fields.Any())
+            {
+                await ReplyAsync("There are no mod log actions that match the specified search query");
+                return;
+            }
+
+            var pages = fields.SplitList(x => x.Name.Length + x.Value.ToString().Length, 5000).Select(x => new PaginatedMessage.Page
+            {
+                Fields = x.ToList()
+            }).ToList();
+
+            var pager = new PaginatedMessage
+            {
+                Pages = pages,
+                Title = header
+            };
+
+            await PagedReplyAsync(pager, new ReactionList
+            {
+                Forward = true,
+                Backward = true,
+                First = true,
+                Last = true,
+                Trash = true
+            });
+        }
+
+        private string ModeratorTime(TimeSpan? time)
+        {
+            if (time.HasValue)
+            {
+                return $"**Time**\n" +
+                        $"{time.Value.GetReadableLength()}\n";
+            }
+            else
+            {
+                return null;
+            }
+        }
+
         public async Task<bool> IsActionable(SocketGuildUser target, SocketGuildUser currentUser)
         {
             if (target.GuildPermissions.Administrator || target.GuildPermissions.BanMembers)

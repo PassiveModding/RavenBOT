@@ -33,9 +33,49 @@ namespace RavenBOT.Common
             for (var i = 0; i < list.Count(); i += groupSize)
             {
                 splitList.Add(list.Skip(i).Take(groupSize).ToList());
+                //yield return list.Skip(i).Take(groupSize);
             }
 
             return splitList;
+        }
+
+
+        public static IEnumerable<IEnumerable<T>> SplitList<T>(this IEnumerable<T> list, Func<T, int> sumComparator, int maxGroupSum)
+        {
+            var subList = new List<T>();
+            int currentSum = 0;
+
+            foreach (var item in list)
+            {
+                //Get the size of the current item.
+                var addedValue = sumComparator(item);
+
+                //Ensure that the current item will fit in a group
+                if (addedValue > maxGroupSum)
+                {
+                    //TODO: add options to skip fields that exceed the length or add them as a solo group rather than just error out
+                    throw new InvalidOperationException("A fields value is greater than the maximum group value size.");
+                }
+
+                //Add group to splitlist if the new item will exceed the given size.
+                if (currentSum + addedValue > maxGroupSum)
+                {
+                    //splitList.Append(subList);
+                    yield return subList;
+                    //Clear the current sum and the subList
+                    currentSum = 0;
+                    subList = new List<T>();
+                }
+
+                subList.Add(item);
+                currentSum += addedValue;
+            }
+
+            //Return any remaining elements
+            if (subList.Count != 0)
+            {
+                yield return subList;
+            }
         }
 
         public static string GetReadableLength(this TimeSpan length)
