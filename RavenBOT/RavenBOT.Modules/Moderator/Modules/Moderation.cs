@@ -75,7 +75,7 @@ namespace RavenBOT.Modules.Moderator.Modules
                                 $"{a.Reason ?? "N/A"}".FixLength(1023)
                                 
                     }).ToArray();
-                headerText = $"{user.GetDisplayName()} ModLog";
+                headerText = $"{user.GetDisplayName()} ModLog Count = {matchedLogs.Length}";
             }
             else
             {
@@ -91,7 +91,7 @@ namespace RavenBOT.Modules.Moderator.Modules
                                 $"{a.Reason ?? "N/A"}"
                                 
                     }).ToArray();
-                headerText = $"Full Mod Log";
+                headerText = $"Full Mod Log Count = {matchedLogs.Length}";
             }
 
             await SendModLogMessage(matchedLogs, headerText);
@@ -117,6 +117,7 @@ namespace RavenBOT.Modules.Moderator.Modules
                                 
                     }).ToArray();
                 headerText = $"{actionType}(s) for {user.GetDisplayName()}";
+                headerText = $"{actionType}(s) for {user.GetDisplayName()} Count = {matchedLogs.Length}";
             }
             else
             {
@@ -132,7 +133,7 @@ namespace RavenBOT.Modules.Moderator.Modules
                                 $"**Reason**\n" +
                                 $"{a.Reason ?? "N/A"}".FixLength(1023)                                
                     }).ToArray();
-                headerText = $"{actionType}(s)";
+                headerText = $"{actionType}(s) Count = {matchedLogs.Length}";
             }
 
             await SendModLogMessage(matchedLogs, headerText);
