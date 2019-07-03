@@ -34,7 +34,7 @@ namespace RavenBOT.Modules.Reminders.Modules
         [Summary("Schedules a reminder that will run each day at the specified time")]
         public async Task Remind([Summary("This is in 24H time")] string timeOfDay, [Remainder] string message)
         {
-            if (TimeSpan.TryParseExact(timeOfDay, "HH:mm", CultureInfo.InvariantCulture, out TimeSpan result))
+            if (TimeSpan.TryParseExact(timeOfDay, "hh\\:mm", CultureInfo.InvariantCulture, out TimeSpan result))
             {
                 var reminderWithNumber = ReminderHandler.AddReminder(new Models.PersistentReminder
                 {
@@ -46,7 +46,7 @@ namespace RavenBOT.Modules.Reminders.Modules
                         //TODO: Get GMT Time
                 });
 
-                await ReplyAsync($"Reminder #{reminderWithNumber.ReminderNumber}", false, $"At {timeOfDay} each day I will remind you to: {message}".QuickEmbed());
+                await ReplyAsync($"Reminder #{reminderWithNumber.ReminderNumber}, Current Time: {DateTime.UtcNow.ToShortTimeString()}", false, $"At {timeOfDay} each day I will remind you to: {message}".QuickEmbed());
             }
             else
             {
@@ -107,10 +107,10 @@ namespace RavenBOT.Modules.Reminders.Modules
                 new PaginatedMessage.Page
                 {
                     Description = x.ReminderMessage,
-                        Title = $"Reminder: #{x.ReminderNumber} sent in {Context.Client.GetGuild(x.GuildId)?.GetTextChannel(x.ChannelId)?.Mention ?? "DMs"}",
+                        Title = $"Reminder: #{x.ReminderNumber} sent in {Context.Client.GetGuild(x.GuildId)?.GetTextChannel(x.ChannelId)?.Name ?? "DMs"}",
                         FooterOverride = new Discord.EmbedFooterBuilder
                         {
-                            Text = $"At {x.ActivationTime.ToString("HH:mm")} daily {GetGMTString(x.GMTAdjustment)}"
+                            Text = $"At {x.ActivationTime.ToString("hh\\:mm")} daily {GetGMTString(x.GMTAdjustment)}"
                         }
                 }).ToList();
             await PagedReplyAsync(pager, new ReactionList

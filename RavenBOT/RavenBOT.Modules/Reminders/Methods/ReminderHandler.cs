@@ -31,7 +31,7 @@ namespace RavenBOT.Modules.Reminders.Methods
         {
             var day = new TimeSpan(24, 0, 0);
             var now = TimeSpan.Parse(DateTime.UtcNow.ToString("HH:mm"));
-            TimeSpan timeLeftUntilFirstRun = (day - now) + reminder.ActivationTime + TimeSpan.FromHours(reminder.GMTAdjustment);
+            TimeSpan timeLeftUntilFirstRun = (day - now) + reminder.ActivationTime - TimeSpan.FromHours(reminder.GMTAdjustment);
             if (timeLeftUntilFirstRun.TotalHours > 24)
                 timeLeftUntilFirstRun -= day;
             return timeLeftUntilFirstRun;
@@ -39,11 +39,12 @@ namespace RavenBOT.Modules.Reminders.Methods
 
         public PersistentReminderTimer MakeTimer(PersistentReminder reminder)
         {
-            return new PersistentReminderTimer
+            var timer = new PersistentReminderTimer
             {
                 Reminder = reminder,
-                    Timer = new Timer(c => ExecutePersistentReminder(reminder), null, GetTimerFirstRunTime(reminder), new TimeSpan(24, 00, 00))
+                Timer = new Timer(c => ExecutePersistentReminder(reminder), null, GetTimerFirstRunTime(reminder), new TimeSpan(24, 00, 00))
             };
+            return timer;
         }
 
         public ReminderHandler(IDatabase database, ShardChecker checker, DiscordShardedClient client, LocalManagementService localManagementService)
@@ -120,7 +121,7 @@ namespace RavenBOT.Modules.Reminders.Methods
         {
             reminder.ReminderNumber = PersistentReminders.Any() ? PersistentReminders.Where(x => x.Reminder.UserId == reminder.UserId).Max(x => x.Reminder.ReminderNumber) + 1 : 1;
             PersistentReminders.Add(MakeTimer(reminder));
-            Database.Store(reminder, Reminder.DocumentName(reminder.GuildId, reminder.ReminderNumber));
+            Database.Store(reminder, PersistentReminder.DocumentName(reminder.GuildId, reminder.UserId, reminder.ReminderNumber));
             return reminder;
         }
 
