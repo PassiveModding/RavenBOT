@@ -17,11 +17,10 @@ namespace RavenBOT.Modules.Partner.Methods
             Client = client;
             checker.AllShardsReady += () =>
             {
-                Timer = new Timer(TimerEvent, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
+                Timer = new Timer(TimerEvent, null, TimeSpan.Zero, TimeSpan.FromHours(1));
                 return Task.CompletedTask;
             };
-            //Timer = new Timer(TimerEvent, null, TimeSpan.FromSeconds(0), TimeSpan.FromHours(1));
-
+            
             Random = new Random();
         }
 
