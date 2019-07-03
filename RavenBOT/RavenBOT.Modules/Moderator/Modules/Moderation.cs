@@ -54,7 +54,13 @@ namespace RavenBOT.Modules.Moderator.Modules
             }
         }
 
-        //TODO: Display logactiontypes command
+        [Command("ModLogActions")]
+        [Summary("Displays all search query values for mod logs")]
+        public async Task ModLogActionsAsync()
+        {
+            var actions = Extensions.ConvertEnumToDictionary<ActionConfig.Log.LogAction>();
+            await ReplyAsync("", false, string.Join("\n", actions.Select(x => x.Key)).QuickEmbed());
+        }
 
         [Command("ModLog")]
         [Summary("Displays moderation log items")]
@@ -116,7 +122,6 @@ namespace RavenBOT.Modules.Moderator.Modules
                                 $"{a.Reason ?? "N/A"}".FixLength(1023)
                                 
                     }).ToArray();
-                headerText = $"{actionType}(s) for {user.GetDisplayName()}";
                 headerText = $"{actionType}(s) for {user.GetDisplayName()} Count = {matchedLogs.Length}";
             }
             else
