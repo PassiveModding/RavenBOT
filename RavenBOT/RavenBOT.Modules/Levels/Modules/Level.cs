@@ -508,6 +508,7 @@ namespace RavenBOT.Modules.Levels.Modules
             await ReplyAsync("Leaderboard has been reset.");
         }
 
+        /*
         [Command("RebaseXPViaRewards")]
         [Summary("Sets user xp based on the current level role they have.")]
         [RavenRequireUserPermission(GuildPermission.Administrator)]
@@ -557,5 +558,6 @@ namespace RavenBOT.Modules.Levels.Modules
 
             await ReplyAsync($"{updatedUsers.Count} users have been updated");
         }
+        */
     }
 }
