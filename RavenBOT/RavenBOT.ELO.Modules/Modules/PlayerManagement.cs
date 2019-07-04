@@ -1,40 +1,68 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Discord.Commands;
 using Discord.WebSocket;
+using RavenBOT.Common;
 using RavenBOT.ELO.Modules.Bases;
 using RavenBOT.ELO.Modules.Models;
 
 namespace RavenBOT.ELO.Modules.Modules
 {
-    [RequireContext(ContextType.Guild)]
+    [RavenRequireContext(ContextType.Guild)]
     //TODO: Moderator permission instead of just admin
-    //TODO: Use raven preconditions instead of discord defaults
-    [RequireUserPermission(Discord.GuildPermission.Administrator)]
+    [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
     public class PlayerManagement : ELOBase
     {
+        [Command("ModifyStates")]
+        public async Task ModifyStatesAsync()
+        {
+            var states = Extensions.ConvertEnumToDictionary<Player.ModifyState>();
+            await ReplyAsync(string.Join("\n", states.Select(x => x.Key)));
+        }
 
+        //TODO: Response should be an embed.
         [Command("Points")]
         public async Task PointsAsync(SocketGuildUser user, Player.ModifyState state, int amount)
         {
-            var player = Context.Service.GetPlayer(Context.Guild.Id, Context.User.Id);
-            player.Points = Player.ModifyValue(state, player.Points, amount);
-            Context.Service.Database.Store(player, Player.DocumentName(player.GuildId, player.UserId));
-            //TODO: accept multiple users to be modified
-            //TODO: Reply with modified amount/player info(s)
-            await ReplyAsync("Points set.");
+            await PointsAsync(state, amount, user);
+        }
+
+        [Command("Points")]
+        public async Task PointsAsync(Player.ModifyState state, int amount, params SocketGuildUser[] users)
+        {
+            var players = users.Select(x => Context.Service.GetPlayer(Context.Guild.Id, x.Id)).ToList();
+            var responseString = "";
+            foreach (var player in players)
+            {
+                var newVal = Player.ModifyValue(state, player.Points, amount);
+                responseString += $"{player.DisplayName}: {player.Points} => {newVal}\n";
+                player.Points = newVal;
+            }
+            Context.Service.Database.StoreMany(players, x => Player.DocumentName(x.GuildId, x.UserId));
+            await ReplyAsync("", false, responseString.QuickEmbed());
         }
 
         [Command("PlayerModify")]
         public async Task PlayerModifyAsync(SocketGuildUser user, string value, Player.ModifyState state, int amount)
         {
-            //TODO: case insensitive value.
-            var player = Context.Service.GetPlayer(Context.Guild.Id, Context.User.Id);
-            player.UpdateValue(value, state, amount);
-            Context.Service.Database.Store(player, Player.DocumentName(player.GuildId, player.UserId));
-            //TODO: accept multiple users to be modified
-            //TODO: Reply with modified amount/player info(s)
-            await ReplyAsync("Points set.");
+            await PlayersModifyAsync(value, state, amount, user);
+        }
+
+        
+        [Command("PlayersModify")]
+        public async Task PlayersModifyAsync(string value, Player.ModifyState state, int amount, params SocketGuildUser[] users)
+        {
+            //TODO: Value should be case insensitive when searching
+            var players = users.Select(x => Context.Service.GetPlayer(Context.Guild.Id, x.Id)).ToList();
+            var responseString = "";
+            foreach (var player in players)
+            {
+                var response = player.UpdateValue(value, state, amount);
+                responseString += $"{player.DisplayName}: {response.Item1} => {response.Item2}\n";
+            }
+            Context.Service.Database.StoreMany(players, x => Player.DocumentName(x.GuildId, x.UserId));
+            await ReplyAsync("", false, responseString.QuickEmbed());
         }
     }
 }

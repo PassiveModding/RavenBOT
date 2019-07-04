@@ -83,7 +83,7 @@ namespace RavenBOT.ELO.Modules.Modules
         public async Task DisplayCaptainModesAsync()
         {
             var capDict = Extensions.ConvertEnumToDictionary<Lobby.CaptainMode>();
-            await ReplyAsync($"{string.Join("\n", capDict.Keys)}");
+            await ReplyAsync(string.Join("\n", capDict.Keys));
         }
     }
 }

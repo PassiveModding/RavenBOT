@@ -51,16 +51,22 @@ namespace RavenBOT.ELO.Modules.Models
         public Dictionary<string, int> AdditionalProperties { get; set; } = new Dictionary<string, int>();
 
   
-        public void UpdateValue(string key, ModifyState state, int modifier)
+        public (int, int) UpdateValue(string key, ModifyState state, int modifier)
         {
+            int original = 0;
+            int newVal = 0;
             if (AdditionalProperties.TryGetValue(key, out int value))
             {
-                AdditionalProperties[key] = ModifyValue(state, value, modifier);
+                newVal = ModifyValue(state, value, modifier);
+                AdditionalProperties[key] = newVal;
+                original = value;
             }
             else
             {
-                AdditionalProperties.Add(key, ModifyValue(state, 0, modifier));
+                newVal = ModifyValue(state, 0, modifier);
+                AdditionalProperties.Add(key, newVal);
             }
+            return (original, newVal);
         }
 
         
