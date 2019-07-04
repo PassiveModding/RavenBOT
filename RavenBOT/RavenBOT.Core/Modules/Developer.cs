@@ -1,11 +1,14 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.Extensions.DependencyInjection;
 using RavenBOT.Common;
 
 namespace RavenBOT.Modules.Developer
@@ -14,23 +17,17 @@ namespace RavenBOT.Modules.Developer
     [Group("Developer")]
     public class Developer : ModuleBase<SocketCommandContext>
     {
-        public LogHandler Logger { get; }
-        public DeveloperSettings DeveloperSettings { get; }
-        public HttpClient _HttpClient { get; }
-        public IDatabase Database { get; }
+        public IServiceProvider Provider { get; }
 
-        public Developer(LogHandler logger, IDatabase dbService, DeveloperSettings developerSettings, HttpClient httpClient)
+        public Developer(IServiceProvider provider)
         {
-            Logger = logger;
-            DeveloperSettings = developerSettings;
-            _HttpClient = httpClient;
-            Database = dbService;
+            Provider = provider;
         }
 
         [Command("EditHelpPreconditionSkips")]
         public async Task EditHelpPreconditionSkipsAsync(string skip)
         {
-            var settings = DeveloperSettings.GetDeveloperSettings();
+            var settings = Provider.GetRequiredService<DeveloperSettings>().GetDeveloperSettings();
             if (settings.SkippableHelpPreconditions.Contains(skip))
             {
                 await ReplyAsync($"Removed {skip}");
@@ -42,7 +39,7 @@ namespace RavenBOT.Modules.Developer
                 settings.SkippableHelpPreconditions.Add(skip);
             }
 
-            DeveloperSettings.SetDeveloperSettings(settings);
+            Provider.GetRequiredService<DeveloperSettings>().SetDeveloperSettings(settings);
 
             await ReplyAsync("Settings:\n" +
                 $"{string.Join("\n", settings.SkippableHelpPreconditions)}");
@@ -51,9 +48,9 @@ namespace RavenBOT.Modules.Developer
         [Command("ClearHelpPreconditionSkips")]
         public async Task ClearHelpPreconditionSkipsAsync()
         {
-            var settings = DeveloperSettings.GetDeveloperSettings();
+            var settings = Provider.GetRequiredService<DeveloperSettings>().GetDeveloperSettings();
             settings.SkippableHelpPreconditions = new List<string>();
-            DeveloperSettings.SetDeveloperSettings(settings);
+            Provider.GetRequiredService<DeveloperSettings>().SetDeveloperSettings(settings);
 
             await ReplyAsync("Set.");
         }
@@ -61,7 +58,7 @@ namespace RavenBOT.Modules.Developer
         [Command("ViewHelpPreconditionSkips")]
         public async Task ViewHelpPreconditionSkipsAsync()
         {
-            var settings = DeveloperSettings.GetDeveloperSettings();
+            var settings = Provider.GetRequiredService<DeveloperSettings>().GetDeveloperSettings();
             await ReplyAsync("Settings:\n" +
                 $"{string.Join("\n", settings.SkippableHelpPreconditions)}");
         }
@@ -82,10 +79,10 @@ namespace RavenBOT.Modules.Developer
             }
 
             var file = Context.Message.Attachments.FirstOrDefault();
-            var stream = await _HttpClient.GetStreamAsync(file.Url);
+            var stream = await Provider.GetRequiredService<HttpClient>().GetStreamAsync(file.Url);
             await Context.Channel.SendFileAsync(stream, file.Filename, "As Stream");
 
-            var bytes = await _HttpClient.GetByteArrayAsync(file.Url);
+            var bytes = await Provider.GetRequiredService<HttpClient>().GetByteArrayAsync(file.Url);
             await Context.Channel.SendFileAsync(new MemoryStream(bytes), file.Filename, "As Byte Array");
         }
 
@@ -95,21 +92,21 @@ namespace RavenBOT.Modules.Developer
         [RavenRequireUserPermission(GuildPermission.Administrator)]
         public async Task SetLoggerChannelAsync(SocketTextChannel channel = null)
         {
-            var originalConfig = Logger.GetLoggerConfig();
+            var originalConfig = Provider.GetRequiredService<LogHandler>().GetLoggerConfig();
             if (channel == null)
             {
                 await ReplyAsync("Removed logger channel");
                 originalConfig.ChannelId = 0;
                 originalConfig.GuildId = 0;
                 originalConfig.LogToChannel = false;
-                Logger.SetLoggerConfig(originalConfig);
+                Provider.GetRequiredService<LogHandler>().SetLoggerConfig(originalConfig);
                 return;
             }
 
             originalConfig.GuildId = channel.Guild.Id;
             originalConfig.ChannelId = channel.Id;
             originalConfig.LogToChannel = true;
-            Logger.SetLoggerConfig(originalConfig);
+            Provider.GetRequiredService<LogHandler>().SetLoggerConfig(originalConfig);
             await ReplyAsync($"Set Logger channel to {channel.Mention}");
         }
 
@@ -119,6 +116,15 @@ namespace RavenBOT.Modules.Developer
             await ReplyAsync($"{Context.Guild.MemberCount}\n{Context.Guild.DownloadedMemberCount}\n{Context.Guild.Users.Count()}");
             await Context.Guild.DownloadUsersAsync();
             await ReplyAsync($"{Context.Guild.MemberCount}\n{Context.Guild.DownloadedMemberCount}\n{Context.Guild.Users.Count()}");
+        }
+
+        [Command("GetCommandJson")]
+        public async Task GetCMDJson()
+        {
+            var overview = Provider.GetRequiredService<HelpService>().GetModuleOverviewJson();
+            byte[] bytes = Encoding.ASCII.GetBytes(overview);
+            await Context.Channel.SendFileAsync(new MemoryStream(bytes), "overview.json", "Overview file");
+            Console.WriteLine();
         }
 
         /*
