@@ -1,9 +1,16 @@
+using System.Linq;
+using System.Collections.Generic;
 using Discord.Commands;
 
 namespace RavenBOT.Common
 {
     public static partial class Extensions
     {
+        public static string ParameterUsage(this IEnumerable<ParameterInfo> parameters)
+        {
+            return string.Join(" ", parameters.Select(x => x.ParameterInformation()));
+        }
+
         public static string ParameterInformation(this ParameterInfo parameter)
         {
             var initial = parameter.Name + (parameter.Summary == null ? "" : $"({parameter.Summary})");

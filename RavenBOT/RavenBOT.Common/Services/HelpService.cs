@@ -10,7 +10,7 @@ using MoreLinq;
 
 namespace RavenBOT.Common
 {
-    public class HelpService
+    public partial class HelpService
     {
         public PrefixService PrefixService { get; }
         public ModuleManagementService ModuleManager { get; }
@@ -29,7 +29,7 @@ namespace RavenBOT.Common
             Provider = provider;
         }
 
-        public async Task<PaginatedMessage> PagedHelpAsync(ShardedCommandContext context, bool usePreconditions = true, List<string> moduleFilter = null, string additionalField = null)
+        public async Task<List<Tuple<string, List<CommandInfo>>>> GetFilteredModulesAsync(ShardedCommandContext context = null, bool usePreconditions = true, List<string> moduleFilter = null)
         {
             var commandCollection = CommandService.Commands.ToList();
 
@@ -42,7 +42,7 @@ namespace RavenBOT.Common
             }
 
             //Skip blacklisted modules
-            var moduleConfig = ModuleManager.GetModuleConfig(context.Guild?.Id ?? 0);
+            var moduleConfig = ModuleManager.GetModuleConfig(context?.Guild?.Id ?? 0);
             if (moduleConfig.Blacklist.Any())
             {
                 //Filter out any blacklisted modules for the server
@@ -53,7 +53,7 @@ namespace RavenBOT.Common
             {
                 if (modules.Sum(x => x.Item2.Count) > 20)
                 {
-                    await context.Channel.SendMessageAsync("This command filters out all commands that you do not have sufficient permissions to access. As such it may take a moment to generate.\n" +
+                    await context?.Channel.SendMessageAsync("This command filters out all commands that you do not have sufficient permissions to access. As such it may take a moment to generate.\n" +
                         "If you want to see every command, use the fullhelp command instead.");
                 }
 
@@ -81,6 +81,12 @@ namespace RavenBOT.Common
             }
 
             modules = modules.OrderBy(m => m.Item1).ToList();
+            return modules;
+        }
+
+        public async Task<PaginatedMessage> PagedHelpAsync(ShardedCommandContext context, bool usePreconditions = true, List<string> moduleFilter = null, string additionalField = null)
+        {
+            var modules = await GetFilteredModulesAsync(context, usePreconditions, moduleFilter);
 
             var overviewFields = new List<EmbedFieldBuilder>
             {
@@ -246,7 +252,11 @@ namespace RavenBOT.Common
         }
 
         public async Task<bool> CheckPreconditionsAsync(ShardedCommandContext context, CommandInfo command, DeveloperSettings.Settings settings)
-        {
+        {            
+            if (context == null)
+            {
+                return true;
+            }
             var preconditions = new List<PreconditionAttribute>();
             preconditions.AddRange(command.Preconditions);
             preconditions.AddRange(command.Module.Preconditions);
