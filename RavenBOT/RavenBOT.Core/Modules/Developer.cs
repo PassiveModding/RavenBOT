@@ -1,14 +1,18 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Discord;
+using Discord.Audio;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
+using NAudio.Wave;
 using RavenBOT.Common;
 
 namespace RavenBOT.Modules.Developer
@@ -125,6 +129,75 @@ namespace RavenBOT.Modules.Developer
             byte[] bytes = Encoding.ASCII.GetBytes(overview);
             await Context.Channel.SendFileAsync(new MemoryStream(bytes), "overview.json", "Overview file");
             Console.WriteLine();
+        }
+
+        [Command("TestAudioStream", RunMode = RunMode.Async)]
+        [RavenRequireOwner]
+        public async Task GetAudioStream(string filepath)
+        {
+            var channel = await Context.User.GetVoiceChannel();
+            var audioClient = await channel.ConnectAsync();
+            await ReplyAsync("Audio connected.");
+            await SendAudioAsync(Context.Guild, audioClient, filepath);
+            await ReplyAsync("Audio stream sent");
+            await CheckStream();
+        }
+
+        [Command("CheckStream", RunMode = RunMode.Async)]
+        [RavenRequireOwner]
+        public async Task CheckStream()
+        {
+            var usr = (Context.User as SocketGuildUser).AudioStream;
+            if (usr == null) return;
+            
+            using (MemoryStream ms = new MemoryStream())
+            {
+                int stopper = 0;
+                var cancellation = new CancellationToken();
+                while (usr.TryReadFrame(cancellation, out var frame))
+                {
+                    stopper++;
+                    await ms.WriteAsync(frame.Payload, 0, frame.Payload.Length);
+                }
+
+                ms.Position = 0;
+
+                var msArr = ms.ToArray();
+                if (msArr.Length == 0)
+                {
+                    await ReplyAsync("Stream was empty");
+                    return;
+                }
+
+                using (WaveFileWriter writer = new WaveFileWriter(Path.Combine(AppContext.BaseDirectory, "output.wav"), new WaveFormat()))
+                {
+                    writer.Write(msArr, 0, msArr.Length);
+                }
+            }
+            await ReplyAsync("Finished");
+
+        }
+
+        public async Task SendAudioAsync(IGuild guild, IAudioClient audio, string path)
+        {
+            //await Log(LogSeverity.Debug, $"Starting playback of {path} in {guild.Name}");
+            using (var ffmpeg = CreateProcess(path))
+            using (var stream = audio.CreatePCMStream(AudioApplication.Music))
+            {
+                try { await ffmpeg.StandardOutput.BaseStream.CopyToAsync(stream); }
+                finally { await stream.FlushAsync(); }
+            }
+        }
+
+        private Process CreateProcess(string path)
+        {
+            return Process.Start(new ProcessStartInfo
+            {
+                FileName = "ffmpeg.exe",
+                Arguments = $"-hide_banner -loglevel panic -i \"{path}\" -ac 2 -f s16le -ar 48000 pipe:1",
+                UseShellExecute = false,
+                RedirectStandardOutput = true
+            });
         }
 
         /*
