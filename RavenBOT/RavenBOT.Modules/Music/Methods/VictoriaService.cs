@@ -55,7 +55,7 @@ namespace RavenBOT.Modules.Music.Methods
             Logger = logger;
             if (!File.Exists(ConfigPath))
             {
-                Logger.Log("Victoria config not found. Unable to initialize music module correctly.", LogSeverity.Warning);
+                Logger.Log($"Victoria config not found at {ConfigPath} \nUnable to initialize music module correctly.", LogSeverity.Warning);
             }
             else
             {

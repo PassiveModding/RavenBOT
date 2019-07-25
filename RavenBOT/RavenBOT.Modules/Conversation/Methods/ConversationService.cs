@@ -13,6 +13,7 @@ namespace RavenBOT.Modules.Conversation.Methods
     {
         public ConversationService(IDatabase database, DiscordShardedClient client, LogHandler logger, LocalManagementService localManagementService)
         {
+            //TODO: Log if conversation api key is not set.
             Database = database;
             Client = client;
             Logger = logger;

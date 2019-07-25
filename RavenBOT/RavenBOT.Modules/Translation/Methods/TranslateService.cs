@@ -44,6 +44,10 @@ namespace RavenBOT.Modules.Translation.Methods
 
                 Client.ReactionAdded += ReactionAdded;
             }
+            else if (Config.APIKey == null && Config.Enabled)
+            {
+                logger.Log("Translate API is enabled but no API Key is specified.", LogSeverity.Warning);
+            }
         }
 
         //Contains the message IDs of translated messages.

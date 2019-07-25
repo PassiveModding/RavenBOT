@@ -12,12 +12,17 @@ namespace RavenBOT.Modules.Statistics.Methods
 {
     public class GraphManager : IServiceable
     {
-        public GraphManager(IDatabase database, DiscordShardedClient client)
+        public GraphManager(IDatabase database, DiscordShardedClient client, LogHandler logger)
         {
             Database = database;
             Client = client;
 
             var config = GetConfig();
+
+            if (config.GraphiteUrl == null)
+            {
+                logger.Log("Graphite URL not set, you can set it using the SetGraphiteUrl command.", Discord.LogSeverity.Warning);
+            }
 
             GraphiteService = new GraphiteService(config.GraphiteUrl);
 

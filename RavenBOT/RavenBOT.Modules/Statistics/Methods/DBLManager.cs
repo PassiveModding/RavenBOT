@@ -8,17 +8,18 @@ namespace RavenBOT.Modules.Statistics.Methods
 {
     public class DBLManager : IServiceable
     {
-        public DBLManager(IDatabase database, DiscordShardedClient client)
+        public DBLManager(IDatabase database, DiscordShardedClient client, LogHandler logger)
         {
             Database = database;
             Client = client;
+            Logger = logger;
             DBLApi = null;
             Initialize();
         }
 
         public IDatabase Database { get; }
         public DiscordShardedClient Client { get; }
-
+        public LogHandler Logger { get; }
         public ShardedDiscordNetDblApi DBLApi { get; set; }
 
         public void Initialize()
@@ -32,6 +33,7 @@ namespace RavenBOT.Modules.Statistics.Methods
 
             if (config.APIKey == null)
             {
+                Logger.Log("DiscordBots.org api key not set but a config was generated.", Discord.LogSeverity.Warning);
                 return;
             }
 
