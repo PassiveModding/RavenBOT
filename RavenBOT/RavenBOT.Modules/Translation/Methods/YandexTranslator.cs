@@ -40,7 +40,7 @@ namespace RavenBOT.Modules.Translation.Methods
 
         private void PopulateLanguages()
         {
-            var response = Client.GetAsync($"https://translate.yandex.net/api/v1.5/tr.json/getLangs?key={ApiKey}&ui=en").Result;
+            var response = Client.GetAsync($"https://translate.yandex.net/api/v1.5/tr.json/getLangs?key={ApiKey}&ui=en").GetAwaiter().GetResult();
             if (!response.IsSuccessStatusCode)
             {
                 AvailableLanguages = new SpecificCulture[] {};
