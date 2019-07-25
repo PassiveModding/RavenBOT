@@ -27,6 +27,9 @@ namespace RavenBOT.ELO.Modules.Modules
         //TODO: Queue
         //TODO: Replace command
         //TODO: Map stuff
+        //TODO: Assign teams to temp roles until game result is decided.
+        //TODO: Assign a game to a specific channel until game result is decided.
+        //TODO: Allow players to party up for a lobby
 
         [Command("Join")]
         [Alias("JoinLobby", "Join Lobby", "j")]
@@ -104,6 +107,7 @@ namespace RavenBOT.ELO.Modules.Modules
                         break;
                 }
 
+                //TODO: Assign team members to specific roles and create a channel for chat within.
                 if (Context.CurrentLobby.TeamPickMode == Lobby.PickMode.Captains)
                 {
                     //TODO: Timer from when captains are mentioned to first pick time. Cancel game if command is not run.
