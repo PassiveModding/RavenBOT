@@ -53,6 +53,7 @@ namespace RavenBOT
                     AlwaysDownloadUsers = false,
                         MessageCacheSize = 50,
                         LogLevel = LogSeverity.Info,
+                        ExclusiveBulkDelete = true,
 
                         //You may want to edit the shard count as the bot grows more and more popular.
                         //Discord will block single shards that try to connect to more than 2500 servers
