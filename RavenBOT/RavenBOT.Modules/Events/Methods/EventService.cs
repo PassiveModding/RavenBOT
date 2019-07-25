@@ -42,6 +42,7 @@ namespace RavenBOT.Modules.Events.Methods
             Client.UserJoined += Client_UserJoined;
             Client.UserLeft += Client_UserLeft;
             Client.GuildMemberUpdated += GuildMemberUpdated;
+            Client.MessagesBulkDeleted += MessagesBulkDeleted;
 
             Timer = new Timer(TimerEvent, null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
         }
@@ -54,6 +55,7 @@ namespace RavenBOT.Modules.Events.Methods
                 ChannelDestroyed,
                 ChannelUpdated,
                 MessageDeleted,
+                BulkDelete,
                 MessageUpdated,
                 UserJoined,
                 UserLeft,
@@ -154,7 +156,7 @@ namespace RavenBOT.Modules.Events.Methods
                                         typeCopies.Add(new EventClassDuplicate
                                         {
                                             Count = 1,
-                                                Class = eClass
+                                            Class = eClass
                                         });
                                     }
                                 }
@@ -211,6 +213,43 @@ namespace RavenBOT.Modules.Events.Methods
                     Console.WriteLine(e);
                 }
             });
+        }
+
+        private Task MessagesBulkDeleted(IReadOnlyCollection<Cacheable<IMessage, ulong>> messageCache, ISocketMessageChannel channel)
+        {
+            MessageDeleted += messageCache.Count;
+            if (channel is SocketGuildChannel gChannel)
+            {
+                var config = TryGetConfig(gChannel.Guild.Id);
+                if (config == null || !config.Enabled || config.ChannelId == 0 || !config.MessageDeleted)
+                {
+                    return Task.CompletedTask;
+                }
+                
+                var msg = messageCache.Select(x => x.HasValue ? $"{x.Value.Author.Username}#{x.Value.Author.Discriminator}: {x.Value.Content}" : $"Uncached: [{x.Id}]");
+                LogEvent(config, "Bulk Message Delete",string.Join("\n", msg).FixLength(1023), EventClass.EventType.BulkDelete, Color.DarkBlue);
+                /*
+                foreach (var message in messageCache)
+                {
+                    if (messageCache.HasValue)
+                    {
+                        var oldMessage = messageCache.Value.Content;
+
+                        LogEvent(config, "Message Deleted", "**Message:**\n" +
+                            $"{oldMessage}\n" +
+                            $"**Channel:** {messageChannel.Name}\n" +
+                            $"**Author:** {messageCache.Value.Author.Username}#{messageCache.Value.Author.Discriminator}", EventClass.EventType.MessageDeleted, Color.DarkBlue);
+                    }
+                    else
+                    {
+                        LogEvent(config, "Message Deleted", "**Message:**\n" +
+                            $"Unable to be retrieved ({messageCache.Id})\n" +
+                            $"**Channel:** {messageChannel.Name}", EventClass.EventType.MessageDeleted, Color.DarkBlue);
+                    }               
+                }
+                */
+            }
+            return Task.CompletedTask;
         }
 
         private Task GuildMemberUpdated(SocketGuildUser userBefore, SocketGuildUser userAfter)
