@@ -87,6 +87,11 @@ namespace RavenBOT.Modules.Statistics.Methods
 
         public async Task UserCountChanged(SocketGuildUser user)
         {
+            if (user.Guild.MemberCount < 250)
+            {
+                //Ignore servers with less than 250 members to reduce disk usage
+                return;
+            }
             GraphiteService.Report(new ahd.Graphite.Datapoint($"Guilds/{user.Guild.Id}/UserCount", user.Guild.MemberCount, DateTime.UtcNow));
         }
 
