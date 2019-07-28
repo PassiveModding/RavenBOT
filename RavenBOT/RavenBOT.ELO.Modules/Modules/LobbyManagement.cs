@@ -5,13 +5,14 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using RavenBOT.Common;
 using RavenBOT.ELO.Modules.Bases;
 using RavenBOT.ELO.Modules.Models;
 using RavenBOT.ELO.Modules.Preconditions;
 
 namespace RavenBOT.ELO.Modules.Modules
 {
-    [RequireContext(ContextType.Guild)]
+    [RavenRequireContext(ContextType.Guild)]
     [IsRegistered]
     [IsLobby]
     public class LobbyManagement : ELOBase
@@ -24,14 +25,68 @@ namespace RavenBOT.ELO.Modules.Modules
         public Random Random { get; }
 
         //TODO: Lobby info
-        //TODO: Queue
         //TODO: Replace command
         //TODO: Map stuff
         //TODO: Assign teams to temp roles until game result is decided.
         //TODO: Assign a game to a specific channel until game result is decided.
         //TODO: Allow players to party up for a lobby
 
-        [Command("Join")]
+        [Command("Lobby")]
+        public async Task LobbyInfoAsync()
+        {
+            var embed = new EmbedBuilder();
+            embed.Fields = new List<EmbedFieldBuilder>()
+            {
+                new EmbedFieldBuilder
+                {
+                    Name = "Team Pick Mode",
+
+                }
+            };
+            Context.CurrentLobby.
+        }
+
+        [Command("Queue")]
+        [Alias("Q")]
+        public async Task ShowQueueAsync()
+        {
+            var game = Context.GetCurrentGame();
+            if (game != null)
+            {
+                if (game.GameState == Models.GameResult.State.Picking)
+                {
+                    var gameEmbed = new EmbedBuilder
+                    {
+                        Title = $"Current Teams."
+                    };
+                    
+                    var t1Users = GetMentionList(GetUserList(Context.Guild, game.Team1.Players));
+                    var t2Users = GetMentionList(GetUserList(Context.Guild, game.Team2.Players));
+                    var remainingPlayers = GetMentionList(GetUserList(Context.Guild, game.Queue.Where(x => !game.Team1.Players.Contains(x) && !game.Team2.Players.Contains(x))));
+                    gameEmbed.AddField("Team 1", $"Captain: {Context.Guild.GetUser(game.Team1.Captain)?.Mention ?? $"[{game.Team1.Captain}]"}\n{string.Join("\n", t1Users)}");
+                    gameEmbed.AddField("Team 2", $"Captain: {Context.Guild.GetUser(game.Team2.Captain)?.Mention ?? $"[{game.Team2.Captain}]"}\n{string.Join("\n", t2Users)}");
+                    gameEmbed.AddField("Remaining Players", string.Join("\n", remainingPlayers));
+                    await ReplyAsync("", false, gameEmbed.Build());
+                    return;
+                }
+            }
+
+            if (Context.CurrentLobby.Queue.Count > 0)
+            {
+                var mentionList = GetMentionList(GetUserList(Context.Guild, Context.CurrentLobby.Queue));
+                var embed = new EmbedBuilder();
+                embed.Title = $"{Context.Channel.Name} [{Context.CurrentLobby.Queue.Count}/{Context.CurrentLobby.PlayersPerTeam*2}]";
+                embed.Description = $"Game: #{Context.CurrentLobby.CurrentGameCount}\n" 
+                                    + string.Join("\n", mentionList);
+                await ReplyAsync("", false, embed.Build());
+            }
+            else
+            {
+                await ReplyAsync("", false, "The queue is empty.".QuickEmbed());
+            }
+        }
+
+        [Command("Join", RunMode = RunMode.Sync)]
         [Alias("JoinLobby", "Join Lobby", "j")]
         public async Task JoinLobbyAsync()
         {
@@ -78,7 +133,9 @@ namespace RavenBOT.ELO.Modules.Modules
                 //Set team players/captains based on the team pick mode
                 switch (Context.CurrentLobby.TeamPickMode)
                 {
-                    case Lobby.PickMode.Captains:
+                    case Lobby.PickMode.Captains_HighestRanked:
+                    case Lobby.PickMode.Captains_Random:
+                    case Lobby.PickMode.Captains_RandomHighestRanked:
                         game.GameState = GameResult.State.Picking;
                         var captains = Context.Service.GetCaptains(Context.CurrentLobby, game, Random);
                         game.Team1.Captain = captains.Item1;
@@ -133,7 +190,7 @@ namespace RavenBOT.ELO.Modules.Modules
             Context.Service.Database.Store(Context.CurrentLobby, Lobby.DocumentName(Context.Guild.Id, Context.Channel.Id));
         }
 
-        [Command("Leave")]
+        [Command("Leave", RunMode = RunMode.Sync)]
         [Alias("LeaveLobby", "Leave Lobby", "l")]
         public async Task LeaveLobbyAsync()
         {
@@ -158,7 +215,7 @@ namespace RavenBOT.ELO.Modules.Modules
             }
         }
 
-        [Command("Pick")]
+        [Command("Pick", RunMode = RunMode.Sync)]
         [Alias("p")]
         public async Task PickPlayerAsync(params SocketGuildUser[] users)
         {

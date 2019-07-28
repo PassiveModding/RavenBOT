@@ -73,14 +73,16 @@ namespace RavenBOT.ELO.Modules.Methods
         {
             ulong cap1 = 0;
             ulong cap2 = 0;
-            if (lobby.CaptainSortMode == Lobby.CaptainMode.RandomHighestRanked)
+            if (lobby.TeamPickMode == Lobby.PickMode.Captains_RandomHighestRanked)
             {
+                //Select randomly from the top 4 ranked players in the queue
                 if (game.Queue.Count >= 4)
                 {
                     var players = game.Queue.Select(x => GetPlayer(game.GuildId, x)).Where(x => x != null).OrderByDescending(x => x.Points).Take(4).OrderBy(x => rnd.Next()).ToList();
                     cap1 = players[0].UserId;
                     cap2 = players[1].UserId;
                 }
+                //Select the two players at random.
                 else
                 {
                     var randomised = game.Queue.OrderBy(x => rnd.Next()).Take(2).ToList();
@@ -88,17 +90,23 @@ namespace RavenBOT.ELO.Modules.Methods
                     cap2 = randomised[1];
                 }
             }
-            else if (lobby.CaptainSortMode == Lobby.CaptainMode.RandomHighestRanked)
+            else if (lobby.TeamPickMode == Lobby.PickMode.Captains_Random)
             {
+                //Select two players at random.
                 var randomised = game.Queue.OrderBy(x => rnd.Next()).Take(2).ToList();
                 cap1 = randomised[0];
                 cap2 = randomised[1];
             }
-            else// if (lobby.CaptainSortMode == Lobby.CaptainMode.HighestRanked)
+            else if (lobby.TeamPickMode == Lobby.PickMode.Captains_HighestRanked)
             {
+                //Select top two players
                 var players = game.Queue.Select(x => GetPlayer(game.GuildId, x)).Where(x => x != null).OrderByDescending(x => x.Points).Take(2).ToList();
                 cap1 = players[0].UserId;
                 cap2 = players[1].UserId;
+            }
+            else
+            {
+                throw new Exception("Unknown captain pick mode.");
             }
 
             return (cap1, cap2);

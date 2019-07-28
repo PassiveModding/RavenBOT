@@ -2,13 +2,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
+using RavenBOT.Common;
 using RavenBOT.ELO.Modules.Bases;
 using RavenBOT.ELO.Modules.Models;
 
 namespace RavenBOT.ELO.Modules.Modules
 {
-    [RequireContext(ContextType.Guild)]
-    [RequireUserPermission(GuildPermission.Administrator)]
+    [RavenRequireContext(ContextType.Guild)]
+    [RavenRequireUserPermission(GuildPermission.Administrator)]
     public class CompetitionSetup : ELOBase
     {
         [Command("SetRegisterRole")]

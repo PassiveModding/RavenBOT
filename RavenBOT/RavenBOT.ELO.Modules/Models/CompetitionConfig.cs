@@ -21,7 +21,6 @@ namespace RavenBOT.ELO.Modules.Models
 
         public string NameFormat { get; set; } = "[{score}] {name}";
 
-        //TODO: Setup toggle for multiqueuing
         public bool BlockMultiQueueing { get; set; } = false;
     }
 }

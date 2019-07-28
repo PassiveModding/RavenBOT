@@ -17,9 +17,11 @@ namespace RavenBOT.ELO.Modules.Models
         public ulong GuildId { get; set; }
         public ulong ChannelId { get; set; }
 
-        public int MinimumPoints { get; set; } = 0;
+        public int? MinimumPoints { get; set; } = null;
 
         public int PlayersPerTeam { get; set; } = 5;
+
+        public int TeamCount { get; set; } = 2;
 
         public List<ulong> Queue { get; set; } = new List<ulong>();
 
@@ -31,18 +33,11 @@ namespace RavenBOT.ELO.Modules.Models
 
         public enum PickMode
         {
-            Captains,
+            Captains_HighestRanked,
+            Captains_RandomHighestRanked,
+            Captains_Random,
             Random,
             TryBalance
-        }
-
-        public CaptainMode CaptainSortMode { get; set; } = CaptainMode.RandomHighestRanked;
-
-        public enum CaptainMode
-        {
-            HighestRanked,
-            RandomHighestRanked,
-            Random
         }
 
         //TODO: Allow for votes on maps, reduce change of repeate games on the same map.

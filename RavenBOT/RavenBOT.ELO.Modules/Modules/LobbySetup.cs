@@ -7,13 +7,13 @@ using RavenBOT.ELO.Modules.Models;
 
 namespace RavenBOT.ELO.Modules.Modules
 {
-    [RequireContext(ContextType.Guild)]
+    [RavenRequireContext(ContextType.Guild)]
     //TODO: Potential different permissions for creating lobby
-    [RequireUserPermission(GuildPermission.Administrator)]
+    [RavenRequireUserPermission(GuildPermission.Administrator)]
     public class LobbySetup : ELOBase
     {
         [Command("Create Lobby")]
-        public async Task CreateLobbyAsync(int playersPerTeam = 5, Lobby.PickMode pickMode = Lobby.PickMode.Captains)
+        public async Task CreateLobbyAsync(int playersPerTeam = 5, Lobby.PickMode pickMode = Lobby.PickMode.Captains_RandomHighestRanked)
         {
             if (Context.Service.GetLobby(Context.Guild.Id, Context.Channel.Id) != null)
             {
@@ -63,27 +63,6 @@ namespace RavenBOT.ELO.Modules.Modules
         {
             var pickDict = Extensions.ConvertEnumToDictionary<Lobby.PickMode>();
             await ReplyAsync($"{string.Join("\n", pickDict.Keys)}");
-        }
-
-        [Command("SetCaptainMode")]
-        public async Task SetCaptainModeAsync(Lobby.CaptainMode captainMode)
-        {
-            var lobby = Context.Service.GetLobby(Context.Guild.Id, Context.Channel.Id);
-            if (lobby == null)
-            {
-                await ReplyAsync("Channel is not a lobby.");
-                return;
-            }
-
-            lobby.CaptainSortMode = captainMode;
-            await ReplyAsync($"Captain mode set.");
-        }
-
-        [Command("CaptainModes")]
-        public async Task DisplayCaptainModesAsync()
-        {
-            var capDict = Extensions.ConvertEnumToDictionary<Lobby.CaptainMode>();
-            await ReplyAsync(string.Join("\n", capDict.Keys));
         }
     }
 }

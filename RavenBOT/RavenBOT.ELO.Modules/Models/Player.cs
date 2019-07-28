@@ -33,6 +33,7 @@ namespace RavenBOT.ELO.Modules.Models
             this.DisplayName = displayName;
             this.UserId = userId;
             this.GuildId = guildId;
+            this.RegistrationDate = DateTime.UtcNow;
         }
 
         /// <summary>
@@ -41,6 +42,8 @@ namespace RavenBOT.ELO.Modules.Models
         /// </summary>
         /// <value></value>
         public int Points { get; set; } = 0;
+
+        public DateTime RegistrationDate { get; set; }
 
         /// <summary>
         /// A set of additional integer values that can be defined in the current server.

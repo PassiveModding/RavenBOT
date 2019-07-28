@@ -7,7 +7,7 @@ using RavenBOT.ELO.Modules.Bases;
 
 namespace RavenBOT.ELO.Modules.Modules
 {
-    [RequireContext(ContextType.Guild)]
+    [RavenRequireContext(ContextType.Guild)]
     public class Info : ELOBase
     {
         [Command("Register")]
