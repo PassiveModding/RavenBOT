@@ -21,7 +21,6 @@ namespace RavenBOT.ELO.Modules.Models
 
         public int PlayersPerTeam { get; set; } = 5;
 
-        public int TeamCount { get; set; } = 2;
 
         public List<ulong> Queue { get; set; } = new List<ulong>();
 

@@ -24,7 +24,6 @@ namespace RavenBOT.ELO.Modules.Modules
 
         public Random Random { get; }
 
-        //TODO: Lobby info
         //TODO: Replace command
         //TODO: Map stuff
         //TODO: Assign teams to temp roles until game result is decided.
@@ -34,16 +33,17 @@ namespace RavenBOT.ELO.Modules.Modules
         [Command("Lobby")]
         public async Task LobbyInfoAsync()
         {
-            var embed = new EmbedBuilder();
-            embed.Fields = new List<EmbedFieldBuilder>()
+            var embed = new EmbedBuilder
             {
-                new EmbedFieldBuilder
-                {
-                    Name = "Team Pick Mode",
-
-                }
+                Color = Color.Blue
             };
-            Context.CurrentLobby.
+            embed.Description = $"**Pick Mode:** {Context.CurrentLobby.TeamPickMode}\n" 
+                                + $"**Minimum Points to Queue:** {Context.CurrentLobby.MinimumPoints?.ToString() ?? "N/A"}\n"
+                                + $"**Games Played:** {Context.CurrentLobby.CurrentGameCount}\n"
+                                + $"**Players Per Team:** {Context.CurrentLobby.PlayersPerTeam}\n"
+                                + $"**Maps:** {string.Join(", ", Context.CurrentLobby.Maps)}\n"
+                                + "For Players in Queue use the `Queue` or `Q` Command.";
+            await ReplyAsync("", false, embed.Build());
         }
 
         [Command("Queue")]
@@ -140,6 +140,8 @@ namespace RavenBOT.ELO.Modules.Modules
                         var captains = Context.Service.GetCaptains(Context.CurrentLobby, game, Random);
                         game.Team1.Captain = captains.Item1;
                         game.Team2.Captain = captains.Item2;
+                        //TODO: Timer from when captains are mentioned to first pick time. Cancel game if command is not run.
+                        await ReplyAsync($"Captains have been picked. Use the `pick` or `p` command to choose your players.\nCaptain 1: <@{game.Team1.Captain}>\nCaptain 2: <@{game.Team2.Captain}>");
                         break;
                     case Lobby.PickMode.Random:
                         game.GameState = GameResult.State.Undecided;
@@ -165,12 +167,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 }
 
                 //TODO: Assign team members to specific roles and create a channel for chat within.
-                if (Context.CurrentLobby.TeamPickMode == Lobby.PickMode.Captains)
-                {
-                    //TODO: Timer from when captains are mentioned to first pick time. Cancel game if command is not run.
-                    await ReplyAsync($"Captains have been picked. Use the `pick` or `p` command to choose your players.\nCaptain 1: <@{game.Team1.Captain}>\nCaptain 2: <@{game.Team2.Captain}>");
-                }
-                else
+                if (Context.CurrentLobby.TeamPickMode == Lobby.PickMode.TryBalance || Context.CurrentLobby.TeamPickMode == Lobby.PickMode.Random)
                 {
                     var t1Users = GetMentionList(GetUserList(Context.Guild, game.Team1.Players));
                     var t2Users = GetMentionList(GetUserList(Context.Guild, game.Team2.Players));
