@@ -1,11 +1,12 @@
 using System;
 using System.Threading.Tasks;
 using Discord.Commands;
+using RavenBOT.Common;
 using RavenBOT.ELO.Modules.Bases;
 
 namespace RavenBOT.ELO.Modules.Preconditions
 {
-    public class IsRegistered : PreconditionAttribute
+    public class IsRegistered : PreconditionBase
     {
         public override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)
         {
@@ -29,6 +30,16 @@ namespace RavenBOT.ELO.Modules.Preconditions
             ec.CurrentPlayer = player;
 
             return Task.FromResult(PreconditionResult.FromSuccess());
+        }
+
+        public override string Name()
+        {
+            return "IsRegistered";
+        }
+
+        public override string PreviewText()
+        {
+            return "Checks to see if the current user is registered";
         }
     }
 }
