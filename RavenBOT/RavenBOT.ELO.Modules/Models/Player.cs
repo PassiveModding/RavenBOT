@@ -1,3 +1,4 @@
+using System.Linq;
 using System;
 using System.Collections.Generic;
 
@@ -58,11 +59,16 @@ namespace RavenBOT.ELO.Modules.Models
         {
             int original = 0;
             int newVal = 0;
-            if (AdditionalProperties.TryGetValue(key, out int value))
+
+            //TODO: Test the matching of default to the key (for case-insensitive search)
+
+            //TODO: Potentially add option to disable negative values for each additional property rather than just points specifically
+            var valMatch = AdditionalProperties.FirstOrDefault(x => x.Key.Equals(key, StringComparison.InvariantCultureIgnoreCase));
+            if (!valMatch.Equals(default(KeyValuePair<string, int>)))
             {
-                newVal = ModifyValue(state, value, modifier);
-                AdditionalProperties[key] = newVal;
-                original = value;
+                newVal = ModifyValue(state, valMatch.Value, modifier);
+                AdditionalProperties[valMatch.Key] = newVal;
+                original = valMatch.Value;                
             }
             else
             {
