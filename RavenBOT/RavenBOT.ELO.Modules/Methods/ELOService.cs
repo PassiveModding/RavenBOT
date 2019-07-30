@@ -45,6 +45,11 @@ namespace RavenBOT.ELO.Modules.Methods
             return Database.Load<Lobby>(Lobby.DocumentName(guildId, channelId));
         }
 
+        public GameResult GetGame(ulong guildId, ulong channelId, int gameId)
+        {
+            return Database.Load<GameResult>(GameResult.DocumentName(gameId, channelId, guildId));
+        }
+
         public Lobby[] GetLobbies(ulong guildId)
         {
             return Database.Query<Lobby>(x => x.GuildId == guildId).ToArray();
