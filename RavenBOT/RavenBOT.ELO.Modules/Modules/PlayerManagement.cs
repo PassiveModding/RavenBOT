@@ -21,7 +21,7 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync(string.Join("\n", states.Select(x => x.Key)));
         }
 
-        //TODO: Response should be an embed.
+        //TODO: Consider whether it's necessary to have the single user command as multi user already is able to accept only one.
         [Command("Points")]
         public async Task PointsAsync(SocketGuildUser user, Player.ModifyState state, int amount)
         {
@@ -53,7 +53,6 @@ namespace RavenBOT.ELO.Modules.Modules
         [Command("PlayersModify")]
         public async Task PlayersModifyAsync(string value, Player.ModifyState state, int amount, params SocketGuildUser[] users)
         {
-            //TODO: Value should be case insensitive when searching
             var players = users.Select(x => Context.Service.GetPlayer(Context.Guild.Id, x.Id)).ToList();
             var responseString = "";
             foreach (var player in players)
