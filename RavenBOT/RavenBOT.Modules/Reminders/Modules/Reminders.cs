@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using RavenBOT.Common;
@@ -28,6 +30,73 @@ namespace RavenBOT.Modules.Reminders.Modules
         {
             ReminderHandler.AddReminder(new Models.Reminder(Context.Guild.Id, Context.User.Id, Context.Channel.Id, length, message));
             await ReplyAsync("", false, $"At {DateTime.UtcNow.ToLongDateString()} {DateTime.UtcNow.ToLongTimeString()} (in {length.GetReadableLength()}) I will remind you to: {message}".QuickEmbed());
+        }
+
+        [Command("Reminders")]
+        public async Task RemindersListAsync()
+        {
+            var reminders = ReminderHandler.Database.Query<Reminder>(x => x.UserId == Context.User.Id).ToArray();
+            if (reminders.Length == 0)
+            {
+                await ReplyAsync("There are no reminders in queue for you.");
+                return;
+            }
+            var currentServer = reminders.Where(x => x.GuildId == Context.Guild.Id).ToArray();
+            var currentChannel = currentServer.Where(x => x.ChannelId == Context.Channel.Id).ToArray();
+
+            var pager = new PaginatedMessage();
+            var p1 = new PaginatedMessage.Page
+            {
+                Title = "Overview",
+                Description = $"**Total Reminders:** {reminders.Length}\n" +
+                $"**Total Reminders in this Server:** {currentServer.Length}\n" +
+                $"**Total Reminders in this Channel:** {currentChannel.Length}\n"
+            };
+
+            var pages = new List<PaginatedMessage.Page>
+            {
+                p1
+            };
+
+            var fields = reminders.Select(x =>
+            {
+                var dueAt = (x.TimeStamp + x.Length);
+                var guild = Context.Client.GetGuild(x.GuildId);
+                var channel = guild?.GetTextChannel(x.ChannelId);
+                return new EmbedFieldBuilder
+                {
+                    Name = $"Reminder: {x.ReminderNumber}",
+                        Value = $"**At:** {dueAt.ToLongDateString()} {dueAt.ToLongTimeString()}\n" +
+                        $"**Due In:** {(dueAt - DateTime.UtcNow).GetReadableLength()}\n" +
+                        $"**Server:** {guild?.Name ?? "N/A"}\n" +
+                        $"**Channel:** {channel?.Name ?? "N/A"}\n**Message:**\n" +
+                        $"{x.ReminderMessage}"
+                };
+            }).SplitList(5).ToList();
+
+            if (fields.Count > 1)
+            {
+                p1.Fields = fields.First().ToList();
+                foreach (var grp in fields.Skip(1))
+                {
+                    pages.Add(new PaginatedMessage.Page
+                    {
+                        Fields = grp.ToList()
+                    });
+                }
+            }
+            else if (fields.Count == 1)
+            {
+                p1.Fields = fields.First().ToList();
+            }
+
+            pager.Pages = pages;
+
+            await PagedReplyAsync(pager, new ReactionList
+            {
+                Forward = true,
+                    Backward = true
+            });
         }
 
         [Command("DailyReminder")]
