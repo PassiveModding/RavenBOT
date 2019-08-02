@@ -46,6 +46,6 @@ namespace RavenBOT.ELO.Modules.Models
         }
 
         //Indicates user IDs and the amount of points added/removed from them when the game result was decided.
-        public List<(ulong, int)> UpdatedScores { get; set; }= new List<(ulong, int)>();
+        public List<(ulong, int)> UpdatedScores { get; set; } = new List<(ulong, int)>();
     }
 }

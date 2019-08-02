@@ -22,6 +22,8 @@ namespace RavenBOT.ELO.Modules.Modules
             Random = random;
         }
 
+        //TODO: Player queuing via reactions to a message.
+
         public Random Random { get; }
 
         //TODO: Replace command

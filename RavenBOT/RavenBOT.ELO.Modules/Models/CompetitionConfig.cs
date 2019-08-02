@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace RavenBOT.ELO.Modules.Models
@@ -12,6 +13,7 @@ namespace RavenBOT.ELO.Modules.Models
         public CompetitionConfig(ulong guildId)
         {
             this.GuildId = guildId;
+            this.DefaultLossModifier = -5;
         }
         public ulong GuildId { get; set; }
 
@@ -25,5 +27,24 @@ namespace RavenBOT.ELO.Modules.Models
         public bool BlockMultiQueueing { get; set; } = false;
 
         public bool AllowNegativeScore { get; set; } = false;
+
+        //TODO: Consider adding a setter to ensure value is always positive.
+        public int DefaultWinModifier { get; set; } = 10;
+        public int DefaultLossModifier { 
+        get
+        {
+            return DefaultLossModifier;
+        } set
+        {
+            if (value < 0)
+            {
+                //Ensure the value that gets set is positive as it will be subtracted from scores.
+                DefaultLossModifier = -value;
+            }
+            else
+            {
+                DefaultLossModifier = value;
+            }
+        } }
     }
 }
