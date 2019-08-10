@@ -408,7 +408,7 @@ namespace RavenBOT.Modules.Moderator.Modules
             await ReplyAsync($"#{caseId} {user.Mention} was banned by {Context.User.Mention} for {reason ?? "N/A"}");
 
             ModHandler.Save(config, ActionConfig.DocumentName(Context.Guild.Id));
-            await ModHandler.LogMessageAsync(Context, $"#{caseId} {user.Mention} was kicked by {Context.User.Mention} for {reason ?? "N/A"}", user, reason);
+            await ModHandler.LogMessageAsync(Context, $"#{caseId} {user.Mention} was banned by {Context.User.Mention} for {reason ?? "N/A"}", user, reason);
         }
 
         [Command("kick")]
