@@ -8,6 +8,7 @@ namespace RavenBOT.ELO.Modules.Methods
 {
     public partial class ELOService : IServiceable
     {
+        //TODO: Event hook for player joins/updates?
         public ELOService(IDatabase database, DiscordShardedClient client)
         {
             Database = database;
@@ -15,6 +16,7 @@ namespace RavenBOT.ELO.Modules.Methods
         }
 
         //TODO: Hook channel deleted event to automatically delete lobbies
+        //TODO: Caching for users and other related objects.
 
         public IDatabase Database { get; }
         public DiscordShardedClient Client { get; }
