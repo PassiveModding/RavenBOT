@@ -3,23 +3,54 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
+using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
 using RavenBOT.Common;
-using RavenBOT.ELO.Modules.Bases;
+using RavenBOT.ELO.Modules.Methods;
 using RavenBOT.ELO.Modules.Models;
-using RavenBOT.ELO.Modules.Preconditions;
 
 namespace RavenBOT.ELO.Modules.Modules
 {
     [RavenRequireContext(ContextType.Guild)]
-    [IsRegistered]
-    [IsLobby]
-    public class LobbyManagement : ELOBase
+    public class LobbyManagement : InteractiveBase<ShardedCommandContext>
     {
-        public LobbyManagement(Random random)
+        public ELOService Service { get; }
+
+        public LobbyManagement(ELOService service, Random random)
         {
+            Service = service;
             Random = random;
+        }
+
+        public Lobby CurrentLobby;
+
+        public async Task<bool> CheckLobbyAsync()
+        {
+            var response = Service.IsLobby(Context.Guild.Id, Context.Channel.Id);
+            if (response.Item1)
+            {
+                CurrentLobby = response.Item2;
+                return true;
+            }
+
+            await ReplyAsync("Current channel is not a lobby.");
+            return false;            
+        }
+
+        public Player CurrentPlayer;
+
+        public async Task<bool> CheckRegisteredAsync()
+        {
+            var response = Service.GetPlayer(Context.Guild.Id, Context.User.Id);
+            if (response != null)
+            {
+                CurrentPlayer = response;
+                return true;
+            }
+
+            await ReplyAsync("You are not registered");
+            return false;            
         }
 
         //TODO: Player queuing via reactions to a message.
@@ -35,15 +66,20 @@ namespace RavenBOT.ELO.Modules.Modules
         [Command("Lobby")]
         public async Task LobbyInfoAsync()
         {
+            if (!await CheckLobbyAsync() || !await CheckRegisteredAsync())
+            {
+                return;
+            }
+
             var embed = new EmbedBuilder
             {
                 Color = Color.Blue
             };
-            embed.Description = $"**Pick Mode:** {Context.CurrentLobby.TeamPickMode}\n" 
-                                + $"**Minimum Points to Queue:** {Context.CurrentLobby.MinimumPoints?.ToString() ?? "N/A"}\n"
-                                + $"**Games Played:** {Context.CurrentLobby.CurrentGameCount}\n"
-                                + $"**Players Per Team:** {Context.CurrentLobby.PlayersPerTeam}\n"
-                                + $"**Maps:** {string.Join(", ", Context.CurrentLobby.Maps)}\n"
+            embed.Description = $"**Pick Mode:** {CurrentLobby.TeamPickMode}\n" 
+                                + $"**Minimum Points to Queue:** {CurrentLobby.MinimumPoints?.ToString() ?? "N/A"}\n"
+                                + $"**Games Played:** {CurrentLobby.CurrentGameCount}\n"
+                                + $"**Players Per Team:** {CurrentLobby.PlayersPerTeam}\n"
+                                + $"**Maps:** {string.Join(", ", CurrentLobby.Maps)}\n"
                                 + "For Players in Queue use the `Queue` or `Q` Command.";
             await ReplyAsync("", false, embed.Build());
         }
@@ -52,7 +88,12 @@ namespace RavenBOT.ELO.Modules.Modules
         [Alias("Q")]
         public async Task ShowQueueAsync()
         {
-            var game = Context.GetCurrentGame();
+            if (!await CheckLobbyAsync())
+            {
+                return;
+            }
+
+            var game = Service.GetCurrentGame(CurrentLobby);
             if (game != null)
             {
                 if (game.GameState == Models.GameResult.State.Picking)
@@ -73,12 +114,12 @@ namespace RavenBOT.ELO.Modules.Modules
                 }
             }
 
-            if (Context.CurrentLobby.Queue.Count > 0)
+            if (CurrentLobby.Queue.Count > 0)
             {
-                var mentionList = GetMentionList(GetUserList(Context.Guild, Context.CurrentLobby.Queue));
+                var mentionList = GetMentionList(GetUserList(Context.Guild, CurrentLobby.Queue));
                 var embed = new EmbedBuilder();
-                embed.Title = $"{Context.Channel.Name} [{Context.CurrentLobby.Queue.Count}/{Context.CurrentLobby.PlayersPerTeam*2}]";
-                embed.Description = $"Game: #{Context.CurrentLobby.CurrentGameCount}\n" 
+                embed.Title = $"{Context.Channel.Name} [{CurrentLobby.Queue.Count}/{CurrentLobby.PlayersPerTeam*2}]";
+                embed.Description = $"Game: #{CurrentLobby.CurrentGameCount}\n" 
                                     + string.Join("\n", mentionList);
                 await ReplyAsync("", false, embed.Build());
             }
@@ -91,17 +132,22 @@ namespace RavenBOT.ELO.Modules.Modules
         [Command("Join", RunMode = RunMode.Sync)]
         [Alias("JoinLobby", "Join Lobby", "j")]
         public async Task JoinLobbyAsync()
-        {
-            if (Context.CurrentLobby.Queue.Count >= Context.CurrentLobby.PlayersPerTeam * 2)
+        {            
+            if (!await CheckLobbyAsync() || !await CheckRegisteredAsync())
+            {
+                return;
+            }
+
+            if (CurrentLobby.Queue.Count >= CurrentLobby.PlayersPerTeam * 2)
             {
                 //Queue will be reset after teams are completely picked.
                 await ReplyAsync("Queue is full, wait for teams to be chosen before joining.");
                 return;
             }
 
-            if (Context.Service.GetCompetition(Context.Guild.Id).BlockMultiQueueing)
+            if (Service.GetCompetition(Context.Guild.Id).BlockMultiQueueing)
             {
-                var lobbies = Context.Service.GetLobbies(Context.Guild.Id);
+                var lobbies = Service.GetLobbies(Context.Guild.Id);
                 var lobbyMatches = lobbies.Where(x => x.Queue.Contains(Context.User.Id));
                 if (lobbyMatches.Any())
                 {
@@ -111,7 +157,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 }
             }
 
-            var currentGame = Context.GetCurrentGame();
+            var currentGame = Service.GetCurrentGame(CurrentLobby);
             if (currentGame != null)
             {
                 if (currentGame.GameState == Models.GameResult.State.Picking)
@@ -121,25 +167,25 @@ namespace RavenBOT.ELO.Modules.Modules
                 }
             }
 
-            Context.CurrentLobby.Queue.Add(Context.User.Id);
-            if (Context.CurrentLobby.Queue.Count >= Context.CurrentLobby.PlayersPerTeam * 2)
+            CurrentLobby.Queue.Add(Context.User.Id);
+            if (CurrentLobby.Queue.Count >= CurrentLobby.PlayersPerTeam * 2)
             {
                 await ReplyAsync("Queue is full. Picking teams...");
                 //Increment the game counter as there is now a new game.
-                Context.CurrentLobby.CurrentGameCount += 1;
-                var game = new GameResult(Context.CurrentLobby.CurrentGameCount, Context.Channel.Id, Context.Guild.Id);
-                game.Queue = Context.CurrentLobby.Queue;
-                Context.CurrentLobby.Queue = new List<ulong>();
+                CurrentLobby.CurrentGameCount += 1;
+                var game = new GameResult(CurrentLobby.CurrentGameCount, Context.Channel.Id, Context.Guild.Id);
+                game.Queue = CurrentLobby.Queue;
+                CurrentLobby.Queue = new List<ulong>();
                 
 
                 //Set team players/captains based on the team pick mode
-                switch (Context.CurrentLobby.TeamPickMode)
+                switch (CurrentLobby.TeamPickMode)
                 {
                     case Lobby.PickMode.Captains_HighestRanked:
                     case Lobby.PickMode.Captains_Random:
                     case Lobby.PickMode.Captains_RandomHighestRanked:
                         game.GameState = GameResult.State.Picking;
-                        var captains = Context.Service.GetCaptains(Context.CurrentLobby, game, Random);
+                        var captains = Service.GetCaptains(CurrentLobby, game, Random);
                         game.Team1.Captain = captains.Item1;
                         game.Team2.Captain = captains.Item2;
                         //TODO: Timer from when captains are mentioned to first pick time. Cancel game if command is not run.
@@ -148,12 +194,12 @@ namespace RavenBOT.ELO.Modules.Modules
                     case Lobby.PickMode.Random:
                         game.GameState = GameResult.State.Undecided;
                         var shuffled = game.Queue.OrderBy(x => Random.Next()).ToList();
-                        game.Team1.Players = shuffled.Take(Context.CurrentLobby.PlayersPerTeam).ToList();
-                        game.Team2.Players = shuffled.Skip(Context.CurrentLobby.PlayersPerTeam).Take(Context.CurrentLobby.PlayersPerTeam).ToList();
+                        game.Team1.Players = shuffled.Take(CurrentLobby.PlayersPerTeam).ToList();
+                        game.Team2.Players = shuffled.Skip(CurrentLobby.PlayersPerTeam).Take(CurrentLobby.PlayersPerTeam).ToList();
                         break;
                     case Lobby.PickMode.TryBalance:
                         game.GameState = GameResult.State.Undecided;
-                        var ordered = game.Queue.Select(x => Context.Service.GetPlayer(Context.Guild.Id, x)).Where(x => x != null).OrderByDescending(x => x.Points).ToList();
+                        var ordered = game.Queue.Select(x => Service.GetPlayer(Context.Guild.Id, x)).Where(x => x != null).OrderByDescending(x => x.Points).ToList();
                         foreach (var user in ordered)
                         {
                             if (game.Team1.Players.Count > game.Team2.Players.Count)
@@ -169,7 +215,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 }
 
                 //TODO: Assign team members to specific roles and create a channel for chat within.
-                if (Context.CurrentLobby.TeamPickMode == Lobby.PickMode.TryBalance || Context.CurrentLobby.TeamPickMode == Lobby.PickMode.Random)
+                if (CurrentLobby.TeamPickMode == Lobby.PickMode.TryBalance || CurrentLobby.TeamPickMode == Lobby.PickMode.Random)
                 {
                     var t1Users = GetMentionList(GetUserList(Context.Guild, game.Team1.Players));
                     var t2Users = GetMentionList(GetUserList(Context.Guild, game.Team2.Players));
@@ -183,19 +229,35 @@ namespace RavenBOT.ELO.Modules.Modules
                     await ReplyAsync("", false, gameEmbed.Build());
                 }
 
-                Context.Service.Database.Store(game, GameResult.DocumentName(game.GameId, game.LobbyId, game.GuildId));
+                Service.Database.Store(game, GameResult.DocumentName(game.GameId, game.LobbyId, game.GuildId));
+            }
+            else
+            {
+                if (Context.Guild.CurrentUser.GuildPermissions.AddReactions)
+                {
+                    await Context.Message.AddReactionAsync(new Emoji("✅"));
+                }
+                else
+                {
+                    await ReplyAsync("Added to queue.");
+                }
             }
 
-            Context.Service.Database.Store(Context.CurrentLobby, Lobby.DocumentName(Context.Guild.Id, Context.Channel.Id));
+            Service.Database.Store(CurrentLobby, Lobby.DocumentName(Context.Guild.Id, Context.Channel.Id));
         }
 
         [Command("Leave", RunMode = RunMode.Sync)]
         [Alias("LeaveLobby", "Leave Lobby", "l")]
         public async Task LeaveLobbyAsync()
-        {
-            if (Context.CurrentLobby.Queue.Contains(Context.User.Id))
+        {            
+            if (!await CheckLobbyAsync() || !await CheckRegisteredAsync())
             {
-                var game = Context.GetCurrentGame();
+                return;
+            }
+
+            if (CurrentLobby.Queue.Contains(Context.User.Id))
+            {
+                var game = Service.GetCurrentGame(CurrentLobby);
                 if (game != null)
                 {
                     if (game.GameState == GameResult.State.Picking)
@@ -204,9 +266,17 @@ namespace RavenBOT.ELO.Modules.Modules
                         return;
                     }
                 }
-                Context.CurrentLobby.Queue.Remove(Context.User.Id);
-                Context.Service.Database.Store(Context.CurrentLobby, Lobby.DocumentName(Context.Guild.Id, Context.Channel.Id));
-                await ReplyAsync("Removed.");
+                CurrentLobby.Queue.Remove(Context.User.Id);
+                Service.Database.Store(CurrentLobby, Lobby.DocumentName(Context.Guild.Id, Context.Channel.Id));
+                
+                if (Context.Guild.CurrentUser.GuildPermissions.AddReactions)
+                {
+                    await Context.Message.AddReactionAsync(new Emoji("✅"));
+                }
+                else
+                {
+                    await ReplyAsync("Added to queue.");
+                }
             }
             else
             {
@@ -218,7 +288,12 @@ namespace RavenBOT.ELO.Modules.Modules
         [Alias("p")]
         public async Task PickPlayerAsync(params SocketGuildUser[] users)
         {
-            var game = Context.GetCurrentGame();
+            if (!await CheckLobbyAsync() || !await CheckRegisteredAsync())
+            {
+                return;
+            }
+
+            var game = Service.GetCurrentGame(CurrentLobby);
             if (game.GameState != GameResult.State.Picking)
             {
                 await ReplyAsync("Lobby is currently not picking teams.");
@@ -360,7 +435,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 await ReplyAsync("", false, gameEmbed.Build());
             }
 
-            Context.Service.Database.Store(game, GameResult.DocumentName(game.GameId, game.LobbyId, game.GuildId));
+            Service.Database.Store(game, GameResult.DocumentName(game.GameId, game.LobbyId, game.GuildId));
         }
 
         public SocketGuildUser[] GetUserList(SocketGuild guild, IEnumerable<ulong> userIds)

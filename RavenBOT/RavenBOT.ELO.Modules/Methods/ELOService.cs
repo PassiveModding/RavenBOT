@@ -31,7 +31,36 @@ namespace RavenBOT.ELO.Modules.Methods
 
         public CompetitionConfig GetCompetition(ulong guildId)
         {
-            return Database.Load<CompetitionConfig>(CompetitionConfig.DocumentName(guildId));
+            return Database.Load<CompetitionConfig>(CompetitionConfig.DocumentName(guildId)) ?? CreateCompetition(guildId);
+        }
+
+        public (bool, Lobby) IsLobby(ulong guildId, ulong channelId)
+        {
+            var lobby = GetLobby(guildId, channelId);
+
+            if (lobby == null)
+            {
+                return (false, null);
+            }
+
+            return (true, lobby);
+        }
+
+        public GameResult GetCurrentGame(Lobby lobby)
+        {
+            return GetCurrentGame(lobby.GuildId, lobby.ChannelId);
+        }
+
+        public GameResult GetCurrentGame(ulong guildId, ulong lobbyId)
+        {
+            var gameMatches = Database.Query<GameResult>(x => x.GuildId == guildId && x.LobbyId == lobbyId).ToArray();
+            if (gameMatches.Any())
+            {
+                int mostRecent = gameMatches.Max(x => x.GameId);
+                return gameMatches.FirstOrDefault(x => x.GameId == mostRecent);
+            }
+
+            return null;
         }
 
         public Lobby CreateLobby(ulong guildId, ulong channelId)

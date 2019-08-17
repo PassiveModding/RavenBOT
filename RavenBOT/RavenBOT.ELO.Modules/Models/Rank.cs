@@ -6,9 +6,11 @@ namespace RavenBOT.ELO.Modules.Models
         public int Points { get; set; }
 
         public int? WinModifier { get; set; }
+
+        private int? _LossModifier;
         public int? LossModifier { get
         {
-            return LossModifier;
+            return _LossModifier;
         } set
         {
             if (value < 0)
@@ -16,7 +18,7 @@ namespace RavenBOT.ELO.Modules.Models
                 value = -value;
             }
 
-            LossModifier = value;
+            _LossModifier = value;
         } }
     }
 }

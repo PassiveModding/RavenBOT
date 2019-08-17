@@ -10,11 +10,13 @@ namespace RavenBOT.ELO.Modules.Models
             return $"CompetitionConfig-{guildId}";
         }
 
+        public CompetitionConfig(){}
         public CompetitionConfig(ulong guildId)
         {
             this.GuildId = guildId;
-            this.DefaultLossModifier = -5;
+            this.DefaultLossModifier = 5;
         }
+
         public ulong GuildId { get; set; }
 
         public List<Rank> Ranks { get; set; } = new List<Rank>();
@@ -30,21 +32,18 @@ namespace RavenBOT.ELO.Modules.Models
 
         //TODO: Consider adding a setter to ensure value is always positive.
         public int DefaultWinModifier { get; set; } = 10;
+
+        private int _DefaultLossModifier;
+        
         public int DefaultLossModifier { 
         get
         {
-            return DefaultLossModifier;
+            return _DefaultLossModifier;
         } set
         {
-            if (value < 0)
-            {
-                //Ensure the value that gets set is positive as it will be subtracted from scores.
-                DefaultLossModifier = -value;
-            }
-            else
-            {
-                DefaultLossModifier = value;
-            }
+            //Ensure the value that gets set is positive as it will be subtracted from scores.
+            _DefaultLossModifier = Math.Abs(value);
+            
         } }
     }
 }

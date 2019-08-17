@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord.WebSocket;
@@ -9,8 +10,9 @@ namespace RavenBOT.ELO.Modules.Methods
 {
     public partial class ELOService
     {
-        public async Task UpdateUserAsync(CompetitionConfig comp, Player player, SocketGuildUser user)
+        public async Task<List<string>> UpdateUserAsync(CompetitionConfig comp, Player player, SocketGuildUser user)
         {
+            var noted = new List<string>();
             if (user.Guild.CurrentUser.GuildPermissions.Administrator)
             {
                 var rankMatches = comp.Ranks.Where(x => x.Points <= player.Points);
@@ -52,15 +54,33 @@ namespace RavenBOT.ELO.Modules.Methods
                     }
                 }
             }
+            else
+            {
+                noted.Add("The bot requires administrator permissions in order to modify user roles.");
+            }
 
             var newName = DoReplacements(comp, player);
             if (!user.Nickname.Equals(newName, StringComparison.InvariantCultureIgnoreCase))
             {
+                //Use heirachy check to ensure that the bot can actually set the nickname
                 if (user.Guild.CurrentUser.GuildPermissions.ManageNicknames)
                 {
-                    await user.ModifyAsync(x => x.Nickname = newName);
+                    if (user.Hierarchy < user.Guild.CurrentUser.Hierarchy)
+                    {
+                        await user.ModifyAsync(x => x.Nickname = newName);
+                    }
+                    else
+                    {
+                        noted.Add("You have a higher permission level than the bot and therefore it cannot edit your nickname.");
+                    }
+                }
+                else
+                {
+                    noted.Add("The bot cannot edit your nickname as it does not have the `ManageNicknames` permission");
                 }
             }
+
+            return noted;
         }
 
         public string DoReplacements(CompetitionConfig comp, Player player)

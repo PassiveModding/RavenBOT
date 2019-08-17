@@ -10,6 +10,8 @@ namespace RavenBOT.ELO.Modules.Models
             return $"GameResult-{gameId}-{lobbyId}-{guildId}";
         }
 
+        public GameResult(){}
+
         public GameResult(int gameId, ulong lobbyId, ulong guildId)
         {
             GameId = gameId;

@@ -6,15 +6,24 @@ using Discord.Commands;
 using Discord.WebSocket;
 using MoreLinq.Extensions;
 using RavenBOT.Common;
-using RavenBOT.ELO.Modules.Bases;
 using RavenBOT.ELO.Modules.Models;
 using Discord;
+using RavenBOT.ELO.Modules.Methods;
+using Discord.Addons.Interactive;
 
 namespace RavenBOT.ELO.Modules.Modules
 {
     [RavenRequireContext(ContextType.Guild)]
-    public class GameManagement : ELOBase
+    public class GameManagement : InteractiveBase<ShardedCommandContext>
     {
+        public ELOService Service { get; }
+
+        public GameManagement(ELOService service)
+        {
+            Service = service;
+        }
+
+
         //TODO: Ensure correct commands require mod/admin perms
 
         //GameResult (Allow players to vote on result), needs to be an optionla command, requires both team captains to vote
@@ -30,21 +39,21 @@ namespace RavenBOT.ELO.Modules.Modules
                 lobbyChannel = Context.Channel as SocketTextChannel;
             }
 
-            var competition = Context.Service.GetCompetition(Context.Guild.Id);
+            var competition = Service.GetCompetition(Context.Guild.Id);
             if (competition == null)
             {
                 await ReplyAsync("Not a competition.");
                 return;
             }
 
-            var lobby = Context.Service.GetLobby(Context.Guild.Id, lobbyChannel.Id);
+            var lobby = Service.GetLobby(Context.Guild.Id, lobbyChannel.Id);
             if (lobby == null)
             {
                 await ReplyAsync("Channel is not a lobby.");
                 return;
             }
 
-            var game = Context.Service.GetGame(Context.Guild.Id, lobby.ChannelId, gameNumber);
+            var game = Service.GetGame(Context.Guild.Id, lobby.ChannelId, gameNumber);
             if (game == null)
             {
                 await ReplyAsync($"Game number is invalid. Most recent game is {lobby.CurrentGameCount}");
@@ -59,7 +68,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
             foreach (var score in game.UpdatedScores)
             {
-                var player = Context.Service.GetPlayer(Context.Guild.Id, score.Item1);
+                var player = Service.GetPlayer(Context.Guild.Id, score.Item1);
                 if (player == null)
                 {
                     //Skip if for whatever reason the player profile cannot be found.
@@ -80,7 +89,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 }
 
                 //Save the player profile after updating scores.
-                Context.Service.Database.Store(player, Player.DocumentName(player.GuildId, player.UserId));
+                Service.Database.Store(player, Player.DocumentName(player.GuildId, player.UserId));
 
                 var guildUser = Context.Guild.GetUser(player.UserId);
                 if (guildUser == null)
@@ -155,6 +164,9 @@ namespace RavenBOT.ELO.Modules.Modules
                 }                
             }
 
+
+            game.GameState = GameResult.State.Undecided;
+            Service.Database.Store(game, GameResult.DocumentName(game.GameId, lobby.ChannelId, lobby.GuildId));
             //TODO: Announce the undone game
         }
 
@@ -175,7 +187,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 lobbyChannel = Context.Channel as SocketTextChannel;
             }
 
-            var lobby = Context.Service.GetLobby(Context.Guild.Id, lobbyChannel.Id);
+            var lobby = Service.GetLobby(Context.Guild.Id, lobbyChannel.Id);
             if (lobby == null)
             {
                 //Reply error not a lobby.
@@ -183,7 +195,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 return;
             }
 
-            var game = Context.Service.GetGame(Context.Guild.Id, lobby.ChannelId, gameNumber);
+            var game = Service.GetGame(Context.Guild.Id, lobby.ChannelId, gameNumber);
             if (game == null)
             {
                 //Reply not valid game number.
@@ -191,7 +203,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 return;
             }
 
-            var competition = Context.Service.GetCompetition(Context.Guild.Id);
+            var competition = Service.GetCompetition(Context.Guild.Id);
             
             List<(Player, int, Rank, RankChangeState, Rank)> winList;
             List<(Player, int, Rank, RankChangeState, Rank)> loseList;
@@ -278,7 +290,7 @@ namespace RavenBOT.ELO.Modules.Modules
             game.GameState = GameResult.State.Decided;
             game.UpdatedScores = allUsers.Select(x => (x.Item1.UserId, x.Item2)).ToList();
             game.WinningTeam = teamNumber;
-            Context.Service.Database.Store(game, GameResult.DocumentName(game.GameId, game.LobbyId, game.GuildId));
+            Service.Database.Store(game, GameResult.DocumentName(game.GameId, game.LobbyId, game.GuildId));
 
             var winField = new EmbedFieldBuilder
             {
@@ -344,7 +356,7 @@ namespace RavenBOT.ELO.Modules.Modules
             var updates = new List<(Player, int, Rank, RankChangeState, Rank)>();
             foreach (var userId in userIds)
             {
-                var botUser = Context.Service.GetPlayer(Context.Guild.Id, userId);
+                var botUser = Service.GetPlayer(Context.Guild.Id, userId);
                 if (botUser == null) continue;
 
                 var maxRank = MaxRank(competition, botUser.Points);
@@ -392,7 +404,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
                 //TODO: Rank checking?
                 //I forget what this means honestly
-                Context.Service.Database.Store(botUser, Player.DocumentName(botUser.GuildId, botUser.UserId));
+                Service.Database.Store(botUser, Player.DocumentName(botUser.GuildId, botUser.UserId));
             }
 
             return updates;

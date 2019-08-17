@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
@@ -37,7 +38,7 @@ namespace RavenBOT.Handlers
                 return;
             }
 
-            var context = new ShardedCommandContext(Client, message);
+            var context = GetCommandContext(Client, message);
             if (!ModuleManager.IsAllowed(context.Guild?.Id ?? 0, message.Content))
             {
                 return;
@@ -45,5 +46,9 @@ namespace RavenBOT.Handlers
 
             var result = await CommandService.ExecuteAsync(context, argPos, Provider);
         }
+
+        public Func<DiscordShardedClient, SocketUserMessage, ICommandContext> GetCommandContext = (c, m) => new ShardedCommandContext(c, m);        
     }
+
+
 }

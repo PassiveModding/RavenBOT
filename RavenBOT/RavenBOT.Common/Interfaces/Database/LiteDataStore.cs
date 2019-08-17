@@ -26,6 +26,8 @@ namespace RavenBOT.Common.Interfaces.Database
         public string DatabaseFolder = Path.Combine(AppContext.BaseDirectory, "LiteDB");
 
         public LiteDatabase Database { get; }
+
+        private static readonly Object locker = new Object();
         public LiteDataStore()
         {
             if (!Directory.Exists(DatabaseFolder))
@@ -43,7 +45,10 @@ namespace RavenBOT.Common.Interfaces.Database
 
         public void StoreInCollection<T>(LiteCollection<BaseEntity<T>> collection, T document, string name = null)
         {
-            collection.Upsert(new BaseEntity<T>(document, name));
+            lock(locker)
+            {
+                collection.Upsert(new BaseEntity<T>(document, name));
+            }
         }
 
         public void StoreMany<T>(List<T> documents, Func<T, string> docName = null)
@@ -63,17 +68,22 @@ namespace RavenBOT.Common.Interfaces.Database
             }
         }
 
-        public T Load<T>(string documentName)
+        public T Load<T>(string documentName) where T : class
         {
-            var collection = GetCollection<T>();
-            try
+            lock(locker)
             {
-                var doc = collection.FindOne(x => x.Id == documentName);
-                return doc.Value;
-            }
-            catch
-            {
-                return default(T);
+                var collection = GetCollection<T>();
+                try
+                {
+                    var doc = collection.FindOne(x => x.Id == documentName);
+                    if (doc == null) return null;
+                    return doc.Value;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    return default(T);
+                }
             }
         }
 
@@ -94,8 +104,11 @@ namespace RavenBOT.Common.Interfaces.Database
 
         public void RemoveDocument<T>(T document)
         {
-            var collection = GetCollection<T>();
-            collection.Delete(x => x.Equals(document));
+            lock(locker)
+            {
+                var collection = GetCollection<T>();
+                collection.Delete(x => x.Equals(document));
+            }
         }
 
         private LiteCollection<BaseEntity<T>> GetCollection<T>()
@@ -106,22 +119,31 @@ namespace RavenBOT.Common.Interfaces.Database
 
         public void Remove<T>(string documentName)
         {
-            var collection = GetCollection<T>();
-            collection.Delete(x => x.Id == documentName);
+            lock(locker)
+            {
+                var collection = GetCollection<T>();
+                collection.Delete(x => x.Id == documentName);
+            }
         }
 
         public void RemoveManyDocuments<T>(List<T> documents)
         {
-            var collection = GetCollection<T>();
-            collection.Delete(x => documents.Contains(x.Value));
+            lock(locker)
+            {
+                var collection = GetCollection<T>();
+                collection.Delete(x => documents.Contains(x.Value));
+            }
         }
 
         public void RemoveMany<T>(List<string> docNames)
         {
-            var collection = GetCollection<T>();
-            foreach (var name in docNames)
+            lock(locker)
             {
-                collection.Delete(x => x.Id == name);
+                var collection = GetCollection<T>();
+                foreach (var name in docNames)
+                {
+                    collection.Delete(x => x.Id == name);
+                }
             }
         }
 

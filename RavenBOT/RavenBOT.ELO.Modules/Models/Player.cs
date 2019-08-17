@@ -36,6 +36,7 @@ namespace RavenBOT.ELO.Modules.Models
             this.GuildId = guildId;
             this.RegistrationDate = DateTime.UtcNow;
         }
+        public Player(){}
 
         /// <summary>
         /// Indicates the user's points.

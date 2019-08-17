@@ -1,10 +1,11 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
 using RavenBOT.Common;
-using RavenBOT.ELO.Modules.Bases;
+using RavenBOT.ELO.Modules.Methods;
 using RavenBOT.ELO.Modules.Models;
 
 namespace RavenBOT.ELO.Modules.Modules
@@ -12,8 +13,15 @@ namespace RavenBOT.ELO.Modules.Modules
     [RavenRequireContext(ContextType.Guild)]
     //TODO: Moderator permission instead of just admin
     [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
-    public class PlayerManagement : ELOBase
+    public class PlayerManagement : InteractiveBase<ShardedCommandContext>
     {
+        public ELOService Service { get; }
+
+        public PlayerManagement(ELOService service)
+        {
+            Service = service;
+        }
+
         [Command("ModifyStates")]
         public async Task ModifyStatesAsync()
         {
@@ -31,7 +39,7 @@ namespace RavenBOT.ELO.Modules.Modules
         [Command("Points")]
         public async Task PointsAsync(Player.ModifyState state, int amount, params SocketGuildUser[] users)
         {
-            var players = users.Select(x => Context.Service.GetPlayer(Context.Guild.Id, x.Id)).ToList();
+            var players = users.Select(x => Service.GetPlayer(Context.Guild.Id, x.Id)).ToList();
             var responseString = "";
             foreach (var player in players)
             {
@@ -39,7 +47,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 responseString += $"{player.DisplayName}: {player.Points} => {newVal}\n";
                 player.Points = newVal;
             }
-            Context.Service.Database.StoreMany(players, x => Player.DocumentName(x.GuildId, x.UserId));
+            Service.Database.StoreMany(players, x => Player.DocumentName(x.GuildId, x.UserId));
             await ReplyAsync("", false, responseString.QuickEmbed());
         }
 
@@ -53,14 +61,14 @@ namespace RavenBOT.ELO.Modules.Modules
         [Command("PlayersModify")]
         public async Task PlayersModifyAsync(string value, Player.ModifyState state, int amount, params SocketGuildUser[] users)
         {
-            var players = users.Select(x => Context.Service.GetPlayer(Context.Guild.Id, x.Id)).ToList();
+            var players = users.Select(x => Service.GetPlayer(Context.Guild.Id, x.Id)).ToList();
             var responseString = "";
             foreach (var player in players)
             {
                 var response = player.UpdateValue(value, state, amount);
                 responseString += $"{player.DisplayName}: {response.Item1} => {response.Item2}\n";
             }
-            Context.Service.Database.StoreMany(players, x => Player.DocumentName(x.GuildId, x.UserId));
+            Service.Database.StoreMany(players, x => Player.DocumentName(x.GuildId, x.UserId));
             await ReplyAsync("", false, responseString.QuickEmbed());
         }
     }

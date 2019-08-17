@@ -182,7 +182,7 @@ namespace RavenBOT.Common.Interfaces.Database
             }
         }
 
-        public T Load<T>(string documentName)
+        public T Load<T>(string documentName) where T : class
         {
             using(var session = DocumentStore.OpenSession())
             {

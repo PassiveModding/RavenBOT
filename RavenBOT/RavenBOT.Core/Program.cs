@@ -15,7 +15,7 @@ namespace RavenBOT
 {
     public class Program
     {
-        public IServiceProvider Provider { get; set; }
+        public static IServiceProvider Provider { get; set; }
 
         public async Task RunAsync()
         {

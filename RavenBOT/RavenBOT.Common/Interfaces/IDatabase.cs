@@ -8,7 +8,7 @@ namespace RavenBOT.Common
     {
         void Store<T>(T document, string name = null);
         void StoreMany<T>(List<T> documents, Func<T, string> docName = null);
-        T Load<T>(string documentName);
+        T Load<T>(string documentName) where T : class;
         IEnumerable<T> Query<T>(Expression<Func<T, bool>> queryFunc);
         IEnumerable<T> Query<T>();
         void RemoveDocument<T>(T document);

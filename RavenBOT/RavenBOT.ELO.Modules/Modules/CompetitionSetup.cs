@@ -1,37 +1,45 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
+using Discord.Addons.Interactive;
 using Discord.Commands;
 using RavenBOT.Common;
-using RavenBOT.ELO.Modules.Bases;
+using RavenBOT.ELO.Modules.Methods;
 using RavenBOT.ELO.Modules.Models;
 
 namespace RavenBOT.ELO.Modules.Modules
 {
     [RavenRequireContext(ContextType.Guild)]
     [RavenRequireUserPermission(GuildPermission.Administrator)]
-    public class CompetitionSetup : ELOBase
+    public class CompetitionSetup : InteractiveBase<ShardedCommandContext>
     {
+        public ELOService Service { get; }
+
+        public CompetitionSetup(ELOService service)
+        {
+            Service = service;
+        }
+
         [Command("SetRegisterRole")]
         public async Task SetRegisterRole(IRole role)
         {
-            var competition = Context.Service.GetCompetition(Context.Guild.Id) ?? Context.Service.CreateCompetition(Context.Guild.Id);
+            var competition = Service.GetCompetition(Context.Guild.Id) ?? Service.CreateCompetition(Context.Guild.Id);
             competition.RegisteredRankId = role.Id;
-            Context.Service.Database.Store(competition, CompetitionConfig.DocumentName(Context.Guild.Id));
+            Service.Database.Store(competition, CompetitionConfig.DocumentName(Context.Guild.Id));
             await ReplyAsync("Register role set.");
         }
 
         [Command("AddRank")]
         public async Task AddRank(IRole role, int points)
         {
-            var competition = Context.Service.GetCompetition(Context.Guild.Id) ?? Context.Service.CreateCompetition(Context.Guild.Id);
+            var competition = Service.GetCompetition(Context.Guild.Id) ?? Service.CreateCompetition(Context.Guild.Id);
             competition.Ranks = competition.Ranks.Where(x => x.RoleId != role.Id).ToList();
             competition.Ranks.Add(new Rank
             {
                 RoleId = role.Id,
                     Points = points
             });
-            Context.Service.Database.Store(competition, CompetitionConfig.DocumentName(Context.Guild.Id));
+            Service.Database.Store(competition, CompetitionConfig.DocumentName(Context.Guild.Id));
             await ReplyAsync("Rank added.");
         }
 
@@ -44,9 +52,9 @@ namespace RavenBOT.ELO.Modules.Modules
         [Command("RemoveRank")]
         public async Task RemoveRank(ulong roleId)
         {
-            var competition = Context.Service.GetCompetition(Context.Guild.Id) ?? Context.Service.CreateCompetition(Context.Guild.Id);
+            var competition = Service.GetCompetition(Context.Guild.Id) ?? Service.CreateCompetition(Context.Guild.Id);
             competition.Ranks = competition.Ranks.Where(x => x.RoleId != roleId).ToList();
-            Context.Service.Database.Store(competition, CompetitionConfig.DocumentName(Context.Guild.Id));
+            Service.Database.Store(competition, CompetitionConfig.DocumentName(Context.Guild.Id));
             await ReplyAsync("Rank Removed.");
         }
 
