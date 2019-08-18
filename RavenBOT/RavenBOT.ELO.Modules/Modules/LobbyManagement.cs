@@ -304,12 +304,12 @@ namespace RavenBOT.ELO.Modules.Modules
                 }
                 else
                 {
-                    await ReplyAsync("Added to queue.");
+                    await ReplyAsync("Removed from queue.");
                 }
             }
             else
             {
-                await ReplyAsync("You are not queued in this lobby.");
+                await ReplyAsync("You are not queued for the next game.");
             }
         }
 
