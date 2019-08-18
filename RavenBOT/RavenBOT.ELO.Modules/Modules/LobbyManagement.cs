@@ -84,6 +84,29 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync("", false, embed.Build());
         }
 
+        [Command("Clear Queue")]
+        [RavenRequireUserPermission(GuildPermission.Administrator)]
+        public async Task ClearQueueAsync()
+        {
+            if (!await CheckLobbyAsync())
+            {
+                return;
+            }
+
+            var game = Service.GetCurrentGame(CurrentLobby);
+            if (game != null)
+            {
+                if (game.GameState == GameResult.State.Picking)
+                {
+                    await ReplyAsync("Current game is being picked, cannot clear queue.");
+                    return;
+                }
+            }
+            CurrentLobby.Queue.Clear();
+            Service.Database.Store(CurrentLobby, Lobby.DocumentName(CurrentLobby.GuildId, CurrentLobby.ChannelId));
+            await ReplyAsync("Queue Cleared.");
+        }
+
         [Command("Queue")]
         [Alias("Q")]
         public async Task ShowQueueAsync()
