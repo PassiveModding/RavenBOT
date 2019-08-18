@@ -33,8 +33,12 @@ namespace RavenBOT.ELO.Modules.Modules
 
             var player = Service.GetPlayer(Context.Guild.Id, Context.User.Id) ?? Service.CreatePlayer(Context.Guild.Id, Context.User.Id, name);
             var competition = Service.GetCompetition(Context.Guild.Id);
-            await Service.UpdateUserAsync(competition, player, Context.User as SocketGuildUser);
+            var responses = await Service.UpdateUserAsync(competition, player, Context.User as SocketGuildUser);
             await ReplyAsync($"You have registered as `{name}`, all roles/name updates have been applied if applicable.");
+            if (responses.Count > 0)
+            {
+                await ReplyAndDeleteAsync("", false, String.Join("\n", responses).QuickEmbed(), TimeSpan.FromSeconds(30));
+            }
         }
 
         [Command("Ranks")]
