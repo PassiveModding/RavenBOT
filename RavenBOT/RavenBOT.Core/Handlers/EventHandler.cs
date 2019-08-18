@@ -84,42 +84,85 @@ namespace RavenBOT.Handlers
             else
             {
                 Logger.Log($"{context.Message.Content}\n{result.Error}\n{result.ErrorReason}", new LogContext(context), LogSeverity.Error);
-                if (result.Error.HasValue)
+
+                if (result is ExecuteResult exResult)
                 {
-                    if (result.Error.Value == CommandError.UnknownCommand)
+                    await context.Channel.SendMessageAsync("", false, new EmbedBuilder
                     {
-                        var prefix = LocalManagementService.LastConfig.Developer ? LocalManagementService.LastConfig.DeveloperPrefix : PrefixService.GetPrefix(context.Guild?.Id ?? 0);
-                        var stripped = context.Message.Content.Substring(prefix.Length);
-                        var dlDistances = new List<Tuple<int, string>>();
-                        foreach (var command in CommandService.Commands)
+                        Title = $"Command Execution Error{(result.Error.HasValue ? $": {result.Error.Value}" : "")}",
+                            Description = $"Message: {context.Message.Content.FixLength(512)}\n" +
+                            "__**Error**__\n" +
+                            $"{result.ErrorReason.FixLength(512)}\n" +
+                            $"{exResult.Exception}".FixLength(1024),
+                            Color = Color.LightOrange
+                    }.Build());
+                }
+                else if (result is PreconditionResult preResult)
+                { 
+                    await context.Channel.SendMessageAsync("", false, new EmbedBuilder
+                    {
+                        Title = $"Command Precondition Error{(result.Error.HasValue ? $": {result.Error.Value}" : "")}",
+                            Description = $"Message: {context.Message.Content.FixLength(512)}\n" +
+                            "__**Error**__\n" +
+                            $"{result.ErrorReason.FixLength(512)}\n".FixLength(1024),
+                            Color = Color.LightOrange
+                    }.Build());
+                }
+                else if (result is RuntimeResult runResult)
+                {
+                    //Post execution result. Ie. returned by developer
+                    await context.Channel.SendMessageAsync("", false, new EmbedBuilder
+                    {
+                        Title = $"Command Runtime Error{(result.Error.HasValue ? $": {result.Error.Value}" : "")}",
+                            Description = $"Message: {context.Message.Content.FixLength(512)}\n" +
+                            "__**Error**__\n" +
+                            $"{runResult.Reason.FixLength(512)}\n".FixLength(1024),
+                            Color = Color.LightOrange
+                    }.Build());
+                }
+                else if (result is SearchResult sResult)
+                {
+                    //Since it is an error you can assume it's an unknown command as SearchResults will only return an error if not found.
+                    var prefix = LocalManagementService.LastConfig.Developer ? LocalManagementService.LastConfig.DeveloperPrefix : PrefixService.GetPrefix(context.Guild?.Id ?? 0);
+                    var stripped = context.Message.Content.Substring(prefix.Length);
+                    var dlDistances = new List<Tuple<int, string>>();
+                    foreach (var command in CommandService.Commands)
+                    {
+                        foreach (var alias in command.Aliases)
                         {
-                            foreach (var alias in command.Aliases)
+                            var distance = stripped.DamerauLavenshteinDistance(alias);
+                            if (distance == stripped.Length || distance == alias.Length)
                             {
-                                var distance = stripped.DamerauLavenshteinDistance(alias);
-                                if (distance == stripped.Length || distance == alias.Length)
-                                {
-                                    continue;
-                                }
-
-                                dlDistances.Add(new Tuple<int, string>(distance, alias));
+                                continue;
                             }
-                        }
 
-                        var similar = dlDistances.OrderBy(x => x.Item1).Take(5).Select(x => prefix + x.Item2).ToList();
-                        await context.Channel.SendMessageAsync("", false, new EmbedBuilder()
-                        {
-                            Title = $"Unknown Command",
-                                Description = $"Message: {context.Message.Content.FixLength(512)}\n" +
-                                $"Similar commands: \n{string.Join("\n", similar)}",
-                                Color = Color.Red
-                        }.Build());
-                        return;
+                            dlDistances.Add(new Tuple<int, string>(distance, alias));
+                        }
                     }
-                    else if (result.Error.Value == CommandError.BadArgCount && commandInfo.IsSpecified)
+
+                    var similar = dlDistances.OrderBy(x => x.Item1).Take(5).Select(x => prefix + x.Item2).ToList();
+                    await context.Channel.SendMessageAsync("", false, new EmbedBuilder()
+                    {
+                        Title = $"Unknown Command",
+                            Description = $"Message: {context.Message.Content.FixLength(512)}\n" +
+                            $"Similar commands: \n{string.Join("\n", similar)}",
+                            Color = Color.Red
+                    }.Build());
+                }
+                else if (result is ParseResult pResult)
+                {
+                    //Invalid parese result can be
+                    //ParseFailed, "There must be at least one character of whitespace between arguments."
+                    //ParseFailed, "Input text may not end on an incomplete escape."
+                    //ParseFailed, "A quoted parameter is incomplete."
+                    //BadArgCount, "The input text has too few parameters."
+                    //BadArgCount, "The input text has too many parameters."
+                    //typeReaderResults
+                    if (pResult.Error.Value == CommandError.BadArgCount && commandInfo.IsSpecified)
                     {
                         await context.Channel.SendMessageAsync("", false, new EmbedBuilder
                         {
-                            Title = $"Command Error {result.Error.Value}",
+                            Title = $"Argument Error {result.Error.Value}",
                                 Description = $"`{commandInfo.Value.Aliases.First()}{string.Join(" ", commandInfo.Value.Parameters.Select(x => x.ParameterInformation()))}`\n" +
                                 $"Message: {context.Message.Content.FixLength(512)}\n" +
                                 "__**Error**__\n" +
@@ -127,18 +170,30 @@ namespace RavenBOT.Handlers
                                 Color = Color.DarkRed
 
                         }.Build());
-                        return;
+                    }
+                    else
+                    {
+                        await context.Channel.SendMessageAsync("", false, new EmbedBuilder
+                        {
+                            Title = $"Command Parse Error{(result.Error.HasValue ? $": {result.Error.Value}" : "")}",
+                                Description = $"Message: {context.Message.Content.FixLength(512)}\n" +
+                                "__**Error**__\n" +
+                                $"{result.ErrorReason.FixLength(512)}\n".FixLength(1024),
+                                Color = Color.LightOrange
+                        }.Build());
                     }
                 }
-
-                await context.Channel.SendMessageAsync("", false, new EmbedBuilder
+                else
                 {
-                    Title = $"Command Error{(result.Error.HasValue ? $": {result.Error.Value}" : "")}",
-                        Description = $"Message: {context.Message.Content.FixLength(512)}\n" +
-                        "__**Error**__\n" +
-                        $"{result.ErrorReason.FixLength(512)}",
-                        Color = Color.LightOrange
-                }.Build());
+                    await context.Channel.SendMessageAsync("", false, new EmbedBuilder
+                    {
+                        Title = $"Command Error{(result.Error.HasValue ? $": {result.Error.Value}" : "")}",
+                            Description = $"Message: {context.Message.Content.FixLength(512)}\n" +
+                            "__**Error**__\n" +
+                            $"{result.ErrorReason.FixLength(512)}\n".FixLength(1024),
+                            Color = Color.LightOrange
+                    }.Build());
+                }
             }
         }
 
