@@ -83,10 +83,11 @@ namespace RavenBOT.Handlers
             }
             else
             {
-                Logger.Log($"{context.Message.Content}\n{result.Error}\n{result.ErrorReason}", new LogContext(context), LogSeverity.Error);
+                
 
                 if (result is ExecuteResult exResult)
                 {
+                    Logger.Log($"{context.Message.Content}\n{result.Error}\n{result.ErrorReason}\n{exResult.Exception}", new LogContext(context), LogSeverity.Error);
                     await context.Channel.SendMessageAsync("", false, new EmbedBuilder
                     {
                         Title = $"Command Execution Error{(result.Error.HasValue ? $": {result.Error.Value}" : "")}",
@@ -99,6 +100,7 @@ namespace RavenBOT.Handlers
                 }
                 else if (result is PreconditionResult preResult)
                 { 
+                    Logger.Log($"{context.Message.Content}\n{result.Error}\n{result.ErrorReason}", new LogContext(context), LogSeverity.Error);
                     await context.Channel.SendMessageAsync("", false, new EmbedBuilder
                     {
                         Title = $"Command Precondition Error{(result.Error.HasValue ? $": {result.Error.Value}" : "")}",
@@ -110,6 +112,7 @@ namespace RavenBOT.Handlers
                 }
                 else if (result is RuntimeResult runResult)
                 {
+                    Logger.Log($"{context.Message.Content}\n{result.Error}\n{result.ErrorReason}", new LogContext(context), LogSeverity.Error);
                     //Post execution result. Ie. returned by developer
                     await context.Channel.SendMessageAsync("", false, new EmbedBuilder
                     {
@@ -122,6 +125,7 @@ namespace RavenBOT.Handlers
                 }
                 else if (result is SearchResult sResult)
                 {
+                    Logger.Log($"{context.Message.Content}\n{result.Error}\n{result.ErrorReason}", new LogContext(context), LogSeverity.Error);
                     //Since it is an error you can assume it's an unknown command as SearchResults will only return an error if not found.
                     var prefix = LocalManagementService.LastConfig.Developer ? LocalManagementService.LastConfig.DeveloperPrefix : PrefixService.GetPrefix(context.Guild?.Id ?? 0);
                     var stripped = context.Message.Content.Substring(prefix.Length);
@@ -151,6 +155,7 @@ namespace RavenBOT.Handlers
                 }
                 else if (result is ParseResult pResult)
                 {
+                    Logger.Log($"{context.Message.Content}\n{result.Error}\n{result.ErrorReason}", new LogContext(context), LogSeverity.Error);
                     //Invalid parese result can be
                     //ParseFailed, "There must be at least one character of whitespace between arguments."
                     //ParseFailed, "Input text may not end on an incomplete escape."
@@ -185,6 +190,7 @@ namespace RavenBOT.Handlers
                 }
                 else
                 {
+                    Logger.Log($"{context.Message.Content}\n{result.Error}\n{result.ErrorReason}", new LogContext(context), LogSeverity.Error);
                     await context.Channel.SendMessageAsync("", false, new EmbedBuilder
                     {
                         Title = $"Command Error{(result.Error.HasValue ? $": {result.Error.Value}" : "")}",
