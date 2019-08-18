@@ -10,6 +10,7 @@ using RavenBOT.ELO.Modules.Models;
 using Discord;
 using RavenBOT.ELO.Modules.Methods;
 using Discord.Addons.Interactive;
+using Newtonsoft.Json;
 
 namespace RavenBOT.ELO.Modules.Modules
 {
@@ -31,6 +32,7 @@ namespace RavenBOT.ELO.Modules.Modules
         //UndoGame (would need to use the amount of points added to the user rather than calculate at command run time)
 
         [Command("UndoGame")]
+        [Alias("Undo Game")]
         [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
         public async Task UndoGameAsync(int gameNumber, SocketTextChannel lobbyChannel = null)
         {
@@ -168,6 +170,35 @@ namespace RavenBOT.ELO.Modules.Modules
             game.GameState = GameResult.State.Undecided;
             Service.Database.Store(game, GameResult.DocumentName(game.GameId, lobby.ChannelId, lobby.GuildId));
             //TODO: Announce the undone game
+        }
+
+        [Command("DeleteGame")]
+        [Alias("DelGame", "Delete Game")]
+        [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
+        public async Task DelGame(int gameNumber, SocketTextChannel lobbyChannel = null)
+        {
+            if (lobbyChannel == null)
+            {
+                lobbyChannel = Context.Channel as SocketTextChannel;
+            }
+
+            var lobby = Service.GetLobby(Context.Guild.Id, lobbyChannel.Id);
+            if (lobby == null)
+            {
+                //Reply error not a lobby.
+                await ReplyAsync("Channel is not a lobby.");
+                return;
+            }
+
+            var game = Service.GetGame(Context.Guild.Id, lobbyChannel.Id, gameNumber);
+            if (game == null)
+            {
+                await ReplyAsync("Invalid game number.");
+                return;
+            }
+
+            Service.Database.Remove<GameResult>(GameResult.DocumentName(gameNumber, lobbyChannel.Id, Context.Guild.Id));
+            await ReplyAsync("Game Deleted.", false, JsonConvert.SerializeObject(game, Formatting.Indented).FixLength(2047).QuickEmbed());
         }
 
         [Command("Game")]
