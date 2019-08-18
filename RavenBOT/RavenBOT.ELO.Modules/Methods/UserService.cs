@@ -18,24 +18,33 @@ namespace RavenBOT.ELO.Modules.Methods
                 var rankMatches = comp.Ranks.Where(x => x.Points <= player.Points);
                 if (rankMatches.Any())
                 {
+                    //Get the highest rank that the user can receive from the bot.
                     var maxRank = rankMatches.Max(x => x.Points);
                     var match = rankMatches.First(x => x.Points == maxRank);
 
+                    //Check to see if the player already has the role
                     if (!user.Roles.Any(x => x.Id == match.RoleId))
                     {
+                        //Try to retrieve the role in the server
                         var role = user.Guild.GetRole(match.RoleId);
-                        if (role.Position < user.Guild.CurrentUser.Hierarchy)
+                        if (role != null)
                         {
-                            if (role != null)
+                            if (role.Position < user.Guild.CurrentUser.Hierarchy)
                             {
-                                await user.AddRoleAsync(role);
-                            }
+                                await user.AddRoleAsync(role);     
+                                noted.Add($"{user.Mention} received the {(role.IsMentionable ? role.Mention : role.Name)} rank");       
+                            }    
                             else
                             {
-                                comp.Ranks.Remove(match);
-                                Database.Store(comp, CompetitionConfig.DocumentName(comp.GuildId));
-                            }
+                                noted.Add($"The {(role.IsMentionable ? role.Mention : role.Name)} rank is above ELO bot's highest role and cannot be added to the user");
+                            }          
                         }
+                        else
+                        {
+                            comp.Ranks.Remove(match);
+                            noted.Add($"A rank could not be found in the server and was subsequently deleted from the server config [{match.RoleId} w:{match.WinModifier} l:{match.LossModifier} p:{match.Points}]");
+                            Database.Store(comp, CompetitionConfig.DocumentName(comp.GuildId));
+                        } 
                     }
                 }
 
