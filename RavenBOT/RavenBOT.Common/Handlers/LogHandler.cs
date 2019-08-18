@@ -124,6 +124,10 @@ namespace RavenBOT.Common
         public void Log(string message, LogContext context, LogSeverity severity = LogSeverity.Info, object additional = null)
         {
             var logObject = new CommandLogObject(message, context, severity, additional);
+            var g = $"GID: {context.guildId}".PadRight(20);
+            var u = $"UID: {context.userId}".PadRight(20);
+            var c = $"CID: {context.channelId}".PadRight(20);
+            message = $"{g} {u} {c}\n{message}";
             LogAndStore(message, severity, logObject);
             LogToDiscord(message, severity, context);
         }
