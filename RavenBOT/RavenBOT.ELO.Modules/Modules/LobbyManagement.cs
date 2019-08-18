@@ -190,6 +190,12 @@ namespace RavenBOT.ELO.Modules.Modules
                 }
             }
 
+            if (CurrentLobby.Queue.Contains(Context.User.Id))
+            {
+                await ReplyAndDeleteAsync("You are already queued.");
+                return;
+            }
+
             CurrentLobby.Queue.Add(Context.User.Id);
             if (CurrentLobby.Queue.Count >= CurrentLobby.PlayersPerTeam * 2)
             {
