@@ -28,6 +28,8 @@ namespace RavenBOT.Modules.RoleManagement.Methods
 
         public int IsUnicodeNumberEmote(string name)
         {
+            if (name == null) return -1;
+
             for (int i = 1; i < 9; i++)
             {
                 if (name.Equals($"{i}\U000020e3"))
