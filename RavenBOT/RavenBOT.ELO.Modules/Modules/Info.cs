@@ -54,5 +54,28 @@ namespace RavenBOT.ELO.Modules.Modules
             var msg = comp.Ranks.OrderByDescending(x => x.Points).Select(x => $"{Context.Guild.GetRole(x.RoleId)?.Mention ?? $"[{x.RoleId}]"} - {x.Points}").ToArray();
             await ReplyAsync("", false, string.Join("\n", msg).QuickEmbed());
         }
+
+        [Command("Info")]
+        public async Task InfoAsync(SocketGuildUser user = null)
+        {
+            if (user == null)
+            {
+                user = Context.User as SocketGuildUser;
+            }
+
+            var player = Service.GetPlayer(Context.Guild.Id, user.Id);
+            if (player == null)
+            {
+                await ReplyAsync("You are not registered.");
+                return;
+            }
+
+            var response = $"{player.DisplayName} Stats\n" +
+                            $"Points: {player.Points}\n"+
+                            $"Registered At: {player.RegistrationDate.ToShortDateString()} {player.RegistrationDate.ToShortTimeString()}\n"+
+                            $"{player.AdditionalProperties.Select(x => $"{x.Key}: {x.Value}")}\n";
+
+            await ReplyAsync("", false, response.QuickEmbed());
+        }
     }
 }
