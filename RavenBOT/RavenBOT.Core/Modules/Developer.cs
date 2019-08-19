@@ -67,7 +67,7 @@ namespace RavenBOT.Modules.Developer
                 $"{string.Join("\n", settings.SkippableHelpPreconditions)}");
         }
 
-        [Command("SetGame")]
+        [Command("SetPlaying")]
         public async Task SetGame([Remainder] string game)
         {
             await Context.Client.SetActivityAsync(new Game(game));
@@ -88,6 +88,68 @@ namespace RavenBOT.Modules.Developer
 
             var bytes = await Provider.GetRequiredService<HttpClient>().GetByteArrayAsync(file.Url);
             await Context.Channel.SendFileAsync(new MemoryStream(bytes), file.Filename, "As Byte Array");
+        }
+
+        [Command("GetInvite")]
+        public async Task GrabInviteAsync(ulong guildId)
+        {
+            var guild = Context.Client.GetGuild(guildId);
+            if (guild == null)
+            {
+                await ReplyAsync("Cannot get guild.");
+                return;
+            }
+
+            try
+            {
+                var invites = await guild.GetInvitesAsync();
+                var filtered = invites.Where(x => x.IsRevoked == false);
+                if (filtered.Any())
+                {
+                    await ReplyAsync(string.Join("\n", filtered.Select(x => x.Url)).FixLength(256));
+                    return;
+                }
+                else
+                {
+                    await TryGenerateInvite(guild);
+                }
+            }
+            catch (Exception e)
+            {
+                await TryGenerateInvite(guild);
+            }
+        }
+
+        public async Task TryGenerateInvite(SocketGuild guild)
+        {
+            if (guild.CurrentUser.GuildPermissions.CreateInstantInvite)
+            {
+                IInviteMetadata invite = null;
+                foreach (var channel in guild.TextChannels)
+                {
+                    try
+                    {
+                        invite = await channel.CreateInviteAsync();
+                        break;
+                    }
+                    catch
+                    {
+
+                    }
+                }
+
+                if (invite == null)
+                {
+                    await ReplyAsync($"Unable to retreive invite for {guild.Name}");
+                    return;
+                }
+
+                await ReplyAsync($"Invite Created: {invite.Url}");
+            }
+            else
+            {
+                await ReplyAsync($"Cannot generate invites in: {guild.Name}");
+            }
         }
 
         [Command("SetLoggerChannel")]
@@ -149,8 +211,8 @@ namespace RavenBOT.Modules.Developer
         {
             var usr = (Context.User as SocketGuildUser).AudioStream;
             if (usr == null) return;
-            
-            using (MemoryStream ms = new MemoryStream())
+
+            using(MemoryStream ms = new MemoryStream())
             {
                 int stopper = 0;
                 var cancellation = new CancellationToken();
@@ -169,7 +231,7 @@ namespace RavenBOT.Modules.Developer
                     return;
                 }
 
-                using (WaveFileWriter writer = new WaveFileWriter(Path.Combine(AppContext.BaseDirectory, "output.wav"), new WaveFormat()))
+                using(WaveFileWriter writer = new WaveFileWriter(Path.Combine(AppContext.BaseDirectory, "output.wav"), new WaveFormat()))
                 {
                     writer.Write(msArr, 0, msArr.Length);
                 }
@@ -181,8 +243,8 @@ namespace RavenBOT.Modules.Developer
         public async Task SendAudioAsync(IGuild guild, IAudioClient audio, string path)
         {
             //await Log(LogSeverity.Debug, $"Starting playback of {path} in {guild.Name}");
-            using (var ffmpeg = CreateProcess(path))
-            using (var stream = audio.CreatePCMStream(AudioApplication.Music))
+            using(var ffmpeg = CreateProcess(path))
+            using(var stream = audio.CreatePCMStream(AudioApplication.Music))
             {
                 try { await ffmpeg.StandardOutput.BaseStream.CopyToAsync(stream); }
                 finally { await stream.FlushAsync(); }
@@ -194,9 +256,9 @@ namespace RavenBOT.Modules.Developer
             return Process.Start(new ProcessStartInfo
             {
                 FileName = "ffmpeg.exe",
-                Arguments = $"-hide_banner -loglevel panic -i \"{path}\" -ac 2 -f s16le -ar 48000 pipe:1",
-                UseShellExecute = false,
-                RedirectStandardOutput = true
+                    Arguments = $"-hide_banner -loglevel panic -i \"{path}\" -ac 2 -f s16le -ar 48000 pipe:1",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true
             });
         }
 
