@@ -25,7 +25,7 @@ namespace RavenBOT.ELO.Modules.Models
 
         public int PlayersPerTeam { get; set; } = 5;
 
-        public List<ulong> Queue { get; set; } = new List<ulong>();
+        public HashSet<ulong> Queue { get; set; } = new HashSet<ulong>();
 
         public PickMode TeamPickMode { get; set; } = PickMode.Random;
 
@@ -42,7 +42,7 @@ namespace RavenBOT.ELO.Modules.Models
         }
 
         //TODO: Allow for votes on maps, reduce change of repeate games on the same map.
-        public List<string> Maps { get; set; } = new List<string>();
+        public HashSet<string> Maps { get; set; } = new HashSet<string>();
 
         //TODO: Instead of storing map history here use the maps that were chosen for recent games?
         public List<string> MapHistory { get; set; } = new List<string>();

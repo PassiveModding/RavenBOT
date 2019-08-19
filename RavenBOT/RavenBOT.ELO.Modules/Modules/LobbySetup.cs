@@ -89,7 +89,7 @@ namespace RavenBOT.ELO.Modules.Modules
             }
 
             lobby.Maps.Add(mapName);
-            lobby.Maps = lobby.Maps.Distinct().ToList();
+            lobby.Maps = lobby.Maps.Distinct().ToHashSet();
             Service.Database.Store(lobby, Lobby.DocumentName(Context.Guild.Id, Context.Channel.Id));
             await ReplyAsync("Map added.");
         }

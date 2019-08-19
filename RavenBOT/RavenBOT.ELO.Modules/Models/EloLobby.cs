@@ -8,9 +8,9 @@ namespace RavenBOT.ELO.Modules.Modules
          ulong ChannelId { get; set; }
          ulong GuildId { get; set; }
 
-         List<ulong> Queue { get; set; }
+         HashSet<ulong> Queue { get; set; }
          int CurrentGameCount { get; set; }
-         List<string> Maps { get; set; }        
+         HashSet<string> Maps { get; set; }        
 
     }
 }

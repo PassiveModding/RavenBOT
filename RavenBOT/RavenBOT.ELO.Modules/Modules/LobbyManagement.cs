@@ -204,7 +204,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 CurrentLobby.CurrentGameCount += 1;
                 var game = new GameResult(CurrentLobby.CurrentGameCount, Context.Channel.Id, Context.Guild.Id);
                 game.Queue = CurrentLobby.Queue;
-                CurrentLobby.Queue = new List<ulong>();
+                CurrentLobby.Queue = new HashSet<ulong>();
                 
 
                 //Set team players/captains based on the team pick mode
@@ -223,8 +223,8 @@ namespace RavenBOT.ELO.Modules.Modules
                     case Lobby.PickMode.Random:
                         game.GameState = GameResult.State.Undecided;
                         var shuffled = game.Queue.OrderBy(x => Random.Next()).ToList();
-                        game.Team1.Players = shuffled.Take(CurrentLobby.PlayersPerTeam).ToList();
-                        game.Team2.Players = shuffled.Skip(CurrentLobby.PlayersPerTeam).Take(CurrentLobby.PlayersPerTeam).ToList();
+                        game.Team1.Players = shuffled.Take(CurrentLobby.PlayersPerTeam).ToHashSet();
+                        game.Team2.Players = shuffled.Skip(CurrentLobby.PlayersPerTeam).Take(CurrentLobby.PlayersPerTeam).ToHashSet();
                         break;
                     case Lobby.PickMode.TryBalance:
                         game.GameState = GameResult.State.Undecided;
@@ -387,7 +387,7 @@ namespace RavenBOT.ELO.Modules.Modules
                     return;
                 }
 
-                game.Team1.Players.AddRange(users.Select(x => x.Id));
+                game.Team1.Players.UnionWith(users.Select(x => x.Id));
                 game.Team1.Players.Add(game.Team1.Captain);
             }
             else if (game.Team2.Players.Count == 0)
@@ -398,7 +398,7 @@ namespace RavenBOT.ELO.Modules.Modules
                     return;
                 }
 
-                game.Team2.Players.AddRange(users.Select(x => x.Id));
+                game.Team2.Players.UnionWith(users.Select(x => x.Id));
                 game.Team2.Players.Add(game.Team2.Captain);
             }
             else

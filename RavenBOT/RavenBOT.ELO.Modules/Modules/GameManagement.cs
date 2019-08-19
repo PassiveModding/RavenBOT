@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Discord.Commands;
 using Discord.WebSocket;
-using MoreLinq.Extensions;
 using RavenBOT.Common;
 using RavenBOT.ELO.Modules.Models;
 using Discord;
@@ -319,7 +318,7 @@ namespace RavenBOT.ELO.Modules.Modules
             }
 
             game.GameState = GameResult.State.Decided;
-            game.UpdatedScores = allUsers.Select(x => (x.Item1.UserId, x.Item2)).ToList();
+            game.UpdatedScores = allUsers.Select(x => (x.Item1.UserId, x.Item2)).ToHashSet();
             game.WinningTeam = teamNumber;
             Service.Database.Store(game, GameResult.DocumentName(game.GameId, game.LobbyId, game.GuildId));
 
@@ -382,7 +381,7 @@ namespace RavenBOT.ELO.Modules.Modules
         /// The player's rank change state (rank up, derank, none)
         /// The players new rank (if changed)
         /// </returns>
-        public List<(Player, int, Rank, RankChangeState, Rank)> UpdateTeamScoresAsync(CompetitionConfig competition, bool win, List<ulong> userIds)
+        public List<(Player, int, Rank, RankChangeState, Rank)> UpdateTeamScoresAsync(CompetitionConfig competition, bool win, HashSet<ulong> userIds)
         {
             var updates = new List<(Player, int, Rank, RankChangeState, Rank)>();
             foreach (var userId in userIds)

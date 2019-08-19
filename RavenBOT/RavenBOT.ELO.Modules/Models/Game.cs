@@ -40,14 +40,14 @@ namespace RavenBOT.ELO.Modules.Models
 
         public Team Team1 { get; set; } = new Team();
         public Team Team2 { get; set; } = new Team();
-        public List<ulong> Queue { get; set; } = new List<ulong>();
+        public HashSet<ulong> Queue { get; set; } = new HashSet<ulong>();
         public class Team
         {
             public ulong Captain { get; set; } = 0;
-            public List<ulong> Players { get; set; } = new List<ulong>();
+            public HashSet<ulong> Players { get; set; } = new HashSet<ulong>();
         }
 
         //Indicates user IDs and the amount of points added/removed from them when the game result was decided.
-        public List<(ulong, int)> UpdatedScores { get; set; } = new List<(ulong, int)>();
+        public HashSet<(ulong, int)> UpdatedScores { get; set; } = new HashSet<(ulong, int)>();
     }
 }
