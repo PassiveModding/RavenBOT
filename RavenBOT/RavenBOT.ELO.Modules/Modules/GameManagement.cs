@@ -167,6 +167,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
 
             game.GameState = GameResult.State.Undecided;
+            game.UpdatedScores = new HashSet<(ulong, int)>();
             Service.Database.Store(game, GameResult.DocumentName(game.GameId, lobby.ChannelId, lobby.GuildId));
             //TODO: Announce the undone game
         }
