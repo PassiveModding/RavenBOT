@@ -207,6 +207,16 @@ namespace RavenBOT.ELO.Modules.Modules
                 CurrentLobby.Queue = new HashSet<ulong>();
                 
 
+                if (CurrentLobby.PlayersPerTeam == 1 && 
+                    (CurrentLobby.TeamPickMode == Lobby.PickMode.Captains_HighestRanked ||
+                    CurrentLobby.TeamPickMode == Lobby.PickMode.Captains_Random ||
+                    CurrentLobby.TeamPickMode == Lobby.PickMode.Captains_RandomHighestRanked))
+                {
+                    //Ensure that there isnt a captain pick mode if the teams only consist of one player
+                    await ReplyAsync("Lobby sort mode was set to random, you cannot have a captain lobby for solo queues.");
+                    CurrentLobby.TeamPickMode = Lobby.PickMode.Random;
+                }
+
                 //Set team players/captains based on the team pick mode
                 switch (CurrentLobby.TeamPickMode)
                 {
@@ -217,8 +227,9 @@ namespace RavenBOT.ELO.Modules.Modules
                         var captains = Service.GetCaptains(CurrentLobby, game, Random);
                         game.Team1.Captain = captains.Item1;
                         game.Team2.Captain = captains.Item2;
+
                         //TODO: Timer from when captains are mentioned to first pick time. Cancel game if command is not run.
-                        await ReplyAsync($"Captains have been picked. Use the `pick` or `p` command to choose your players.\nCaptain 1: <@{game.Team1.Captain}>\nCaptain 2: <@{game.Team2.Captain}>");
+                        await ReplyAsync($"Captains have been picked. Use the `pick` or `p` command to choose your players.\nCaptain 1: <@{game.Team1.Captain}>\nCaptain 2: <@{game.Team2.Captain}>");  
                         break;
                     case Lobby.PickMode.Random:
                         game.GameState = GameResult.State.Undecided;
