@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using RavenBOT.ELO.Modules.Modules;
 
@@ -42,7 +43,7 @@ namespace RavenBOT.ELO.Modules.Models
         }
 
         //TODO: Allow for votes on maps, reduce change of repeate games on the same map.
-        public HashSet<string> Maps { get; set; } = new HashSet<string>();
+        public HashSet<string> Maps { get; set; } = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
 
         //TODO: Instead of storing map history here use the maps that were chosen for recent games?
         public List<string> MapHistory { get; set; } = new List<string>();
