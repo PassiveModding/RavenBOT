@@ -266,5 +266,13 @@ namespace RavenBOT.Common.Interfaces.Database
                 return session.Advanced.Exists(docName);
             }
         }
+
+        public bool Any<T>(Expression<Func<T, bool>> queryFunc)
+        {
+            using (var session = DocumentStore.OpenSession())
+            {
+                return session.Query<T>().Any(queryFunc);
+            }
+        }
     }
 }

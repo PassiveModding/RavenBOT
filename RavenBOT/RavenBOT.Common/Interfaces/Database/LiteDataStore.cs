@@ -152,5 +152,16 @@ namespace RavenBOT.Common.Interfaces.Database
             var collection = GetCollection<T>();
             return collection.Exists(x => x.Id == docName);
         }
+
+        public bool Any<T>(Expression<Func<T, bool>> queryFunc)
+        {
+            lock (locker)
+            {     
+                //TODO: Check that this is valid           
+                var collection = GetCollection<T>();
+                var func = queryFunc.Compile();
+                return collection.Exists(x => func(x.Value));
+            }
+        }
     }
 }
