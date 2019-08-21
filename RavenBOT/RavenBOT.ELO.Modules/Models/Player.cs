@@ -1,6 +1,6 @@
-using System.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace RavenBOT.ELO.Modules.Models
 {
@@ -36,7 +36,7 @@ namespace RavenBOT.ELO.Modules.Models
             this.GuildId = guildId;
             this.RegistrationDate = DateTime.UtcNow;
         }
-        public Player(){}
+        public Player() {}
 
         /// <summary>
         /// Indicates the user's points.
@@ -44,6 +44,62 @@ namespace RavenBOT.ELO.Modules.Models
         /// </summary>
         /// <value></value>
         public int Points { get; set; } = 0;
+
+        private int _Wins = 0;
+
+        public int Wins
+        {
+            get
+            {
+                return _Wins;
+            }
+            set
+            {
+                _Wins = NoNegative(value);
+            }
+        }
+
+        private int _Losses = 0;
+
+        public int Losses
+        {
+            get
+            {
+                return _Losses;
+            }
+            set
+            {
+                _Losses = NoNegative(value);
+            }
+        }
+
+        private int _Draws = 0;
+
+        public int Draws
+        {
+            get
+            {
+                return _Draws;
+            }
+            set
+            {
+                _Draws = NoNegative(value);
+            }
+        }
+
+        private int _Games = 0;
+
+        public int Games
+        {
+            get
+            {
+                return _Games;
+            }
+            set
+            {
+                _Games = NoNegative(value);
+            }
+        }
 
         public DateTime RegistrationDate { get; set; }
 
@@ -55,8 +111,7 @@ namespace RavenBOT.ELO.Modules.Models
         /// <returns></returns>
         public Dictionary<string, int> AdditionalProperties { get; set; } = new Dictionary<string, int>();
 
-  
-        public (int, int) UpdateValue(string key, ModifyState state, int modifier)
+        public(int, int) UpdateValue(string key, ModifyState state, int modifier)
         {
             int original = 0;
             int newVal = 0;
@@ -69,7 +124,7 @@ namespace RavenBOT.ELO.Modules.Models
             {
                 newVal = ModifyValue(state, valMatch.Value, modifier);
                 AdditionalProperties[valMatch.Key] = newVal;
-                original = valMatch.Value;                
+                original = valMatch.Value;
             }
             else
             {
@@ -79,7 +134,16 @@ namespace RavenBOT.ELO.Modules.Models
             return (original, newVal);
         }
 
-        
+        private int NoNegative(int value)
+        {
+            if (value < 0)
+            {
+                return 0;
+            }
+
+            return value;
+        }
+
         public enum ModifyState
         {
             Add,
