@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord.Addons.Interactive;
@@ -13,11 +12,11 @@ namespace RavenBOT.ELO.Modules.Modules
     [RavenRequireContext(ContextType.Guild)]
     //TODO: Moderator permission instead of just admin
     [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
-    public class PlayerManagement : InteractiveBase<ShardedCommandContext>
+    public class ScoreManagement : InteractiveBase<ShardedCommandContext>
     {
         public ELOService Service { get; }
 
-        public PlayerManagement(ELOService service)
+        public ScoreManagement(ELOService service)
         {
             Service = service;
         }
