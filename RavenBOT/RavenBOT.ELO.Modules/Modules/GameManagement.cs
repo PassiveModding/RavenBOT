@@ -390,17 +390,21 @@ namespace RavenBOT.ELO.Modules.Modules
                 var botUser = Service.GetPlayer(Context.Guild.Id, userId);
                 if (botUser == null) continue;
 
+                //This represents the current user's rank
                 var maxRank = MaxRank(competition, botUser.Points);
 
                 int updateVal;
                 RankChangeState state = RankChangeState.None;
                 Rank newRank = null;
 
-                //TODO: Store wins/losses/draws/games played
+                //TODO: Add support for draw tracking
+                botUser.Games++;
+
                 if (win)
                 {
                     updateVal = maxRank?.WinModifier ?? competition.DefaultWinModifier;
                     botUser.Points += updateVal;
+                    botUser.Wins++;
                     newRank = MaxRank(competition, botUser.Points);
                     if (newRank != null)
                     {
@@ -419,8 +423,10 @@ namespace RavenBOT.ELO.Modules.Modules
                     //Ensure the update value is positive as it will be subtracted from the user's points.
                     updateVal = Math.Abs(maxRank?.LossModifier ?? competition.DefaultLossModifier);
                     botUser.Points -= updateVal;
+                    botUser.Losses++;
                     //Set the update value to a negative value for returning purposes.
                     updateVal = -updateVal;
+
                     if (maxRank != null)
                     {
                         if (botUser.Points < maxRank.Points)
