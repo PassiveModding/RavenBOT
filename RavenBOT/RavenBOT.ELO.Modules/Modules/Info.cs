@@ -1,3 +1,4 @@
+using System.Text;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -117,26 +118,27 @@ namespace RavenBOT.ELO.Modules.Modules
                 var lines = GetPlayerLines(playerGroup, index);
                 index = lines.Item1;
                 var page = new PaginatedMessage.Page();
-                page.Description = string.Join("\n", lines.Item2);
+                page.Description = lines.Item2;
                 pages.Add(page);
             }
 
             return pages;
         }
 
-        public (int, List<string>) GetPlayerLines(Player[] players, int startValue)
+        //Returns the updated index and the formatted player lines
+        public (int, string) GetPlayerLines(Player[] players, int startValue)
         {
-            var retList = new List<string>(players.Length);
+            var sb = new StringBuilder();
             
             //Iterate through the players and add their summary line to the list.
             foreach (var player in players)
             {
-                retList.Add($"{startValue}: {player.DisplayName} - {player.Points}");
+                sb.AppendLine($"{startValue}: {player.DisplayName} - {player.Points}");
                 startValue++;
             }
 
             //Return the updated start value and the list of player lines.
-            return (startValue, retList);
+            return (startValue, sb.ToString());
         }
     }
 }
