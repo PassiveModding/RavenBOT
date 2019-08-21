@@ -67,6 +67,12 @@ namespace RavenBOT.ELO.Modules.Modules
                 return;
             }
 
+            await UpdateScores(lobby, game, competition);
+            //TODO: Announce the undone game
+        }
+
+        public async Task UpdateScores(Lobby lobby, GameResult game, CompetitionConfig competition)
+        {
             foreach (var score in game.UpdatedScores)
             {
                 var player = Service.GetPlayer(Context.Guild.Id, score.Item1);
@@ -168,12 +174,12 @@ namespace RavenBOT.ELO.Modules.Modules
             game.GameState = GameResult.State.Undecided;
             game.UpdatedScores = new HashSet < (ulong, int) > ();
             Service.Database.Store(game, GameResult.DocumentName(game.GameId, lobby.ChannelId, lobby.GuildId));
-            //TODO: Announce the undone game
         }
 
         [Command("DeleteGame")]
         [Alias("DelGame", "Delete Game")]
         [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
+        //TODO: Explain that this does not affect the users who were in the game if it had a result. this is only for removing the game log from the database
         public async Task DelGame(int gameNumber, SocketTextChannel lobbyChannel = null)
         {
             if (lobbyChannel == null)
@@ -202,10 +208,10 @@ namespace RavenBOT.ELO.Modules.Modules
 
         [Command("Game")]
         [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
-        public async Task GameAsync(int teamNumber, int gameNumber, SocketTextChannel lobbyChannel = null)
+        public async Task GameAsync(int winningTeamNumber, int gameNumber, SocketTextChannel lobbyChannel = null)
         {
             //TODO: Needs a way of cancelling games and calling draws
-            if (teamNumber != 1 && teamNumber != 2)
+            if (winningTeamNumber != 1 && winningTeamNumber != 2)
             {
                 await ReplyAsync("Team number must be either then number `1` or `2`");
                 return;
@@ -237,7 +243,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
             List < (Player, int, Rank, RankChangeState, Rank) > winList;
             List < (Player, int, Rank, RankChangeState, Rank) > loseList;
-            if (teamNumber == 1)
+            if (winningTeamNumber == 1)
             {
                 winList = UpdateTeamScoresAsync(competition, true, game.Team1.Players);
                 loseList = UpdateTeamScoresAsync(competition, false, game.Team2.Players);
@@ -320,12 +326,12 @@ namespace RavenBOT.ELO.Modules.Modules
 
             game.GameState = GameResult.State.Decided;
             game.UpdatedScores = allUsers.Select(x => (x.Item1.UserId, x.Item2)).ToHashSet();
-            game.WinningTeam = teamNumber;
+            game.WinningTeam = winningTeamNumber;
             Service.Database.Store(game, GameResult.DocumentName(game.GameId, game.LobbyId, game.GuildId));
 
             var winField = new EmbedFieldBuilder
             {
-                Name = $"Winning Team, Team #{teamNumber}",
+                Name = $"Winning Team, Team #{winningTeamNumber}",
                 Value = GetResponseContent(winList).FixLength(1023)
             };
             var loseField = new EmbedFieldBuilder
