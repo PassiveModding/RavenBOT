@@ -46,7 +46,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 responseString += $"{player.DisplayName}: {player.Points} => {newVal}\n";
                 player.Points = newVal;
             }
-            Service.Database.StoreMany(players, x => Player.DocumentName(x.GuildId, x.UserId));
+            Service.SavePlayers(players);
             await ReplyAsync("", false, responseString.QuickEmbed());
         }
         
@@ -67,7 +67,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 responseString += $"{player.DisplayName}: {player.Wins} => {newVal}\n";
                 player.Wins = newVal;
             }
-            Service.Database.StoreMany(players, x => Player.DocumentName(x.GuildId, x.UserId));
+            Service.SavePlayers(players);
             await ReplyAsync("", false, responseString.QuickEmbed());
         }
 
@@ -88,7 +88,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 responseString += $"{player.DisplayName}: {player.Losses} => {newVal}\n";
                 player.Losses = newVal;
             }
-            Service.Database.StoreMany(players, x => Player.DocumentName(x.GuildId, x.UserId));
+            Service.SavePlayers(players);
             await ReplyAsync("", false, responseString.QuickEmbed());
         }
 
@@ -109,7 +109,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 responseString += $"{player.DisplayName}: {player.Draws} => {newVal}\n";
                 player.Draws = newVal;
             }
-            Service.Database.StoreMany(players, x => Player.DocumentName(x.GuildId, x.UserId));
+            Service.SavePlayers(players);
             await ReplyAsync("", false, responseString.QuickEmbed());
         }
 
@@ -130,7 +130,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 var response = player.UpdateValue(value, state, amount);
                 responseString += $"{player.DisplayName}: {response.Item1} => {response.Item2}\n";
             }
-            Service.Database.StoreMany(players, x => Player.DocumentName(x.GuildId, x.UserId));
+            Service.SavePlayers(players);
             await ReplyAsync("", false, responseString.QuickEmbed());
         }
     }

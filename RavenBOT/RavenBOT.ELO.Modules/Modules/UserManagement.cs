@@ -31,10 +31,10 @@ namespace RavenBOT.ELO.Modules.Modules
                 return;
             }
 
-            var competition = Service.GetCompetition(Context.Guild.Id);
+            var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
 
             //Remove user ranks, register role and nickname
-            Service.Database.Remove<Player>(Player.DocumentName(player.GuildId, player.UserId));
+            Service.RemovePlayer(player);
 
             if (user.Hierarchy < Context.Guild.CurrentUser.Hierarchy)
             {

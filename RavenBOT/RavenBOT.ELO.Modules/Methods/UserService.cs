@@ -43,7 +43,7 @@ namespace RavenBOT.ELO.Modules.Methods
                         {
                             comp.Ranks.Remove(match);
                             noted.Add($"A rank could not be found in the server and was subsequently deleted from the server config [{match.RoleId} w:{match.WinModifier} l:{match.LossModifier} p:{match.Points}]");
-                            Database.Store(comp, CompetitionConfig.DocumentName(comp.GuildId));
+                            SaveCompetition(comp);
                         } 
                     }
                 }

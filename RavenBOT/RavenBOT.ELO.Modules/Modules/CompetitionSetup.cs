@@ -23,23 +23,23 @@ namespace RavenBOT.ELO.Modules.Modules
         [Command("SetRegisterRole", RunMode = RunMode.Sync)]
         public async Task SetRegisterRole(IRole role)
         {
-            var competition = Service.GetCompetition(Context.Guild.Id) ?? Service.CreateCompetition(Context.Guild.Id);
+            var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
             competition.RegisteredRankId = role.Id;
-            Service.Database.Store(competition, CompetitionConfig.DocumentName(Context.Guild.Id));
+            Service.SaveCompetition(competition);
             await ReplyAsync("Register role set.");
         }
 
         [Command("AddRank", RunMode = RunMode.Sync)]
         public async Task AddRank(IRole role, int points)
         {
-            var competition = Service.GetCompetition(Context.Guild.Id) ?? Service.CreateCompetition(Context.Guild.Id);
+            var competition = Service.GetOrCreateCompetition(Context.Guild.Id) ?? Service.CreateCompetition(Context.Guild.Id);
             competition.Ranks = competition.Ranks.Where(x => x.RoleId != role.Id).ToList();
             competition.Ranks.Add(new Rank
             {
                 RoleId = role.Id,
                     Points = points
             });
-            Service.Database.Store(competition, CompetitionConfig.DocumentName(Context.Guild.Id));
+            Service.SaveCompetition(competition);
             await ReplyAsync("Rank added.");
         }
 
@@ -52,9 +52,9 @@ namespace RavenBOT.ELO.Modules.Modules
         [Command("RemoveRank", RunMode = RunMode.Sync)]
         public async Task RemoveRank(ulong roleId)
         {
-            var competition = Service.GetCompetition(Context.Guild.Id) ?? Service.CreateCompetition(Context.Guild.Id);
+            var competition = Service.GetOrCreateCompetition(Context.Guild.Id) ?? Service.CreateCompetition(Context.Guild.Id);
             competition.Ranks = competition.Ranks.Where(x => x.RoleId != roleId).ToList();
-            Service.Database.Store(competition, CompetitionConfig.DocumentName(Context.Guild.Id));
+            Service.SaveCompetition(competition);
             await ReplyAsync("Rank Removed.");
         }
 

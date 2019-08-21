@@ -1,8 +1,11 @@
+using System.Linq.Expressions;
+using System.Collections.Generic;
 using System.Linq;
 using Discord.WebSocket;
 using RavenBOT.Common;
 using RavenBOT.Common.Interfaces;
 using RavenBOT.ELO.Modules.Models;
+using System;
 
 namespace RavenBOT.ELO.Modules.Methods
 {
@@ -18,20 +21,25 @@ namespace RavenBOT.ELO.Modules.Methods
         //TODO: Hook channel deleted event to automatically delete lobbies
         //TODO: Caching for users and other related objects.
 
-        public IDatabase Database { get; }
+        private IDatabase Database { get; }
         public DiscordShardedClient Client { get; }
 
         public CompetitionConfig CreateCompetition(ulong guildId)
         {
             var config = new CompetitionConfig(guildId);
-            Database.Store(config, CompetitionConfig.DocumentName(guildId));
+            SaveCompetition(config);
 
             return config;
         }
 
-        public CompetitionConfig GetCompetition(ulong guildId)
+        public CompetitionConfig GetOrCreateCompetition(ulong guildId)
         {
             return Database.Load<CompetitionConfig>(CompetitionConfig.DocumentName(guildId)) ?? CreateCompetition(guildId);
+        }
+
+        public void SaveCompetition(CompetitionConfig comp)
+        {
+            Database.Store<CompetitionConfig>(comp, CompetitionConfig.DocumentName(comp.GuildId));
         }
 
         public (bool, Lobby) IsLobby(ulong guildId, ulong channelId)
@@ -63,10 +71,30 @@ namespace RavenBOT.ELO.Modules.Methods
             return null;
         }
 
+        public GameResult GetGame(ulong guildId, ulong channelId, int gameId)
+        {
+            return Database.Load<GameResult>(GameResult.DocumentName(gameId, channelId, guildId));
+        }
+
+        public void RemoveGame(GameResult game)
+        {
+            Database.Remove<GameResult>(GameResult.DocumentName(game.GameId, game.LobbyId, game.GuildId));
+        }
+
+        public void SaveGame(GameResult game)
+        {
+            Database.Store<GameResult>(game, GameResult.DocumentName(game.GameId, game.LobbyId, game.GuildId));
+        }
+
+        public Lobby[] GetLobbies(ulong guildId)
+        {
+            return Database.Query<Lobby>(x => x.GuildId == guildId).ToArray();
+        }
+
         public Lobby CreateLobby(ulong guildId, ulong channelId)
         {
             var config = new Lobby(guildId, channelId);
-            Database.Store(config, Lobby.DocumentName(guildId, channelId));
+            SaveLobby(config);
 
             return config;
         }
@@ -76,25 +104,47 @@ namespace RavenBOT.ELO.Modules.Methods
             return Database.Load<Lobby>(Lobby.DocumentName(guildId, channelId));
         }
 
-        public GameResult GetGame(ulong guildId, ulong channelId, int gameId)
+        public void SaveLobby(Lobby lobby)
         {
-            return Database.Load<GameResult>(GameResult.DocumentName(gameId, channelId, guildId));
+            Database.Store<Lobby>(lobby, Lobby.DocumentName(lobby.GuildId, lobby.ChannelId));
         }
 
-        public Lobby[] GetLobbies(ulong guildId)
-        {
-            return Database.Query<Lobby>(x => x.GuildId == guildId).ToArray();
-        }
-
+        /// <summary>
+        /// Tries to get a player from the database, will return null if they are not found.
+        /// </summary>
+        /// <param name="guildId"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public Player GetPlayer(ulong guildId, ulong userId)
         {
             return Database.Load<Player>(Player.DocumentName(guildId, userId));
         }
 
+        public void SavePlayer(Player player)
+        {
+            Database.Store<Player>(player, Player.DocumentName(player.GuildId, player.UserId));
+        }
+
+        public void RemovePlayer(Player player)
+        {
+            Database.Remove<Player>(Player.DocumentName(player.GuildId, player.UserId));
+        }
+
+        
+        public void SavePlayers(IEnumerable<Player> players)
+        {
+            Database.StoreMany<Player>(players.ToList(), x => Player.DocumentName(x.GuildId, x.UserId));
+        }
+
+        public IEnumerable<Player> GetPlayers(Expression<Func<Player, bool>> queryFunc)
+        {
+            return Database.Query<Player>(queryFunc);
+        }
+
         public Player CreatePlayer(ulong guildId, ulong userId, string name)
         {
-            var config = new Player(guildId, userId, name);
-            Database.Store(config, Player.DocumentName(guildId, userId));
+            var config = new Player(userId, guildId, name);
+            SavePlayer(config);
 
             return config;
         }

@@ -33,7 +33,7 @@ namespace RavenBOT.ELO.Modules.Modules
             var lobby = Service.CreateLobby(Context.Guild.Id, Context.Channel.Id);
             lobby.PlayersPerTeam = playersPerTeam;
             lobby.TeamPickMode = pickMode;
-            Service.Database.Store(lobby, Lobby.DocumentName(Context.Guild.Id, Context.Channel.Id));
+            Service.SaveLobby(lobby);
             await ReplyAsync("New Lobby has been created\n" +
                 $"Players per team: {playersPerTeam}\n" +
                 $"Pick Mode: {pickMode}");
@@ -50,7 +50,7 @@ namespace RavenBOT.ELO.Modules.Modules
             }
 
             lobby.PlayersPerTeam = playersPerTeam;
-            Service.Database.Store(lobby, Lobby.DocumentName(Context.Guild.Id, Context.Channel.Id));
+            Service.SaveLobby(lobby);
             await ReplyAsync($"There can now be up to {playersPerTeam} in each team.");
         }
 
@@ -65,7 +65,7 @@ namespace RavenBOT.ELO.Modules.Modules
             }
 
             lobby.TeamPickMode = pickMode;
-            Service.Database.Store(lobby, Lobby.DocumentName(Context.Guild.Id, Context.Channel.Id));
+            Service.SaveLobby(lobby);
             await ReplyAsync($"Pick mode set.");
         }
 
@@ -90,7 +90,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
             lobby.Maps.Add(mapName);
             lobby.Maps = lobby.Maps.Distinct().ToHashSet();
-            Service.Database.Store(lobby, Lobby.DocumentName(Context.Guild.Id, Context.Channel.Id));
+            Service.SaveLobby(lobby);
             await ReplyAsync("Map added.");
         }
     }

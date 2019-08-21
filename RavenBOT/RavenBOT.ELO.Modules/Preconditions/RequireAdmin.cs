@@ -30,7 +30,7 @@ namespace RavenBOT.ELO.Modules.Preconditions
             }
 
             var eloService = services.GetRequiredService<ELOService>();
-            var competition = eloService.GetCompetition(context.Guild.Id);
+            var competition = eloService.GetOrCreateCompetition(context.Guild.Id);
 
 
             if (competition.AdminRole != 0)

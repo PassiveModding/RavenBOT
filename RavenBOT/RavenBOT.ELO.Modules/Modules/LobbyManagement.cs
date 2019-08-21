@@ -103,7 +103,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 }
             }
             CurrentLobby.Queue.Clear();
-            Service.Database.Store(CurrentLobby, Lobby.DocumentName(CurrentLobby.GuildId, CurrentLobby.ChannelId));
+            Service.SaveLobby(CurrentLobby);
             await ReplyAsync("Queue Cleared.");
         }
 
@@ -168,7 +168,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 return;
             }
 
-            if (Service.GetCompetition(Context.Guild.Id).BlockMultiQueueing)
+            if (Service.GetOrCreateCompetition(Context.Guild.Id).BlockMultiQueueing)
             {
                 var lobbies = Service.GetLobbies(Context.Guild.Id);
                 var lobbyMatches = lobbies.Where(x => x.Queue.Contains(Context.User.Id));
@@ -271,7 +271,7 @@ namespace RavenBOT.ELO.Modules.Modules
                     await ReplyAsync("", false, gameEmbed.Build());
                 }
 
-                Service.Database.Store(game, GameResult.DocumentName(game.GameId, game.LobbyId, game.GuildId));
+                Service.SaveGame(game);
             }
             else
             {
@@ -285,7 +285,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 }
             }
 
-            Service.Database.Store(CurrentLobby, Lobby.DocumentName(Context.Guild.Id, Context.Channel.Id));
+            Service.SaveLobby(CurrentLobby);
         }
 
         [Command("Leave", RunMode = RunMode.Sync)]
@@ -309,7 +309,7 @@ namespace RavenBOT.ELO.Modules.Modules
                     }
                 }
                 CurrentLobby.Queue.Remove(Context.User.Id);
-                Service.Database.Store(CurrentLobby, Lobby.DocumentName(Context.Guild.Id, Context.Channel.Id));
+                Service.SaveLobby(CurrentLobby);
                 
                 if (Context.Guild.CurrentUser.GuildPermissions.AddReactions)
                 {
@@ -477,7 +477,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 await ReplyAsync("", false, gameEmbed.Build());
             }
 
-            Service.Database.Store(game, GameResult.DocumentName(game.GameId, game.LobbyId, game.GuildId));
+            Service.SaveGame(game);
         }
 
         public SocketGuildUser[] GetUserList(SocketGuild guild, IEnumerable<ulong> userIds)

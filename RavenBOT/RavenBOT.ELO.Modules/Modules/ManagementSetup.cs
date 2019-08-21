@@ -21,9 +21,9 @@ namespace RavenBOT.ELO.Modules.Modules
         [Command("SetModerator", RunMode = RunMode.Sync)]
         public async Task SetModeratorAsync(SocketRole modRole = null)
         {
-            var competition = Service.GetCompetition(Context.Guild.Id);
+            var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
             competition.ModeratorRole = modRole?.Id ?? 0;
-            Service.Database.Store(competition, CompetitionConfig.DocumentName(Context.Guild.Id));
+            Service.SaveCompetition(competition);
             if (modRole != null)
             {
                 await ReplyAsync("Moderator role set.");
@@ -35,11 +35,11 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("SetAdmin", RunMode = RunMode.Sync)]
-        public async Task SetAdminAsync(SocketRole adminRole)
+        public async Task SetAdminAsync(SocketRole adminRole = null)
         {
-            var competition = Service.GetCompetition(Context.Guild.Id);
+            var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
             competition.ModeratorRole = adminRole?.Id ?? 0;
-            Service.Database.Store(competition, CompetitionConfig.DocumentName(Context.Guild.Id));
+            Service.SaveCompetition(competition);
             if (adminRole != null)
             {
                 await ReplyAsync("Admin role set.");

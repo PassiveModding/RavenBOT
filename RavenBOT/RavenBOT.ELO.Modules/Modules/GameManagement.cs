@@ -40,7 +40,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 lobbyChannel = Context.Channel as SocketTextChannel;
             }
 
-            var competition = Service.GetCompetition(Context.Guild.Id);
+            var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
             if (competition == null)
             {
                 await ReplyAsync("Not a competition.");
@@ -98,7 +98,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 }
 
                 //Save the player profile after updating scores.
-                Service.Database.Store(player, Player.DocumentName(player.GuildId, player.UserId));
+                Service.SavePlayer(player);
 
                 var guildUser = Context.Guild.GetUser(player.UserId);
                 if (guildUser == null)
@@ -175,7 +175,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
             game.GameState = GameResult.State.Undecided;
             game.UpdatedScores = new HashSet <(ulong, int)> ();
-            Service.Database.Store(game, GameResult.DocumentName(game.GameId, lobby.ChannelId, lobby.GuildId));
+            Service.SaveGame(game);
         }
 
         [Command("DeleteGame", RunMode = RunMode.Sync)]
@@ -203,7 +203,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 return;
             }
 
-            Service.Database.Remove<GameResult>(GameResult.DocumentName(gameNumber, lobbyChannel.Id, Context.Guild.Id));
+            Service.RemoveGame(game);
             await ReplyAsync("Game Deleted.", false, JsonConvert.SerializeObject(game, Formatting.Indented).FixLength(2047).QuickEmbed());
         }
 
@@ -234,7 +234,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
             game.GameState = GameResult.State.Draw;
             game.UpdatedScores = new HashSet<(ulong, int)>();
-            Service.Database.Store(game, GameResult.DocumentName(game.GameId, game.LobbyId, game.GuildId));
+            Service.SaveGame(game);
 
             await DrawPlayersAsync(game.Team1.Players);
             await DrawPlayersAsync(game.Team2.Players);
@@ -245,12 +245,12 @@ namespace RavenBOT.ELO.Modules.Modules
         {
             foreach (var id in playerIds)
             {
-                var player = Service.Database.Load<Player>(Player.DocumentName(Context.Guild.Id, id));
+                var player = Service.GetPlayer(Context.Guild.Id, id);
                 if (player == null) continue;
 
                 player.Draws++;
 
-                Service.Database.Store(player, Player.DocumentName(Context.Guild.Id, id));
+                Service.SavePlayer(player);
             }
 
             return Task.CompletedTask;
@@ -288,7 +288,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 return;
             }
 
-            var competition = Service.GetCompetition(Context.Guild.Id);
+            var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
 
             List < (Player, int, Rank, RankChangeState, Rank) > winList;
             List < (Player, int, Rank, RankChangeState, Rank) > loseList;
@@ -376,7 +376,7 @@ namespace RavenBOT.ELO.Modules.Modules
             game.GameState = GameResult.State.Decided;
             game.UpdatedScores = allUsers.Select(x => (x.Item1.UserId, x.Item2)).ToHashSet();
             game.WinningTeam = winningTeamNumber;
-            Service.Database.Store(game, GameResult.DocumentName(game.GameId, game.LobbyId, game.GuildId));
+            Service.SaveGame(game);
 
             var winField = new EmbedFieldBuilder
             {
@@ -450,11 +450,11 @@ namespace RavenBOT.ELO.Modules.Modules
             var updates = new List < (Player, int, Rank, RankChangeState, Rank) > ();
             foreach (var userId in userIds)
             {
-                var botUser = Service.GetPlayer(Context.Guild.Id, userId);
-                if (botUser == null) continue;
+                var player = Service.GetPlayer(Context.Guild.Id, userId);
+                if (player == null) continue;
 
                 //This represents the current user's rank
-                var maxRank = competition.MaxRank(botUser.Points);
+                var maxRank = competition.MaxRank(player.Points);
 
                 int updateVal;
                 RankChangeState state = RankChangeState.None;
@@ -463,9 +463,9 @@ namespace RavenBOT.ELO.Modules.Modules
                 if (win)
                 {
                     updateVal = maxRank?.WinModifier ?? competition.DefaultWinModifier;
-                    botUser.Points += updateVal;
-                    botUser.Wins++;
-                    newRank = competition.MaxRank(botUser.Points);
+                    player.Points += updateVal;
+                    player.Wins++;
+                    newRank = competition.MaxRank(player.Points);
                     if (newRank != null)
                     {
                         if (maxRank == null)
@@ -482,26 +482,26 @@ namespace RavenBOT.ELO.Modules.Modules
                 {
                     //Ensure the update value is positive as it will be subtracted from the user's points.
                     updateVal = Math.Abs(maxRank?.LossModifier ?? competition.DefaultLossModifier);
-                    botUser.Points -= updateVal;
-                    botUser.Losses++;
+                    player.Points -= updateVal;
+                    player.Losses++;
                     //Set the update value to a negative value for returning purposes.
                     updateVal = -updateVal;
 
                     if (maxRank != null)
                     {
-                        if (botUser.Points < maxRank.Points)
+                        if (player.Points < maxRank.Points)
                         {
                             state = RankChangeState.Derank;
-                            newRank = competition.MaxRank(botUser.Points);
+                            newRank = competition.MaxRank(player.Points);
                         }
                     }
                 }
 
-                updates.Add((botUser, updateVal, maxRank, state, newRank));
+                updates.Add((player, updateVal, maxRank, state, newRank));
 
                 //TODO: Rank checking?
                 //I forget what this means honestly
-                Service.Database.Store(botUser, Player.DocumentName(botUser.GuildId, botUser.UserId));
+                Service.SavePlayer(player);
             }
 
             return updates;

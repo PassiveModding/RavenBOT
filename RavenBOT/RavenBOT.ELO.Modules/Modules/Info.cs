@@ -35,7 +35,7 @@ namespace RavenBOT.ELO.Modules.Modules
             //TODO: Fix name not being set when re-registering
 
             var player = Service.GetPlayer(Context.Guild.Id, Context.User.Id) ?? Service.CreatePlayer(Context.Guild.Id, Context.User.Id, name);
-            var competition = Service.GetCompetition(Context.Guild.Id);
+            var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
             var responses = await Service.UpdateUserAsync(competition, player, Context.User as SocketGuildUser);
             await ReplyAsync($"You have registered as `{name}`, all roles/name updates have been applied if applicable.");
             if (responses.Count > 0)
@@ -47,7 +47,7 @@ namespace RavenBOT.ELO.Modules.Modules
         [Command("Ranks")]
         public async Task ShowRanksAsync()
         {
-            var comp = Service.GetCompetition(Context.Guild.Id);
+            var comp = Service.GetOrCreateCompetition(Context.Guild.Id);
             if (!comp.Ranks.Any())
             {
                 await ReplyAsync("There are currently no ranks set up.");
@@ -73,7 +73,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 return;
             }
             
-            var competition = Service.GetCompetition(Context.Guild.Id);
+            var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
             var rank = competition.MaxRank(player.Points);
             string rankStr = null;
             if (rank != null)
@@ -105,10 +105,15 @@ namespace RavenBOT.ELO.Modules.Modules
             //TODO: Implement sort modes
 
             //Retrieve players in the current guild from database
-            var users = Service.Database.Query<Player>(x => x.GuildId == Context.Guild.Id);
+            var users = Service.GetPlayers(x => x.GuildId == Context.Guild.Id);
 
             //Order players by score and then split them into groups of 20 for pagination
             var userGroups = users.OrderByDescending(x => x.Points).SplitList(20).ToArray();
+            if (userGroups.Length == 0)
+            {
+                await ReplyAndDeleteAsync("There are no registed users in this server yet.");
+                return;
+            }
 
             //Convert the groups into formatted pages for the response message
             var pages = GetPages(userGroups);
