@@ -172,7 +172,7 @@ namespace RavenBOT.ELO.Modules.Modules
             }
 
             game.GameState = GameResult.State.Undecided;
-            game.UpdatedScores = new HashSet < (ulong, int) > ();
+            game.UpdatedScores = new HashSet <(ulong, int)> ();
             Service.Database.Store(game, GameResult.DocumentName(game.GameId, lobby.ChannelId, lobby.GuildId));
         }
 
@@ -204,6 +204,58 @@ namespace RavenBOT.ELO.Modules.Modules
 
             Service.Database.Remove<GameResult>(GameResult.DocumentName(gameNumber, lobbyChannel.Id, Context.Guild.Id));
             await ReplyAsync("Game Deleted.", false, JsonConvert.SerializeObject(game, Formatting.Indented).FixLength(2047).QuickEmbed());
+        }
+
+        [Command("Draw")]
+        [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
+        public async Task DrawAsync(int gameNumber, SocketTextChannel lobbyChannel = null)
+        {
+            if (lobbyChannel == null)
+            {
+                //If no lobby is provided, assume that it is the current channel.
+                lobbyChannel = Context.Channel as SocketTextChannel;
+            }
+
+            var lobby = Service.GetLobby(Context.Guild.Id, lobbyChannel.Id);
+            if (lobby == null)
+            {
+                //Reply error not a lobby.
+                await ReplyAsync("Channel is not a lobby.");
+                return;
+            }
+
+            var game = Service.GetGame(Context.Guild.Id, lobby.ChannelId, gameNumber);
+            if (game == null)
+            {
+                //Reply not valid game number.
+                await ReplyAsync($"Game number is invalid. Most recent game is {lobby.CurrentGameCount}");
+                return;
+            }
+
+
+            game.GameState = GameResult.State.Draw;
+            game.UpdatedScores = new HashSet<(ulong, int)>();
+            Service.Database.Store(game, GameResult.DocumentName(game.GameId, game.LobbyId, game.GuildId));
+
+            await DrawPlayersAsync(game.Team1.Players);
+            await DrawPlayersAsync(game.Team2.Players);
+            await ReplyAsync($"Called draw on game #{game.GameId}, player's game and draw counts have been updated.");
+        }
+
+        public Task DrawPlayersAsync(HashSet<ulong> playerIds)
+        {
+            foreach (var id in playerIds)
+            {
+                var player = Service.Database.Load<Player>(Player.DocumentName(Context.Guild.Id, id));
+                if (player == null) continue;
+
+                player.Games++;
+                player.Draws++;
+
+                Service.Database.Store(player, Player.DocumentName(Context.Guild.Id, id));
+            }
+
+            return Task.CompletedTask;
         }
 
         [Command("Game")]
