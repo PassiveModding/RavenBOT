@@ -1,15 +1,16 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using Discord;
+using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
-using RavenBOT.Common;
-using RavenBOT.ELO.Modules.Models;
-using Discord;
-using RavenBOT.ELO.Modules.Methods;
-using Discord.Addons.Interactive;
 using Newtonsoft.Json;
+using RavenBOT.Common;
+using RavenBOT.ELO.Modules.Methods;
+using RavenBOT.ELO.Modules.Models;
 
 namespace RavenBOT.ELO.Modules.Modules
 {
@@ -22,7 +23,6 @@ namespace RavenBOT.ELO.Modules.Modules
         {
             Service = service;
         }
-
 
         //TODO: Ensure correct commands require mod/admin perms
 
@@ -108,7 +108,7 @@ namespace RavenBOT.ELO.Modules.Modules
                         nicknameChange = true;
                     }
                 }
-                
+
                 //TODO: Rank updates
                 bool rankChange = false;
                 var newRank = MaxRank(competition, player.Points);
@@ -162,12 +162,11 @@ namespace RavenBOT.ELO.Modules.Modules
                     {
                         //TODO: Add to list of name change errors.
                     }
-                }                
+                }
             }
 
-
             game.GameState = GameResult.State.Undecided;
-            game.UpdatedScores = new HashSet<(ulong, int)>();
+            game.UpdatedScores = new HashSet < (ulong, int) > ();
             Service.Database.Store(game, GameResult.DocumentName(game.GameId, lobby.ChannelId, lobby.GuildId));
             //TODO: Announce the undone game
         }
@@ -235,23 +234,24 @@ namespace RavenBOT.ELO.Modules.Modules
             }
 
             var competition = Service.GetCompetition(Context.Guild.Id);
-            
-            List<(Player, int, Rank, RankChangeState, Rank)> winList;
-            List<(Player, int, Rank, RankChangeState, Rank)> loseList;
+
+            List < (Player, int, Rank, RankChangeState, Rank) > winList;
+            List < (Player, int, Rank, RankChangeState, Rank) > loseList;
             if (teamNumber == 1)
             {
                 winList = UpdateTeamScoresAsync(competition, true, game.Team1.Players);
                 loseList = UpdateTeamScoresAsync(competition, false, game.Team2.Players);
-            } else 
+            }
+            else
             {
                 loseList = UpdateTeamScoresAsync(competition, false, game.Team1.Players);
                 winList = UpdateTeamScoresAsync(competition, true, game.Team2.Players);
             }
 
-            var allUsers = new List<(Player, int, Rank, RankChangeState, Rank)>();
+            var allUsers = new List < (Player, int, Rank, RankChangeState, Rank) > ();
             allUsers.AddRange(winList);
             allUsers.AddRange(loseList);
-            
+
             foreach (var user in allUsers)
             {
                 //Ignore user updates if they aren't found in the server.
@@ -291,7 +291,7 @@ namespace RavenBOT.ELO.Modules.Modules
                         roleIds.Remove(user.Item3.RoleId);
                     }
                 }
-                
+
                 bool updateRoles = false;
                 //Compare the updated roles against the original roles for equality                
                 if (!Enumerable.SequenceEqual(roleIds.Distinct().OrderBy(x => x), gUser.Roles.Select(x => x.Id).OrderBy(x => x)))
@@ -335,32 +335,40 @@ namespace RavenBOT.ELO.Modules.Modules
             };
             var response = new EmbedBuilder
             {
-                Fields = new List<EmbedFieldBuilder>{winField, loseField},
+                Fields = new List<EmbedFieldBuilder> { winField, loseField },
                 Title = $"Game #{gameNumber} Result called by {Context.User.Username}#{Context.User.Discriminator}"
             };
             await ReplyAsync("", false, response.Build());
         }
 
-        public string GetResponseContent(List<(Player, int, Rank, RankChangeState, Rank)> players)
+        public string GetResponseContent(List < (Player, int, Rank, RankChangeState, Rank) > players)
         {
-            return string.Join("\n", players.Select(x => 
+            var sb = new StringBuilder();
+            foreach (var player in players)
+            {
+                if (player.Item4 == RankChangeState.None) 
                 {
-                    if (x.Item4 == RankChangeState.None) return $"[{x.Item1.Points}] {x.Item1.DisplayName} Points: {x.Item2}";
-                    
-                    SocketRole originalRole = null;
-                    SocketRole newRole = null;
-                    if (x.Item3 != null)
-                    {
-                        originalRole = Context.Guild.GetRole(x.Item3.RoleId);
-                    }
+                    sb.AppendLine($"[{player.Item1.Points}] {player.Item1.DisplayName} Points: {player.Item2}");
+                    continue;
+                }
 
-                    if (x.Item5 != null)
-                    {
-                        newRole = Context.Guild.GetRole(x.Item5.RoleId);
-                    }
+                SocketRole originalRole = null;
+                SocketRole newRole = null;
+                if (player.Item3 != null)
+                {
+                    originalRole = Context.Guild.GetRole(player.Item3.RoleId);
+                }
 
-                    return $"[{x.Item1.Points}] {x.Item1.DisplayName} Points: {x.Item2} Rank: {originalRole?.Mention ?? "N.A"} => {newRole?.Mention ?? "N/A"}";
-                }));
+                if (player.Item5 != null)
+                {
+                    newRole = Context.Guild.GetRole(player.Item5.RoleId);
+                }
+
+                sb.AppendLine($"[{player.Item1.Points}] {player.Item1.DisplayName} Points: {player.Item2} Rank: {originalRole?.Mention ?? "N.A"} => {newRole?.Mention ?? "N/A"}");
+
+            }
+
+            return sb.ToString();
         }
 
         public enum RankChangeState
@@ -382,9 +390,9 @@ namespace RavenBOT.ELO.Modules.Modules
         /// The player's rank change state (rank up, derank, none)
         /// The players new rank (if changed)
         /// </returns>
-        public List<(Player, int, Rank, RankChangeState, Rank)> UpdateTeamScoresAsync(CompetitionConfig competition, bool win, HashSet<ulong> userIds)
+        public List < (Player, int, Rank, RankChangeState, Rank) > UpdateTeamScoresAsync(CompetitionConfig competition, bool win, HashSet<ulong> userIds)
         {
-            var updates = new List<(Player, int, Rank, RankChangeState, Rank)>();
+            var updates = new List < (Player, int, Rank, RankChangeState, Rank) > ();
             foreach (var userId in userIds)
             {
                 var botUser = Service.GetPlayer(Context.Guild.Id, userId);
@@ -411,11 +419,11 @@ namespace RavenBOT.ELO.Modules.Modules
                         if (maxRank == null)
                         {
                             state = RankChangeState.RankUp;
-                        } 
+                        }
                         else if (newRank.RoleId != maxRank.RoleId)
                         {
                             state = RankChangeState.RankUp;
-                        }                          
+                        }
                     }
                 }
                 else
