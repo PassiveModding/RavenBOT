@@ -11,7 +11,7 @@ namespace RavenBOT.ELO.Modules.Modules
 {
     [RavenRequireContext(ContextType.Guild)]
     //TODO: Moderator permission instead of just admin
-    [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
+    [Preconditions.RequireModerator]
     public class ScoreManagement : InteractiveBase<ShardedCommandContext>
     {
         public ELOService Service { get; }
@@ -29,13 +29,13 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         //TODO: Consider whether it's necessary to have the single user command as multi user already is able to accept only one.
-        [Command("Points")]
+        [Command("Points", RunMode = RunMode.Sync)]
         public async Task PointsAsync(SocketGuildUser user, Player.ModifyState state, int amount)
         {
             await PointsAsync(state, amount, user);
         }
 
-        [Command("Points")]
+        [Command("Points", RunMode = RunMode.Sync)]
         public async Task PointsAsync(Player.ModifyState state, int amount, params SocketGuildUser[] users)
         {
             var players = users.Select(x => Service.GetPlayer(Context.Guild.Id, x.Id)).ToList();
@@ -50,13 +50,13 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync("", false, responseString.QuickEmbed());
         }
         
-        [Command("Wins")]
+        [Command("Wins", RunMode = RunMode.Sync)]
         public async Task WinsAsync(SocketGuildUser user, Player.ModifyState state, int amount)
         {
             await WinsAsync(state, amount, user);
         }
 
-        [Command("Wins")]
+        [Command("Wins", RunMode = RunMode.Sync)]
         public async Task WinsAsync(Player.ModifyState state, int amount, params SocketGuildUser[] users)
         {
             var players = users.Select(x => Service.GetPlayer(Context.Guild.Id, x.Id)).ToList();
@@ -71,13 +71,13 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync("", false, responseString.QuickEmbed());
         }
 
-        [Command("Losses")]
+        [Command("Losses", RunMode = RunMode.Sync)]
         public async Task LossesAsync(SocketGuildUser user, Player.ModifyState state, int amount)
         {
             await LossesAsync(state, amount, user);
         }
 
-        [Command("Losses")]
+        [Command("Losses", RunMode = RunMode.Sync)]
         public async Task LossesAsync(Player.ModifyState state, int amount, params SocketGuildUser[] users)
         {
             var players = users.Select(x => Service.GetPlayer(Context.Guild.Id, x.Id)).ToList();
@@ -92,13 +92,13 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync("", false, responseString.QuickEmbed());
         }
 
-        [Command("Draws")]
+        [Command("Draws", RunMode = RunMode.Sync)]
         public async Task DrawsAsync(SocketGuildUser user, Player.ModifyState state, int amount)
         {
             await DrawsAsync(state, amount, user);
         }
 
-        [Command("Draws")]
+        [Command("Draws", RunMode = RunMode.Sync)]
         public async Task DrawsAsync(Player.ModifyState state, int amount, params SocketGuildUser[] users)
         {
             var players = users.Select(x => Service.GetPlayer(Context.Guild.Id, x.Id)).ToList();
@@ -113,14 +113,14 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync("", false, responseString.QuickEmbed());
         }
 
-        [Command("PlayerModify")]
+        [Command("PlayerModify", RunMode = RunMode.Sync)]
         public async Task PlayerModifyAsync(SocketGuildUser user, string value, Player.ModifyState state, int amount)
         {
             await PlayersModifyAsync(value, state, amount, user);
         }
 
         
-        [Command("PlayersModify")]
+        [Command("PlayersModify", RunMode = RunMode.Sync)]
         public async Task PlayersModifyAsync(string value, Player.ModifyState state, int amount, params SocketGuildUser[] users)
         {
             var players = users.Select(x => Service.GetPlayer(Context.Guild.Id, x.Id)).ToList();

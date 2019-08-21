@@ -22,7 +22,7 @@ namespace RavenBOT.ELO.Modules.Modules
             Service = service;
         }
 
-        [Command("Register")]
+        [Command("Register", RunMode = RunMode.Sync)]
         public async Task RegisterAsync([Remainder]string name = null)
         {
             if (name == null)
@@ -99,6 +99,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("Leaderboard")]
+        //TODO: Ratelimiting as this is a data heavy command.
         public async Task LeaderboardAsync()
         {
             //TODO: Implement sort modes

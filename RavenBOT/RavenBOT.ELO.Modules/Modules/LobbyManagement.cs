@@ -84,8 +84,8 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync("", false, embed.Build());
         }
 
-        [Command("Clear Queue")]
-        [RavenRequireUserPermission(GuildPermission.Administrator)]
+        [Command("Clear Queue", RunMode = RunMode.Sync)]
+        [Preconditions.RequireModerator]
         public async Task ClearQueueAsync()
         {
             if (!await CheckLobbyAsync())

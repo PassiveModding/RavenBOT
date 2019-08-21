@@ -10,7 +10,7 @@ using RavenBOT.ELO.Modules.Models;
 namespace RavenBOT.ELO.Modules.Modules
 {
     [RavenRequireContext(ContextType.Guild)]
-    [RavenRequireUserPermission(GuildPermission.Administrator)]
+    [Preconditions.RequireAdmin]
     public class CompetitionSetup : InteractiveBase<ShardedCommandContext>
     {
         public ELOService Service { get; }
@@ -20,7 +20,7 @@ namespace RavenBOT.ELO.Modules.Modules
             Service = service;
         }
 
-        [Command("SetRegisterRole")]
+        [Command("SetRegisterRole", RunMode = RunMode.Sync)]
         public async Task SetRegisterRole(IRole role)
         {
             var competition = Service.GetCompetition(Context.Guild.Id) ?? Service.CreateCompetition(Context.Guild.Id);
@@ -29,7 +29,7 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync("Register role set.");
         }
 
-        [Command("AddRank")]
+        [Command("AddRank", RunMode = RunMode.Sync)]
         public async Task AddRank(IRole role, int points)
         {
             var competition = Service.GetCompetition(Context.Guild.Id) ?? Service.CreateCompetition(Context.Guild.Id);
@@ -43,13 +43,13 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync("Rank added.");
         }
 
-        [Command("AddRank")]
+        [Command("AddRank", RunMode = RunMode.Sync)]
         public async Task AddRank(int points, IRole role)
         {
             await AddRank(role, points);
         }
 
-        [Command("RemoveRank")]
+        [Command("RemoveRank", RunMode = RunMode.Sync)]
         public async Task RemoveRank(ulong roleId)
         {
             var competition = Service.GetCompetition(Context.Guild.Id) ?? Service.CreateCompetition(Context.Guild.Id);
@@ -58,7 +58,7 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync("Rank Removed.");
         }
 
-        [Command("RemoveRank")]
+        [Command("RemoveRank", RunMode = RunMode.Sync)]
         public async Task RemoveRank(IRole role)
         {
             await RemoveRank(role.Id);

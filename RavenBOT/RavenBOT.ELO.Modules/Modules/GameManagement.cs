@@ -15,6 +15,7 @@ using RavenBOT.ELO.Modules.Models;
 namespace RavenBOT.ELO.Modules.Modules
 {
     [RavenRequireContext(ContextType.Guild)]
+    [Preconditions.RequireModerator]
     public class GameManagement : InteractiveBase<ShardedCommandContext>
     {
         public ELOService Service { get; }
@@ -30,9 +31,8 @@ namespace RavenBOT.ELO.Modules.Modules
         //Game (Mods/admins submit game results), could potentially accept a comment for the result as well (ie for proof of wins)
         //UndoGame (would need to use the amount of points added to the user rather than calculate at command run time)
 
-        [Command("UndoGame")]
+        [Command("UndoGame", RunMode = RunMode.Sync)]
         [Alias("Undo Game")]
-        [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
         public async Task UndoGameAsync(int gameNumber, SocketTextChannel lobbyChannel = null)
         {
             if (lobbyChannel == null)
@@ -178,9 +178,8 @@ namespace RavenBOT.ELO.Modules.Modules
             Service.Database.Store(game, GameResult.DocumentName(game.GameId, lobby.ChannelId, lobby.GuildId));
         }
 
-        [Command("DeleteGame")]
+        [Command("DeleteGame", RunMode = RunMode.Sync)]
         [Alias("DelGame", "Delete Game")]
-        [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
         //TODO: Explain that this does not affect the users who were in the game if it had a result. this is only for removing the game log from the database
         public async Task DelGame(int gameNumber, SocketTextChannel lobbyChannel = null)
         {
@@ -208,8 +207,7 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync("Game Deleted.", false, JsonConvert.SerializeObject(game, Formatting.Indented).FixLength(2047).QuickEmbed());
         }
 
-        [Command("Draw")]
-        [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
+        [Command("Draw", RunMode = RunMode.Sync)]
         public async Task DrawAsync(int gameNumber, SocketTextChannel lobbyChannel = null)
         {
             if (lobbyChannel == null)
@@ -258,8 +256,7 @@ namespace RavenBOT.ELO.Modules.Modules
             return Task.CompletedTask;
         }
 
-        [Command("Game")]
-        [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
+        [Command("Game", RunMode = RunMode.Sync)]
         public async Task GameAsync(int winningTeamNumber, int gameNumber, SocketTextChannel lobbyChannel = null)
         {
             //TODO: Needs a way of cancelling games and calling draws

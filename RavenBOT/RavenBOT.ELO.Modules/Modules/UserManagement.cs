@@ -10,7 +10,7 @@ using RavenBOT.ELO.Modules.Models;
 namespace RavenBOT.ELO.Modules.Modules
 {
     [RavenRequireContext(ContextType.Guild)]
-    [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
+    [Preconditions.RequireAdmin]
     public class UserManagement : InteractiveBase<ShardedCommandContext>
     {
         public UserManagement(ELOService service)
@@ -20,7 +20,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
         public ELOService Service { get; }
 
-        [Command("DeleteUser")]
+        [Command("DeleteUser", RunMode = RunMode.Sync)]
 
         public async Task DeleteUserAsync(SocketGuildUser user)
         {

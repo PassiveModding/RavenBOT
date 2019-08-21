@@ -11,7 +11,7 @@ namespace RavenBOT.ELO.Modules.Modules
 {
     [RavenRequireContext(ContextType.Guild)]
     //TODO: Potential different permissions for creating lobby
-    [RavenRequireUserPermission(GuildPermission.Administrator)]
+    [Preconditions.RequireAdmin]
     public class LobbySetup : InteractiveBase<ShardedCommandContext>
     {
         public ELOService Service { get; }
@@ -21,7 +21,7 @@ namespace RavenBOT.ELO.Modules.Modules
             Service = service;
         }
 
-        [Command("Create Lobby")]
+        [Command("Create Lobby", RunMode = RunMode.Sync)]
         public async Task CreateLobbyAsync(int playersPerTeam = 5, Lobby.PickMode pickMode = Lobby.PickMode.Captains_RandomHighestRanked)
         {
             if (Service.GetLobby(Context.Guild.Id, Context.Channel.Id) != null)
@@ -39,7 +39,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 $"Pick Mode: {pickMode}");
         }
 
-        [Command("Set Player Count")]
+        [Command("Set Player Count", RunMode = RunMode.Sync)]
         public async Task SetPlayerAsync(int playersPerTeam)
         {
             var lobby = Service.GetLobby(Context.Guild.Id, Context.Channel.Id);
@@ -54,7 +54,7 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync($"There can now be up to {playersPerTeam} in each team.");
         }
 
-        [Command("Set Pick Mode")]
+        [Command("Set Pick Mode", RunMode = RunMode.Sync)]
         public async Task SetPickModeAsync(Lobby.PickMode pickMode)
         {
             var lobby = Service.GetLobby(Context.Guild.Id, Context.Channel.Id);
@@ -77,7 +77,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         
-        [Command("Add Map")]
+        [Command("Add Map", RunMode = RunMode.Sync)]
         [Alias("Add Map")]
         public async Task AddMapAsync([Remainder]string mapName)
         {
