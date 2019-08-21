@@ -84,7 +84,6 @@ namespace RavenBOT.ELO.Modules.Modules
 
                 var currentRank = MaxRank(competition, player.Points);
 
-                player.Games--;
                 if (score.Item2 < 0)
                 {
                     //Points lost, so add them back
@@ -251,7 +250,6 @@ namespace RavenBOT.ELO.Modules.Modules
                 var player = Service.Database.Load<Player>(Player.DocumentName(Context.Guild.Id, id));
                 if (player == null) continue;
 
-                player.Games++;
                 player.Draws++;
 
                 Service.Database.Store(player, Player.DocumentName(Context.Guild.Id, id));
@@ -464,9 +462,6 @@ namespace RavenBOT.ELO.Modules.Modules
                 int updateVal;
                 RankChangeState state = RankChangeState.None;
                 Rank newRank = null;
-
-                //TODO: Add support for draw tracking
-                botUser.Games++;
 
                 if (win)
                 {

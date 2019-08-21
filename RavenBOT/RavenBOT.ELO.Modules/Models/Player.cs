@@ -87,19 +87,10 @@ namespace RavenBOT.ELO.Modules.Models
             }
         }
 
-        private int _Games = 0;
-
-        public int Games
-        {
-            get
-            {
-                return _Games;
-            }
-            set
-            {
-                _Games = NoNegative(value);
-            }
-        }
+        /// <summary>
+        /// This can be inferred from other stored data
+        /// </summary>
+        public int Games => Draws + Losses + Wins;
 
         public DateTime RegistrationDate { get; set; }
 
