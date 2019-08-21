@@ -56,17 +56,18 @@ namespace RavenBOT.Common
             }
         }
 
-        private string MakeLogMessage(string message, LogSeverity severity, LogContext context = null)
+        private string MakeLogMessage(string message, LogSeverity severity)
         {
             var newSev = severity.ToString().PadRight(20).Substring(0, 4).ToUpper();
-            var contextString = "";
-            if (context != null)
-            {
-                contextString = $"\n[U:{context.userId} G:{context.guildId} C:{context.channelId} M:{context.message}]";
-            }
-            return $"[{newSev}][{DateTime.UtcNow.ToShortDateString()} {DateTime.UtcNow.ToShortTimeString()}] {message}{contextString}";
+            return $"[{newSev}][{DateTime.UtcNow.ToShortDateString()} {DateTime.UtcNow.ToShortTimeString()}] {message}";
         }
 
+        /// <summary>
+        /// Log without command context
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="severity"></param>
+        /// <param name="additional">Additional object, optional</param>
         public void Log(string message, LogSeverity severity = LogSeverity.Info, object additional = null)
         {
             var logObject = new BotLogObject(message, severity, additional);
@@ -90,6 +91,7 @@ namespace RavenBOT.Common
                 return;
             }
 
+            //Ignore logging back to discord if the gateway is blocked
             if (message.Contains("is blocking the gateway task.", StringComparison.InvariantCultureIgnoreCase))
             {
                 return;
@@ -107,9 +109,9 @@ namespace RavenBOT.Common
                 if (context != null)
                 {
                     embed = embed.AddField("Context",
-                        $"Channel: {context.channelId}\n" +
-                        $"Guild: {context.guildId}\n" +
-                        $"User: {context.userId}\n" +
+                        $"Channel: {context.channelName} ({context.channelId})\n" +
+                        $"Guild: {context.guildName} ({context.guildId})\n" +
+                        $"User: {context.userName} ({context.userId})\n" +
                         $"Message: {context.message}".FixLength());
                 }
 
@@ -121,12 +123,19 @@ namespace RavenBOT.Common
             }
         }
 
+        /// <summary>
+        /// log with command context
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="context"></param>
+        /// <param name="severity"></param>
+        /// <param name="additional">Additional object for storage, optional</param>
         public void Log(string message, LogContext context, LogSeverity severity = LogSeverity.Info, object additional = null)
         {
             var logObject = new CommandLogObject(message, context, severity, additional);
-            var g = $"GID: {context.guildId}".PadRight(20);
-            var u = $"UID: {context.userId}".PadRight(20);
-            var c = $"CID: {context.channelId}".PadRight(20);
+            var g = $"G:{context.guildId} [{context.guildName}]".PadRight(40);
+            var u = $"U:{context.userId} [{context.userName}]".PadRight(40);
+            var c = $"C:{context.channelId} [{context.channelName}]".PadRight(40);
             message = $"{g} {u} {c}\n{message}";
             LogAndStore(message, severity, logObject);
             LogToDiscord(message, severity, context);
