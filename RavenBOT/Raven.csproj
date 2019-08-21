@@ -5,16 +5,24 @@
     <RuntimeFrameworkVersion>2.1.6</RuntimeFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup>
-    <DefaultItemExcludes>$(DefaultItemExcludes);RavenBOT.Modules\**;RavenBOT.Cloner.Modules\**</DefaultItemExcludes>
+    <DefaultItemExcludes>$(DefaultItemExcludes);RavenBOT.ELO.Modules\**;RavenBOT.Cloner.Modules\**</DefaultItemExcludes>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="ahd.Graphite" Version="2.1.0-ci-20190329-121200" />
     <PackageReference Include="Discord.Addons.PassiveInteractive" Version="2.0.4" />
     <PackageReference Include="Discord.Net" Version="2.1.1" />
+    <PackageReference Include="CaptchaGen.NetCore" Version="1.0.2" />
+    <PackageReference Include="Google.Cloud.Translation.V2" Version="1.1.0" />
     <PackageReference Include="NAudio" Version="1.9.0" />
     <PackageReference Include="RavenDB.Client" Version="4.2.0" />
+    <PackageReference Include="RedditSharp" Version="2.0.0-ci00075" />
+    <PackageReference Include="DiscordBotsList.Api.Adapter.Discord.Net" Version="1.1.0" />
+    <PackageReference Include="Google.Cloud.Dialogflow.V2" Version="1.0.0-beta02" />
+    <PackageReference Include="Victoria" Version="4.0.10" />
     <PackageReference Include="RavenDB.Embedded" Version="4.2.0" />
     <PackageReference Include="LiteDB" Version="4.1.4" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.7" />
     <PackageReference Include="morelinq" Version="3.1.1" />
   </ItemGroup>
   <ItemGroup>

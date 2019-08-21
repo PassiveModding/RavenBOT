@@ -5,7 +5,7 @@
     <RuntimeFrameworkVersion>2.1.6</RuntimeFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup>
-    <DefaultItemExcludes>$(DefaultItemExcludes);RavenBOT.Modules\**;RavenBOT.Cloner.Modules\**</DefaultItemExcludes>
+    <DefaultItemExcludes>$(DefaultItemExcludes);</DefaultItemExcludes>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="ahd.Graphite" Version="2.1.0-ci-20190329-121200" />
