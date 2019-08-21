@@ -82,7 +82,7 @@ namespace RavenBOT.ELO.Modules.Modules
                     continue;
                 }
 
-                var currentRank = MaxRank(competition, player.Points);
+                var currentRank = competition.MaxRank(player.Points);
 
                 if (score.Item2 < 0)
                 {
@@ -119,7 +119,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
                 //TODO: Rank updates
                 bool rankChange = false;
-                var newRank = MaxRank(competition, player.Points);
+                var newRank = competition.MaxRank(player.Points);
                 var currentRoles = guildUser.Roles.Select(x => x.Id).ToList();
                 if (currentRank == null)
                 {
@@ -457,7 +457,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 if (botUser == null) continue;
 
                 //This represents the current user's rank
-                var maxRank = MaxRank(competition, botUser.Points);
+                var maxRank = competition.MaxRank(botUser.Points);
 
                 int updateVal;
                 RankChangeState state = RankChangeState.None;
@@ -468,7 +468,7 @@ namespace RavenBOT.ELO.Modules.Modules
                     updateVal = maxRank?.WinModifier ?? competition.DefaultWinModifier;
                     botUser.Points += updateVal;
                     botUser.Wins++;
-                    newRank = MaxRank(competition, botUser.Points);
+                    newRank = competition.MaxRank(botUser.Points);
                     if (newRank != null)
                     {
                         if (maxRank == null)
@@ -495,7 +495,7 @@ namespace RavenBOT.ELO.Modules.Modules
                         if (botUser.Points < maxRank.Points)
                         {
                             state = RankChangeState.Derank;
-                            newRank = MaxRank(competition, botUser.Points);
+                            newRank = competition.MaxRank(botUser.Points);
                         }
                     }
                 }
@@ -508,18 +508,6 @@ namespace RavenBOT.ELO.Modules.Modules
             }
 
             return updates;
-        }
-
-        //Returns the highest rank that has less points that the provided amount
-        public Rank MaxRank(CompetitionConfig comp, int points)
-        {
-            var maxRank = comp.Ranks.Where(x => x.Points <= points).OrderByDescending(x => x.Points).FirstOrDefault();
-            if (maxRank == null)
-            {
-                return null;
-            }
-
-            return maxRank;
         }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace RavenBOT.ELO.Modules.Models
 {
@@ -45,5 +46,22 @@ namespace RavenBOT.ELO.Modules.Models
             _DefaultLossModifier = Math.Abs(value);
             
         } }
+
+        /// <summary>
+        /// Returns the highest available rank for the user or null
+        /// </summary>
+        /// <param name="comp"></param>
+        /// <param name="points"></param>
+        /// <returns></returns>
+        public Rank MaxRank(int points)
+        {
+            var maxRank = Ranks.Where(x => x.Points <= points).OrderByDescending(x => x.Points).FirstOrDefault();
+            if (maxRank == null)
+            {
+                return null;
+            }
+
+            return maxRank;
+        }
     }
 }

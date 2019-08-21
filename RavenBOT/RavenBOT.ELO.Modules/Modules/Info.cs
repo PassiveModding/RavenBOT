@@ -73,8 +73,21 @@ namespace RavenBOT.ELO.Modules.Modules
                 return;
             }
             
+            var competition = Service.GetCompetition(Context.Guild.Id);
+            var rank = competition.MaxRank(player.Points);
+            string rankStr = null;
+            if (rank != null)
+            {
+                var guildRole = Context.Guild.GetRole(rank.RoleId);
+                if (guildRole != null)
+                {
+                    rankStr = $"Rank: {guildRole.Mention} ({rank.Points})\n";
+                }
+            }
+
             var response = $"{player.DisplayName} Stats\n" +
                             $"Points: {player.Points}\n"+
+                            rankStr +
                             $"Wins: {player.Wins}\n"+
                             $"Losses: {player.Losses}\n"+
                             $"Draws: {player.Draws}\n"+
