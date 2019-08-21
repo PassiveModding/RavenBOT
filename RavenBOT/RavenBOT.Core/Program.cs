@@ -57,6 +57,7 @@ namespace RavenBOT
 
                         //You may want to edit the shard count as the bot grows more and more popular.
                         //Discord will block single shards that try to connect to more than 2500 servers
+                        //May be advisable to fetch from a config file OR default to 1
                         TotalShards = 1
                 }))
                 .AddSingleton(x => new LogHandler(x.GetRequiredService<DiscordShardedClient>(), x.GetRequiredService<IDatabase>()))

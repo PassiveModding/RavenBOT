@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord.Addons.Interactive;
@@ -6,6 +7,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using RavenBOT.Common;
 using RavenBOT.ELO.Modules.Methods;
+using RavenBOT.ELO.Modules.Models;
 
 namespace RavenBOT.ELO.Modules.Modules
 {
@@ -76,6 +78,65 @@ namespace RavenBOT.ELO.Modules.Modules
                             $"{player.AdditionalProperties.Select(x => $"{x.Key}: {x.Value}")}\n";
 
             await ReplyAsync("", false, response.QuickEmbed());
+        }
+
+        [Command("Leaderboard")]
+        public async Task LeaderboardAsync()
+        {
+            //TODO: Implement sort modes
+
+            //Retrieve players in the current guild from database
+            var users = Service.Database.Query<Player>(x => x.GuildId == Context.Guild.Id);
+
+            //Order players by score and then split them into groups of 20 for pagination
+            var userGroups = users.OrderByDescending(x => x.Points).SplitList(20).ToArray();
+
+            //Convert the groups into formatted pages for the response message
+            var pages = GetPages(userGroups);
+
+            //Construct a paginated message with each of the leaderboard pages
+            var pager = new PaginatedMessage();
+            pager.Pages = pages;
+            await PagedReplyAsync(pager, new ReactionList
+            {
+                Forward = true,
+                Backward = true,
+                First = true,
+                Last = true
+            });
+        }
+
+        public List<PaginatedMessage.Page> GetPages(IEnumerable<Player>[] groups)
+        {
+            //Start the index at 1 because we are ranking players here ie. first place.
+            int index = 1;
+            var pages = new List<PaginatedMessage.Page>(groups.Length);
+            foreach (var group in groups)
+            {
+                var playerGroup = group.ToArray();
+                var lines = GetPlayerLines(playerGroup, index);
+                index = lines.Item1;
+                var page = new PaginatedMessage.Page();
+                page.Description = string.Join("\n", lines.Item2);
+                pages.Add(page);
+            }
+
+            return pages;
+        }
+
+        public (int, List<string>) GetPlayerLines(Player[] players, int startValue)
+        {
+            var retList = new List<string>(players.Length);
+            
+            //Iterate through the players and add their summary line to the list.
+            foreach (var player in players)
+            {
+                retList.Add($"{startValue}: {player.DisplayName} - {player.Points}");
+                startValue++;
+            }
+
+            //Return the updated start value and the list of player lines.
+            return (startValue, retList);
         }
     }
 }
