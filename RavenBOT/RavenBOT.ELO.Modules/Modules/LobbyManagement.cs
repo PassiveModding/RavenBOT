@@ -264,8 +264,10 @@ namespace RavenBOT.ELO.Modules.Modules
                         Title = $"Game #{game.GameId} Started"
                     };
                 
-                    gameEmbed.AddField("Team 1", $"Captain: {Context.Guild.GetUser(game.Team1.Captain)?.Mention ?? $"[{game.Team1.Captain}]"}\n{string.Join("\n", t1Users)}");
-                    gameEmbed.AddField("Team 2", $"Captain: {Context.Guild.GetUser(game.Team2.Captain)?.Mention ?? $"[{game.Team2.Captain}]"}\n{string.Join("\n", t2Users)}");
+                    //TODO: Is it necessary to announce captains here? since auto selected teams don't really have a captain
+                    //Maybe add an additional property for server owners to select
+                    gameEmbed.AddField("Team 1", $"Captain: {Context.Guild.GetUser(game.Team1.Captain)?.Mention ?? $"[{game.Team1.Captain}]"}\nPlayers: {string.Join("\n", t1Users)}");
+                    gameEmbed.AddField("Team 2", $"Captain: {Context.Guild.GetUser(game.Team2.Captain)?.Mention ?? $"[{game.Team2.Captain}]"}\nPlayers: {string.Join("\n", t2Users)}");
                     await ReplyAsync("", false, gameEmbed.Build());
                 }
 
@@ -453,8 +455,8 @@ namespace RavenBOT.ELO.Modules.Modules
                 
                 var t1Users = GetMentionList(GetUserList(Context.Guild, game.Team1.Players));
                 var t2Users = GetMentionList(GetUserList(Context.Guild, game.Team2.Players));
-                gameEmbed.AddField("Team 1", $"Captain: {Context.Guild.GetUser(game.Team1.Captain)?.Mention ?? $"[{game.Team1.Captain}]"}\n{string.Join("\n", t1Users)}");
-                gameEmbed.AddField("Team 2", $"Captain: {Context.Guild.GetUser(game.Team2.Captain)?.Mention ?? $"[{game.Team2.Captain}]"}\n{string.Join("\n", t2Users)}");
+                gameEmbed.AddField("Team 1", $"Captain: {Context.Guild.GetUser(game.Team1.Captain)?.Mention ?? $"[{game.Team1.Captain}]"}\nPlayers: {string.Join("\n", t1Users)}");
+                gameEmbed.AddField("Team 2", $"Captain: {Context.Guild.GetUser(game.Team2.Captain)?.Mention ?? $"[{game.Team2.Captain}]"}\nPlayers: {string.Join("\n", t2Users)}");
                 await ReplyAsync("", false, gameEmbed.Build());
 
             }
@@ -469,8 +471,8 @@ namespace RavenBOT.ELO.Modules.Modules
                 var t1Users = GetMentionList(GetUserList(Context.Guild, game.Team1.Players));
                 var t2Users = GetMentionList(GetUserList(Context.Guild, game.Team2.Players));
                 var remainingPlayers = GetMentionList(GetUserList(Context.Guild, game.Queue.Where(x => !game.Team1.Players.Contains(x) && !game.Team2.Players.Contains(x))));
-                gameEmbed.AddField("Team 1", $"Captain: {Context.Guild.GetUser(game.Team1.Captain)?.Mention ?? $"[{game.Team1.Captain}]"}\n{string.Join("\n", t1Users)}");
-                gameEmbed.AddField("Team 2", $"Captain: {Context.Guild.GetUser(game.Team2.Captain)?.Mention ?? $"[{game.Team2.Captain}]"}\n{string.Join("\n", t2Users)}");
+                gameEmbed.AddField("Team 1", $"Captain: {Context.Guild.GetUser(game.Team1.Captain)?.Mention ?? $"[{game.Team1.Captain}]"}\nPlayers: {string.Join("\n", t1Users)}");
+                gameEmbed.AddField("Team 2", $"Captain: {Context.Guild.GetUser(game.Team2.Captain)?.Mention ?? $"[{game.Team2.Captain}]"}\nPlayers: {string.Join("\n", t2Users)}");
                 gameEmbed.AddField("Remaining Players", string.Join("\n", remainingPlayers));
                 await ReplyAsync("", false, gameEmbed.Build());
             }
