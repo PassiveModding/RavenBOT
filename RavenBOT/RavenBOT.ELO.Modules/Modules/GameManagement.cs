@@ -84,14 +84,17 @@ namespace RavenBOT.ELO.Modules.Modules
 
                 var currentRank = MaxRank(competition, player.Points);
 
+                player.Games--;
                 if (score.Item2 < 0)
                 {
                     //Points lost, so add them back
+                    player.Losses--;
                     player.Points += Math.Abs(score.Item2);
                 }
                 else
                 {
                     //Points gained so remove them
+                    player.Wins--;
                     player.Points -= score.Item2;
                 }
 
@@ -231,7 +234,6 @@ namespace RavenBOT.ELO.Modules.Modules
                 await ReplyAsync($"Game number is invalid. Most recent game is {lobby.CurrentGameCount}");
                 return;
             }
-
 
             game.GameState = GameResult.State.Draw;
             game.UpdatedScores = new HashSet<(ulong, int)>();
