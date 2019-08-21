@@ -93,7 +93,7 @@ namespace RavenBOT.ELO.Modules.Modules
                             $"Draws: {player.Draws}\n"+
                             $"Games: {player.Games}\n"+
                             $"Registered At: {player.RegistrationDate.ToShortDateString()} {player.RegistrationDate.ToShortTimeString()}\n"+
-                            $"{player.AdditionalProperties.Select(x => $"{x.Key}: {x.Value}")}\n";
+                            $"{string.Join("\n", player.AdditionalProperties.Select(x => $"{x.Key}: {x.Value}"))}";
 
             await ReplyAsync("", false, response.QuickEmbed());
         }
