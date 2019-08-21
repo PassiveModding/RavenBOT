@@ -72,9 +72,13 @@ namespace RavenBOT.ELO.Modules.Modules
                 await ReplyAsync("You are not registered.");
                 return;
             }
-
+            
             var response = $"{player.DisplayName} Stats\n" +
                             $"Points: {player.Points}\n"+
+                            $"Wins: {player.Wins}\n"+
+                            $"Losses: {player.Losses}\n"+
+                            $"Draws: {player.Draws}\n"+
+                            $"Games: {player.Games}\n"+
                             $"Registered At: {player.RegistrationDate.ToShortDateString()} {player.RegistrationDate.ToShortTimeString()}\n"+
                             $"{player.AdditionalProperties.Select(x => $"{x.Key}: {x.Value}")}\n";
 
