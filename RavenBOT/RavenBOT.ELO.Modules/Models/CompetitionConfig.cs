@@ -20,6 +20,9 @@ namespace RavenBOT.ELO.Modules.Models
 
         public ulong GuildId { get; set; }
 
+        public ulong AdminRole { get; set; }
+        public ulong ModeratorRole { get; set; }
+
         public List<Rank> Ranks { get; set; } = new List<Rank>();
 
         //TODO: Automatically generate registration role instead of requiring one to be set?
