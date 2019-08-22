@@ -7,7 +7,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using RavenBOT.Common;
 
-namespace RavenBOT.Modules.Info.Modules
+namespace RavenBOT.Modules
 {
     [Group("info")]
     public class Info : InteractiveBase<ShardedCommandContext>
