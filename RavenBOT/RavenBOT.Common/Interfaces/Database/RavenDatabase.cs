@@ -207,6 +207,7 @@ namespace RavenBOT.Common.Interfaces.Database
             }
         }
 
+        //TODO: Unsure if document deletion will work with document referenced outside the session?
         public void RemoveDocument<T>(T document)
         {
             using(var session = DocumentStore.OpenSession())
