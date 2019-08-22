@@ -288,6 +288,12 @@ namespace RavenBOT.ELO.Modules.Modules
                 return;
             }
 
+            if (game.GameState == GameResult.State.Decided || game.GameState == GameResult.State.Draw)
+            {
+                await ReplyAsync("Game results cannot currenly be overwritten without first running the `undogame` command.");
+                return;
+            }
+
             var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
 
             List < (Player, int, Rank, RankChangeState, Rank) > winList;
