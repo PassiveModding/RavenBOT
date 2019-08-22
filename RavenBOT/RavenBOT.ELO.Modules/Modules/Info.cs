@@ -44,6 +44,45 @@ namespace RavenBOT.ELO.Modules.Modules
             }
         }
 
+        [Command("Rename", RunMode = RunMode.Sync)]
+        public async Task RenameAsync([Remainder]string name)
+        {
+            var player = Service.GetPlayer(Context.Guild.Id, Context.User.Id);
+            if (player == null)
+            {
+                await ReplyAsync("You are not registered yet.");
+                return;
+            }
+
+            var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
+
+            var newName = competition.GetNickname(player);
+            var gUser = (Context.User as SocketGuildUser);
+            var currentName = gUser.Nickname ?? gUser.Username;
+            if (!currentName.Equals(newName))
+            {
+                if (gUser.Hierarchy < Context.Guild.CurrentUser.Hierarchy)
+                {
+                    if (Context.Guild.CurrentUser.GuildPermissions.ManageNicknames)
+                    {
+                        await gUser.ModifyAsync(x => x.Nickname = newName);
+                    }
+                    else
+                    {
+                        await ReplyAsync("The bot does not have the `ManageNicknames` permission and therefore cannot update your nickname.");
+                    }
+                }
+                else
+                {
+                    await ReplyAsync("You have a higher permission level than the bot and therefore it cannot update your nickname.");
+                }
+            }
+
+            player.DisplayName = name;
+            Service.SavePlayer(player);
+            await ReplyAsync($"Your profile has been renamed from {player.DisplayName} to {name}");
+        }
+
         [Command("Ranks")]
         public async Task ShowRanksAsync()
         {
