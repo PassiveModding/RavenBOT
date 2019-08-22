@@ -29,6 +29,39 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync("Register role set.");
         }
 
+        [Command("SetNicknameFormat", RunMode = RunMode.Sync)]
+        public async Task SetNicknameFormatAsync([Remainder]string format)
+        {
+            var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
+            competition.NameFormat = format;
+            var testProfile = new Player(0, 0, "Player");
+            testProfile.Wins = 5;
+            testProfile.Losses = 2;
+            testProfile.Draws = 1;
+            testProfile.Points = 600;
+            var exampleNick = competition.GetNickname(testProfile);
+            
+            Service.SaveCompetition(competition);
+            await ReplyAsync($"Register role set.\nExample: `{exampleNick}`");
+        }
+
+        [Command("NicknameFormats")]
+        public async Task ShowNicknameFormatsAsync()
+        {
+            var response = "{score} - Total points\n" +
+                        "{name} - Registration name\n" +
+                        "{wins} - Total wins\n" +
+                        "{draws} - Total draws\n" +
+                        "{losses} - Total losses\n" +
+                        "{games} - Games played\n" +
+                        "Examples:\n" +
+                        "`setnicknameformat {score} - {name}` `1000 - Player`\n" +
+                        "`setnicknameformat [{wins}] {name}` `[5] - Player`\n" +
+                        "NOTE: Nicknames are limited to 32 characters long on discord";
+            
+            await ReplyAsync("", false, response.QuickEmbed());
+        }
+
         [Command("AddRank", RunMode = RunMode.Sync)]
         public async Task AddRank(IRole role, int points)
         {
