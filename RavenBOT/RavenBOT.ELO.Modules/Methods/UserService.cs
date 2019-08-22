@@ -68,7 +68,7 @@ namespace RavenBOT.ELO.Modules.Methods
                 noted.Add("The bot requires administrator permissions in order to modify user roles.");
             }
 
-            var newName = DoReplacements(comp, player);
+            var newName = comp.GetNickname(player);
             var currentName = user.Nickname ?? user.Username;
             if (!currentName.Equals(newName, StringComparison.InvariantCultureIgnoreCase))
             {
@@ -91,12 +91,6 @@ namespace RavenBOT.ELO.Modules.Methods
             }
 
             return noted;
-        }
-
-        public string DoReplacements(CompetitionConfig comp, Player player)
-        {
-            return comp.NameFormat.Replace("{score}", player.Points.ToString(), StringComparison.InvariantCultureIgnoreCase)
-                .Replace("{name}", player.DisplayName, StringComparison.InvariantCultureIgnoreCase).FixLength(32);
         }
 
         public (ulong, ulong) GetCaptains(Lobby lobby, GameResult game, Random rnd)

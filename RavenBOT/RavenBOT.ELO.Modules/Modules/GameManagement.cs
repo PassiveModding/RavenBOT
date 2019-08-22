@@ -107,7 +107,7 @@ namespace RavenBOT.ELO.Modules.Modules
                     continue;
                 }
 
-                var displayName = $"[{player.Points}] - {player.DisplayName}".FixLength(32);
+                var displayName = competition.GetNickname(player);
                 bool nicknameChange = false;
                 if (guildUser.Nickname != null)
                 {

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using RavenBOT.Common;
 
 namespace RavenBOT.ELO.Modules.Models
 {
@@ -29,6 +30,18 @@ namespace RavenBOT.ELO.Modules.Models
         public ulong RegisteredRankId { get; set; } = 0;
 
         public string NameFormat { get; set; } = "[{score}] {name}";
+
+        public string GetNickname(Player player)
+        {
+            return NameFormat
+                    .Replace("{score}", player.Points.ToString(), StringComparison.InvariantCultureIgnoreCase)
+                    .Replace("{name}", player.DisplayName, StringComparison.InvariantCultureIgnoreCase)
+                    .Replace("{wins}", player.Wins.ToString(), StringComparison.InvariantCultureIgnoreCase)                    
+                    .Replace("{losses}", player.Losses.ToString(), StringComparison.InvariantCultureIgnoreCase)
+                    .Replace("{draws}", player.Draws.ToString(), StringComparison.InvariantCultureIgnoreCase)
+                    .Replace("{games}", player.Games.ToString(), StringComparison.InvariantCultureIgnoreCase)
+                    .FixLength(32);
+        }
 
         public bool BlockMultiQueueing { get; set; } = false;
 
