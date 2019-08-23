@@ -10,7 +10,7 @@ namespace RavenBOT.Common
     public class LocalManagementService
     {
         private static readonly string ConfigDirectory = Path.Combine(AppContext.BaseDirectory, "setup");
-        private static readonly string ConfigPath = Path.Combine(ConfigDirectory, "Local.json");
+        public static string ConfigPath = Path.Combine(ConfigDirectory, "Local.json");
 
         public LocalConfig LastConfig { get; set; }
 

@@ -8,24 +8,14 @@
     <DefaultItemExcludes>$(DefaultItemExcludes);RavenBOT.Modules\**;RavenBOT.Cloner.Modules\**</DefaultItemExcludes>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Discord.Addons.PassiveInteractive" Version="2.0.4" />
-    <PackageReference Include="Discord.Net" Version="2.1.1" />
-    <PackageReference Include="NAudio" Version="1.9.0" />
-    <PackageReference Include="RavenDB.Client" Version="4.2.0" />
-    <PackageReference Include="RavenDB.Embedded" Version="4.2.0" />
-    <PackageReference Include="LiteDB" Version="4.1.4" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
-    <PackageReference Include="morelinq" Version="3.1.1" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="libsodium.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="opus.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="ffmpeg.exe">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <PackageReference Include="Discord.Addons.PassiveInteractive" Version="2.0.4"/>
+    <PackageReference Include="Discord.Net" Version="2.1.1"/>
+    <PackageReference Include="NAudio" Version="1.9.0"/>
+    <PackageReference Include="RavenDB.Client" Version="4.2.0"/>
+    <PackageReference Include="RavenDB.Embedded" Version="4.2.0"/>
+    <PackageReference Include="LiteDB" Version="4.1.4"/>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2"/>
+    <PackageReference Include="morelinq" Version="3.1.1"/>
+    <PackageReference Include="CommandLineParser" Version="2.6.0"/>
   </ItemGroup>
 </Project>

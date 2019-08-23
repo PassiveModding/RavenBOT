@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System;
 using System.Linq;
 using System.Net.Http;
@@ -10,15 +11,33 @@ using Microsoft.Extensions.DependencyInjection;
 using RavenBOT.Common;
 using RavenBOT.Common.Interfaces.Database;
 using EventHandler = RavenBOT.Handlers.EventHandler;
+using CommandLine;
 
 namespace RavenBOT
 {
     public class Program
     {
-        public static IServiceProvider Provider { get; set; }
-
-        public async Task RunAsync()
+        public class Options
         {
+            [Option('p', "path", Required = false, HelpText = "Path to a LocalConfig.json file")]
+            public string Path { get; set; }
+        }
+
+        public static IServiceProvider Provider { get; set; }
+        public async Task RunAsync(string[] args = null)
+        {
+            if (args != null)
+            {
+                Parser.Default.ParseArguments<Options>(args)
+                    .WithParsed<Options>(o =>
+                    {
+                        if (o.Path != null)
+                        {
+                            LocalManagementService.ConfigPath = o.Path;
+                        }
+                    });
+            }            
+
             var localManagement = new LocalManagementService();
             var localConfig = localManagement.GetConfig();
             IDatabase database;
@@ -118,7 +137,7 @@ namespace RavenBOT
         public static void Main(string[] args)
         {
             var program = new Program();
-            program.RunAsync().GetAwaiter().GetResult();
+            program.RunAsync(args).GetAwaiter().GetResult();
         }
     }
 }
