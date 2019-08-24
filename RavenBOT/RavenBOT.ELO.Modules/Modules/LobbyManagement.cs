@@ -428,6 +428,13 @@ namespace RavenBOT.ELO.Modules.Modules
                     }
 
                     game.Team2.Players.Add(user.Id);
+
+                    //Auto add the last remaining player to the opposing team
+                    var remiaining = RemainingPlayers(game);
+                    if (remiaining.Length == 1)
+                    {
+                        game.Team1.Players.Add(remiaining.First());
+                    }
                 }
                 else
                 {
@@ -438,6 +445,12 @@ namespace RavenBOT.ELO.Modules.Modules
                     }
 
                     game.Team1.Players.Add(user.Id);
+                                        
+                    var remiaining = RemainingPlayers(game);
+                    if (remiaining.Length == 1)
+                    {
+                        game.Team2.Players.Add(remiaining.First());
+                    }
                 }                
             }
 
@@ -470,7 +483,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 
                 var t1Users = GetMentionList(GetUserList(Context.Guild, game.Team1.Players));
                 var t2Users = GetMentionList(GetUserList(Context.Guild, game.Team2.Players));
-                var remainingPlayers = GetMentionList(GetUserList(Context.Guild, game.Queue.Where(x => !game.Team1.Players.Contains(x) && !game.Team2.Players.Contains(x))));
+                var remainingPlayers = GetMentionList(GetUserList(Context.Guild, RemainingPlayers(game)));
                 gameEmbed.AddField("Team 1", $"Captain: {Context.Guild.GetUser(game.Team1.Captain)?.Mention ?? $"[{game.Team1.Captain}]"}\nPlayers: {string.Join("\n", t1Users)}");
                 gameEmbed.AddField("Team 2", $"Captain: {Context.Guild.GetUser(game.Team2.Captain)?.Mention ?? $"[{game.Team2.Captain}]"}\nPlayers: {string.Join("\n", t2Users)}");
                 gameEmbed.AddField("Remaining Players", string.Join("\n", remainingPlayers));
@@ -478,6 +491,11 @@ namespace RavenBOT.ELO.Modules.Modules
             }
 
             Service.SaveGame(game);
+        }
+
+        public ulong[] RemainingPlayers(GameResult game)
+        {
+            return game.Queue.Where(x => !game.Team1.Players.Contains(x) && !game.Team2.Players.Contains(x)).ToArray();
         }
 
         public SocketGuildUser[] GetUserList(SocketGuild guild, IEnumerable<ulong> userIds)
