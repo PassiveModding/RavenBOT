@@ -179,7 +179,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("DeleteGame", RunMode = RunMode.Sync)]
-        [Alias("DelGame", "Delete Game")]
+        [Alias("Delete Game", "DelGame")]
         //TODO: Explain that this does not affect the users who were in the game if it had a result. this is only for removing the game log from the database
         public async Task DelGame(int gameNumber, SocketTextChannel lobbyChannel = null)
         {
@@ -257,6 +257,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("Game", RunMode = RunMode.Sync)]
+        [Alias("g")]
         public async Task GameAsync(int winningTeamNumber, int gameNumber, SocketTextChannel lobbyChannel = null)
         {
             //TODO: Needs a way of cancelling games and calling draws
@@ -386,7 +387,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
             var winField = new EmbedFieldBuilder
             {
-                Name = $"Winning Team, Team #{winningTeamNumber}",
+                Name = $"Winning Team, Team{winningTeamNumber}",
                 Value = GetResponseContent(winList).FixLength(1023)
             };
             var loseField = new EmbedFieldBuilder
@@ -397,7 +398,7 @@ namespace RavenBOT.ELO.Modules.Modules
             var response = new EmbedBuilder
             {
                 Fields = new List<EmbedFieldBuilder> { winField, loseField },
-                Title = $"Game #{gameNumber} Result called by {Context.User.Username}#{Context.User.Discriminator}"
+                Title = $"GameID: {gameNumber} Result called by {Context.User.Username}#{Context.User.Discriminator}"
             };
             await ReplyAsync("", false, response.Build());
         }
@@ -434,7 +435,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
         public enum RankChangeState
         {
-            Derank,
+            DeRank,
             RankUp,
             None
         }
@@ -497,7 +498,7 @@ namespace RavenBOT.ELO.Modules.Modules
                     {
                         if (player.Points < maxRank.Points)
                         {
-                            state = RankChangeState.Derank;
+                            state = RankChangeState.DeRank;
                             newRank = competition.MaxRank(player.Points);
                         }
                     }

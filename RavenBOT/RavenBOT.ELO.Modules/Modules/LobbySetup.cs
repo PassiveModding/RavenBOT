@@ -21,7 +21,8 @@ namespace RavenBOT.ELO.Modules.Modules
             Service = service;
         }
 
-        [Command("Create Lobby", RunMode = RunMode.Sync)]
+        [Command("CreateLobby", RunMode = RunMode.Sync)]
+        [Alias("Create Lobby")]
         public async Task CreateLobbyAsync(int playersPerTeam = 5, Lobby.PickMode pickMode = Lobby.PickMode.Captains_RandomHighestRanked)
         {
             if (Service.GetLobby(Context.Guild.Id, Context.Channel.Id) != null)
@@ -39,7 +40,8 @@ namespace RavenBOT.ELO.Modules.Modules
                 $"Pick Mode: {pickMode}");
         }
 
-        [Command("Set Player Count", RunMode = RunMode.Sync)]
+        [Command("SetPlayerCount", RunMode = RunMode.Sync)]
+        [Alias("Set Player Count", "Set PlayerCount")]
         public async Task SetPlayerAsync(int playersPerTeam)
         {
             var lobby = Service.GetLobby(Context.Guild.Id, Context.Channel.Id);
@@ -54,7 +56,8 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync($"There can now be up to {playersPerTeam} in each team.");
         }
 
-        [Command("Set Pick Mode", RunMode = RunMode.Sync)]
+        [Command("SetPickMode", RunMode = RunMode.Sync)]
+        [Alias("Set PickMode", "Set Pick Mode", "SetPickMode")]
         public async Task SetPickModeAsync(Lobby.PickMode pickMode)
         {
             var lobby = Service.GetLobby(Context.Guild.Id, Context.Channel.Id);
@@ -70,6 +73,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("PickModes")]
+        [Alias("Pick Modes")]
         public async Task DisplayPickModesAsync()
         {
             var pickDict = Extensions.ConvertEnumToDictionary<Lobby.PickMode>();
@@ -77,7 +81,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         
-        [Command("Add Map", RunMode = RunMode.Sync)]
+        [Command("AddMap", RunMode = RunMode.Sync)]
         [Alias("Add Map")]
         public async Task AddMapAsync([Remainder]string mapName)
         {

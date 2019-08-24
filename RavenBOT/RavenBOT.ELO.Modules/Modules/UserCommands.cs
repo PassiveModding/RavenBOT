@@ -18,6 +18,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("Register", RunMode = RunMode.Sync)]
+        [Alias("reg")]
         public async Task RegisterAsync([Remainder]string name = null)
         {
             if (name == null)

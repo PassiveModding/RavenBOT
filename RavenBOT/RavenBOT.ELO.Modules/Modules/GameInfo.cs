@@ -7,6 +7,7 @@ namespace RavenBOT.ELO.Modules.Modules
     public partial class Info
     {
         [Command("LastGame")]
+        [Alias("Last Game", "Latest Game", "LatestGame", "lg")]
         public async Task LastGameAsync(SocketGuildChannel lobbyChannel = null)
         {
             if (lobbyChannel == null)
@@ -32,6 +33,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("GameInfo")]
+        [Alias("Game Info", "Show Game", "ShowGame", "sg")]
         public async Task GameListAsync(int gameNumber, SocketGuildChannel lobbyChannel = null) //add functionality to specify lobby
         {
             if (lobbyChannel == null)
@@ -59,7 +61,8 @@ namespace RavenBOT.ELO.Modules.Modules
             //TODO: Format response
         }
 
-        [Command("GameList")] //Showgames
+        [Command("GameList")]
+        [Alias("Game List", "GamesList", "ShowGames", "ListGames")]
         public async Task GameListAsync(SocketGuildChannel lobbyChannel = null)
         {
             //return a paginated message with history of all previous games for the specified (or current) lobby

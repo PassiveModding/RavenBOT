@@ -84,7 +84,8 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync("", false, embed.Build());
         }
 
-        [Command("Clear Queue", RunMode = RunMode.Sync)]
+        [Command("ClearQueue", RunMode = RunMode.Sync)]
+        [Alias("Clear Queue", "clearq", "clearque")]
         [Preconditions.RequireModerator]
         public async Task ClearQueueAsync()
         {
@@ -108,7 +109,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("Queue")]
-        [Alias("Q")]
+        [Alias("Q", "lps", "listplayers", "playerlist", "who")]
         public async Task ShowQueueAsync()
         {
             if (!await CheckLobbyAsync())
@@ -153,7 +154,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("Join", RunMode = RunMode.Sync)]
-        [Alias("JoinLobby", "Join Lobby", "j")]
+        [Alias("JoinLobby", "Join Lobby", "j", "sign", "play", "ready")]
         public async Task JoinLobbyAsync()
         {            
             if (!await CheckLobbyAsync() || !await CheckRegisteredAsync())
@@ -289,7 +290,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("Leave", RunMode = RunMode.Sync)]
-        [Alias("LeaveLobby", "Leave Lobby", "l")]
+        [Alias("LeaveLobby", "Leave Lobby", "l", "out", "unsign", "remove", "unready")]
         public async Task LeaveLobbyAsync()
         {            
             if (!await CheckLobbyAsync() || !await CheckRegisteredAsync())
