@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
+using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
 using RavenBOT.Common;
@@ -179,9 +180,35 @@ namespace RavenBOT.ELO.Modules.Modules
                 return;
             }
 
-            var games = Service.GetGames(Context.Guild.Id, lobbyChannel.Id);
+            var games = Service.GetGames(Context.Guild.Id, lobbyChannel.Id).OrderByDescending(x => x.GameId);
 
-            //TODO: Paginate and format repsonse.
+            var gamePages = games.SplitList(20);
+            var pages = new List<PaginatedMessage.Page>();
+            foreach (var page in gamePages)
+            {
+                var content = page.Select(x => {
+                    if (x.GameState == GameResult.State.Decided)
+                    {
+                        return $"#{x.GameId}: Team {x.WinningTeam}";
+                    }
+                    return $"#{x.GameId}: {x.GameState}";
+                });
+                pages.Add(new PaginatedMessage.Page
+                {
+                    Description = string.Join("\n", content).FixLength(1023)
+                });
+            }
+
+            await PagedReplyAsync(new PaginatedMessage
+            {
+                Pages = pages
+            }, new ReactionList
+            {
+                Forward = true,
+                Backward = true,
+                First = true,
+                Last = true
+            });
         }
     }
 }
