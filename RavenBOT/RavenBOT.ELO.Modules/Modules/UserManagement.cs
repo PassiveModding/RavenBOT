@@ -21,6 +21,7 @@ namespace RavenBOT.ELO.Modules.Modules
         public ELOService Service { get; }
 
         [Command("DeleteUser", RunMode = RunMode.Sync)]
+        [Alias("DelUser")]
         public async Task DeleteUserAsync(SocketGuildUser user)
         {
             var player = Service.GetPlayer(Context.Guild.Id, user.Id);

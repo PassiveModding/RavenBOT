@@ -36,8 +36,9 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync("", false, string.Join("\n", msg).QuickEmbed());
         }
 
-        [Command("Info")]
-        public async Task InfoAsync(SocketGuildUser user = null)
+        [Command("Info")] // Please make default command name "Stats"
+        [Alias("Profile", "GetUser")]
+        public async Task InfoAsync(SocketGuildUser user = null)    
         {
             if (user == null)
             {
@@ -63,7 +64,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 }
             }
 
-            var response = $"{player.DisplayName} Stats\n" +
+            var response = $"{player.DisplayName} Stats\n" + // Use Title?
                             $"Points: {player.Points}\n"+
                             rankStr +
                             $"Wins: {player.Wins}\n"+
@@ -77,6 +78,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("Leaderboard")]
+        [Alias("lb", "top20")]
         //TODO: Ratelimiting as this is a data heavy command.
         public async Task LeaderboardAsync()
         {
@@ -89,7 +91,7 @@ namespace RavenBOT.ELO.Modules.Modules
             var userGroups = users.OrderByDescending(x => x.Points).SplitList(20).ToArray();
             if (userGroups.Length == 0)
             {
-                await ReplyAndDeleteAsync("There are no registed users in this server yet.");
+                await ReplyAndDeleteAsync("There are no registered users in this server yet.");
                 return;
             }
 

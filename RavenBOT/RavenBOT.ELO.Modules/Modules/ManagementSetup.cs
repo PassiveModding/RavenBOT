@@ -19,6 +19,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("SetModerator", RunMode = RunMode.Sync)]
+        [Alias("Set Moderator", "Set Moderator Role", "SetMod" ,"Set Mod Role")]
         public async Task SetModeratorAsync(SocketRole modRole = null)
         {
             var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
@@ -34,7 +35,7 @@ namespace RavenBOT.ELO.Modules.Modules
             }
         }
 
-        [Command("SetAdmin", RunMode = RunMode.Sync)]
+        [Command("SetAdmin", RunMode = RunMode.Sync)]   
         public async Task SetAdminAsync(SocketRole adminRole = null)
         {
             var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
