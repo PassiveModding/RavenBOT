@@ -23,7 +23,7 @@ namespace RavenBOT.ELO.Modules.Modules
         {
             if (name == null)
             {
-                name = (Context.User as SocketGuildUser)?.Nickname ?? Context.User.Username;
+                name = Context.User.Username;
             }
 
             //TODO: Add option to prevent re-registering
