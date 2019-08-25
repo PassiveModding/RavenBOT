@@ -23,18 +23,21 @@ namespace RavenBOT.Common.Interfaces.Database
 
     public class LiteDataStore : IDatabase
     {
-        public string DatabaseFolder = Path.Combine(AppContext.BaseDirectory, "LiteDB");
+        public static string DatabaseFolder = Path.Combine(AppContext.BaseDirectory, "LiteDB");
+
+        public static string DatabasePath = Path.Combine(DatabaseFolder, "LiteDB.db");
 
         public LiteDatabase Database { get; }
 
         private static readonly Object locker = new Object();
         public LiteDataStore()
         {
+            //TODO: Ignore if path is specified
             if (!Directory.Exists(DatabaseFolder))
             {
                 Directory.CreateDirectory(DatabaseFolder);
             }
-            Database = new LiteDatabase(Path.Combine(DatabaseFolder, "LiteDB.db"));
+            Database = new LiteDatabase(DatabasePath);
         }
 
         public void Store<T>(T document, string name = null)
@@ -162,6 +165,16 @@ namespace RavenBOT.Common.Interfaces.Database
                 var collection = GetCollection<T>();
                 var func = queryFunc.Compile();
                 return collection.Exists(x => func(x.Value));
+            }
+        }
+
+        public IEnumerable<T> QuerySome<T>(Expression<Func<T, bool>> queryFunc, int amount)
+        {
+            lock (locker)
+            {
+                var collection = GetCollection<T>();
+                var func = queryFunc.Compile();
+                return collection.Find(x => func(x.Value), 0, 100).Select(x => x.Value);
             }
         }
     }

@@ -28,7 +28,7 @@ namespace RavenBOT.Common.Interfaces.Database
         private IDocumentStore DocumentStore { get; set; }
         private RavenDatabaseConfig Config { get; }
         private static readonly string ConfigDirectory = Path.Combine(AppContext.BaseDirectory, "setup");
-        private static readonly string ConfigPath = Path.Combine(ConfigDirectory, "RavenConfig.json");
+        public static string ConfigPath = Path.Combine(ConfigDirectory, "RavenConfig.json");
 
         public void StartServer(RavenDatabaseConfig config)
         {

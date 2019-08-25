@@ -53,8 +53,28 @@ namespace RavenBOT.Common
                 config.Developer = devMode.Equals("Y", StringComparison.InvariantCultureIgnoreCase);
 
                 Console.WriteLine("Please enter a developer prefix for the bot.");
-
                 config.DeveloperPrefix = Console.ReadLine();
+
+                if (config.Developer)
+                {
+                    Console.WriteLine("You selected developer mode for the bot, would you like to ensure most functions can only run in whitelisted servers while developer mode is set to true? Y/N");
+                    var whitelist = Console.ReadLine();
+                    config.EnforceWhitelist = whitelist.Equals("Y", StringComparison.InvariantCultureIgnoreCase);
+
+                    if (config.EnforceWhitelist)
+                    {
+                        Console.WriteLine("Whitelisting is now enforced, please input a guild (server) id that functions will be limited to (you can add more by manually editing the config.json)");
+                        var guildId = Console.ReadLine();
+                        if (ulong.TryParse(guildId, out var res))
+                        {
+                            config.WhitelistedGuilds.Add(res);
+                        }
+                        else
+                        {
+                            Console.WriteLine("Whitelisted guild must be a ulong datatype ie. 1234567890 Skipping whitelisting guild, you can edit this manually in the config file.");
+                        }
+                    }
+                }
 
                 Console.WriteLine("Please select a database solution to use.");
                 foreach (var name in Enum.GetNames(typeof(LocalConfig.DatabaseSelection)))
@@ -84,9 +104,9 @@ namespace RavenBOT.Common
             public string DeveloperPrefix { get; set; } = "dev.";
 
             //Used for whitelisting commands/events while in dev mode.
-            public List<ulong> WhitelistedGuilds { get; set; } = new List<ulong>();
+            public HashSet<ulong> WhitelistedGuilds { get; set; } = new HashSet<ulong>();
 
-            public bool EnforceWhitelist { get; set; } = true;
+            public bool EnforceWhitelist { get; set; } = false;
             public bool IsAcceptable(ulong guildId)
             {
                 if (!EnforceWhitelist)

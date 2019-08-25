@@ -21,11 +21,15 @@ namespace RavenBOT
         {
             [Option('p', "path", Required = false, HelpText = "Path to a LocalConfig.json file")]
             public string Path { get; set; }
+
+            [Option('d', "dbpath", Required = false, HelpText = "Path to a LiteDB database file or RavenDB config")]
+            public string DatabaseConfigPath { get; set; }
         }
 
         public static IServiceProvider Provider { get; set; }
         public async Task RunAsync(string[] args = null)
         {
+            string dbPathOverride = null;
             if (args != null)
             {
                 Parser.Default.ParseArguments<Options>(args)
@@ -34,6 +38,11 @@ namespace RavenBOT
                         if (o.Path != null)
                         {
                             LocalManagementService.ConfigPath = o.Path;
+                        }
+
+                        if (o.DatabaseConfigPath != null)
+                        {
+                            dbPathOverride = o.DatabaseConfigPath;
                         }
                     });
             }            
@@ -44,12 +53,15 @@ namespace RavenBOT
             switch (localConfig.DatabaseChoice)
             {
                 case LocalManagementService.LocalConfig.DatabaseSelection.RavenDatabase:
+                     if (dbPathOverride != null) RavenDatabase.ConfigPath = dbPathOverride;
                     database = new RavenDatabase();
                     break;
                 case LocalManagementService.LocalConfig.DatabaseSelection.LiteDatabase:
+                    if (dbPathOverride != null) LiteDataStore.DatabasePath = dbPathOverride;
                     database = new LiteDataStore();
                     break;
                 default:
+                    if (dbPathOverride != null) LiteDataStore.DatabasePath = dbPathOverride;
                     database = new LiteDataStore();
                     break;
             }

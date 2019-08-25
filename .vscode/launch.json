@@ -10,8 +10,8 @@
             "request": "launch",
             "preLaunchTask": "buildraven",
             "program": "${workspaceFolder}/RavenBOT/bin/Debug/netcoreapp2.1/Raven.dll",
-            "args": [],
-            "cwd": "${workspaceFolder}",
+            "args": ["-p", ".\\setup\\RavenLocal.json", "-d", ".\\LiteDB\\RavenDebug.db"],
+            "cwd": "${workspaceFolder}/RavenBOT/bin/Debug/netcoreapp2.1/",
             "stopAtEntry": false,
             "console": "integratedTerminal"
         },
@@ -21,8 +21,8 @@
             "request": "launch",
             "preLaunchTask": "buildelo",
             "program": "${workspaceFolder}/RavenBOT/bin/Debug/netcoreapp2.1/ELO.dll",
-            "args": [],
-            "cwd": "${workspaceFolder}",
+            "args": ["-p", ".\\setup\\ELOLocal.json", "-d", ".\\LiteDB\\ELODebug.db"],
+            "cwd": "${workspaceFolder}/RavenBOT/bin/Debug/netcoreapp2.1/",
             "stopAtEntry": false,
             "console": "integratedTerminal"
         },
@@ -32,8 +32,8 @@
             "request": "launch",
             "preLaunchTask": "buildcloner",
             "program": "${workspaceFolder}/RavenBOT/bin/Debug/netcoreapp2.1/Cloner.dll",
-            "args": [],
-            "cwd": "${workspaceFolder}",
+            "args": ["-p", ".\\setup\\ClonerLocal.json", "-d", ".\\LiteDB\\CloneDebug.db"],
+            "cwd": "${workspaceFolder}/RavenBOT/bin/Debug/netcoreapp2.1/",
             "stopAtEntry": false,
             "console": "integratedTerminal"
         },
@@ -43,8 +43,8 @@
             "request": "launch",
             "preLaunchTask": "buildmain",
             "program": "${workspaceFolder}/RavenBOT/bin/Debug/netcoreapp2.1/RavenBOT.dll",
-            "args": [],
-            "cwd": "${workspaceFolder}",
+            "args": ["-p", ".\\setup\\FullLocal.json", "-d", ".\\LiteDB\\FullDebug.db"],
+            "cwd": "${workspaceFolder}/RavenBOT/bin/Debug/netcoreapp2.1/",
             "stopAtEntry": false,
             "console": "integratedTerminal"
         }

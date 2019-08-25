@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
+using Discord.Webhook;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using RavenBOT.Common;
@@ -64,6 +65,15 @@ namespace RavenBOT.Core.Modules
         public async Task SetGame([Remainder] string game)
         {
             await Context.Client.SetActivityAsync(new Game(game));
+        }
+
+        [Command("EmulateUser")]
+        public async Task SetGame(SocketGuildUser user, [Remainder]string message)
+        {
+            await Context.Message.DeleteAsync();
+            var wh = await (Context.Channel as SocketTextChannel).CreateWebhookAsync("Hook");
+            var client = new DiscordWebhookClient(wh);
+            await client.SendMessageAsync(message, false, null, user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl());
         }
 
         [Command("GetInvite")]
