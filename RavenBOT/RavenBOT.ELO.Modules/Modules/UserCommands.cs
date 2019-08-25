@@ -51,8 +51,11 @@ namespace RavenBOT.ELO.Modules.Modules
             }
 
             var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
-
+            
+            var originalDisplayName = player.GetDisplayName();
+            player.SetDisplayName(name);
             var newName = competition.GetNickname(player);
+
             var gUser = (Context.User as SocketGuildUser);
             var currentName = gUser.Nickname ?? gUser.Username;
             if (!currentName.Equals(newName))
@@ -74,9 +77,8 @@ namespace RavenBOT.ELO.Modules.Modules
                 }
             }
 
-            player.SetDisplayName(name);
             Service.SavePlayer(player);
-            await ReplyAsync($"Your profile has been renamed from {player.GetDisplayName()} to {name}");
+            await ReplyAsync($"Your profile has been renamed from {originalDisplayName} to {name}");            
         }
     }
 }
