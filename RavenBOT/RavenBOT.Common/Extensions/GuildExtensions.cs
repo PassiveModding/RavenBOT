@@ -125,24 +125,48 @@ namespace RavenBOT.Common
                 return $"{(user.Nickname != null ? $"{user.Nickname} ( {user.Username}#{user.Discriminator} )" : $"{user.Username}#{user.Discriminator}")}";
             }
         }
+        
+        public static async Task<IEnumerable<string>> GetUserMentionListAsync(this SocketGuild guild, IEnumerable<ulong> userIds)
+        {           
+            await guild.DownloadUsersAsync(); 
+            return userIds.Select(x => 
+            {
+                var u = guild.GetUser(x);
+                string val;
+                if (u == null)
+                {
+                    val = $"[{x}]";
+                }
+                else
+                {
+                    val = u.Mention;
+                }
 
-        public static string GetMentionList(this IGuild guild, IEnumerable<ulong> roleIds)
+                return val;
+            });
+        }
+
+        public static IEnumerable<string> GetRoleMentionList(this IGuild guild, IEnumerable<ulong> roleIds)
         {
-            var builder = new StringBuilder();
+            var roleMentions = new List<string>();
             foreach (var id in roleIds)
             {
                 var role = guild.GetRole(id);
                 if (role == null)
                 {
-                    builder.AppendLine($"Deleted Role: {id}");
+                    roleMentions.Add($"Deleted Role: {id}");
                 }
                 else
                 {
-                    builder.AppendLine($"{role.Mention}");
+                    roleMentions.Add($"{role.Mention}");
                 }
             }
+            return roleMentions;
+        }
 
-            return builder.ToString();
+        public static string GetRoleMentionString(this IGuild guild, IEnumerable<ulong> roleIds)
+        {
+            return string.Join("\n", GetRoleMentionList(guild, roleIds));
         }
     }
 }

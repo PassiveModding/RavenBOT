@@ -350,7 +350,7 @@ namespace RavenBOT.Modules.Tickets.Modules
                 await ReplyAsync("There are no ticket creator roles. Ie. Anyone in this server can create a ticket.");
                 return;
             }
-            var mentionlist = Context.Guild.GetMentionList(guild.TicketCreatorWhitelist);
+            var mentionlist = Context.Guild.GetRoleMentionString(guild.TicketCreatorWhitelist);
             await ReplyAsync("", false, new EmbedBuilder()
             {
                 Title = "Ticket Creator Roles",
@@ -369,7 +369,7 @@ namespace RavenBOT.Modules.Tickets.Modules
                 await ReplyAsync("There are no ticket manager roles. Ie. Only admins or the creator of the ticket can modify tickets");
                 return;
             }
-            var mentionlist = Context.Guild.GetMentionList(guild.TicketManagers);
+            var mentionlist = Context.Guild.GetRoleMentionString(guild.TicketManagers);
             await ReplyAsync("", false, new EmbedBuilder()
             {
                 Title = "Ticket Manager Roles",
