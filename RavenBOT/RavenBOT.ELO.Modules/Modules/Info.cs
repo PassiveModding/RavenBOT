@@ -64,7 +64,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 }
             }
 
-            var response = $"{player.DisplayName} Stats\n" + // Use Title?
+            var response = $"{player.GetDisplayName()} Stats\n" + // Use Title?
                             $"Points: {player.Points}\n"+
                             rankStr +
                             $"Wins: {player.Wins}\n"+
@@ -136,7 +136,7 @@ namespace RavenBOT.ELO.Modules.Modules
             //Iterate through the players and add their summary line to the list.
             foreach (var player in players)
             {
-                sb.AppendLine($"{startValue}: {player.DisplayName} - {player.Points}");
+                sb.AppendLine($"{startValue}: {player.GetDisplayName()} - {player.Points}");
                 startValue++;
             }
 

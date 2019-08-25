@@ -74,9 +74,9 @@ namespace RavenBOT.ELO.Modules.Modules
                 }
             }
 
-            player.DisplayName = name;
+            player.SetDisplayName(name);
             Service.SavePlayer(player);
-            await ReplyAsync($"Your profile has been renamed from {player.DisplayName} to {name}");
+            await ReplyAsync($"Your profile has been renamed from {player.GetDisplayName()} to {name}");
         }
     }
 }

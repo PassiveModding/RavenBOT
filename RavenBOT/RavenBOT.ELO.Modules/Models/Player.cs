@@ -15,7 +15,17 @@ namespace RavenBOT.ELO.Modules.Models
         /// The user display name
         /// </summary>
         /// <value></value>
-        public string DisplayName { get; set; }
+        private string DisplayName { get; set; }
+
+        public string GetDisplayName() => DisplayName;
+
+        public void SetDisplayName(string newName)
+        {
+            DisplayName = newName;
+            DisplayNameHistory.Add(DateTime.UtcNow, newName);
+        }
+
+        public Dictionary<DateTime, string> DisplayNameHistory { get; set; }
 
         /// <summary>
         /// The user ID
