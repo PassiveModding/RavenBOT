@@ -14,24 +14,37 @@ namespace RavenBOT.ELO.Modules.Modules
     public class CompetitionSetup : InteractiveBase<ShardedCommandContext>
     {
         public ELOService Service { get; }
-
+        
         public CompetitionSetup(ELOService service)
         {
             Service = service;
         }
 
         [Command("SetRegisterRole", RunMode = RunMode.Sync)]
-        [Alias("Set RegisterRole")]
-        public async Task SetRegisterRole(IRole role)
+        [Alias("Set RegisterRole", "RegisterRole")]
+        public async Task SetRegisterRole([Remainder]IRole role = null)
         {
             var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
+            var mentionRegisteredRank = MentionUtils.MentionRole(competition.RegisteredRankId);
+            if (role == null)
+            {
+                var currentRegRole = competition.RegisteredRankId;
+                if (currentRegRole == 0)
+                {
+                    await ReplyAsync($"No Register Role set. Set one with (PREFIX)SetRegisterRole");
+                    return;
+                }
+                await ReplyAsync($"**Current Register Role:** {mentionRegisteredRank}");
+                return;
+            }
             competition.RegisteredRankId = role.Id;
             Service.SaveCompetition(competition);
-            await ReplyAsync("Register role set.");
+            await ReplyAsync("Register role set.\n" +
+                                    $"**Current Register Role:** {role.Mention}");
         }
 
         [Command("SetNicknameFormat", RunMode = RunMode.Sync)]
-        [Alias("Set NicknameFormat", "NameFormat", "SetNameFormat")]
+        [Alias("Set NicknameFormat", "NicknameFormat", "NameFormat", "SetNameFormat")]
         public async Task SetNicknameFormatAsync([Remainder]string format)
         {
             var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
