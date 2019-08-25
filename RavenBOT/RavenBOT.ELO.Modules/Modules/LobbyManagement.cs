@@ -203,7 +203,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 await ReplyAsync("Queue is full. Picking teams...");
                 //Increment the game counter as there is now a new game.
                 CurrentLobby.CurrentGameCount += 1;
-                var game = new GameResult(CurrentLobby.CurrentGameCount, Context.Channel.Id, Context.Guild.Id);
+                var game = new GameResult(CurrentLobby.CurrentGameCount, Context.Channel.Id, Context.Guild.Id, CurrentLobby.TeamPickMode);
                 game.Queue = CurrentLobby.Queue;
                 CurrentLobby.Queue = new HashSet<ulong>();
                 

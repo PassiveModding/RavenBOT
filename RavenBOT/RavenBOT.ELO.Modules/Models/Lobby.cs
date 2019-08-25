@@ -42,6 +42,21 @@ namespace RavenBOT.ELO.Modules.Models
             TryBalance
         }
 
+        /// <summary>
+        /// Checks wether the specified pickmode is captains
+        /// </summary>
+        /// <param name="pickMode"></param>
+        /// <returns></returns>
+        public static bool IsCaptains(PickMode pickMode)
+        {
+            if (pickMode == PickMode.Random || pickMode == PickMode.TryBalance)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         //TODO: Allow for votes on maps, reduce change of repeate games on the same map.
         public HashSet<string> Maps { get; set; } = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
 
