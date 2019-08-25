@@ -59,8 +59,8 @@ namespace RavenBOT.ELO.Modules.Modules
                            "{losses} - Total losses\n" +
                            "{games} - Games played\n\n" +
                            "Examples:\n" +
-                           "`NicknameFormats {score} - {name}` `1000 - Player`\n" +
-                           "`NicknameFormats [{wins}] {name}` `[5] Player`\n" +
+                           "`SetNicknameFormat {score} - {name}` `1000 - Player`\n" +
+                           "`SetNicknameFormat [{wins}] {name}` `[5] Player`\n" +
                            "NOTE: Nicknames are limited to 32 characters long on discord";
 
             await ReplyAsync("", false, response.QuickEmbed());
