@@ -181,6 +181,11 @@ namespace RavenBOT.ELO.Modules.Modules
             }
 
             var games = Service.GetGames(Context.Guild.Id, lobbyChannel.Id).OrderByDescending(x => x.GameId);
+            if (games.Count() == 0)
+            {
+                await ReplyAsync("There aren't any games in history for the specified lobby.");
+                return;
+            }
 
             var gamePages = games.SplitList(20);
             var pages = new List<PaginatedMessage.Page>();
