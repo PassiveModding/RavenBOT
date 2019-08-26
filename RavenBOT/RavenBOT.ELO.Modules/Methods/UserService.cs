@@ -70,6 +70,8 @@ namespace RavenBOT.ELO.Modules.Methods
 
             var newName = comp.GetNickname(player);
             var currentName = user.Nickname ?? user.Username;
+            //TODO: Investigate null ref here?
+            //Not sure if newname or current name could be null.
             if (!currentName.Equals(newName, StringComparison.InvariantCultureIgnoreCase))
             {
                 //Use heirachy check to ensure that the bot can actually set the nickname
