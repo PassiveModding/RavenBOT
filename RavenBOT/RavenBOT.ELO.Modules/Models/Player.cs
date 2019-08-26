@@ -25,7 +25,7 @@ namespace RavenBOT.ELO.Modules.Models
             DisplayNameHistory.Add(DateTime.UtcNow, newName);
         }
 
-        public Dictionary<DateTime, string> DisplayNameHistory { get; set; }
+        public Dictionary<DateTime, string> DisplayNameHistory { get; set; } = new Dictionary<DateTime, string>();
 
         /// <summary>
         /// The user ID
