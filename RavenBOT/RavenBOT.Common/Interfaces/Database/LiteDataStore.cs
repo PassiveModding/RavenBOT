@@ -167,15 +167,5 @@ namespace RavenBOT.Common.Interfaces.Database
                 return collection.Exists(x => func(x.Value));
             }
         }
-
-        public IEnumerable<T> QuerySome<T>(Expression<Func<T, bool>> queryFunc, int amount)
-        {
-            lock (locker)
-            {
-                var collection = GetCollection<T>();
-                var func = queryFunc.Compile();
-                return collection.Find(x => func(x.Value), 0, 100).Select(x => x.Value);
-            }
-        }
     }
 }

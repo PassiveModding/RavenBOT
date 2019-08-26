@@ -89,10 +89,6 @@ namespace RavenBOT.ELO.Modules.Methods
 
         public GameResult[] GetGames(ulong guildId, ulong channelId)
         {
-            if (Database is LiteDataStore lsd)
-            {
-                return lsd.QuerySome<GameResult>(x => x.GuildId == guildId && x.LobbyId == channelId, 100).ToArray();
-            }
             return Database.Query<GameResult>(x => x.GuildId == guildId && x.LobbyId == channelId).ToArray();
         }
 
