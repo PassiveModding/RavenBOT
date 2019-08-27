@@ -106,7 +106,7 @@ namespace RavenBOT.ELO.Modules.Modules
                     if (eUser == null) continue; 
 
                     var pointUpdate = game.UpdatedScores.FirstOrDefault(x => x.Item1 == player);
-                    pointsAwarded.Add($"{eUser.GetDisplayName()} - +{pointUpdate.Item2}");
+                    pointsAwarded.Add($"{eUser.DisplayName} - +{pointUpdate.Item2}");
                 }
 
                 var losers = game.GetLosingTeam();
@@ -117,7 +117,7 @@ namespace RavenBOT.ELO.Modules.Modules
                     if (eUser == null) continue; 
 
                     var pointUpdate = game.UpdatedScores.FirstOrDefault(x => x.Item1 == player);
-                    pointsAwarded.Add($"{eUser.GetDisplayName()} - {pointUpdate.Item2}");
+                    pointsAwarded.Add($"{eUser.DisplayName} - {pointUpdate.Item2}");
                 }
                 gameStateInfo = $"Result: Team {game.WinningTeam} Won\n" +
                     $"Team 1:\n{await game.Team1.GetTeamInfo(Context.Guild)}\n"+

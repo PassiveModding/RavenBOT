@@ -43,7 +43,7 @@ namespace RavenBOT.ELO.Modules.Modules
             foreach (var player in players)
             {
                 var newVal = Player.ModifyValue(state, player.Points, amount);
-                responseString += $"{player.GetDisplayName()}: {player.Points} => {newVal}\n";
+                responseString += $"{player.DisplayName}: {player.Points} => {newVal}\n";
                 player.Points = newVal;
             }
             Service.SavePlayers(players);
@@ -64,7 +64,7 @@ namespace RavenBOT.ELO.Modules.Modules
             foreach (var player in players)
             {
                 var newVal = Player.ModifyValue(state, player.Wins, amount);
-                responseString += $"{player.GetDisplayName()}: {player.Wins} => {newVal}\n";
+                responseString += $"{player.DisplayName}: {player.Wins} => {newVal}\n";
                 player.Wins = newVal;
             }
             Service.SavePlayers(players);
@@ -85,7 +85,7 @@ namespace RavenBOT.ELO.Modules.Modules
             foreach (var player in players)
             {
                 var newVal = Player.ModifyValue(state, player.Losses, amount);
-                responseString += $"{player.GetDisplayName()}: {player.Losses} => {newVal}\n";
+                responseString += $"{player.DisplayName}: {player.Losses} => {newVal}\n";
                 player.Losses = newVal;
             }
             Service.SavePlayers(players);
@@ -106,7 +106,7 @@ namespace RavenBOT.ELO.Modules.Modules
             foreach (var player in players)
             {
                 var newVal = Player.ModifyValue(state, player.Draws, amount);
-                responseString += $"{player.GetDisplayName()}: {player.Draws} => {newVal}\n";
+                responseString += $"{player.DisplayName}: {player.Draws} => {newVal}\n";
                 player.Draws = newVal;
             }
             Service.SavePlayers(players);
@@ -128,7 +128,7 @@ namespace RavenBOT.ELO.Modules.Modules
             foreach (var player in players)
             {
                 var response = player.UpdateValue(value, state, amount);
-                responseString += $"{player.GetDisplayName()}: {response.Item1} => {response.Item2}\n";
+                responseString += $"{player.DisplayName}: {response.Item1} => {response.Item2}\n";
             }
             Service.SavePlayers(players);
             await ReplyAsync("", false, responseString.QuickEmbed());

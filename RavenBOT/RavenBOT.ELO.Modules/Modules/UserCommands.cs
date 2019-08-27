@@ -41,8 +41,14 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("Rename", RunMode = RunMode.Sync)]
-        public async Task RenameAsync([Remainder]string name)
+        public async Task RenameAsync([Remainder]string name = null)
         {
+            if (name == null)
+            {
+                await ReplyAsync("You must specify a new name in order to be renamed.");
+                return;
+            }
+
             var player = Service.GetPlayer(Context.Guild.Id, Context.User.Id);
             if (player == null)
             {
@@ -52,8 +58,8 @@ namespace RavenBOT.ELO.Modules.Modules
 
             var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
             
-            var originalDisplayName = player.GetDisplayName();
-            player.SetDisplayName(name);
+            var originalDisplayName = player.DisplayName;
+            player.DisplayName = name;
             var newName = competition.GetNickname(player);
 
             var gUser = (Context.User as SocketGuildUser);

@@ -321,7 +321,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 if (gUser == null) continue;
 
                 //Create the new user display name template
-                var displayName = $"[{user.Item1.Points}] - {user.Item1.GetDisplayName()}".FixLength(32);
+                var displayName = competition.GetNickname(user.Item1);
 
                 //TODO: Check if the user can have their nickname set.
                 bool nickNameUpdate = false;
@@ -410,7 +410,7 @@ namespace RavenBOT.ELO.Modules.Modules
             {
                 if (player.Item4 == RankChangeState.None) 
                 {
-                    sb.AppendLine($"[{player.Item1.Points}] {player.Item1.GetDisplayName()} Points: {player.Item2}");
+                    sb.AppendLine($"[{player.Item1.Points}] {player.Item1.DisplayName} Points: {player.Item2}");
                     continue;
                 }
 
@@ -426,7 +426,7 @@ namespace RavenBOT.ELO.Modules.Modules
                     newRole = Context.Guild.GetRole(player.Item5.RoleId);
                 }
 
-                sb.AppendLine($"[{player.Item1.Points}] {player.Item1.GetDisplayName()} Points: {player.Item2} Rank: {originalRole?.Mention ?? "N.A"} => {newRole?.Mention ?? "N/A"}");
+                sb.AppendLine($"[{player.Item1.Points}] {player.Item1.DisplayName} Points: {player.Item2} Rank: {originalRole?.Mention ?? "N.A"} => {newRole?.Mention ?? "N/A"}");
 
             }
 

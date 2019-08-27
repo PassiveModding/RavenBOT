@@ -35,7 +35,7 @@ namespace RavenBOT.ELO.Modules.Models
         {
             return NameFormat
                     .Replace("{score}", player.Points.ToString(), StringComparison.InvariantCultureIgnoreCase)
-                    .Replace("{name}", player.GetDisplayName(), StringComparison.InvariantCultureIgnoreCase)
+                    .Replace("{name}", player.DisplayName, StringComparison.InvariantCultureIgnoreCase)
                     .Replace("{wins}", player.Wins.ToString(), StringComparison.InvariantCultureIgnoreCase)                    
                     .Replace("{losses}", player.Losses.ToString(), StringComparison.InvariantCultureIgnoreCase)
                     .Replace("{draws}", player.Draws.ToString(), StringComparison.InvariantCultureIgnoreCase)
