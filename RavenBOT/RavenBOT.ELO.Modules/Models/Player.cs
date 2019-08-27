@@ -15,14 +15,19 @@ namespace RavenBOT.ELO.Modules.Models
         /// The user display name
         /// </summary>
         /// <value></value>
-        private string DisplayName { get; set; }
+        private string _DisplayName;
 
-        public string GetDisplayName() => DisplayName;
-
-        public void SetDisplayName(string newName)
+        public string DisplayName
         {
-            DisplayName = newName;
-            DisplayNameHistory.Add(DateTime.UtcNow, newName);
+            get {
+                return _DisplayName;
+            }
+            set {
+                if (string.IsNullOrWhiteSpace(value)) return;
+
+                _DisplayName = value;
+                DisplayNameHistory.Add(DateTime.UtcNow, value);
+            }
         }
 
         public Dictionary<DateTime, string> DisplayNameHistory { get; set; } = new Dictionary<DateTime, string>();
@@ -46,6 +51,7 @@ namespace RavenBOT.ELO.Modules.Models
             this.GuildId = guildId;
             this.RegistrationDate = DateTime.UtcNow;
         }
+
         public Player() {}
 
         /// <summary>
