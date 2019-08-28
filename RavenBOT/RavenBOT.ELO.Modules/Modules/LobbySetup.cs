@@ -131,6 +131,38 @@ namespace RavenBOT.ELO.Modules.Modules
             Service.SaveLobby(lobby);
             await ReplyAsync($"Game ready announcements for the current lobby will be sent to {destinationChannel.Mention}");
         }
+
+        [Command("SetMinimumPoints", RunMode = RunMode.Sync)]
+        public async Task SetMinimumPointsAsync(int points)
+        {
+            var lobby = Service.GetLobby(Context.Guild.Id, Context.Channel.Id);
+            if (lobby == null)
+            {
+                await ReplyAsync("Current channel is not a lobby.");
+                return;
+            }
+
+            lobby.MinimumPoints = points;
+
+            Service.SaveLobby(lobby);
+            await ReplyAsync($"Minimum points is now set to {points}.");
+        }
+
+        [Command("ResetMinimumPoints", RunMode = RunMode.Sync)]
+        public async Task ResetMinPointsAsync()
+        {
+            var lobby = Service.GetLobby(Context.Guild.Id, Context.Channel.Id);
+            if (lobby == null)
+            {
+                await ReplyAsync("Current channel is not a lobby.");
+                return;
+            }
+
+            lobby.MinimumPoints = null;
+
+            Service.SaveLobby(lobby);
+            await ReplyAsync($"Minimum points is now disabled for this lobby.");
+        }
         
         [Command("AddMap", RunMode = RunMode.Sync)]
         [Alias("Add Map")]
