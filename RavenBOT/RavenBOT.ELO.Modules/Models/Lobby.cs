@@ -22,6 +22,8 @@ namespace RavenBOT.ELO.Modules.Models
         public ulong GuildId { get; set; }
         public ulong ChannelId { get; set; }
 
+        public ulong GameReadyAnnouncementChannel { get; set; }
+
         public int? MinimumPoints { get; set; } = null;
 
         public int PlayersPerTeam { get; set; } = 5;

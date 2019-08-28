@@ -269,6 +269,14 @@ namespace RavenBOT.ELO.Modules.Modules
                     gameEmbed.AddField("Team 1", $"Captain: {Context.Guild.GetUser(game.Team1.Captain)?.Mention ?? $"[{game.Team1.Captain}]"}\nPlayers: {string.Join("\n", t1Users)}");
                     gameEmbed.AddField("Team 2", $"Captain: {Context.Guild.GetUser(game.Team2.Captain)?.Mention ?? $"[{game.Team2.Captain}]"}\nPlayers: {string.Join("\n", t2Users)}");
                     await ReplyAsync("", false, gameEmbed.Build());
+                    if (CurrentLobby.GameReadyAnnouncementChannel != 0)
+                    {
+                        var channel = Context.Guild.GetTextChannel(CurrentLobby.GameReadyAnnouncementChannel);
+                        if (channel != null)
+                        {
+                            await channel.SendMessageAsync("", false, gameEmbed.Build());
+                        }
+                    }
                 }
 
                 Service.SaveGame(game);
@@ -391,6 +399,14 @@ namespace RavenBOT.ELO.Modules.Modules
                 gameEmbed.AddField("Team 1", $"Captain: {Context.Guild.GetUser(game.Team1.Captain)?.Mention ?? $"[{game.Team1.Captain}]"}\nPlayers:\n{string.Join("\n", t1Users)}");
                 gameEmbed.AddField("Team 2", $"Captain: {Context.Guild.GetUser(game.Team2.Captain)?.Mention ?? $"[{game.Team2.Captain}]"}\nPlayers:\n{string.Join("\n", t2Users)}");
                 await ReplyAsync("", false, gameEmbed.Build());
+                if (CurrentLobby.GameReadyAnnouncementChannel != 0)
+                {
+                    var channel = Context.Guild.GetTextChannel(CurrentLobby.GameReadyAnnouncementChannel);
+                    if (channel != null)
+                    {
+                        await channel.SendMessageAsync("", false, gameEmbed.Build());
+                    }
+                }
 
             }
             else

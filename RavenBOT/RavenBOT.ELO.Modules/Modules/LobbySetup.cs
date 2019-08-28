@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
+using Discord.WebSocket;
 using RavenBOT.Common;
 using RavenBOT.ELO.Modules.Methods;
 using RavenBOT.ELO.Modules.Models;
@@ -102,6 +103,33 @@ namespace RavenBOT.ELO.Modules.Modules
         {
             var pickDict = Extensions.ConvertEnumToDictionary<GameResult.CaptainPickOrder>();
             await ReplyAsync($"{string.Join("\n", pickDict.Keys)}");
+        }
+
+        [Command("SetGameReadyAnnouncementChannel")]
+        public async Task GameReadyAnnouncementChannel(SocketTextChannel destinationChannel = null)
+        {
+            if (destinationChannel == null)
+            {
+                await ReplyAsync("You need to specify a channel for the announcements to be sent to.");
+                return;
+            }
+
+            if (destinationChannel.Id == Context.Channel.Id)
+            {
+                await ReplyAsync("You cannot send announcements to the current channel.");
+                return;
+            }
+
+            var lobby = Service.GetLobby(Context.Guild.Id, Context.Channel.Id);
+            if (lobby == null)
+            {
+                await ReplyAsync("Current channel is not a lobby.");
+                return;
+            }
+
+            lobby.GameReadyAnnouncementChannel = Context.Channel.Id;
+            Service.SaveLobby(lobby);
+            await ReplyAsync($"Game ready announcements for the current lobby will be sent to {destinationChannel.Mention}");
         }
         
         [Command("AddMap", RunMode = RunMode.Sync)]
