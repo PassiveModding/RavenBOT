@@ -5,7 +5,7 @@ namespace RavenBOT.Common
     public class PrefixService
     {
         private IDatabase Store { get; }
-        private PrefixInfo Info { get; }
+        private PrefixInfo Info { get; set; } = null;
         private string DocumentName { get; }
 
         public string DefaultPrefix { get; }
@@ -15,24 +15,32 @@ namespace RavenBOT.Common
             DocumentName = "PrefixSetup";
             Store = store;
             DefaultPrefix = defaultPrefix;
+        }
 
-            var doc = Store.Load<PrefixInfo>(DocumentName);
-            if (doc == null)
+        public void TryGetInfo()
+        {         
+            if (Info == null)
             {
-                doc = new PrefixInfo();
-                store.Store(doc, DocumentName);
-            }
+                var doc = Store.Load<PrefixInfo>(DocumentName);
+                if (doc == null)
+                {
+                    doc = new PrefixInfo();
+                    Store.Store(doc, DocumentName);
+                }
 
-            Info = doc;
+                Info = doc;                
+            }   
         }
 
         public string GetPrefix(ulong guildId)
         {
+            TryGetInfo();
             return Info.GetPrefix(guildId) ?? DefaultPrefix;
         }
 
         public void SetPrefix(ulong guildId, string prefix)
         {
+            TryGetInfo();
             Info.SetPrefix(guildId, prefix);
             Store.Store(Info, DocumentName);
         }
