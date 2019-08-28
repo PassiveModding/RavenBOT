@@ -50,6 +50,8 @@ namespace RavenBOT.ELO.Modules.Models
             PickTwo
         }
 
+        public ulong Submitter { get; set; }
+
         public CaptainPickOrder PickOrder { get; set; } = CaptainPickOrder.PickTwo;
 
         public Lobby.PickMode GamePickMode { get; set; }

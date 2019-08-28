@@ -208,7 +208,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("Draw", RunMode = RunMode.Sync)]
-        public async Task DrawAsync(int gameNumber, SocketTextChannel lobbyChannel = null)
+        public async Task DrawAsync(int gameNumber, SocketTextChannel lobbyChannel = null, [Remainder]string comment = null)
         {
             if (lobbyChannel == null)
             {
@@ -233,6 +233,8 @@ namespace RavenBOT.ELO.Modules.Modules
             }
 
             game.GameState = GameResult.State.Draw;
+            game.Submitter = Context.User.Id;
+            game.Comment = comment;
             game.UpdatedScores = new HashSet<(ulong, int)>();
             Service.SaveGame(game);
 
@@ -258,7 +260,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
         [Command("Game", RunMode = RunMode.Sync)]
         [Alias("g")]
-        public async Task GameAsync(int winningTeamNumber, int gameNumber, SocketTextChannel lobbyChannel = null)
+        public async Task GameAsync(int winningTeamNumber, int gameNumber, SocketTextChannel lobbyChannel = null, [Remainder]string comment = null)
         {
             //TODO: Needs a way of cancelling games and calling draws
             if (winningTeamNumber != 1 && winningTeamNumber != 2)
@@ -383,6 +385,8 @@ namespace RavenBOT.ELO.Modules.Modules
             game.GameState = GameResult.State.Decided;
             game.UpdatedScores = allUsers.Select(x => (x.Item1.UserId, x.Item2)).ToHashSet();
             game.WinningTeam = winningTeamNumber;
+            game.Comment = comment;
+            game.Submitter = Context.User.Id;
             Service.SaveGame(game);
 
             var winField = new EmbedFieldBuilder
@@ -400,6 +404,12 @@ namespace RavenBOT.ELO.Modules.Modules
                 Fields = new List<EmbedFieldBuilder> { winField, loseField },
                 Title = $"GameID: {gameNumber} Result called by {Context.User.Username}#{Context.User.Discriminator}"
             };
+
+            if (!string.IsNullOrWhiteSpace(comment))
+            {
+                response.AddField("Comment", comment.FixLength(1023));
+            }
+
             await ReplyAsync("", false, response.Build());
         }
 
