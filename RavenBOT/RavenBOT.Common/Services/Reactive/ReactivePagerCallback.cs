@@ -6,21 +6,20 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Discord;
 
-namespace RavenBOT.Common.Reactive
+namespace RavenBOT.Common
 {
-    public class ReactivePagerCallback : IReactionCallback
+    public class ReactivePagerCallback : IReactiveCallback
     {
-        public ReactivePagerCallback(SocketCommandContext context, ReactivePager pager, TimeSpan timeout)
+        public ReactivePagerCallback(ReactivePager pager, TimeSpan? timeout = null)
         {
             _timeout = timeout;
             Pager = pager;
             Callbacks = new Dictionary<IEmote, Func<ReactivePagerCallback, SocketReaction, Task<bool>>>();
-            _context = context;
             pages = Pager.Pages.Count();            
         }
         public RunMode RunMode => RunMode.Async;
 
-        private TimeSpan _timeout;
+        private TimeSpan? _timeout;
 
         public TimeSpan? Timeout => _timeout;
 
@@ -154,10 +153,11 @@ namespace RavenBOT.Common.Reactive
         /// Sends the initial pager message and sets the 'Message' to it's response.
         /// </summary>
         /// <returns></returns>
-        public async Task DisplayAsync()
+        public async Task DisplayAsync(ShardedCommandContext context)
         {
+            _context = context;
             var embed = BuildEmbed();
-            var message = await Context.Channel.SendMessageAsync(Pager.Content, embed: embed).ConfigureAwait(false);
+            var message = await _context.Channel.SendMessageAsync(Pager.Content, embed: embed).ConfigureAwait(false);
             Message = message;
             if (Callbacks.Any())
             {

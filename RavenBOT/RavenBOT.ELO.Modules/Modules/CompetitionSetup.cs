@@ -11,7 +11,7 @@ namespace RavenBOT.ELO.Modules.Modules
 {
     [RavenRequireContext(ContextType.Guild)]
     [Preconditions.RequireAdmin]
-    public class CompetitionSetup : InteractiveBase<ShardedCommandContext>
+    public class CompetitionSetup : ReactiveBase
     {
         public ELOService Service { get; }
         public PrefixService Prefix { get; }

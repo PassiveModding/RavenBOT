@@ -1,19 +1,16 @@
 using System;
 using System.Threading.Tasks;
-
 using Discord.Commands;
 using Discord.WebSocket;
 
-namespace RavenBOT.Common.Reactive
+namespace RavenBOT.Common
 {
     /// <summary>
     /// Defines the functionality of a message using reaction callbacks.
     /// </summary>
-    public interface IReactionCallback
+    public interface IReactiveCallback
     {
         RunMode RunMode { get; }
-
-        TimeSpan? Timeout { get; }
 
         SocketCommandContext Context { get; }
 

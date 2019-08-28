@@ -13,7 +13,7 @@ using RavenBOT.ELO.Modules.Models;
 namespace RavenBOT.ELO.Modules.Modules
 {
     [RavenRequireContext(ContextType.Guild)]
-    public class LobbyManagement : InteractiveBase<ShardedCommandContext>
+    public class LobbyManagement : ReactiveBase
     {
         public ELOService Service { get; }
 
@@ -203,7 +203,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
             if (CurrentLobby.Queue.Contains(Context.User.Id))
             {
-                await ReplyAndDeleteAsync("You are already queued.");
+                await ReplyAsync("You are already queued.");
                 return;
             }
 
@@ -242,7 +242,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 player.AddGame(game.GameId);
                 Service.SavePlayer(player);
             }
-            
+
             CurrentLobby.Queue = new HashSet<ulong>();
 
             if (CurrentLobby.PlayersPerTeam == 1 &&
