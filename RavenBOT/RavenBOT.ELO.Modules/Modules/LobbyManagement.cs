@@ -343,46 +343,8 @@ namespace RavenBOT.ELO.Modules.Modules
                 return;
             }
 
-            if (game.Team1.Captain != Context.User.Id && game.Team2.Captain != Context.User.Id)
-            {
-                await ReplyAsync("You are not a team captain.");
-                return;
-            }
-
-            
-            var userCount = users.Count();
-            if (userCount == 0)
-            {
-                await ReplyAsync("You must specify a player to join.");
-                return;
-            } 
-            else if (userCount > 2)
-            {
-                await ReplyAsync("Too many players specified.");
-                return;
-            }
-
-            //Ensure that two players are specified for the first pick.
-            //Or only one player if it is after the first pick.
-            if (game.Team1.Players.Count == 0 || game.Team2.Players.Count == 0)
-            {
-                if (userCount != 2)
-                {
-                    await ReplyAsync("Please specify two players to be added on the first pick.");
-                    return;
-                }
-            }
-            else
-            {
-                if (userCount != 1)
-                {
-                    await ReplyAsync("Please specify only one player to be added to your team.");
-                    return;
-                }
-            }
-
-
-            if (!users.All(user => game.Queue.Contains(user.Id)))
+            //Ensure the player is eligible to join a team
+            if (users.Any(user => !game.Queue.Contains(user.Id)))
             {
                 await ReplyAsync("A selected player is not queued for this game.");
                 return;
@@ -393,66 +355,101 @@ namespace RavenBOT.ELO.Modules.Modules
                 return;
             }
 
-            if (game.Team1.Players.Count == 0)
+            var uc = users.Count();
+            //Lay out custom logic for 1-2-2-1-1... pick order.
+            if (game.Picks == 0)
             {
-                if (game.Team1.Captain != Context.User.Id)
+                //captain 1 turn to pick.
+                if (Context.User.Id != game.Team1.Captain)
                 {
-                    await ReplyAsync("You are not the team 1 captain.");
+                    await ReplyAsync("It is currently the team 1 captains turn to pick.");
+                    return;
+                }
+
+                if (uc != 1)
+                {
+                    await ReplyAsync("You can only specify one player for the initial pick.");
+                    return;
+                }
+
+                game.Team1.Players.Add(game.Team1.Captain);
+                game.Team1.Players.Add(users.First().Id);
+                game.Picks++;
+            }
+            else if (game.Picks == 1)
+            {
+                //cap 2 turn to pick. they get to pick 2 people.
+                if (Context.User.Id != game.Team2.Captain)
+                {
+                    await ReplyAsync("It is currently the team 2 captains turn to pick.");
+                    return;
+                }
+
+                if (uc != 2)
+                {
+                    await ReplyAsync("You must specify 2 players for this pick.");
+                    return;
+                }
+
+                game.Team2.Players.Add(game.Team1.Captain);
+                game.Team2.Players.UnionWith(users.Select(x => x.Id));
+                game.Picks++;
+            }
+            else if (game.Picks == 2)
+            {
+                if (Context.User.Id != game.Team1.Captain)
+                {
+                    await ReplyAsync("It is currently the team 1 captains turn to pick.");
+                    return;
+                }
+
+                if (uc != 2)
+                {
+                    await ReplyAsync("You must specify 2 players for this pick.");
                     return;
                 }
 
                 game.Team1.Players.UnionWith(users.Select(x => x.Id));
-                game.Team1.Players.Add(game.Team1.Captain);
-            }
-            else if (game.Team2.Players.Count == 0)
-            {
-                if (game.Team2.Captain != Context.User.Id)
-                {
-                    await ReplyAsync("You are not the team 2 captain.");
-                    return;
-                }
-
-                game.Team2.Players.UnionWith(users.Select(x => x.Id));
-                game.Team2.Players.Add(game.Team2.Captain);
+                game.Picks++;
             }
             else
             {
-                //After both teams have picked their first two players, alternate between teams
-                var user = users.First();
-
-                if (game.Team1.Players.Count > game.Team2.Players.Count)
+                if (game.Picks % 2 == 0)
                 {
-                    if (game.Team2.Captain != Context.User.Id)
+                    //Captain 1 pick
+                    if (Context.User.Id != game.Team1.Captain)
                     {
-                        await ReplyAsync("You are not the team 2 captain.");
+                        await ReplyAsync("It is currently the team 1 captains turn to pick.");
                         return;
                     }
 
-                    game.Team2.Players.Add(user.Id);
-
-                    //Auto add the last remaining player to the opposing team
-                    var remiaining = RemainingPlayers(game);
-                    if (remiaining.Length == 1)
+                    if (uc != 1)
                     {
-                        game.Team1.Players.Add(remiaining.First());
+                        await ReplyAsync("You can only specify one player for this pick.");
+                        return;
                     }
+
+                    game.Team1.Players.Add(users.First().Id);
+                    game.Picks++;
                 }
                 else
                 {
-                    if (game.Team1.Captain != Context.User.Id)
+                    //Captain 2 pick
+                    if (Context.User.Id != game.Team2.Captain)
                     {
-                        await ReplyAsync("You are not the team 1 captain.");
+                        await ReplyAsync("It is currently the team 2 captains turn to pick.");
                         return;
                     }
 
-                    game.Team1.Players.Add(user.Id);
-                                        
-                    var remiaining = RemainingPlayers(game);
-                    if (remiaining.Length == 1)
+                    if (uc != 1)
                     {
-                        game.Team2.Players.Add(remiaining.First());
+                        await ReplyAsync("You can only specify one player for this pick.");
+                        return;
                     }
-                }                
+
+                    game.Team2.Players.Add(users.First().Id);
+                    game.Picks++;
+                }
             }
 
             if (game.Team1.Players.Count + game.Team2.Players.Count >= game.Queue.Count)
@@ -469,8 +466,8 @@ namespace RavenBOT.ELO.Modules.Modules
                 
                 var t1Users = GetMentionList(GetUserList(Context.Guild, game.Team1.Players));
                 var t2Users = GetMentionList(GetUserList(Context.Guild, game.Team2.Players));
-                gameEmbed.AddField("Team 1", $"Captain: {Context.Guild.GetUser(game.Team1.Captain)?.Mention ?? $"[{game.Team1.Captain}]"}\nPlayers: {string.Join("\n", t1Users)}");
-                gameEmbed.AddField("Team 2", $"Captain: {Context.Guild.GetUser(game.Team2.Captain)?.Mention ?? $"[{game.Team2.Captain}]"}\nPlayers: {string.Join("\n", t2Users)}");
+                gameEmbed.AddField("Team 1", $"Captain: {Context.Guild.GetUser(game.Team1.Captain)?.Mention ?? $"[{game.Team1.Captain}]"}\nPlayers:\n{string.Join("\n", t1Users)}");
+                gameEmbed.AddField("Team 2", $"Captain: {Context.Guild.GetUser(game.Team2.Captain)?.Mention ?? $"[{game.Team2.Captain}]"}\nPlayers:\n{string.Join("\n", t2Users)}");
                 await ReplyAsync("", false, gameEmbed.Build());
 
             }
@@ -485,8 +482,8 @@ namespace RavenBOT.ELO.Modules.Modules
                 var t1Users = GetMentionList(GetUserList(Context.Guild, game.Team1.Players));
                 var t2Users = GetMentionList(GetUserList(Context.Guild, game.Team2.Players));
                 var remainingPlayers = GetMentionList(GetUserList(Context.Guild, RemainingPlayers(game)));
-                gameEmbed.AddField("Team 1", $"Captain: {Context.Guild.GetUser(game.Team1.Captain)?.Mention ?? $"[{game.Team1.Captain}]"}\nPlayers: {string.Join("\n", t1Users)}");
-                gameEmbed.AddField("Team 2", $"Captain: {Context.Guild.GetUser(game.Team2.Captain)?.Mention ?? $"[{game.Team2.Captain}]"}\nPlayers: {string.Join("\n", t2Users)}");
+                gameEmbed.AddField("Team 1", $"Captain: {Context.Guild.GetUser(game.Team1.Captain)?.Mention ?? $"[{game.Team1.Captain}]"}\nPlayers:\n{string.Join("\n", t1Users)}");
+                gameEmbed.AddField("Team 2", $"Captain: {Context.Guild.GetUser(game.Team2.Captain)?.Mention ?? $"[{game.Team2.Captain}]"}\nPlayers:\n{string.Join("\n", t2Users)}");
                 gameEmbed.AddField("Remaining Players", string.Join("\n", remainingPlayers));
                 await ReplyAsync("", false, gameEmbed.Build());
             }
