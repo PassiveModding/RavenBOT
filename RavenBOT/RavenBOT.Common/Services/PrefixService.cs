@@ -47,7 +47,8 @@ namespace RavenBOT.Common
 
         public class PrefixInfo
         {
-            private Dictionary<ulong, string> Prefixes { get; } = new Dictionary<ulong, string>();
+            public PrefixInfo() {}
+            private Dictionary<ulong, string> Prefixes = new Dictionary<ulong, string>();
 
             public void SetPrefix(ulong guildId, string prefix)
             {
