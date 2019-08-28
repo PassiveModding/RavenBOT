@@ -9,6 +9,7 @@ using Discord.WebSocket;
 using RavenBOT.Common;
 using RavenBOT.ELO.Modules.Methods;
 using RavenBOT.ELO.Modules.Models;
+using Discord;
 
 namespace RavenBOT.ELO.Modules.Modules
 {
@@ -103,7 +104,7 @@ namespace RavenBOT.ELO.Modules.Modules
             var pages = GetPages(userGroups);
 
             //Construct a paginated message with each of the leaderboard pages
-            await PagedReplyAsync(new ReactivePager(pages).ToCallBack());
+            await PagedReplyAsync(new ReactivePager(pages).ToCallBack().WithDefaultPagerCallbacks());
         }
 
         public List<ReactivePage> GetPages(IEnumerable<Player>[] groups)

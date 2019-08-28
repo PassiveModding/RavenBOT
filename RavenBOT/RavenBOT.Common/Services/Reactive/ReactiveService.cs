@@ -24,9 +24,31 @@ namespace RavenBOT.Common
 
         public async Task<IUserMessage> SendPagedMessageAsync(ShardedCommandContext context, ReactivePagerCallback pagerCallback)
         {
-            await pagerCallback.DisplayAsync(context);
+            await pagerCallback.DisplayAsync(context, this);
             callbacks.Add(pagerCallback.Message.Id, pagerCallback);
             return pagerCallback.Message;
+        }
+
+        public async Task<IUserMessage> ReplyAndDeleteAsync(ShardedCommandContext context, string content, Embed embed, TimeSpan? timeout = null)
+        {
+            var message = await ReplyAsync(context, content, embed);
+            _ = Task.Delay(timeout ?? TimeSpan.FromSeconds(15))
+                .ContinueWith(_ => message.DeleteAsync().ConfigureAwait(false))
+                .ConfigureAwait(false);
+                return message;
+        }
+
+        public async Task<IUserMessage> ReplyAsync(ShardedCommandContext context, string message, Embed embed)
+        {
+            return await context.Channel.SendMessageAsync(message, false, embed);
+        }
+
+        public async Task<IUserMessage> SimpleEmbedAsync(ShardedCommandContext context, string content, Color? color = null)
+        {
+            var embed = new EmbedBuilder();
+            embed.Description = content.FixLength(2047);
+            embed.Color = color ?? Color.Default;
+            return await context.Channel.SendMessageAsync("", false, embed.Build());
         }
 
         private async Task HandleReactionAsync(Cacheable<IUserMessage, ulong> message, ISocketMessageChannel channel, SocketReaction reaction)

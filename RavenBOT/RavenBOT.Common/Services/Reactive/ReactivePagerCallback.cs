@@ -40,8 +40,10 @@ namespace RavenBOT.Common
         /// </summary>
         public SocketCommandContext Context => _context;
 
-        public ReactivePager Pager;
-        private readonly int pages;
+        public ReactiveService Reactive;
+
+        public ReactivePager Pager { get; }
+        private int pages;
         private int page = 1;
 
         public Dictionary<IEmote, Func<ReactivePagerCallback, SocketReaction, Task<bool>>> Callbacks { get; set; }
@@ -115,6 +117,31 @@ namespace RavenBOT.Common
             return true;
         }
 
+        public void AddPage(ReactivePage newPage)
+        {
+            Pager.Pages = Pager.Pages.Append(newPage).ToList();
+            pages++;
+        }
+        
+        //TODO: Additional checks for setting pages to empty collection or removing the only remaining page.
+        public void SetPages(IEnumerable<ReactivePage> collection)
+        {
+            Pager.Pages = collection;
+            page = 1;
+            pages = collection.Count();
+        }
+
+        public void RemovePage(int pageNumber)
+        {
+            if (pageNumber <= 0 || pageNumber > pages) return;
+
+            var toRemove = Pager.Pages.ElementAtOrDefault(pageNumber - 1);
+            if (toRemove == null) return;
+            Pager.Pages = Pager.Pages.Where(x => !x.Equals(toRemove)).ToList();
+            //TODO: Ensure current page is not out of bounds if collection modified.
+            pages = Pager.Pages.Count();
+        }
+
         public Task RenderAsync()
         {
             var embed = BuildEmbed();
@@ -153,9 +180,10 @@ namespace RavenBOT.Common
         /// Sends the initial pager message and sets the 'Message' to it's response.
         /// </summary>
         /// <returns></returns>
-        public async Task DisplayAsync(ShardedCommandContext context)
+        public async Task DisplayAsync(ShardedCommandContext context, ReactiveService service)
         {
             _context = context;
+            Reactive = service;
             var embed = BuildEmbed();
             var message = await _context.Channel.SendMessageAsync(Pager.Content, embed: embed).ConfigureAwait(false);
             Message = message;
@@ -174,6 +202,16 @@ namespace RavenBOT.Common
         public ReactivePagerCallback WithCallback(IEmote emote, Func<ReactivePagerCallback, SocketReaction, Task<bool>> callback)
         {
             Callbacks.Add(emote, callback);
+            return this;
+        }
+
+        public ReactivePagerCallback WithDefaultPagerCallbacks()
+        {
+            Callbacks.Add(new Emoji("⏮") , (x, y) => FirstAsync(y));
+            Callbacks.Add(new Emoji("◀") , (x, y) => PreviousAsync(y));
+            Callbacks.Add(new Emoji("▶") , (x, y) => NextAsync(y));
+            Callbacks.Add(new Emoji("⏭") , (x, y) => LastAsync(y));
+            Callbacks.Add(new Emoji("⏹") , (x, y) => TrashAsync(y));
             return this;
         }
     }
