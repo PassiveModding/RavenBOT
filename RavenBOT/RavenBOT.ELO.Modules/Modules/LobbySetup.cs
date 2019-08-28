@@ -57,7 +57,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("SetPickMode", RunMode = RunMode.Sync)]
-        [Alias("Set PickMode", "Set Pick Mode", "SetPickMode")]
+        [Alias("Set PickMode", "Set Pick Mode")]
         public async Task SetPickModeAsync(Lobby.PickMode pickMode)
         {
             var lobby = Service.GetLobby(Context.Guild.Id, Context.Channel.Id);
@@ -73,13 +73,36 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("PickModes")]
-        [Alias("Pick Modes")]
+        //[Alias("Pick Modes")] ignore this as it can potentially conflict with the lobby Pick command.
         public async Task DisplayPickModesAsync()
         {
             var pickDict = Extensions.ConvertEnumToDictionary<Lobby.PickMode>();
             await ReplyAsync($"{string.Join("\n", pickDict.Keys)}");
         }
 
+        [Command("SetPickOrder", RunMode = RunMode.Sync)]
+        [Alias("Set PickOrder", "Set PickOrder")]
+        public async Task SetPickOrderAsync(GameResult.CaptainPickOrder orderMode)
+        {
+            var lobby = Service.GetLobby(Context.Guild.Id, Context.Channel.Id);
+            if (lobby == null)
+            {
+                await ReplyAsync("Channel is not a lobby.");
+                return;
+            }
+
+            lobby.CaptainPickOrder = orderMode;
+            Service.SaveLobby(lobby);
+            await ReplyAsync($"Captain pick order set.");
+        }
+
+
+        [Command("PickOrders")]
+        public async Task DisplayPickOrdersAsync()
+        {
+            var pickDict = Extensions.ConvertEnumToDictionary<GameResult.CaptainPickOrder>();
+            await ReplyAsync($"{string.Join("\n", pickDict.Keys)}");
+        }
         
         [Command("AddMap", RunMode = RunMode.Sync)]
         [Alias("Add Map")]

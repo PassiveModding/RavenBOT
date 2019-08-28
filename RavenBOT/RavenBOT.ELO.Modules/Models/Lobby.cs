@@ -32,6 +32,8 @@ namespace RavenBOT.ELO.Modules.Models
 
         public int CurrentGameCount { get; set; } = 0;
 
+        public GameResult.CaptainPickOrder CaptainPickOrder { get; set; } = GameResult.CaptainPickOrder.PickTwo;
+
         //TODO: Specific announcement channel per lobby
         public enum PickMode
         {
