@@ -121,6 +121,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 var lines = GetPlayerLines(playerGroup, index);
                 index = lines.Item1;
                 var page = new PaginatedMessage.Page();
+                page.Title = $"{Context.Guild.Name} - Leaderboard";
                 page.Description = lines.Item2;
                 pages.Add(page);
             }

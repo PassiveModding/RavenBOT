@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord.Addons.Interactive;
@@ -38,7 +39,7 @@ namespace RavenBOT.ELO.Modules.Modules
         [Command("Points", RunMode = RunMode.Sync)]
         public async Task PointsAsync(Player.ModifyState state, int amount, params SocketGuildUser[] users)
         {
-            var players = users.Select(x => Service.GetPlayer(Context.Guild.Id, x.Id)).ToList();
+            var players = Service.GetPlayersSafe(users.Select(x => x.Id), Context.Guild.Id);
             var responseString = "";
             foreach (var player in players)
             {
@@ -59,7 +60,7 @@ namespace RavenBOT.ELO.Modules.Modules
         [Command("Wins", RunMode = RunMode.Sync)]
         public async Task WinsAsync(Player.ModifyState state, int amount, params SocketGuildUser[] users)
         {
-            var players = users.Select(x => Service.GetPlayer(Context.Guild.Id, x.Id)).ToList();
+            var players = Service.GetPlayersSafe(users.Select(x => x.Id), Context.Guild.Id);
             var responseString = "";
             foreach (var player in players)
             {
@@ -80,7 +81,7 @@ namespace RavenBOT.ELO.Modules.Modules
         [Command("Losses", RunMode = RunMode.Sync)]
         public async Task LossesAsync(Player.ModifyState state, int amount, params SocketGuildUser[] users)
         {
-            var players = users.Select(x => Service.GetPlayer(Context.Guild.Id, x.Id)).ToList();
+            var players = Service.GetPlayersSafe(users.Select(x => x.Id), Context.Guild.Id);
             var responseString = "";
             foreach (var player in players)
             {
@@ -101,7 +102,7 @@ namespace RavenBOT.ELO.Modules.Modules
         [Command("Draws", RunMode = RunMode.Sync)]
         public async Task DrawsAsync(Player.ModifyState state, int amount, params SocketGuildUser[] users)
         {
-            var players = users.Select(x => Service.GetPlayer(Context.Guild.Id, x.Id)).ToList();
+            var players = Service.GetPlayersSafe(users.Select(x => x.Id), Context.Guild.Id);
             var responseString = "";
             foreach (var player in players)
             {
@@ -120,10 +121,13 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         
+
+        
         [Command("PlayersModify", RunMode = RunMode.Sync)]
         public async Task PlayersModifyAsync(string value, Player.ModifyState state, int amount, params SocketGuildUser[] users)
         {
-            var players = users.Select(x => Service.GetPlayer(Context.Guild.Id, x.Id)).ToList();
+            
+            var players = Service.GetPlayersSafe(users.Select(x => x.Id), Context.Guild.Id);
             var responseString = "";
             foreach (var player in players)
             {

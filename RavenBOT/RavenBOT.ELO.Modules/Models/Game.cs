@@ -42,6 +42,8 @@ namespace RavenBOT.ELO.Modules.Models
 
         public State GameState { get; set; } = State.Undecided;
 
+        public string Comment { get; set; } = null;
+
         public enum CaptainPickOrder
         {
             PickOne,

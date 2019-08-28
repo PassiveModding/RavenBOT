@@ -147,6 +147,11 @@ namespace RavenBOT.ELO.Modules.Methods
             return Database.Query<Player>(queryFunc);
         }
 
+        public IEnumerable<Player> GetPlayersSafe(IEnumerable<ulong> userIds, ulong guildId)
+        {
+            return Database.Query<Player>(x => x.GuildId == guildId && userIds.Contains(x.UserId)).Where(x => x != null);
+        }
+
         public Player CreatePlayer(ulong guildId, ulong userId, string name)
         {
             var config = new Player(userId, guildId, name);
