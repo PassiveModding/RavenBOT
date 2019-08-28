@@ -122,9 +122,9 @@ namespace RavenBOT.ELO.Modules.Modules
             {
                 if (game.GameState == Models.GameResult.State.Picking)
                 {
-                var gameEmbed = new EmbedBuilder
-                {
-                Title = $"Current Teams."
+                    var gameEmbed = new EmbedBuilder
+                    {
+                        Title = $"Current Teams."
                     };
 
                     var t1Users = GetMentionList(GetUserList(Context.Guild, game.Team1.Players));
@@ -210,86 +210,7 @@ namespace RavenBOT.ELO.Modules.Modules
             CurrentLobby.Queue.Add(Context.User.Id);
             if (CurrentLobby.Queue.Count >= CurrentLobby.PlayersPerTeam * 2)
             {
-                await ReplyAsync("Queue is full. Picking teams...");
-                //Increment the game counter as there is now a new game.
-                CurrentLobby.CurrentGameCount += 1;
-                var game = new GameResult(CurrentLobby.CurrentGameCount, Context.Channel.Id, Context.Guild.Id, CurrentLobby.TeamPickMode);
-                game.Queue = CurrentLobby.Queue;
-                CurrentLobby.Queue = new HashSet<ulong>();
-
-                if (CurrentLobby.PlayersPerTeam == 1 &&
-                    (CurrentLobby.TeamPickMode == Lobby.PickMode.Captains_HighestRanked ||
-                        CurrentLobby.TeamPickMode == Lobby.PickMode.Captains_Random ||
-                        CurrentLobby.TeamPickMode == Lobby.PickMode.Captains_RandomHighestRanked))
-                {
-                    //Ensure that there isnt a captain pick mode if the teams only consist of one player
-                    await ReplyAsync("Lobby sort mode was set to random, you cannot have a captain lobby for solo queues.");
-                    CurrentLobby.TeamPickMode = Lobby.PickMode.Random;
-                }
-
-                //Set team players/captains based on the team pick mode
-                switch (CurrentLobby.TeamPickMode)
-                {
-                    case Lobby.PickMode.Captains_HighestRanked:
-                    case Lobby.PickMode.Captains_Random:
-                    case Lobby.PickMode.Captains_RandomHighestRanked:
-                        game.GameState = GameResult.State.Picking;
-                        var captains = Service.GetCaptains(CurrentLobby, game, Random);
-                        game.Team1.Captain = captains.Item1;
-                        game.Team2.Captain = captains.Item2;
-
-                        //TODO: Timer from when captains are mentioned to first pick time. Cancel game if command is not run.
-                        await ReplyAsync($"Captains have been picked. Use the `pick` or `p` command to choose your players.\nCaptain 1: <@{game.Team1.Captain}>\nCaptain 2: <@{game.Team2.Captain}>");
-                        break;
-                    case Lobby.PickMode.Random:
-                        game.GameState = GameResult.State.Undecided;
-                        var shuffled = game.Queue.OrderBy(x => Random.Next()).ToList();
-                        game.Team1.Players = shuffled.Take(CurrentLobby.PlayersPerTeam).ToHashSet();
-                        game.Team2.Players = shuffled.Skip(CurrentLobby.PlayersPerTeam).Take(CurrentLobby.PlayersPerTeam).ToHashSet();
-                        break;
-                    case Lobby.PickMode.TryBalance:
-                        game.GameState = GameResult.State.Undecided;
-                        var ordered = game.Queue.Select(x => Service.GetPlayer(Context.Guild.Id, x)).Where(x => x != null).OrderByDescending(x => x.Points).ToList();
-                        foreach (var user in ordered)
-                        {
-                            if (game.Team1.Players.Count > game.Team2.Players.Count)
-                            {
-                                game.Team2.Players.Add(user.UserId);
-                            }
-                            else
-                            {
-                                game.Team1.Players.Add(user.UserId);
-                            }
-                        }
-                        break;
-                }
-
-                //TODO: Assign team members to specific roles and create a channel for chat within.
-                if (CurrentLobby.TeamPickMode == Lobby.PickMode.TryBalance || CurrentLobby.TeamPickMode == Lobby.PickMode.Random)
-                {
-                    var t1Users = GetMentionList(GetUserList(Context.Guild, game.Team1.Players));
-                    var t2Users = GetMentionList(GetUserList(Context.Guild, game.Team2.Players));
-                    var gameEmbed = new EmbedBuilder
-                    {
-                        Title = $"Game #{game.GameId} Started"
-                    };
-
-                    //TODO: Is it necessary to announce captains here? since auto selected teams don't really have a captain
-                    //Maybe add an additional property for server owners to select
-                    gameEmbed.AddField("Team 1", $"Captain: {Context.Guild.GetUser(game.Team1.Captain)?.Mention ?? $"[{game.Team1.Captain}]"}\nPlayers: {string.Join("\n", t1Users)}");
-                    gameEmbed.AddField("Team 2", $"Captain: {Context.Guild.GetUser(game.Team2.Captain)?.Mention ?? $"[{game.Team2.Captain}]"}\nPlayers: {string.Join("\n", t2Users)}");
-                    await ReplyAsync("", false, gameEmbed.Build());
-                    if (CurrentLobby.GameReadyAnnouncementChannel != 0)
-                    {
-                        var channel = Context.Guild.GetTextChannel(CurrentLobby.GameReadyAnnouncementChannel);
-                        if (channel != null)
-                        {
-                            await channel.SendMessageAsync("", false, gameEmbed.Build());
-                        }
-                    }
-                }
-
-                Service.SaveGame(game);
+                await LobbyFullAsync();
             }
             else
             {
@@ -304,6 +225,90 @@ namespace RavenBOT.ELO.Modules.Modules
             }
 
             Service.SaveLobby(CurrentLobby);
+        }
+
+        public async Task LobbyFullAsync()
+    {
+            await ReplyAsync("Queue is full. Picking teams...");
+            //Increment the game counter as there is now a new game.
+            CurrentLobby.CurrentGameCount += 1;
+            var game = new GameResult(CurrentLobby.CurrentGameCount, Context.Channel.Id, Context.Guild.Id, CurrentLobby.TeamPickMode);
+            game.Queue = CurrentLobby.Queue;
+            CurrentLobby.Queue = new HashSet<ulong>();
+
+            if (CurrentLobby.PlayersPerTeam == 1 &&
+                (CurrentLobby.TeamPickMode == Lobby.PickMode.Captains_HighestRanked ||
+                    CurrentLobby.TeamPickMode == Lobby.PickMode.Captains_Random ||
+                    CurrentLobby.TeamPickMode == Lobby.PickMode.Captains_RandomHighestRanked))
+            {
+                //Ensure that there isnt a captain pick mode if the teams only consist of one player
+                await ReplyAsync("Lobby sort mode was set to random, you cannot have a captain lobby for solo queues.");
+                CurrentLobby.TeamPickMode = Lobby.PickMode.Random;
+            }
+
+            //Set team players/captains based on the team pick mode
+            switch (CurrentLobby.TeamPickMode)
+            {
+                case Lobby.PickMode.Captains_HighestRanked:
+                case Lobby.PickMode.Captains_Random:
+                case Lobby.PickMode.Captains_RandomHighestRanked:
+                    game.GameState = GameResult.State.Picking;
+                    var captains = Service.GetCaptains(CurrentLobby, game, Random);
+                    game.Team1.Captain = captains.Item1;
+                    game.Team2.Captain = captains.Item2;
+
+                    //TODO: Timer from when captains are mentioned to first pick time. Cancel game if command is not run.
+                    await ReplyAsync($"Captains have been picked. Use the `pick` or `p` command to choose your players.\nCaptain 1: <@{game.Team1.Captain}>\nCaptain 2: <@{game.Team2.Captain}>");
+                    break;
+                case Lobby.PickMode.Random:
+                    game.GameState = GameResult.State.Undecided;
+                    var shuffled = game.Queue.OrderBy(x => Random.Next()).ToList();
+                    game.Team1.Players = shuffled.Take(CurrentLobby.PlayersPerTeam).ToHashSet();
+                    game.Team2.Players = shuffled.Skip(CurrentLobby.PlayersPerTeam).Take(CurrentLobby.PlayersPerTeam).ToHashSet();
+                    break;
+                case Lobby.PickMode.TryBalance:
+                    game.GameState = GameResult.State.Undecided;
+                    var ordered = game.Queue.Select(x => Service.GetPlayer(Context.Guild.Id, x)).Where(x => x != null).OrderByDescending(x => x.Points).ToList();
+                    foreach (var user in ordered)
+                    {
+                        if (game.Team1.Players.Count > game.Team2.Players.Count)
+                        {
+                            game.Team2.Players.Add(user.UserId);
+                        }
+                        else
+                        {
+                            game.Team1.Players.Add(user.UserId);
+                        }
+                    }
+                    break;
+            }
+
+            //TODO: Assign team members to specific roles and create a channel for chat within.
+            if (CurrentLobby.TeamPickMode == Lobby.PickMode.TryBalance || CurrentLobby.TeamPickMode == Lobby.PickMode.Random)
+            {
+                var t1Users = GetMentionList(GetUserList(Context.Guild, game.Team1.Players));
+                var t2Users = GetMentionList(GetUserList(Context.Guild, game.Team2.Players));
+                var gameEmbed = new EmbedBuilder
+                {
+                    Title = $"Game #{game.GameId} Started"
+                };
+
+                //TODO: Is it necessary to announce captains here? since auto selected teams don't really have a captain
+                //Maybe add an additional property for server owners to select
+                gameEmbed.AddField("Team 1", $"Players: {string.Join("\n", t1Users)}");
+                gameEmbed.AddField("Team 2", $"Players: {string.Join("\n", t2Users)}");
+                await ReplyAsync("", false, gameEmbed.Build());
+                if (CurrentLobby.GameReadyAnnouncementChannel != 0)
+                {
+                    var channel = Context.Guild.GetTextChannel(CurrentLobby.GameReadyAnnouncementChannel);
+                    if (channel != null)
+                    {
+                        await channel.SendMessageAsync("", false, gameEmbed.Build());
+                    }
+                }
+            }
+
+            Service.SaveGame(game);
         }
 
         [Command("Leave", RunMode = RunMode.Sync)]
