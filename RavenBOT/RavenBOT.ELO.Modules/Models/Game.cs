@@ -49,6 +49,9 @@ namespace RavenBOT.ELO.Modules.Models
         public Team Team1 { get; set; } = new Team();
         public Team Team2 { get; set; } = new Team();
         public HashSet<ulong> Queue { get; set; } = new HashSet<ulong>();
+
+        public int Picks { get; set; } = 0;
+
         public class Team
         {
             public ulong Captain { get; set; } = 0;
