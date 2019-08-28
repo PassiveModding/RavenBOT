@@ -8,7 +8,7 @@ using RavenBOT.ELO.Modules.Methods;
 
 namespace RavenBOT.ELO.Modules.Modules
 {
-    public class UserCommands : InteractiveBase<ShardedCommandContext>
+    public class UserCommands : ReactiveBase
     {
         public ELOService Service { get; }
 
@@ -36,7 +36,7 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync($"You have registered as `{name}`, all roles/name updates have been applied if applicable.");
             if (responses.Count > 0)
             {
-                await ReplyAndDeleteAsync("", false, String.Join("\n", responses).QuickEmbed(), TimeSpan.FromSeconds(30));
+                await ReplyAsync("", false, String.Join("\n", responses).QuickEmbed());
             }
         }
 

@@ -4,28 +4,27 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 using Discord.Commands;
-using RavenBOT.Common;
 
-namespace RavenBOT.Common.Reactive
+namespace RavenBOT.Common
 {
     public class ReactiveService : IDisposable, IServiceable
     {
         public DiscordShardedClient Client { get; }
         
-        private readonly Dictionary<ulong, IReactionCallback> callbacks;
+        private readonly Dictionary<ulong, IReactiveCallback> callbacks;
         public ReactiveService(DiscordShardedClient client)
         {
             Client = client;
-            callbacks = new Dictionary<ulong, IReactionCallback>();
+            callbacks = new Dictionary<ulong, IReactiveCallback>();
             Client.ReactionAdded += HandleReactionAsync;
         }
 
-        public void AddReactionCallback(IMessage message, IReactionCallback callback)
+        public void AddReactionCallback(IMessage message, IReactiveCallback callback)
             => callbacks[message.Id] = callback;
 
         public async Task<IUserMessage> SendPagedMessageAsync(ShardedCommandContext context, ReactivePagerCallback pagerCallback)
         {
-            await pagerCallback.DisplayAsync();
+            await pagerCallback.DisplayAsync(context);
             callbacks.Add(pagerCallback.Message.Id, pagerCallback);
             return pagerCallback.Message;
         }

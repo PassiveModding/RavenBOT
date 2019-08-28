@@ -13,7 +13,7 @@ namespace RavenBOT.ELO.Modules.Modules
     [RavenRequireContext(ContextType.Guild)]
     //TODO: Moderator permission instead of just admin
     [Preconditions.RequireModerator]
-    public class ScoreManagement : InteractiveBase<ShardedCommandContext>
+    public class ScoreManagement : ReactiveBase
     {
         public ELOService Service { get; }
 

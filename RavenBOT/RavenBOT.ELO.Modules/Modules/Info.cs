@@ -13,7 +13,7 @@ using RavenBOT.ELO.Modules.Models;
 namespace RavenBOT.ELO.Modules.Modules
 {
     [RavenRequireContext(ContextType.Guild)]
-    public partial class Info : InteractiveBase<ShardedCommandContext>
+    public partial class Info : ReactiveBase
     {
         public ELOService Service { get; }
 
@@ -95,7 +95,7 @@ namespace RavenBOT.ELO.Modules.Modules
             var userGroups = users.OrderByDescending(x => x.Points).SplitList(20).ToArray();
             if (userGroups.Length == 0)
             {
-                await ReplyAndDeleteAsync("There are no registered users in this server yet.");
+                await ReplyAsync("There are no registered users in this server yet.");
                 return;
             }
 
@@ -103,28 +103,20 @@ namespace RavenBOT.ELO.Modules.Modules
             var pages = GetPages(userGroups);
 
             //Construct a paginated message with each of the leaderboard pages
-            var pager = new PaginatedMessage();
-            pager.Pages = pages;
-            await PagedReplyAsync(pager, new ReactionList
-            {
-                Forward = true,
-                Backward = true,
-                First = true,
-                Last = true
-            });
+            await PagedReplyAsync(new ReactivePager(pages).ToCallBack());
         }
 
-        public List<PaginatedMessage.Page> GetPages(IEnumerable<Player>[] groups)
+        public List<ReactivePage> GetPages(IEnumerable<Player>[] groups)
         {
             //Start the index at 1 because we are ranking players here ie. first place.
             int index = 1;
-            var pages = new List<PaginatedMessage.Page>(groups.Length);
+            var pages = new List<ReactivePage>(groups.Length);
             foreach (var group in groups)
             {
                 var playerGroup = group.ToArray();
                 var lines = GetPlayerLines(playerGroup, index);
                 index = lines.Item1;
-                var page = new PaginatedMessage.Page();
+                var page = new ReactivePage();
                 page.Title = $"{Context.Guild.Name} - Leaderboard";
                 page.Description = lines.Item2;
                 pages.Add(page);

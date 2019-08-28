@@ -16,7 +16,7 @@ namespace RavenBOT.ELO.Modules.Modules
 {
     [RavenRequireContext(ContextType.Guild)]
     [Preconditions.RequireModerator]
-    public class GameManagement : InteractiveBase<ShardedCommandContext>
+    public class GameManagement : ReactiveBase
     {
         public ELOService Service { get; }
 

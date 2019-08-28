@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Discord;
 
-namespace RavenBOT.Common.Reactive
+namespace RavenBOT.Common
 {
     /// <summary>
     /// ReactivePage contains the values for any page in a reactive pager, these will override the defaults defined in the pager.

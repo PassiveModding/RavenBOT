@@ -2,14 +2,17 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 
-namespace RavenBOT.Common.Reactive
+namespace RavenBOT.Common
 {
     public class ReactiveBase : ModuleBase<ShardedCommandContext>
     {
-        public ReactiveService Service { get; set; }
+        public ReactiveService ReactiveService { get; set; }
 
-        public Task<IUserMessage> PagedReplyAsync(ReactivePagerCallback pagerCallback)
-                => Service.SendPagedMessageAsync(Context, pagerCallback);
+        public async Task<IUserMessage> PagedReplyAsync(ReactivePagerCallback pagerCallback)
+        {
+            var res = await ReactiveService.SendPagedMessageAsync(Context, pagerCallback);
+            return res;
+        }
 
         public async Task<IUserMessage> SimpleEmbedAsync(string content, Color? color = null)
         {

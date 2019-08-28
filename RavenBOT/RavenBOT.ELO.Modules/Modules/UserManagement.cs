@@ -11,7 +11,7 @@ namespace RavenBOT.ELO.Modules.Modules
 {
     [RavenRequireContext(ContextType.Guild)]
     [Preconditions.RequireAdmin]
-    public class UserManagement : InteractiveBase<ShardedCommandContext>
+    public class UserManagement : ReactiveBase
     {
         public UserManagement(ELOService service)
         {

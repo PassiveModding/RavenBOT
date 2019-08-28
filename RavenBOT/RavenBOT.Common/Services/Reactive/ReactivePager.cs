@@ -1,14 +1,21 @@
+using System.Collections;
 using System;
 using System.Collections.Generic;
 using Discord;
 
-namespace RavenBOT.Common.Reactive
+namespace RavenBOT.Common
 {
     /// <summary>
     /// This defines the base Reactive message, note that values defined in a page will override values defined here if that page is beign displayed
     /// </summary>
     public class ReactivePager
     {
+        public ReactivePager(){}
+        public ReactivePager(IEnumerable<ReactivePage> pages)
+        {
+            Pages = pages;
+        }
+
         public IEnumerable<ReactivePage> Pages { get; set; } = new List<ReactivePage>();
 
         public string Content { get; set; } = string.Empty;
@@ -32,5 +39,10 @@ namespace RavenBOT.Common.Reactive
         public DateTimeOffset? TimeStamp { get; set; } = null;
 
         public Discord.Color Color { get; set; } = Discord.Color.Default;
+
+        public ReactivePagerCallback ToCallBack(TimeSpan? timeout = null)
+        {
+            return new ReactivePagerCallback(this, timeout);
+        }
     }
 }

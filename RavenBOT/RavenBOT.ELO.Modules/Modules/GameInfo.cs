@@ -188,7 +188,7 @@ namespace RavenBOT.ELO.Modules.Modules
             }
 
             var gamePages = games.SplitList(20);
-            var pages = new List<PaginatedMessage.Page>();
+            var pages = new List<ReactivePage>();
             foreach (var page in gamePages)
             {
                 var content = page.Select(x => {
@@ -198,22 +198,15 @@ namespace RavenBOT.ELO.Modules.Modules
                     }
                     return $"#{x.GameId}: {x.GameState}";
                 });
-                pages.Add(new PaginatedMessage.Page
+                pages.Add(new ReactivePage
                 {
                     Description = string.Join("\n", content).FixLength(1023)
                 });
             }
 
-            await PagedReplyAsync(new PaginatedMessage
-            {
-                Pages = pages
-            }, new ReactionList
-            {
-                Forward = true,
-                Backward = true,
-                First = true,
-                Last = true
-            });
+
+
+            await PagedReplyAsync(new ReactivePager(pages).ToCallBack());
         }
     }
 }
