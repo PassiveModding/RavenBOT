@@ -234,6 +234,13 @@ namespace RavenBOT.ELO.Modules.Modules
             CurrentLobby.CurrentGameCount += 1;
             var game = new GameResult(CurrentLobby.CurrentGameCount, Context.Channel.Id, Context.Guild.Id, CurrentLobby.TeamPickMode);
             game.Queue = CurrentLobby.Queue;
+            foreach (var userId in game.Queue)
+            {
+                var player = Service.GetPlayer(Context.Guild.Id, Context.User.Id);
+                if (player == null) continue;
+                player.AddGame(game.GameId);
+                Service.SavePlayer(player);
+            }
             CurrentLobby.Queue = new HashSet<ulong>();
 
             if (CurrentLobby.PlayersPerTeam == 1 &&
