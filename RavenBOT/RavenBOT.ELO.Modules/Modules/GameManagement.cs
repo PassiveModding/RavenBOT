@@ -57,7 +57,7 @@ namespace RavenBOT.ELO.Modules.Modules
             var game = Service.GetGame(Context.Guild.Id, lobby.ChannelId, gameNumber);
             if (game == null)
             {
-                await ReplyAsync($"Game number is invalid. Most recent game is {lobby.CurrentGameCount}");
+                await ReplyAsync($"GameID is invalid. Most recent game is {lobby.CurrentGameCount}");
                 return;
             }
 
@@ -199,7 +199,7 @@ namespace RavenBOT.ELO.Modules.Modules
             var game = Service.GetGame(Context.Guild.Id, lobbyChannel.Id, gameNumber);
             if (game == null)
             {
-                await ReplyAsync("Invalid game number.");
+                await ReplyAsync("Invalid GameID.");
                 return;
             }
 
@@ -228,7 +228,7 @@ namespace RavenBOT.ELO.Modules.Modules
             if (game == null)
             {
                 //Reply not valid game number.
-                await ReplyAsync($"Game number is invalid. Most recent game is {lobby.CurrentGameCount}");
+                await ReplyAsync($"GameID is invalid. Most recent game is {lobby.CurrentGameCount}");
                 return;
             }
 
@@ -240,7 +240,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
             await DrawPlayersAsync(game.Team1.Players);
             await DrawPlayersAsync(game.Team2.Players);
-            await ReplyAsync($"Called draw on game #{game.GameId}, player's game and draw counts have been updated.");
+            await ReplyAsync($"Called draw on game with GameID: {game.GameId}, player's game and draw counts have been updated.");
         }
 
         public Task DrawPlayersAsync(HashSet<ulong> playerIds)
@@ -287,13 +287,13 @@ namespace RavenBOT.ELO.Modules.Modules
             if (game == null)
             {
                 //Reply not valid game number.
-                await ReplyAsync($"Game number is invalid. Most recent game is {lobby.CurrentGameCount}");
+                await ReplyAsync($"GameID is invalid. Most recent game is {lobby.CurrentGameCount}");
                 return;
             }
 
             if (game.GameState == GameResult.State.Decided || game.GameState == GameResult.State.Draw)
             {
-                await ReplyAsync("Game results cannot currenly be overwritten without first running the `undogame` command.");
+                await ReplyAsync("Game results cannot currently be overwritten without first running the `undogame` command.");
                 return;
             }
 
