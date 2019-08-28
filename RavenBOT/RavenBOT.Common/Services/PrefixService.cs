@@ -17,7 +17,7 @@ namespace RavenBOT.Common
             DefaultPrefix = defaultPrefix;
         }
 
-        public void TryGetInfo()
+        private void TryGetInfo()
         {         
             if (Info == null)
             {
