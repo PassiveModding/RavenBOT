@@ -162,6 +162,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 return;
             }
 
+            //Not sure if this is actually needed.
             if (CurrentLobby.Queue.Count >= CurrentLobby.PlayersPerTeam * 2)
             {
                 //Queue will be reset after teams are completely picked.
@@ -177,6 +178,15 @@ namespace RavenBOT.ELO.Modules.Modules
                 {
                     var guildChannels = lobbyMatches.Select(x => Context.Guild.GetTextChannel(x.ChannelId)?.Mention ?? $"[{x.ChannelId}]");
                     await ReplyAsync($"MultiQueuing is not enabled in this server.\nPlease leave: {string.Join("\n", guildChannels)}");
+                    return;
+                }
+            }
+
+            if (CurrentLobby.MinimumPoints != null)
+            {
+                if (CurrentPlayer.Points < CurrentLobby.MinimumPoints)
+                {
+                    await ReplyAsync($"You need a minimum of {CurrentLobby.MinimumPoints} points to join this lobby.");
                     return;
                 }
             }
