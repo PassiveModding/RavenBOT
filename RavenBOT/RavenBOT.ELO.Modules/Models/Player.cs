@@ -108,6 +108,20 @@ namespace RavenBOT.ELO.Modules.Models
         /// </summary>
         public int Games => Draws + Losses + Wins;
 
+        private Queue<int> _RecentGames = new Queue<int>();
+        public int[] GetRecentGames()
+        {
+            return _RecentGames.ToArray();
+        }
+        public void AddGame(int gameNumber)
+        {
+            _RecentGames.Enqueue(gameNumber);
+            if (_RecentGames.Count > 5)
+            {
+                _RecentGames.Dequeue();
+            }
+        }
+
         public DateTime RegistrationDate { get; set; }
 
         /// <summary>
