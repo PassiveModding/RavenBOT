@@ -74,6 +74,10 @@ namespace RavenBOT.ELO.Modules.Modules
                             $"Registered At: {player.RegistrationDate.ToShortDateString()} {player.RegistrationDate.ToShortTimeString()}\n"+
                             $"{string.Join("\n", player.AdditionalProperties.Select(x => $"{x.Key}: {x.Value}"))}";
 
+                            //TODO: Add game history (last 5) to this response
+                            //+ if they were on the winning team?
+                            //maybe only games with a decided result should be shown?
+
             await ReplyAsync("", false, response.QuickEmbed());
         }
 
