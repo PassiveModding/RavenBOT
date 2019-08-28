@@ -164,9 +164,9 @@ namespace RavenBOT.ELO.Modules.Modules
 
         [Command("GameList")]
         [Alias("Game List", "GamesList", "ShowGames", "ListGames")]
+        [Summary("Displays statuses for the last 100 games in the lobby")]
         public async Task GameListAsync(SocketGuildChannel lobbyChannel = null)
         {
-            //return a paginated message with history of all previous games for the specified (or current) lobby
             if (lobbyChannel == null)
             {
                 lobbyChannel = Context.Channel as SocketGuildChannel;
@@ -180,7 +180,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 return;
             }
 
-            var games = Service.GetGames(Context.Guild.Id, lobbyChannel.Id).OrderByDescending(x => x.GameId);
+            var games = Service.GetGames(Context.Guild.Id, lobbyChannel.Id).OrderByDescending(x => x.GameId).Take(100);
             if (games.Count() == 0)
             {
                 await ReplyAsync("There aren't any games in history for the specified lobby.");
