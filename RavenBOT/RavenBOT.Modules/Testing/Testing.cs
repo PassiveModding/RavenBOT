@@ -14,7 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NAudio.Wave;
 using RavenBOT.Common;
 
-namespace RavenBOT.Modules
+namespace RavenBOT.Modules.Testing
 {
     [RavenRequireOwner]
     [Group("Tests")]
