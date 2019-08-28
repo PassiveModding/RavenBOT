@@ -236,11 +236,13 @@ namespace RavenBOT.ELO.Modules.Modules
             game.Queue = CurrentLobby.Queue;
             foreach (var userId in game.Queue)
             {
+                //TODO: Fetch and update players later as some could be retrieved later like in the captains function.
                 var player = Service.GetPlayer(Context.Guild.Id, Context.User.Id);
                 if (player == null) continue;
                 player.AddGame(game.GameId);
                 Service.SavePlayer(player);
             }
+            
             CurrentLobby.Queue = new HashSet<ulong>();
 
             if (CurrentLobby.PlayersPerTeam == 1 &&
