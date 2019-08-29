@@ -43,8 +43,8 @@ namespace RavenBOT.Common
         public ReactiveService Reactive;
 
         public ReactivePager Pager { get; }
-        private int pages;
-        private int page = 1;
+        public int pages { get; private set; }
+        public int page { get; set; } = 1;
 
         public Dictionary<IEmote, Func<ReactivePagerCallback, SocketReaction, Task<bool>>> Callbacks { get; set; }
 
@@ -111,35 +111,54 @@ namespace RavenBOT.Common
             return false;
         }
 
-        public async Task<bool> TrashAsync(SocketReaction reaction)
+        public async Task<bool> TrashAsync()
         {
             await Message.DeleteAsync().ConfigureAwait(false);
             return true;
         }
 
+        /// <summary>
+        /// Adds a new page to the end of the pager
+        /// Does not change the page number.
+        /// </summary>
+        /// <param name="newPage"></param>
         public void AddPage(ReactivePage newPage)
         {
             Pager.Pages = Pager.Pages.Append(newPage).ToList();
-            pages++;
+            pages = Pager.Pages.Count();
         }
-        
-        //TODO: Additional checks for setting pages to empty collection or removing the only remaining page.
+
+        /// <summary>
+        /// Sets the pages to a new collection
+        /// Will default to a blank page if an empty collection is specified
+        /// </summary>
+        /// <param name="collection"></param>
         public void SetPages(IEnumerable<ReactivePage> collection)
         {
+            if (collection.Count() == 0)
+            {
+                collection = new ReactivePage[]{new ReactivePage()};
+            }
             Pager.Pages = collection;
             page = 1;
             pages = collection.Count();
         }
 
+        /// <summary>
+        /// Removes the specified page (at index + 1)
+        /// Resets the current page to the first one.
+        /// </summary>
+        /// <param name="pageNumber"></param>
         public void RemovePage(int pageNumber)
         {
             if (pageNumber <= 0 || pageNumber > pages) return;
 
             var toRemove = Pager.Pages.ElementAtOrDefault(pageNumber - 1);
+
+            //Ignore invalid index.
             if (toRemove == null) return;
-            Pager.Pages = Pager.Pages.Where(x => !x.Equals(toRemove)).ToList();
-            //TODO: Ensure current page is not out of bounds if collection modified.
-            pages = Pager.Pages.Count();
+            var pageNum = page;
+            SetPages(Pager.Pages.Where(x => !x.Equals(toRemove)).ToList());
         }
 
         public Task RenderAsync()
@@ -211,7 +230,7 @@ namespace RavenBOT.Common
             Callbacks.Add(new Emoji("◀") , (x, y) => PreviousAsync(y));
             Callbacks.Add(new Emoji("▶") , (x, y) => NextAsync(y));
             Callbacks.Add(new Emoji("⏭") , (x, y) => LastAsync(y));
-            Callbacks.Add(new Emoji("⏹") , (x, y) => TrashAsync(y));
+            Callbacks.Add(new Emoji("⏹") , (x, y) => TrashAsync());
             return this;
         }
     }
