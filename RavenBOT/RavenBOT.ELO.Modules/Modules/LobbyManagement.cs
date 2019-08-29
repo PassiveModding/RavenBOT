@@ -306,13 +306,14 @@ namespace RavenBOT.ELO.Modules.Modules
                 //Maybe add an additional property for server owners to select
                 gameEmbed.AddField("Team 1", $"Players: {string.Join("\n", t1Users)}");
                 gameEmbed.AddField("Team 2", $"Players: {string.Join("\n", t2Users)}");
-                await ReplyAsync("", false, gameEmbed.Build());
+                var message = string.Join(" ", game.Queue.Select(x => MentionUtils.MentionUser(x)));
+                await ReplyAsync(message, false, gameEmbed.Build());
                 if (CurrentLobby.GameReadyAnnouncementChannel != 0)
                 {
                     var channel = Context.Guild.GetTextChannel(CurrentLobby.GameReadyAnnouncementChannel);
                     if (channel != null)
                     {
-                        await channel.SendMessageAsync("", false, gameEmbed.Build());
+                        await channel.SendMessageAsync(message, false, gameEmbed.Build());
                     }
                 }
             }
