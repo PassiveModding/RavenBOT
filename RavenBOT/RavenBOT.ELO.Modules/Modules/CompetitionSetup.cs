@@ -1,7 +1,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
-using Discord.Addons.Interactive;
 using Discord.Commands;
 using RavenBOT.Common;
 using RavenBOT.ELO.Modules.Methods;

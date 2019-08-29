@@ -228,7 +228,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         public async Task LobbyFullAsync()
-    {
+        {
             await ReplyAsync("Queue is full. Picking teams...");
             //Increment the game counter as there is now a new game.
             CurrentLobby.CurrentGameCount += 1;
@@ -383,6 +383,11 @@ namespace RavenBOT.ELO.Modules.Modules
             else if (users.Any(u => game.Team1.Players.Contains(u.Id) || game.Team2.Players.Contains(u.Id)))
             {
                 await ReplyAsync("A selected player is already picked for a team.");
+                return;
+            }
+            else if (users.Any(u => u.Id == game.Team1.Captain || u.Id == game.Team2.Captain))
+            {
+                await ReplyAsync("You cannot select a captain for picking.");
                 return;
             }
 
@@ -582,7 +587,8 @@ namespace RavenBOT.ELO.Modules.Modules
 
         public ulong[] RemainingPlayers(GameResult game)
         {
-            return game.Queue.Where(x => !game.Team1.Players.Contains(x) && !game.Team2.Players.Contains(x)).ToArray();
+            return game.Queue.Where(x => !game.Team1.Players.Contains(x) && !game.Team2.Players.Contains(x) 
+                                && x != game.Team1.Captain && x != game.Team2.Captain).ToArray();
         }
 
         public SocketGuildUser[] GetUserList(SocketGuild guild, IEnumerable<ulong> userIds)
