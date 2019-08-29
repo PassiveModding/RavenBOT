@@ -101,8 +101,11 @@ namespace RavenBOT.ELO.Modules.Modules
         [Command("PickOrders")]
         public async Task DisplayPickOrdersAsync()
         {
-            var pickDict = Extensions.ConvertEnumToDictionary<GameResult.CaptainPickOrder>();
-            await ReplyAsync($"{string.Join("\n", pickDict.Keys)}");
+            var res = "`PickOne` - Captains each alternate picking one player until there are none remaining\n" +
+                    "`PickTwo` - 1-2-2-1-1... Pick order. Captain 1 gets first pick, then Captain 2 picks 2 players,\n"+
+                    "then Captain 1 picks 2 players and then alternate picking 1 player until teams are filled\n" +
+                    "This is often used to reduce any advantage given for picking the first player.";
+            await ReplyAsync(res);
         }
 
         [Command("SetGameReadyAnnouncementChannel")]
