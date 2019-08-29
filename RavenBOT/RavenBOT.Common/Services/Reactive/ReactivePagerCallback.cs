@@ -19,6 +19,11 @@ namespace RavenBOT.Common
         }
         public RunMode RunMode => RunMode.Async;
 
+        /// <summary>
+        /// Return false if the precondition does not pass, used to add default checks prior to running callbacks.
+        /// </summary>
+        public Func<ReactivePagerCallback, SocketReaction, Task<bool>> Precondition = null;
+
         private TimeSpan? _timeout;
 
         public TimeSpan? Timeout => _timeout;
@@ -57,6 +62,16 @@ namespace RavenBOT.Common
         /// </returns>
         public async Task<bool> HandleCallbackAsync(SocketReaction reaction)
         {
+            if (Precondition != null)
+            {
+                var result = await Precondition.Invoke(this, reaction);
+                if (!result)
+                {
+                    _ = Message.RemoveReactionAsync(reaction.Emote, reaction.User.Value);
+                    return false;
+                }
+            }
+
             if (!Pager.Pages.Any())
             {
                 return true;
