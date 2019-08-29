@@ -57,7 +57,7 @@ namespace RavenBOT.ELO.Modules.Modules
             var game = Service.GetGame(Context.Guild.Id, lobby.ChannelId, gameNumber);
             if (game == null)
             {
-                await ReplyAsync($"Game number is invalid. Most recent game is {lobby.CurrentGameCount}");
+                await ReplyAsync($"GameID is invalid. Most recent game is {lobby.CurrentGameCount}");
                 return;
             }
 
@@ -199,7 +199,7 @@ namespace RavenBOT.ELO.Modules.Modules
             var game = Service.GetGame(Context.Guild.Id, lobbyChannel.Id, gameNumber);
             if (game == null)
             {
-                await ReplyAsync("Invalid game number.");
+                await ReplyAsync("Invalid GameID.");
                 return;
             }
 
@@ -228,7 +228,7 @@ namespace RavenBOT.ELO.Modules.Modules
             if (game == null)
             {
                 //Reply not valid game number.
-                await ReplyAsync($"Game number is invalid. Most recent game is {lobby.CurrentGameCount}");
+                await ReplyAsync($"GameID is invalid. Most recent game is {lobby.CurrentGameCount}");
                 return;
             }
 
@@ -265,7 +265,7 @@ namespace RavenBOT.ELO.Modules.Modules
             //TODO: Needs a way of cancelling games and calling draws
             if (winningTeamNumber != 1 && winningTeamNumber != 2)
             {
-                await ReplyAsync("Team number must be either then number `1` or `2`");
+                await ReplyAsync("Team number must be either number `1` or `2`");
                 return;
             }
 
@@ -287,13 +287,13 @@ namespace RavenBOT.ELO.Modules.Modules
             if (game == null)
             {
                 //Reply not valid game number.
-                await ReplyAsync($"Game number is invalid. Most recent game is {lobby.CurrentGameCount}");
+                await ReplyAsync($"GameID is invalid. Most recent game is {lobby.CurrentGameCount}");
                 return;
             }
 
             if (game.GameState == GameResult.State.Decided || game.GameState == GameResult.State.Draw)
             {
-                await ReplyAsync("Game results cannot currenly be overwritten without first running the `undogame` command.");
+                await ReplyAsync("Game results cannot currently be overwritten without first running the `undogame` command.");
                 return;
             }
 
