@@ -87,9 +87,81 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync("Queue Cleared.");
         }
 
+        [Command("ForceJoin")]
+        [Summary("Forcefully adds a user to queue, bypasses minimum points")]
+        [Preconditions.RequireModerator]
+        public async Task ForceJoinAsync(SocketGuildUser user)
+        {
+            if (!await CheckLobbyAsync())
+            {
+                return;
+            }
+
+            var response = Service.GetPlayer(Context.Guild.Id, user.Id);
+            if (response == null)
+            {
+                await ReplyAsync("User is not registered.");
+                return;
+            }
+
+            if (CurrentLobby.Queue.Count >= CurrentLobby.PlayersPerTeam * 2)
+            {
+                //Queue will be reset after teams are completely picked.
+                await ReplyAsync("Queue is full, wait for teams to be chosen before joining.");
+                return;
+            }
+
+            if (Service.GetOrCreateCompetition(Context.Guild.Id).BlockMultiQueueing)
+            {
+                var lobbies = Service.GetLobbies(Context.Guild.Id);
+                var lobbyMatches = lobbies.Where(x => x.Queue.Contains(user.Id));
+                if (lobbyMatches.Any())
+                {
+                    var guildChannels = lobbyMatches.Select(x => Context.Guild.GetTextChannel(x.ChannelId)?.Mention ?? $"[{x.ChannelId}]");
+                    await ReplyAsync($"MultiQueuing is not enabled in this server.\nUser must leave: {string.Join("\n", guildChannels)}");
+                    return;
+                }
+            }
+
+            var currentGame = Service.GetCurrentGame(CurrentLobby);
+            if (currentGame != null)
+            {
+                if (currentGame.GameState == Models.GameResult.State.Picking)
+                {
+                    await ReplyAsync("Current game is picking teams, wait until this is completed.");
+                    return;
+                }
+            }
+
+            if (CurrentLobby.Queue.Contains(user.Id))
+            {
+                await ReplyAsync("User is already queued.");
+                return;
+            }
+
+            CurrentLobby.Queue.Add(user.Id);
+            if (CurrentLobby.Queue.Count >= CurrentLobby.PlayersPerTeam * 2)
+            {
+                await LobbyFullAsync();
+            }
+            else
+            {
+                if (Context.Guild.CurrentUser.GuildPermissions.AddReactions)
+                {
+                    await Context.Message.AddReactionAsync(new Emoji("✅"));
+                }
+                else
+                {
+                    await ReplyAsync("Added to queue.");
+                }
+            }
+
+            Service.SaveLobby(CurrentLobby);
+        }
+
         [Command("ForceRemove")]
         [Preconditions.RequireModerator]
-        public async Task ForceRemove(SocketGuildUser user)
+        public async Task ForceRemoveAsync(SocketGuildUser user)
         {
             if (!await CheckLobbyAsync())
             {
