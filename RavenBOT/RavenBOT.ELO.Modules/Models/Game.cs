@@ -25,6 +25,29 @@ namespace RavenBOT.ELO.Modules.Models
         }
         public int GameId { get; set; }
 
+        /// <summary>
+        /// Requires at least 50% of the palayers on each team to vote for auto result
+        /// </summary>
+        /// <typeparam name="ulong"></typeparam>
+        /// <typeparam name="Vote"></typeparam>
+        /// <returns></returns>
+        public Dictionary<ulong, Vote> Votes { get; set; } = new Dictionary<ulong, Vote>();
+        public bool VoteComplete { get; set; } = false;
+
+        public class Vote
+        {
+            public ulong UserId { get; set; }
+            public VoteState UserVote { get; set; }
+
+            public enum VoteState
+            {
+                Cancel,
+                Win,
+                Lose,
+                Draw
+            }
+        }
+
         public ulong LobbyId { get; set; }
 
         public ulong GuildId { get; set; }

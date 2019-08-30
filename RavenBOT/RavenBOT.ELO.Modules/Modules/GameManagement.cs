@@ -15,7 +15,6 @@ using RavenBOT.ELO.Modules.Models;
 namespace RavenBOT.ELO.Modules.Modules
 {
     [RavenRequireContext(ContextType.Guild)]
-    [Preconditions.RequireModerator]
     public class GameManagement : ReactiveBase
     {
         public ELOService Service { get; }
@@ -31,8 +30,117 @@ namespace RavenBOT.ELO.Modules.Modules
         //Game (Mods/admins submit game results), could potentially accept a comment for the result as well (ie for proof of wins)
         //UndoGame (would need to use the amount of points added to the user rather than calculate at command run time)
 
+        [Command("Result")]
+        public async Task GameResultAsync(int gameNumber, GameResult.Vote.VoteState vote)
+        {
+            var game = Service.GetGame(Context.Guild.Id, Context.Channel.Id, gameNumber);
+            if (game == null)
+            {
+                await ReplyAsync("GameID is invalid.");
+                return;
+            }
+
+            if (game.GameState != GameResult.State.Undecided)
+            {
+                await ReplyAsync("You can only vote on the result of undecided games.");
+                return;
+            }
+            else if (game.VoteComplete)
+            {
+                //Result is undecided but vote has taken place, therefore it wasn't unanimous
+                await ReplyAsync("Vote has already been taken on this game but wasn't unanimous, ask an admin to submit the result");
+                return;
+            }
+
+            if (!game.Team1.Players.Contains(Context.User.Id) && !game.Team2.Players.Contains(Context.User.Id))
+            {
+                await ReplyAsync("You are not a player in this game and cannot vote on it's result.");
+                return;
+            }
+
+            if (game.Votes.ContainsKey(Context.User.Id))
+            {
+                await ReplyAsync("You already submitted your vote for this game.");
+                return;
+            }
+
+            var userVote = new GameResult.Vote()
+            {
+                UserId = Context.User.Id,
+                UserVote = vote
+            };
+
+            game.Votes.Add(Context.User.Id, userVote);
+            
+            //Ensure votes is greater than half the amount of players.
+            if (game.Votes.Count * 2 > game.Team1.Players.Count + game.Team2.Players.Count)
+            {
+                var drawCount = game.Votes.Count(x => x.Value.UserVote == GameResult.Vote.VoteState.Draw);
+                var cancelCount = game.Votes.Count(x => x.Value.UserVote == GameResult.Vote.VoteState.Cancel);
+
+                var team1WinCount = game.Votes
+                                        //Get players in team 1 and count wins
+                                        .Where(x => game.Team1.Players.Contains(x.Key))
+                                        .Count(x => x.Value.UserVote == GameResult.Vote.VoteState.Win)
+                                    +
+                                    game.Votes
+                                        //Get players in team 2 and count losses
+                                        .Where(x => game.Team2.Players.Contains(x.Key))
+                                        .Count(x => x.Value.UserVote == GameResult.Vote.VoteState.Lose);
+
+                var team2WinCount = game.Votes
+                                        //Get players in team 2 and count wins
+                                        .Where(x => game.Team2.Players.Contains(x.Key))
+                                        .Count(x => x.Value.UserVote == GameResult.Vote.VoteState.Win)
+                                    +
+                                    game.Votes
+                                        //Get players in team 1 and count losses
+                                        .Where(x => game.Team1.Players.Contains(x.Key))
+                                        .Count(x => x.Value.UserVote == GameResult.Vote.VoteState.Lose);
+
+                if (team1WinCount == game.Votes.Count)
+                {
+                    //team1 win
+                    Service.SaveGame(game);
+                    await GameAsync(1, gameNumber, null, "Decided by vote.");
+                }
+                else if (team2WinCount == game.Votes.Count)
+                {
+                    //team2 win
+                    Service.SaveGame(game);
+                    await GameAsync(2, gameNumber, null, "Decided by vote.");
+                }
+                else if (drawCount == game.Votes.Count)
+                {
+                    //draw
+                    Service.SaveGame(game);
+                    await DrawAsync(gameNumber, null, "Decided by vote.");
+                }
+                else if (cancelCount == game.Votes.Count)
+                {
+                    //cancel
+                    Service.SaveGame(game);
+                    await CancelAsync(gameNumber, null, "Decided by vote.");
+                }
+                else
+                {
+                    //Lock game votes and require admin to decide.
+                    await ReplyAsync("Vote was not unanimous, game result must be decided by a moderator.");
+                    game.VoteComplete = true;
+                    Service.SaveGame(game);
+                    return;
+                }
+            }
+            else
+            {
+                Service.SaveGame(game);
+                await ReplyAsync("Vote counted.");
+            }            
+        }
+
         [Command("UndoGame", RunMode = RunMode.Sync)]
         [Alias("Undo Game")]
+        [Preconditions.RequireModerator]
         public async Task UndoGameAsync(int gameNumber, SocketTextChannel lobbyChannel = null)
         {
             if (lobbyChannel == null)
@@ -180,6 +288,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
         [Command("DeleteGame", RunMode = RunMode.Sync)]
         [Alias("Delete Game", "DelGame")]
+        [Preconditions.RequireAdmin]
         //TODO: Explain that this does not affect the users who were in the game if it had a result. this is only for removing the game log from the database
         public async Task DelGame(int gameNumber, SocketTextChannel lobbyChannel = null)
         {
@@ -208,6 +317,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("Cancel", RunMode = RunMode.Sync)]
+        [Preconditions.RequireModerator]
         public async Task CancelAsync(int gameNumber, SocketTextChannel lobbyChannel = null, [Remainder]string comment = null)
         {
             if (lobbyChannel == null)
@@ -242,6 +352,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("Draw", RunMode = RunMode.Sync)]
+        [Preconditions.RequireModerator]
         public async Task DrawAsync(int gameNumber, SocketTextChannel lobbyChannel = null, [Remainder]string comment = null)
         {
             if (lobbyChannel == null)
@@ -294,6 +405,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
         [Command("Game", RunMode = RunMode.Sync)]
         [Alias("g")]
+        [Preconditions.RequireModerator]
         public async Task GameAsync(int winningTeamNumber, int gameNumber, SocketTextChannel lobbyChannel = null, [Remainder]string comment = null)
         {
             //TODO: Needs a way of cancelling games and calling draws
