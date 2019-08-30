@@ -13,7 +13,7 @@ using RavenBOT.ELO.Modules.Models;
 namespace RavenBOT.ELO.Modules.Modules
 {
     [RavenRequireContext(ContextType.Guild)]
-    public class LobbyManagement : ReactiveBase
+    public partial class LobbyManagement : ReactiveBase
     {
         public ELOService Service { get; }
 
@@ -63,27 +63,6 @@ namespace RavenBOT.ELO.Modules.Modules
         //TODO: Assign a game to a specific channel until game result is decided.
         //TODO: Allow players to party up for a lobby
 
-        [Command("Lobby")]
-        public async Task LobbyInfoAsync()
-        {
-            if (!await CheckLobbyAsync() || !await CheckRegisteredAsync())
-            {
-                return;
-            }
-
-            var embed = new EmbedBuilder
-            {
-                Color = Color.Blue
-            };
-            embed.Description = $"**Pick Mode:** {CurrentLobby.TeamPickMode}\n" +
-                $"**Minimum Points to Queue:** {CurrentLobby.MinimumPoints?.ToString() ?? "N/A"}\n" +
-                $"**Games Played:** {CurrentLobby.CurrentGameCount}\n" +
-                $"**Players Per Team:** {CurrentLobby.PlayersPerTeam}\n" +
-                $"**Maps:** {string.Join(", ", CurrentLobby.Maps)}\n" +
-                "For Players in Queue use the `Queue` or `Q` Command.";
-            await ReplyAsync("", false, embed.Build());
-        }
-
         [Command("ClearQueue", RunMode = RunMode.Sync)]
         [Alias("Clear Queue", "clearq", "clearque")]
         [Preconditions.RequireModerator]
@@ -106,125 +85,6 @@ namespace RavenBOT.ELO.Modules.Modules
             CurrentLobby.Queue.Clear();
             Service.SaveLobby(CurrentLobby);
             await ReplyAsync("Queue Cleared.");
-        }
-
-        [Command("Queue")]
-        [Alias("Q", "lps", "listplayers", "playerlist", "who")]
-        public async Task ShowQueueAsync()
-        {
-            if (!await CheckLobbyAsync())
-            {
-                return;
-            }
-
-            var game = Service.GetCurrentGame(CurrentLobby);
-            if (game != null)
-            {
-                if (game.GameState == Models.GameResult.State.Picking)
-                {
-                    var gameEmbed = new EmbedBuilder
-                    {
-                        Title = $"Current Teams."
-                    };
-
-                    var t1Users = GetMentionList(GetUserList(Context.Guild, game.Team1.Players));
-                    var t2Users = GetMentionList(GetUserList(Context.Guild, game.Team2.Players));
-                    var remainingPlayers = GetMentionList(GetUserList(Context.Guild, game.Queue.Where(x => !game.Team1.Players.Contains(x) && !game.Team2.Players.Contains(x))));
-                    gameEmbed.AddField("Team 1", $"Captain: {Context.Guild.GetUser(game.Team1.Captain)?.Mention ?? $"[{game.Team1.Captain}]"}\n{string.Join("\n", t1Users)}");
-                    gameEmbed.AddField("Team 2", $"Captain: {Context.Guild.GetUser(game.Team2.Captain)?.Mention ?? $"[{game.Team2.Captain}]"}\n{string.Join("\n", t2Users)}");
-                    gameEmbed.AddField("Remaining Players", string.Join("\n", remainingPlayers));
-                    await ReplyAsync("", false, gameEmbed.Build());
-                    return;
-                }
-            }
-
-            if (CurrentLobby.Queue.Count > 0)
-            {
-                var mentionList = GetMentionList(GetUserList(Context.Guild, CurrentLobby.Queue));
-                var embed = new EmbedBuilder();
-                embed.Title = $"{Context.Channel.Name} [{CurrentLobby.Queue.Count}/{CurrentLobby.PlayersPerTeam*2}]";
-                embed.Description = $"Game: #{CurrentLobby.CurrentGameCount}\n" +
-                    string.Join("\n", mentionList);
-                await ReplyAsync("", false, embed.Build());
-            }
-            else
-            {
-                await ReplyAsync("", false, "The queue is empty.".QuickEmbed());
-            }
-        }
-
-        [Command("Join", RunMode = RunMode.Sync)]
-        [Alias("JoinLobby", "Join Lobby", "j", "sign", "play", "ready")]
-        public async Task JoinLobbyAsync()
-        {
-            if (!await CheckLobbyAsync() || !await CheckRegisteredAsync())
-            {
-                return;
-            }
-
-            //Not sure if this is actually needed.
-            if (CurrentLobby.Queue.Count >= CurrentLobby.PlayersPerTeam * 2)
-            {
-                //Queue will be reset after teams are completely picked.
-                await ReplyAsync("Queue is full, wait for teams to be chosen before joining.");
-                return;
-            }
-
-            if (Service.GetOrCreateCompetition(Context.Guild.Id).BlockMultiQueueing)
-            {
-                var lobbies = Service.GetLobbies(Context.Guild.Id);
-                var lobbyMatches = lobbies.Where(x => x.Queue.Contains(Context.User.Id));
-                if (lobbyMatches.Any())
-                {
-                    var guildChannels = lobbyMatches.Select(x => Context.Guild.GetTextChannel(x.ChannelId)?.Mention ?? $"[{x.ChannelId}]");
-                    await ReplyAsync($"MultiQueuing is not enabled in this server.\nPlease leave: {string.Join("\n", guildChannels)}");
-                    return;
-                }
-            }
-
-            if (CurrentLobby.MinimumPoints != null)
-            {
-                if (CurrentPlayer.Points < CurrentLobby.MinimumPoints)
-                {
-                    await ReplyAsync($"You need a minimum of {CurrentLobby.MinimumPoints} points to join this lobby.");
-                    return;
-                }
-            }
-
-            var currentGame = Service.GetCurrentGame(CurrentLobby);
-            if (currentGame != null)
-            {
-                if (currentGame.GameState == Models.GameResult.State.Picking)
-                {
-                    await ReplyAsync("Current game is picking teams, wait until this is completed.");
-                    return;
-                }
-            }
-
-            if (CurrentLobby.Queue.Contains(Context.User.Id))
-            {
-                await ReplyAsync("You are already queued.");
-                return;
-            }
-
-            CurrentLobby.Queue.Add(Context.User.Id);
-            if (CurrentLobby.Queue.Count >= CurrentLobby.PlayersPerTeam * 2)
-            {
-                await LobbyFullAsync();
-            }
-            else
-            {
-                if (Context.Guild.CurrentUser.GuildPermissions.AddReactions)
-                {
-                    await Context.Message.AddReactionAsync(new Emoji("✅"));
-                }
-                else
-                {
-                    await ReplyAsync("Added to queue.");
-                }
-            }
-
-            Service.SaveLobby(CurrentLobby);
         }
 
         public async Task LobbyFullAsync()
@@ -321,44 +181,6 @@ namespace RavenBOT.ELO.Modules.Modules
             }
 
             Service.SaveGame(game);
-        }
-
-        [Command("Leave", RunMode = RunMode.Sync)]
-        [Alias("LeaveLobby", "Leave Lobby", "l", "out", "unsign", "remove", "unready")]
-        public async Task LeaveLobbyAsync()
-        {
-            if (!await CheckLobbyAsync() || !await CheckRegisteredAsync())
-            {
-                return;
-            }
-
-            if (CurrentLobby.Queue.Contains(Context.User.Id))
-            {
-                var game = Service.GetCurrentGame(CurrentLobby);
-                if (game != null)
-                {
-                    if (game.GameState == GameResult.State.Picking)
-                    {
-                        await ReplyAsync("Lobby is currently picking teams. You cannot leave a queue while this is happening.");
-                        return;
-                    }
-                }
-                CurrentLobby.Queue.Remove(Context.User.Id);
-                Service.SaveLobby(CurrentLobby);
-
-                if (Context.Guild.CurrentUser.GuildPermissions.AddReactions)
-                {
-                    await Context.Message.AddReactionAsync(new Emoji("✅"));
-                }
-                else
-                {
-                    await ReplyAsync("Removed from queue.");
-                }
-            }
-            else
-            {
-                await ReplyAsync("You are not queued for the next game.");
-            }
         }
 
         [Command("Pick", RunMode = RunMode.Sync)]
@@ -504,7 +326,7 @@ namespace RavenBOT.ELO.Modules.Modules
         {
             var uc = users.Count();
             //Lay out custom logic for 1-2-2-1-1... pick order.
-            
+
             var team = game.GetTeam();
             var offTeam = game.GetOffTeam();
 
@@ -573,8 +395,8 @@ namespace RavenBOT.ELO.Modules.Modules
 
         public ulong[] RemainingPlayers(GameResult game)
         {
-            return game.Queue.Where(x => !game.Team1.Players.Contains(x) && !game.Team2.Players.Contains(x) 
-                                && x != game.Team1.Captain && x != game.Team2.Captain).ToArray();
+            return game.Queue.Where(x => !game.Team1.Players.Contains(x) && !game.Team2.Players.Contains(x) &&
+                x != game.Team1.Captain && x != game.Team2.Captain).ToArray();
         }
 
         public SocketGuildUser[] GetUserList(SocketGuild guild, IEnumerable<ulong> userIds)
