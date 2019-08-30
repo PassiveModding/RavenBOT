@@ -8,7 +8,6 @@ namespace RavenBOT.ELO.Modules.Modules
 {
     public partial class LobbyManagement
     {
-        
         [Command("Join", RunMode = RunMode.Sync)]
         [Alias("JoinLobby", "Join Lobby", "j", "sign", "play", "ready")]
         public async Task JoinLobbyAsync()
