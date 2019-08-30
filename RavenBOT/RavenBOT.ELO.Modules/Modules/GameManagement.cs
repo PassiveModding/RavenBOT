@@ -207,6 +207,40 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync("Game Deleted.", false, JsonConvert.SerializeObject(game, Formatting.Indented).FixLength(2047).QuickEmbed());
         }
 
+        [Command("Cancel", RunMode = RunMode.Sync)]
+        public async Task CancelAsync(int gameNumber, SocketTextChannel lobbyChannel = null, [Remainder]string comment = null)
+        {
+            if (lobbyChannel == null)
+            {
+                //If no lobby is provided, assume that it is the current channel.
+                lobbyChannel = Context.Channel as SocketTextChannel;
+            }
+
+            var lobby = Service.GetLobby(Context.Guild.Id, lobbyChannel.Id);
+            if (lobby == null)
+            {
+                //Reply error not a lobby.
+                await ReplyAsync("Channel is not a lobby.");
+                return;
+            }
+
+            var game = Service.GetGame(Context.Guild.Id, lobby.ChannelId, gameNumber);
+            if (game == null)
+            {
+                //Reply not valid game number.
+                await ReplyAsync($"GameID is invalid. Most recent game is {lobby.CurrentGameCount}");
+                return;
+            }
+
+            game.GameState = GameResult.State.Canceled;
+            game.Submitter = Context.User.Id;
+            game.Comment = comment;
+            game.UpdatedScores = new HashSet<(ulong, int)>();
+            Service.SaveGame(game);
+
+            await ReplyAsync($"Cancelled game #{game.GameId}");
+        }
+
         [Command("Draw", RunMode = RunMode.Sync)]
         public async Task DrawAsync(int gameNumber, SocketTextChannel lobbyChannel = null, [Remainder]string comment = null)
         {
