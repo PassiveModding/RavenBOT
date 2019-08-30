@@ -87,10 +87,10 @@ namespace RavenBOT.ELO.Modules.Methods
             Database.Store<GameResult>(game, GameResult.DocumentName(game.GameId, game.LobbyId, game.GuildId));
         }
 
-        public IEnumerable<GameResult> GetGames(ulong guildId, ulong channelId, int? limit = null)
+        public GameResult[] GetGames(ulong guildId, ulong channelId, int? limit = null)
         {
             
-            return Database.Query<GameResult>(x => x.GuildId == guildId && x.LobbyId == channelId);
+            return Database.Query<GameResult>(x => x.GuildId == guildId && x.LobbyId == channelId).ToArray();
         }
 
         public Lobby[] GetLobbies(ulong guildId)
@@ -143,14 +143,14 @@ namespace RavenBOT.ELO.Modules.Methods
             Database.StoreMany<Player>(players.ToList(), x => Player.DocumentName(x.GuildId, x.UserId));
         }
 
-        public IEnumerable<Player> GetPlayers(Expression<Func<Player, bool>> queryFunc)
+        public Player[] GetPlayers(Expression<Func<Player, bool>> queryFunc)
         {
-            return Database.Query<Player>(queryFunc);
+            return Database.Query<Player>(queryFunc).ToArray();
         }
 
-        public IEnumerable<Player> GetPlayersSafe(IEnumerable<ulong> userIds, ulong guildId)
+        public Player[] GetPlayersSafe(IEnumerable<ulong> userIds, ulong guildId)
         {
-            return Database.Query<Player>(x => x.GuildId == guildId && userIds.Contains(x.UserId)).Where(x => x != null);
+            return Database.Query<Player>(x => x.GuildId == guildId && userIds.Contains(x.UserId)).Where(x => x != null).ToArray();
         }
 
         public Player CreatePlayer(ulong guildId, ulong userId, string name)
