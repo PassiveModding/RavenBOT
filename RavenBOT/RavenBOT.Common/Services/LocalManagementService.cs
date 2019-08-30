@@ -101,6 +101,8 @@ namespace RavenBOT.Common
         {
             public bool Developer { get; set; } = false;
 
+            public bool IgnoreBotInput { get; set; } = true;
+
             public string DeveloperPrefix { get; set; } = "dev.";
 
             //Used for whitelisting commands/events while in dev mode.

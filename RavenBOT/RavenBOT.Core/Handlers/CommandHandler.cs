@@ -16,9 +16,12 @@ namespace RavenBOT.Handlers
                 return;
             }
 
-            if (message.Author.IsBot || message.Author.IsWebhook)
+            if (LocalManagementService.LastConfig.IgnoreBotInput)
             {
-                return;
+                if (message.Author.IsBot || message.Author.IsWebhook)
+                {
+                    return;
+                }                
             }
 
             ulong guildId = 0;
