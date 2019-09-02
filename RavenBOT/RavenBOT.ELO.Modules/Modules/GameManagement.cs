@@ -410,6 +410,14 @@ namespace RavenBOT.ELO.Modules.Modules
             await AnnounceResultAsync(lobby, game);
         }
 
+
+        [Command("Draw", RunMode = RunMode.Sync)]
+        [Preconditions.RequireModerator]
+        public async Task DrawAsync(SocketTextChannel lobbyChannel, int gameNumber, [Remainder]string comment = null)
+        {
+            await DrawAsync(gameNumber, lobbyChannel, comment);
+        }
+
         [Command("Draw", RunMode = RunMode.Sync)]
         [Preconditions.RequireModerator]
         public async Task DrawAsync(int gameNumber, SocketTextChannel lobbyChannel = null, [Remainder]string comment = null)
