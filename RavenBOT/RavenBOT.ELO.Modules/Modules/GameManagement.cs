@@ -172,6 +172,14 @@ namespace RavenBOT.ELO.Modules.Modules
         [Command("UndoGame", RunMode = RunMode.Sync)]
         [Alias("Undo Game")]
         [Preconditions.RequireModerator]
+        public async Task UndoGameAsync(SocketTextChannel lobbyChannel , int gameNumber)
+        {
+            await UndoGameAsync(gameNumber, lobbyChannel);
+        }
+
+        [Command("UndoGame", RunMode = RunMode.Sync)]
+        [Alias("Undo Game")]
+        [Preconditions.RequireModerator]
         public async Task UndoGameAsync(int gameNumber, SocketTextChannel lobbyChannel = null)
         {
             if (lobbyChannel == null)
