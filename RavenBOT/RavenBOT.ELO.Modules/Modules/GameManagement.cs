@@ -318,7 +318,7 @@ namespace RavenBOT.ELO.Modules.Modules
                             if (rankChange)
                             {
                                 //Set the user's roles to the modified list which removes and lost ranks and adds any gained ranks
-                                x.RoleIds = currentRoles.Where(x => x != Context.Guild.EveryoneRole.Id).ToArray();
+                                x.RoleIds = currentRoles.Where(r => r != Context.Guild.EveryoneRole.Id).ToArray();
                             }
                         });
                     }
@@ -570,7 +570,7 @@ namespace RavenBOT.ELO.Modules.Modules
                         if (updateRoles)
                         {
                             //Set the user's roles to the modified list which removes and lost ranks and adds any gained ranks
-                            x.RoleIds = roleIds.Where(x => x != Context.Guild.EveryoneRole.Id).ToArray();
+                            x.RoleIds = roleIds.Where(r => r != Context.Guild.EveryoneRole.Id).ToArray();
                         }
                     });
                 }
