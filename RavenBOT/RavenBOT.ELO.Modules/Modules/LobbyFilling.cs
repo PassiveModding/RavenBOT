@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
+using Discord.WebSocket;
 using RavenBOT.ELO.Modules.Models;
 
 namespace RavenBOT.ELO.Modules.Modules
@@ -69,13 +70,21 @@ namespace RavenBOT.ELO.Modules.Modules
             }
             else
             {
+
                 if (Context.Guild.CurrentUser.GuildPermissions.AddReactions)
                 {
-                    await Context.Message.AddReactionAsync(new Emoji("✅"));
+                    try
+                    {
+                        await Context.Message.AddReactionAsync(new Emoji("✅"));
+                    }
+                    catch
+                    {
+                        await ReplyAsync($"Added to queue. **[{CurrentLobby.Queue.Count}/{CurrentLobby.PlayersPerTeam*2}]**");
+                    }
                 }
                 else
                 {
-                    await ReplyAsync("Added to queue.");
+                    await ReplyAsync($"Added to queue. **[{CurrentLobby.Queue.Count}/{CurrentLobby.PlayersPerTeam*2}]**");
                 }
             }
 
@@ -107,11 +116,18 @@ namespace RavenBOT.ELO.Modules.Modules
 
                 if (Context.Guild.CurrentUser.GuildPermissions.AddReactions)
                 {
-                    await Context.Message.AddReactionAsync(new Emoji("✅"));
+                    try
+                    {
+                        await Context.Message.AddReactionAsync(new Emoji("✅"));
+                    }
+                    catch
+                    {
+                        await ReplyAsync($"Removed from queue. **[{CurrentLobby.Queue.Count}/{CurrentLobby.PlayersPerTeam*2}]**");
+                    }
                 }
                 else
                 {
-                    await ReplyAsync("Removed from queue.");
+                    await ReplyAsync($"Removed from queue. **[{CurrentLobby.Queue.Count}/{CurrentLobby.PlayersPerTeam*2}]**");
                 }
             }
             else
