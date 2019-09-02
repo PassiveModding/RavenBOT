@@ -37,13 +37,13 @@ namespace RavenBOT.ELO.Modules.Modules
         }        
 
 
-        [Command("Result")]
+        [Command("Result", RunMode = RunMode.Sync)]
         public async Task GameResultAsync(SocketTextChannel lobbyChannel, int gameNumber, string voteState)
         {
             await GameResultAsync(gameNumber, voteState, lobbyChannel);
         }
 
-        [Command("Result")]
+        [Command("Result", RunMode = RunMode.Sync)]
         public async Task GameResultAsync(int gameNumber, string voteState, SocketTextChannel lobbyChannel = null)
         {
             if (lobbyChannel == null)
