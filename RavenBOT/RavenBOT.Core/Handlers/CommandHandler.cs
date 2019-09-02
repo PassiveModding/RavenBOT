@@ -23,6 +23,13 @@ namespace RavenBOT.Handlers
                     return;
                 }                
             }
+            else
+            {
+                if (message.Author.Id == Client.CurrentUser.Id)
+                {
+                    return;
+                }
+            }
 
             ulong guildId = 0;
             if (message.Channel is IGuildChannel gChannel)
