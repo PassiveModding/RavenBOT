@@ -9,6 +9,7 @@ using RavenBOT.ELO.Modules.Models;
 namespace RavenBOT.ELO.Modules.Modules
 {
     [Group("EloDev")]
+    [RavenRequireOwner]
     public class Developer : ReactiveBase
     {
         public Developer(IDatabase database)

@@ -8,6 +8,7 @@ using RavenBOT.ELO.Modules.Methods;
 
 namespace RavenBOT.ELO.Modules.Modules
 {
+    [RavenRequireContext(ContextType.Guild)]
     public class UserCommands : ReactiveBase
     {
         public ELOService Service { get; }

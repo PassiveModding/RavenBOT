@@ -9,6 +9,7 @@ using RavenBOT.ELO.Modules.Models;
 namespace RavenBOT.ELO.Modules.Modules
 {
     [RavenRequireUserPermission(Discord.GuildPermission.Administrator)]
+    [RavenRequireContext(ContextType.Guild)]
     public class ManagementSetup : ReactiveBase
     {
         public ELOService Service { get; }
