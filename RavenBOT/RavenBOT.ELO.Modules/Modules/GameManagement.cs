@@ -26,7 +26,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
         //TODO: Ensure correct commands require mod/admin perms
 
-        //GameResult (Allow players to vote on result), needs to be an optionla command, requires both team captains to vote
+        //GameResult (Allow players to vote on result), needs to be an optional command, requires both team captains to vote
         //Game (Mods/admins submit game results), could potentially accept a comment for the result as well (ie for proof of wins)
         //UndoGame (would need to use the amount of points added to the user rather than calculate at command run time)
 
@@ -38,8 +38,20 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("Result")]
-        public async Task GameResultAsync(int gameNumber, GameResult.Vote.VoteState vote)
+        public async Task GameResultAsync(int gameNumber, string voteState)
         {
+            //Do vote conversion to ensure that the state is a string and not an int (to avoid confusion with team number from old elo version)
+            if (int.TryParse(voteState, out var voteNumber))
+            {
+                await ReplyAsync("Please supply a result relevant to you rather than the team number. Use the `Results` command to see a list of these.");
+                return;
+            }
+            if (!Enum.TryParse(voteState, true, out GameResult.Vote.VoteState vote))
+            {
+                await ReplyAsync("Your vote was invalid. Please choose a result relevant to you. ie. Win (if you won the game) or Lose (if you lost the game)\nYou can view all possible results using the `Results` command.");
+                return;
+            }
+
             var game = Service.GetGame(Context.Guild.Id, Context.Channel.Id, gameNumber);
             if (game == null)
             {
@@ -132,6 +144,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 else
                 {
                     //Lock game votes and require admin to decide.
+                    //TODO: Show votes by whoever
                     await ReplyAsync("Vote was not unanimous, game result must be decided by a moderator.");
                     game.VoteComplete = true;
                     Service.SaveGame(game);
@@ -141,7 +154,7 @@ namespace RavenBOT.ELO.Modules.Modules
             else
             {
                 Service.SaveGame(game);
-                await ReplyAsync("Vote counted.");
+                await ReplyAsync($"Vote counted as: {vote.ToString()}");
             }            
         }
 
@@ -185,6 +198,34 @@ namespace RavenBOT.ELO.Modules.Modules
             await UpdateScores(lobby, game, competition);
             //TODO: Announce the undone game
         }
+
+        public async Task AnnounceResultAsync(Lobby lobby, EmbedBuilder builder)
+        {
+            if (lobby.GameResultAnnouncementChannel != 0 && lobby.GameResultAnnouncementChannel != Context.Channel.Id)
+            {
+                var channel = Context.Guild.GetTextChannel(lobby.GameReadyAnnouncementChannel);
+                if (channel != null)
+                {
+                    try
+                    {
+                        await channel.SendMessageAsync("", false, builder.Build());
+                    }
+                    catch
+                    {
+                        //
+                    }
+                }
+            }
+
+            await Context.Channel.SendMessageAsync("", false, builder.Build());
+        }
+
+        public async Task AnnounceResultAsync(Lobby lobby, GameResult game)
+        {
+            var embed = await Service.GetGameEmbedAsync(Context, game);
+            await AnnounceResultAsync(lobby, embed);
+        }
+
 
         public async Task UpdateScores(Lobby lobby, GameResult game, CompetitionConfig competition)
         {
@@ -277,7 +318,7 @@ namespace RavenBOT.ELO.Modules.Modules
                             if (rankChange)
                             {
                                 //Set the user's roles to the modified list which removes and lost ranks and adds any gained ranks
-                                x.RoleIds = currentRoles.ToArray();
+                                x.RoleIds = currentRoles.Where(x => x != Context.Guild.EveryoneRole.Id).ToArray();
                             }
                         });
                     }
@@ -355,7 +396,7 @@ namespace RavenBOT.ELO.Modules.Modules
             game.UpdatedScores = new HashSet<(ulong, int)>();
             Service.SaveGame(game);
 
-            await ReplyAsync($"Cancelled game #{game.GameId}");
+            await AnnounceResultAsync(lobby, game);
         }
 
         [Command("Draw", RunMode = RunMode.Sync)]
@@ -393,6 +434,7 @@ namespace RavenBOT.ELO.Modules.Modules
             await DrawPlayersAsync(game.Team1.Players);
             await DrawPlayersAsync(game.Team2.Players);
             await ReplyAsync($"Called draw on game #{game.GameId}, player's game and draw counts have been updated.");
+            await AnnounceResultAsync(lobby, game);
         }
 
         public Task DrawPlayersAsync(HashSet<ulong> playerIds)
@@ -403,7 +445,6 @@ namespace RavenBOT.ELO.Modules.Modules
                 if (player == null) continue;
 
                 player.Draws++;
-
                 Service.SavePlayer(player);
             }
 
@@ -529,7 +570,7 @@ namespace RavenBOT.ELO.Modules.Modules
                         if (updateRoles)
                         {
                             //Set the user's roles to the modified list which removes and lost ranks and adds any gained ranks
-                            x.RoleIds = roleIds.ToArray();
+                            x.RoleIds = roleIds.Where(x => x != Context.Guild.EveryoneRole.Id).ToArray();
                         }
                     });
                 }
@@ -563,7 +604,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 response.AddField("Comment", comment.FixLength(1023));
             }
 
-            await ReplyAsync("", false, response.Build());
+            await AnnounceResultAsync(lobby, response);
         }
 
         public string GetResponseContent(List < (Player, int, Rank, RankChangeState, Rank) > players)

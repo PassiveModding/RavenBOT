@@ -130,9 +130,36 @@ namespace RavenBOT.ELO.Modules.Modules
                 return;
             }
 
-            lobby.GameReadyAnnouncementChannel = Context.Channel.Id;
+            lobby.GameReadyAnnouncementChannel = destinationChannel.Id;
             Service.SaveLobby(lobby);
             await ReplyAsync($"Game ready announcements for the current lobby will be sent to {destinationChannel.Mention}");
+        }
+
+        [Command("SetGameResultAnnouncementChannel")]
+        public async Task GameResultAnnouncementChannel(SocketTextChannel destinationChannel = null)
+        {
+            if (destinationChannel == null)
+            {
+                await ReplyAsync("You need to specify a channel for the announcements to be sent to.");
+                return;
+            }
+
+            if (destinationChannel.Id == Context.Channel.Id)
+            {
+                await ReplyAsync("You cannot send announcements to the current channel.");
+                return;
+            }
+
+            var lobby = Service.GetLobby(Context.Guild.Id, Context.Channel.Id);
+            if (lobby == null)
+            {
+                await ReplyAsync("Current channel is not a lobby.");
+                return;
+            }
+
+            lobby.GameReadyAnnouncementChannel = destinationChannel.Id;
+            Service.SaveLobby(lobby);
+            await ReplyAsync($"Game results for the current lobby will be sent to {destinationChannel.Mention}");
         }
 
         [Command("SetMinimumPoints", RunMode = RunMode.Sync)]

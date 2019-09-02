@@ -41,10 +41,16 @@ namespace RavenBOT.ELO.Modules.Models
 
             public enum VoteState
             {
-                Cancel,
-                Win,
-                Lose,
-                Draw
+                Cancel=   10,
+                Cancelled=10,
+                Canceled= 10,
+                Win =     20,                
+                Won =     20,
+                Lose =    30,
+                Lost =    30,                
+                Loss =    30,
+                Draw =    40,
+                Drew =    40
             }
         }
 
