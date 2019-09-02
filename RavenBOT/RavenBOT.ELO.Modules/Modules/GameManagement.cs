@@ -349,6 +349,15 @@ namespace RavenBOT.ELO.Modules.Modules
         [Alias("Delete Game", "DelGame")]
         [Preconditions.RequireAdmin]
         //TODO: Explain that this does not affect the users who were in the game if it had a result. this is only for removing the game log from the database
+        public async Task DelGame(SocketTextChannel lobbyChannel, int gameNumber)
+        {
+            await DelGame(gameNumber, lobbyChannel);
+        }
+
+        [Command("DeleteGame", RunMode = RunMode.Sync)]
+        [Alias("Delete Game", "DelGame")]
+        [Preconditions.RequireAdmin]
+        //TODO: Explain that this does not affect the users who were in the game if it had a result. this is only for removing the game log from the database
         public async Task DelGame(int gameNumber, SocketTextChannel lobbyChannel = null)
         {
             if (lobbyChannel == null)
