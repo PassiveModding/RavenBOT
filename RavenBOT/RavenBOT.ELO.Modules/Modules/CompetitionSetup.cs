@@ -133,5 +133,56 @@ namespace RavenBOT.ELO.Modules.Modules
         {
             await RemoveRank(role.Id);
         }
+
+        [Command("DefaultWinModifier", RunMode = RunMode.Sync)]
+        public async Task CompWinModifier(int amountToAdd)
+        {
+            var competition = Service.GetOrCreateCompetition(Context.Guild.Id) ?? Service.CreateCompetition(Context.Guild.Id);
+            competition.DefaultWinModifier = amountToAdd;
+            Service.SaveCompetition(competition);
+            await ReplyAsync("Competition Updated.");
+        }
+
+        
+        [Command("DefaultLossModifier", RunMode = RunMode.Sync)]
+        public async Task CompLossModifier(int amountToSubtract)
+        {
+            var competition = Service.GetOrCreateCompetition(Context.Guild.Id) ?? Service.CreateCompetition(Context.Guild.Id);
+            competition.DefaultLossModifier = amountToSubtract;
+            Service.SaveCompetition(competition);
+            await ReplyAsync("Competition Updated.");
+        }
+
+        [Command("RankLossModifier", RunMode = RunMode.Sync)]
+        public async Task RankLossModifier(IRole role, int amountToSubtract)
+        {
+            var competition = Service.GetOrCreateCompetition(Context.Guild.Id) ?? Service.CreateCompetition(Context.Guild.Id);
+            var rank = competition.Ranks.FirstOrDefault(x => x.RoleId == role.Id);
+            if (rank == null)
+            {
+                await ReplyAsync("Provided role is not a rank.");
+                return;
+            }
+
+            rank.LossModifier = amountToSubtract;
+            Service.SaveCompetition(competition);
+            await ReplyAsync("Rank Updated.");
+        }
+
+        [Command("RankWinModifier", RunMode = RunMode.Sync)]
+        public async Task RankWinModifier(IRole role, int amountToAdd)
+        {
+            var competition = Service.GetOrCreateCompetition(Context.Guild.Id) ?? Service.CreateCompetition(Context.Guild.Id);
+            var rank = competition.Ranks.FirstOrDefault(x => x.RoleId == role.Id);
+            if (rank == null)
+            {
+                await ReplyAsync("Provided role is not a rank.");
+                return;
+            }
+
+            rank.WinModifier = amountToAdd;
+            Service.SaveCompetition(competition);
+            await ReplyAsync("Rank Updated.");
+        }
     }
 }
