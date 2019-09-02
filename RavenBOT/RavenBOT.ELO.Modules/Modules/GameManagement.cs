@@ -36,6 +36,13 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync(string.Join("\n", Extensions.EnumNames<GameResult.Vote.VoteState>()));
         }        
 
+
+        [Command("Result")]
+        public async Task GameResultAsync(SocketTextChannel lobbyChannel, int gameNumber, string voteState)
+        {
+            await GameResultAsync(gameNumber, voteState, lobbyChannel);
+        }
+
         [Command("Result")]
         public async Task GameResultAsync(int gameNumber, string voteState, SocketTextChannel lobbyChannel = null)
         {
