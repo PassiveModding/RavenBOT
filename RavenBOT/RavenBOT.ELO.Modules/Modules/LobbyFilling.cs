@@ -79,12 +79,12 @@ namespace RavenBOT.ELO.Modules.Modules
                     }
                     catch
                     {
-                        await ReplyAsync($"Added to queue. **[{CurrentLobby.Queue.Count}/{CurrentLobby.PlayersPerTeam*2}]**");
+                        await ReplyAsync($"Added {CurrentPlayer.DisplayName} to queue. **[{CurrentLobby.Queue.Count}/{CurrentLobby.PlayersPerTeam*2}]**");
                     }
                 }
                 else
                 {
-                    await ReplyAsync($"Added to queue. **[{CurrentLobby.Queue.Count}/{CurrentLobby.PlayersPerTeam*2}]**");
+                    await ReplyAsync($"Added {CurrentPlayer.DisplayName} to queue. **[{CurrentLobby.Queue.Count}/{CurrentLobby.PlayersPerTeam*2}]**");
                 }
             }
 
@@ -122,12 +122,12 @@ namespace RavenBOT.ELO.Modules.Modules
                     }
                     catch
                     {
-                        await ReplyAsync($"Removed from queue. **[{CurrentLobby.Queue.Count}/{CurrentLobby.PlayersPerTeam*2}]**");
+                        await ReplyAsync($"Removed {CurrentPlayer.DisplayName} from queue. **[{CurrentLobby.Queue.Count}/{CurrentLobby.PlayersPerTeam*2}]**");
                     }
                 }
                 else
                 {
-                    await ReplyAsync($"Removed from queue. **[{CurrentLobby.Queue.Count}/{CurrentLobby.PlayersPerTeam*2}]**");
+                    await ReplyAsync($"Removed {CurrentPlayer.DisplayName} from queue. **[{CurrentLobby.Queue.Count}/{CurrentLobby.PlayersPerTeam*2}]**");
                 }
             }
             else
