@@ -25,8 +25,7 @@ namespace RavenBOT.ELO.Modules.Modules
         [Command("ModifyStates")]
         public async Task ModifyStatesAsync()
         {
-            var states = Extensions.ConvertEnumToDictionary<Player.ModifyState>();
-            await ReplyAsync(string.Join("\n", states.Select(x => x.Key)));
+            await ReplyAsync(string.Join("\n", Extensions.EnumNames<Player.ModifyState>()));
         }
 
         //TODO: Consider whether it's necessary to have the single user command as multi user already is able to accept only one.

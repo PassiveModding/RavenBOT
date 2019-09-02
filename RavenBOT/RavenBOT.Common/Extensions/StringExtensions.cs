@@ -102,7 +102,7 @@ namespace RavenBOT.Common
             }
         }
 
-        public static IDictionary<String, Int32> ConvertEnumToDictionary<K>()
+        public static List<Tuple<string, K>> GetEnumNameValues<K>()
         {
             //Ensure that the base type is actually an enum
             if (typeof(K).BaseType != typeof(Enum))
@@ -110,7 +110,19 @@ namespace RavenBOT.Common
                 throw new InvalidCastException();
             }
 
-            return Enum.GetValues(typeof(K)).Cast<Int32>().ToDictionary(currentItem => Enum.GetName(typeof(K), currentItem));
+            return Enum.GetNames(typeof(K)).Select(x => new Tuple<string, K>(x, (K)Enum.Parse(typeof(K), x))).ToList();
+            //return Enum.GetValues(typeof(K)).Cast<Int32>().ToDictionary(currentItem => Enum.GetName(typeof(K), currentItem));
+        }
+
+        public static string[] EnumNames<K>()
+        {
+            //Ensure that the base type is actually an enum
+            if (typeof(K).BaseType != typeof(Enum))
+            {
+                throw new InvalidCastException();
+            }
+
+            return Enum.GetNames(typeof(K));
         }
     }
 }

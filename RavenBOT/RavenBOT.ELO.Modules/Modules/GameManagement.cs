@@ -33,9 +33,8 @@ namespace RavenBOT.ELO.Modules.Modules
         [Command("Results")]
         public async Task ShowResultsAsync()
         {
-            var states = Extensions.ConvertEnumToDictionary<GameResult.Vote.VoteState>();
-            await ReplyAsync(string.Join("\n", states.Select(x => x.Key)));
-        }
+            await ReplyAsync(string.Join("\n", Extensions.EnumNames<GameResult.Vote.VoteState>()));
+        }        
 
         [Command("Result")]
         public async Task GameResultAsync(int gameNumber, string voteState)

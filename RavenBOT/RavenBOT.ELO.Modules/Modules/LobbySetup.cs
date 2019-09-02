@@ -77,8 +77,7 @@ namespace RavenBOT.ELO.Modules.Modules
         //[Alias("Pick Modes")] ignore this as it can potentially conflict with the lobby Pick command.
         public async Task DisplayPickModesAsync()
         {
-            var pickDict = Extensions.ConvertEnumToDictionary<Lobby.PickMode>();
-            await ReplyAsync($"{string.Join("\n", pickDict.Keys)}");
+            await ReplyAsync(string.Join("\n", Extensions.EnumNames<Lobby.PickMode>()));
         }
 
         [Command("SetPickOrder", RunMode = RunMode.Sync)]

@@ -58,8 +58,7 @@ namespace RavenBOT.Modules.Moderator.Modules
         [Summary("Displays all search query values for mod logs")]
         public async Task ModLogActionsAsync()
         {
-            var actions = Extensions.ConvertEnumToDictionary<ActionConfig.Log.LogAction>();
-            await ReplyAsync("", false, string.Join("\n", actions.Select(x => x.Key)).QuickEmbed());
+            await ReplyAsync("", false, string.Join("\n", Extensions.EnumNames<ActionConfig.Log.LogAction>()).QuickEmbed());
         }
 
         [Command("ModLog")]
@@ -309,8 +308,7 @@ namespace RavenBOT.Modules.Moderator.Modules
         [RavenRequireUserPermission(GuildPermission.Administrator)]
         public async Task MaxWarningsActions()
         {
-            var actions = Extensions.ConvertEnumToDictionary<Models.ActionConfig.Action>();
-            await ReplyAsync(string.Join("\n", actions.Keys));
+            await ReplyAsync(string.Join("\n", Extensions.EnumNames<Models.ActionConfig.Action>()));
         }
 
         [Command("MaxWarningsAction")]
