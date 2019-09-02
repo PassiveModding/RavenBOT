@@ -207,7 +207,7 @@ namespace RavenBOT.ELO.Modules.Modules
         {
             if (lobby.GameResultAnnouncementChannel != 0 && lobby.GameResultAnnouncementChannel != Context.Channel.Id)
             {
-                var channel = Context.Guild.GetTextChannel(lobby.GameReadyAnnouncementChannel);
+                var channel = Context.Guild.GetTextChannel(lobby.GameResultAnnouncementChannel);
                 if (channel != null)
                 {
                     try
