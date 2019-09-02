@@ -638,6 +638,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
             var winField = new EmbedFieldBuilder
             {
+                //TODO: Is this necessary to show which team the winning team was?
                 Name = $"Winning Team, Team{winningTeamNumber}",
                 Value = GetResponseContent(winList).FixLength(1023)
             };
@@ -649,6 +650,7 @@ namespace RavenBOT.ELO.Modules.Modules
             var response = new EmbedBuilder
             {
                 Fields = new List<EmbedFieldBuilder> { winField, loseField },
+                //TODO: Remove this if from the vote command
                 Title = $"GameID: {gameNumber} Result called by {Context.User.Username}#{Context.User.Discriminator}"
             };
 
@@ -667,7 +669,7 @@ namespace RavenBOT.ELO.Modules.Modules
             {
                 if (player.Item4 == RankChangeState.None) 
                 {
-                    sb.AppendLine($"[{player.Item1.Points}] {player.Item1.DisplayName} Points: {player.Item2}");
+                    sb.AppendLine($"{player.Item1.DisplayName} **Points:** {player.Item1.Points} **Points Received:** {player.Item2}");
                     continue;
                 }
 
@@ -683,7 +685,7 @@ namespace RavenBOT.ELO.Modules.Modules
                     newRole = Context.Guild.GetRole(player.Item5.RoleId);
                 }
 
-                sb.AppendLine($"[{player.Item1.Points}] {player.Item1.DisplayName} Points: {player.Item2} Rank: {originalRole?.Mention ?? "N.A"} => {newRole?.Mention ?? "N/A"}");
+                sb.AppendLine($"{player.Item1.DisplayName} **Points:** {player.Item1.Points} **Points Received:** {player.Item2} Rank: {originalRole?.Mention ?? "N.A"} => {newRole?.Mention ?? "N/A"}");
 
             }
 
@@ -705,6 +707,7 @@ namespace RavenBOT.ELO.Modules.Modules
         /// <returns>
         /// A list containing a value tuple with the
         /// Player object
+        /// Amount of points received/lost
         /// The player's current rank
         /// The player's rank change state (rank up, derank, none)
         /// The players new rank (if changed)
