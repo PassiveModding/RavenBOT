@@ -470,6 +470,15 @@ namespace RavenBOT.ELO.Modules.Modules
             return Task.CompletedTask;
         }
 
+        
+        [Command("Game", RunMode = RunMode.Sync)]
+        [Alias("g")]
+        [Preconditions.RequireModerator]
+        public async Task GameAsync(SocketTextChannel lobbyChannel, int winningTeamNumber, int gameNumber, [Remainder]string comment = null)
+        {
+            await GameAsync(winningTeamNumber, gameNumber, lobbyChannel, comment);
+        }
+
         [Command("Game", RunMode = RunMode.Sync)]
         [Alias("g")]
         [Preconditions.RequireModerator]
