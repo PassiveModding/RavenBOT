@@ -37,8 +37,13 @@ namespace RavenBOT.ELO.Modules.Modules
         }        
 
         [Command("Result")]
-        public async Task GameResultAsync(int gameNumber, string voteState)
+        public async Task GameResultAsync(int gameNumber, string voteState, SocketTextChannel lobbyChannel = null)
         {
+            if (lobbyChannel == null)
+            {
+                lobbyChannel = Context.Channel as SocketTextChannel;
+            }
+
             //Do vote conversion to ensure that the state is a string and not an int (to avoid confusion with team number from old elo version)
             if (int.TryParse(voteState, out var voteNumber))
             {
@@ -51,7 +56,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 return;
             }
 
-            var game = Service.GetGame(Context.Guild.Id, Context.Channel.Id, gameNumber);
+            var game = Service.GetGame(Context.Guild.Id, lobbyChannel.Id, gameNumber);
             if (game == null)
             {
                 await ReplyAsync("GameID is invalid.");
@@ -120,25 +125,25 @@ namespace RavenBOT.ELO.Modules.Modules
                 {
                     //team1 win
                     Service.SaveGame(game);
-                    await GameAsync(1, gameNumber, null, "Decided by vote.");
+                    await GameAsync(1, gameNumber, lobbyChannel, "Decided by vote.");
                 }
                 else if (team2WinCount == game.Votes.Count)
                 {
                     //team2 win
                     Service.SaveGame(game);
-                    await GameAsync(2, gameNumber, null, "Decided by vote.");
+                    await GameAsync(2, gameNumber, lobbyChannel, "Decided by vote.");
                 }
                 else if (drawCount == game.Votes.Count)
                 {
                     //draw
                     Service.SaveGame(game);
-                    await DrawAsync(gameNumber, null, "Decided by vote.");
+                    await DrawAsync(gameNumber, lobbyChannel, "Decided by vote.");
                 }
                 else if (cancelCount == game.Votes.Count)
                 {
                     //cancel
                     Service.SaveGame(game);
-                    await CancelAsync(gameNumber, null, "Decided by vote.");
+                    await CancelAsync(gameNumber, lobbyChannel, "Decided by vote.");
                 }
                 else
                 {
