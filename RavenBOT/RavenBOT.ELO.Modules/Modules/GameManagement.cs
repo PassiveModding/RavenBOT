@@ -375,6 +375,14 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync("Game Deleted.", false, JsonConvert.SerializeObject(game, Formatting.Indented).FixLength(2047).QuickEmbed());
         }
 
+
+        [Command("Cancel", RunMode = RunMode.Sync)]
+        [Preconditions.RequireModerator]
+        public async Task CancelAsync(SocketTextChannel lobbyChannel, int gameNumber, [Remainder]string comment = null)
+        {
+            await CancelAsync(gameNumber, lobbyChannel, comment);
+        }
+
         [Command("Cancel", RunMode = RunMode.Sync)]
         [Preconditions.RequireModerator]
         public async Task CancelAsync(int gameNumber, SocketTextChannel lobbyChannel = null, [Remainder]string comment = null)
