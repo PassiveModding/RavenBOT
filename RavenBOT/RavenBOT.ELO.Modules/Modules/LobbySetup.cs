@@ -156,7 +156,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 return;
             }
 
-            lobby.GameReadyAnnouncementChannel = destinationChannel.Id;
+            lobby.GameResultAnnouncementChannel = destinationChannel.Id;
             Service.SaveLobby(lobby);
             await ReplyAsync($"Game results for the current lobby will be sent to {destinationChannel.Mention}");
         }
