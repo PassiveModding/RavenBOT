@@ -221,9 +221,16 @@ namespace RavenBOT.Common
             var embed = BuildEmbed();
             var message = await _context.Channel.SendMessageAsync(Pager.Content, embed: embed).ConfigureAwait(false);
             Message = message;
-            if (Callbacks.Any())
+            
+            //Only attempt to add reaction if the bot has permissions to do so.
+            var canReact = _context.Guild?.CurrentUser.GetPermissions(context.Channel as SocketTextChannel).AddReactions;
+
+            if (canReact == null || canReact == true)
             {
-                await Message.AddReactionsAsync(Callbacks.Select(x => x.Key).ToArray());
+                if (Callbacks.Any())
+                {
+                    await Message.AddReactionsAsync(Callbacks.Select(x => x.Key).ToArray());
+                }                      
             }
         }
 
