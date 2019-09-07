@@ -225,6 +225,27 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync(string.Join(", ", Extensions.EnumNames<MapSelector.MapMode>()));
         }
 
+        [Command("ClearMaps")]
+        public async Task MapClear()
+        {
+            var lobby = Service.GetLobby(Context.Guild.Id, Context.Channel.Id);
+            if (lobby == null)
+            {
+                await ReplyAsync("Current channel is not a lobby.");
+                return;
+            }
+
+            if (lobby.MapSelector == null)
+            {
+                await ReplyAsync("There are no maps to clear.");
+                return;
+            }
+
+            lobby.MapSelector.Maps.Clear();
+            Service.SaveLobby(lobby);
+            await ReplyAsync("Map added.");
+        }
+
         [Command("AddMap", RunMode = RunMode.Sync)]
         [Alias("Add Map")]
         public async Task AddMapAsync([Remainder]string mapName)
