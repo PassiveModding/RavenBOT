@@ -65,7 +65,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
             var gUser = (Context.User as SocketGuildUser);
             var currentName = gUser.Nickname ?? gUser.Username;
-            if (!currentName.Equals(newName))
+            if (competition.UpdateNames && !currentName.Equals(newName))
             {
                 if (gUser.Hierarchy < Context.Guild.CurrentUser.Hierarchy)
                 {

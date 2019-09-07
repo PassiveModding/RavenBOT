@@ -31,20 +31,20 @@ namespace RavenBOT.ELO.Modules.Methods
                         {
                             if (role.Position < user.Guild.CurrentUser.Hierarchy)
                             {
-                                await user.AddRoleAsync(role);     
-                                noted.Add($"{user.Mention} received the {(role.IsMentionable ? role.Mention : role.Name)} rank");       
-                            }    
+                                await user.AddRoleAsync(role);
+                                noted.Add($"{user.Mention} received the {(role.IsMentionable ? role.Mention : role.Name)} rank");
+                            }
                             else
                             {
                                 noted.Add($"The {(role.IsMentionable ? role.Mention : role.Name)} rank is above ELO bot's highest role and cannot be added to the user");
-                            }          
+                            }
                         }
                         else
                         {
                             comp.Ranks.Remove(match);
                             noted.Add($"A rank could not be found in the server and was subsequently deleted from the server config [{match.RoleId} w:{match.WinModifier} l:{match.LossModifier} p:{match.Points}]");
                             SaveCompetition(comp);
-                        } 
+                        }
                     }
                 }
 
@@ -68,34 +68,37 @@ namespace RavenBOT.ELO.Modules.Methods
                 noted.Add("The bot requires manage roles permissions in order to modify user roles.");
             }
 
-            var newName = comp.GetNickname(player);
-            var currentName = user.Nickname ?? user.Username;
-            //TODO: Investigate null ref here?
-            //Not sure if newname or current name could be null.
-            if (!currentName.Equals(newName, StringComparison.InvariantCultureIgnoreCase))
+            if (comp.UpdateNames)
             {
-                //Use heirachy check to ensure that the bot can actually set the nickname
-                if (user.Guild.CurrentUser.GuildPermissions.ManageNicknames)
+                var newName = comp.GetNickname(player);
+                var currentName = user.Nickname ?? user.Username;
+                //TODO: Investigate null ref here?
+                //Not sure if newname or current name could be null.
+                if (!currentName.Equals(newName, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    if (user.Hierarchy < user.Guild.CurrentUser.Hierarchy)
+                    //Use heirachy check to ensure that the bot can actually set the nickname
+                    if (user.Guild.CurrentUser.GuildPermissions.ManageNicknames)
                     {
-                        await user.ModifyAsync(x => x.Nickname = newName);
+                        if (user.Hierarchy < user.Guild.CurrentUser.Hierarchy)
+                        {
+                            await user.ModifyAsync(x => x.Nickname = newName);
+                        }
+                        else
+                        {
+                            noted.Add("You have a higher permission level than the bot and therefore it cannot edit your nickname.");
+                        }
                     }
                     else
                     {
-                        noted.Add("You have a higher permission level than the bot and therefore it cannot edit your nickname.");
+                        noted.Add("The bot cannot edit your nickname as it does not have the `ManageNicknames` permission");
                     }
-                }
-                else
-                {
-                    noted.Add("The bot cannot edit your nickname as it does not have the `ManageNicknames` permission");
                 }
             }
 
             return noted;
         }
 
-        public (ulong, ulong) GetCaptains(Lobby lobby, GameResult game, Random rnd)
+        public(ulong, ulong) GetCaptains(Lobby lobby, GameResult game, Random rnd)
         {
             ulong cap1 = 0;
             ulong cap2 = 0;

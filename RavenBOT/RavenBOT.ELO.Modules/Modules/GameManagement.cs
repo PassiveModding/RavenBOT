@@ -281,10 +281,10 @@ namespace RavenBOT.ELO.Modules.Modules
                     //The user cannot be found in the server so skip updating their name/profile
                     continue;
                 }
-
+                
                 var displayName = competition.GetNickname(player);
                 bool nicknameChange = false;
-                if (guildUser.Nickname != null)
+                if (guildUser.Nickname != null && competition.UpdateNames) 
                 {
                     if (!guildUser.Nickname.Equals(displayName))
                     {
@@ -574,7 +574,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
                 //TODO: Check if the user can have their nickname set.
                 bool nickNameUpdate = false;
-                if (gUser.Nickname != null)
+                if (competition.UpdateNames && gUser.Nickname != null)
                 {
                     if (!gUser.Nickname.Equals(displayName))
                     {

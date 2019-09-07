@@ -30,6 +30,7 @@ namespace RavenBOT.ELO.Modules.Models
         public ulong RegisteredRankId { get; set; } = 0;
 
         public string NameFormat { get; set; } = "[{score}] {name}";
+        public bool UpdateNames { get; set; } = true;
 
         public string GetNickname(Player player)
         {
