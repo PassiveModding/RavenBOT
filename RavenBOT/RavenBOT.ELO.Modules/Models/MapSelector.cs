@@ -38,7 +38,7 @@ namespace RavenBOT.ELO.Modules.Models
             History.Add(map);
         }
 
-        public async Task<(string, string, string)> GenerateVoter(Random rnd)
+        public (string, string, string) GenerateVoter(Random rnd)
         {
             throw new NotImplementedException();
             

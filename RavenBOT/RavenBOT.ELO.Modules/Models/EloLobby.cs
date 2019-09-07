@@ -9,8 +9,7 @@ namespace RavenBOT.ELO.Modules.Modules
          ulong GuildId { get; set; }
 
          HashSet<ulong> Queue { get; set; }
-         int CurrentGameCount { get; set; }
-         HashSet<string> Maps { get; set; }        
+         int CurrentGameCount { get; set; } 
 
     }
 }
