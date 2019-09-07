@@ -10,6 +10,116 @@ namespace RavenBOT.ELO.Modules.Methods
 {
     public partial class ELOService
     {
+        public enum GameFlag
+        {
+            gamestate,
+            map,
+            time,
+            lobby,
+            pickmode,
+            usermentions,
+            submitter
+        }
+        public async Task<(string, EmbedBuilder)> GetGameMessageAsync(SocketCommandContext context, GameResult game, string title = null, params GameFlag[] flags)
+        {
+            bool usermentions = flags.Contains(GameFlag.usermentions);
+
+            bool gamestate = flags.Contains(GameFlag.gamestate);
+            bool map = flags.Contains(GameFlag.map);
+            bool time = flags.Contains(GameFlag.time);
+            bool lobby = flags.Contains(GameFlag.lobby);
+            bool pickmode = flags.Contains(GameFlag.pickmode);
+            bool submitter = flags.Contains(GameFlag.submitter);
+            bool remainingPlayers = false;
+            bool winningteam = false;
+            bool team1 = false;
+            bool team2 = false;
+
+            var message = usermentions ? string.Join(" ", game.Queue.Select(x => MentionUtils.MentionUser(x))) : "";
+            
+            var embed = new EmbedBuilder();
+            embed.Title = title ?? $"Game #{game.GameId}";
+            var desc = "";
+
+            if (time)
+            {
+                desc += $"**Creation Time:** {game.CreationTime.ToShortDateString()} {game.CreationTime.ToShortTimeString()}\n";
+            }
+
+            if (pickmode)
+            {
+                desc += $"**Pick Mode:** {game.GamePickMode}\n";
+            }
+
+            if (lobby)
+            {
+                desc += $"**Lobby:** {MentionUtils.MentionChannel(game.LobbyId)}\n";
+            }
+
+            if (map && game.MapName != null)
+            {
+                desc += $"**Map:** {game.MapName}\n";
+            }
+
+            if (gamestate)
+            {
+                team1 = true;
+                team2 = true;
+
+                switch (game.GameState)
+                {
+                    case GameResult.State.Canceled:
+                        desc += "**State:** Cancelled\n";
+                        break;
+                    case GameResult.State.Draw:
+                        desc += "**State:** Draw\n";
+                        break;
+                    case GameResult.State.Picking:
+                        remainingPlayers = true;
+                        break;
+                    case GameResult.State.Decided:
+                        winningteam = true;
+                        break;
+                    case GameResult.State.Undecided:
+                        break;
+                }
+            }
+
+            if (winningteam)
+            {
+                var teamInfo = game.GetWinningTeam();
+                embed.AddField($"Winning Team, Team #{teamInfo.Item1}", await teamInfo.Item2.GetTeamInfo(context.Guild));
+                if (teamInfo.Item1 == 1)
+                {
+                    team1 = false;
+                }
+                else if (teamInfo.Item1 == 2)
+                {
+                    team2 = false;
+                }
+            }
+
+            if (team1)
+            {
+                embed.AddField("Team 1", await game.Team1.GetTeamInfo(context.Guild));
+            }
+
+            if (team2)
+            {
+                embed.AddField("Team 2", await game.Team2.GetTeamInfo(context.Guild));
+            }
+
+            if (remainingPlayers)
+            {
+                embed.AddField("Remaining Players", string.Join(" ", game.GetQueueRemainingPlayers()));
+            }
+
+
+
+            return (message, embed);
+        }
+
+
         public async Task<EmbedBuilder> GetGameEmbedAsync(SocketCommandContext context, GameResult game)
         {
             var embed = new EmbedBuilder();

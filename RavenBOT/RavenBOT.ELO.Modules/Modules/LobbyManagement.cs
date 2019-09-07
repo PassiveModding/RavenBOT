@@ -255,44 +255,31 @@ namespace RavenBOT.ELO.Modules.Modules
             if (game.Team1.Players.Count + game.Team2.Players.Count >= game.Queue.Count)
             {
                 //Teams have been filled.
-                //TODO: Announce game
                 game.GameState = GameResult.State.Undecided;
-                //TODO: Map selection
 
-                var gameEmbed = new EmbedBuilder
-                {
-                    Title = $"Game #{game.GameId} Started"
-                };
+                var res = await Service.GetGameMessageAsync(Context, game, $"Game #{game.GameId} Started",
+                        ELOService.GameFlag.gamestate,
+                        ELOService.GameFlag.lobby,
+                        ELOService.GameFlag.map,
+                        ELOService.GameFlag.usermentions,
+                        ELOService.GameFlag.time);
 
-                var t1Users = GetMentionList(GetUserList(Context.Guild, game.Team1.Players));
-                var t2Users = GetMentionList(GetUserList(Context.Guild, game.Team2.Players));
-                gameEmbed.AddField("Team 1", $"Captain: {Context.Guild.GetUser(game.Team1.Captain)?.Mention ?? $"[{game.Team1.Captain}]"}\nPlayers:\n{string.Join("\n", t1Users)}");
-                gameEmbed.AddField("Team 2", $"Captain: {Context.Guild.GetUser(game.Team2.Captain)?.Mention ?? $"[{game.Team2.Captain}]"}\nPlayers:\n{string.Join("\n", t2Users)}");
-                await ReplyAsync("", false, gameEmbed.Build());
+                await ReplyAsync(res.Item1, false, res.Item2.Build());
+                
                 if (CurrentLobby.GameReadyAnnouncementChannel != 0)
                 {
                     var channel = Context.Guild.GetTextChannel(CurrentLobby.GameReadyAnnouncementChannel);
                     if (channel != null)
                     {
-                        await channel.SendMessageAsync("", false, gameEmbed.Build());
+                        await channel.SendMessageAsync(res.Item1, false, res.Item2.Build());
                     }
                 }
             }
             else
             {
-                //Display players in each team and remaining players.
-                var gameEmbed = new EmbedBuilder
-                {
-                    Title = $"Player(s) picked."
-                };
-
-                var t1Users = GetMentionList(GetUserList(Context.Guild, game.Team1.Players));
-                var t2Users = GetMentionList(GetUserList(Context.Guild, game.Team2.Players));
-                var remainingPlayers = GetMentionList(GetUserList(Context.Guild, RemainingPlayers(game)));
-                gameEmbed.AddField("Team 1", $"Captain: {Context.Guild.GetUser(game.Team1.Captain)?.Mention ?? $"[{game.Team1.Captain}]"}\nPlayers:\n{string.Join("\n", t1Users)}");
-                gameEmbed.AddField("Team 2", $"Captain: {Context.Guild.GetUser(game.Team2.Captain)?.Mention ?? $"[{game.Team2.Captain}]"}\nPlayers:\n{string.Join("\n", t2Users)}");
-                gameEmbed.AddField("Remaining Players", string.Join("\n", remainingPlayers));
-                await ReplyAsync(PickResponse ?? "", false, gameEmbed.Build());
+                var res = await Service.GetGameMessageAsync(Context, game, "Player(s) picked.",
+                        ELOService.GameFlag.gamestate);
+                await ReplyAsync(PickResponse ?? "", false, res.Item2.Build());
             }
 
             Service.SaveGame(game);

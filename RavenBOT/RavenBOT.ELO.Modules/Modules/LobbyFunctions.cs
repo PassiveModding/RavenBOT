@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
+using RavenBOT.ELO.Modules.Methods;
 using RavenBOT.ELO.Modules.Models;
 
 namespace RavenBOT.ELO.Modules.Modules
@@ -93,27 +94,19 @@ namespace RavenBOT.ELO.Modules.Modules
             //TODO: Assign team members to specific roles and create a channel for chat within.
             if (CurrentLobby.TeamPickMode == Lobby.PickMode.TryBalance || CurrentLobby.TeamPickMode == Lobby.PickMode.Random)
             {
-                var t1Users = GetMentionList(GetUserList(Context.Guild, game.Team1.Players));
-                var t2Users = GetMentionList(GetUserList(Context.Guild, game.Team2.Players));
-                var gameEmbed = new EmbedBuilder
-                {
-                    Title = $"Game #{game.GameId} Started"
-                };
+                var res = await Service.GetGameMessageAsync(Context, game, $"Game #{game.GameId} Started", 
+                        ELOService.GameFlag.lobby,
+                        ELOService.GameFlag.map,
+                        ELOService.GameFlag.time,
+                        ELOService.GameFlag.usermentions);
 
-                //TODO: Is it necessary to announce captains here? since auto selected teams don't really have a captain
-                //Maybe add an additional property for server owners to select
-                gameEmbed.AddField("Team 1", $"Players: {string.Join("\n", t1Users)}");
-                gameEmbed.AddField("Team 2", $"Players: {string.Join("\n", t2Users)}");
-
-                //Display message mentioning all team members so they are pinged and notified for the game.
-                var message = string.Join(" ", game.Queue.Select(x => MentionUtils.MentionUser(x)));
-                await ReplyAsync(message, false, gameEmbed.Build());
+                await ReplyAsync(res.Item1, false, res.Item2.Build());
                 if (CurrentLobby.GameReadyAnnouncementChannel != 0)
                 {
                     var channel = Context.Guild.GetTextChannel(CurrentLobby.GameReadyAnnouncementChannel);
                     if (channel != null)
                     {
-                        await channel.SendMessageAsync(message, false, gameEmbed.Build());
+                        await channel.SendMessageAsync(res.Item1, false, res.Item2.Build());
                     }
                 }
             }
