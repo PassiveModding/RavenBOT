@@ -13,7 +13,7 @@ namespace RavenBOT.ELO.Modules.Methods
         public async Task<List<string>> UpdateUserAsync(CompetitionConfig comp, Player player, SocketGuildUser user)
         {
             var noted = new List<string>();
-            if (user.Guild.CurrentUser.GuildPermissions.Administrator)
+            if (user.Guild.CurrentUser.GuildPermissions.ManageRoles)
             {
                 var rankMatches = comp.Ranks.Where(x => x.Points <= player.Points);
                 if (rankMatches.Any())
@@ -65,7 +65,7 @@ namespace RavenBOT.ELO.Modules.Methods
             }
             else
             {
-                noted.Add("The bot requires administrator permissions in order to modify user roles.");
+                noted.Add("The bot requires manage roles permissions in order to modify user roles.");
             }
 
             var newName = comp.GetNickname(player);
