@@ -73,6 +73,8 @@ namespace RavenBOT.ELO.Modules.Models
 
         public string Comment { get; set; } = null;
 
+        public string MapName { get; set; } = null;
+
         public enum CaptainPickOrder
         {
             PickOne,

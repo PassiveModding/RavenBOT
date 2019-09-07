@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using RavenBOT.ELO.Modules.Modules;
 
 namespace RavenBOT.ELO.Modules.Models
@@ -17,7 +18,7 @@ namespace RavenBOT.ELO.Modules.Models
             this.ChannelId = channelId;
         }
 
-        public Lobby(){}
+        public Lobby() {}
 
         public ulong GuildId { get; set; }
         public ulong ChannelId { get; set; }
@@ -63,10 +64,8 @@ namespace RavenBOT.ELO.Modules.Models
             return true;
         }
 
-        //TODO: Allow for votes on maps, reduce change of repeate games on the same map.
-        public HashSet<string> Maps { get; set; } = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
-
-        //TODO: Instead of storing map history here use the maps that were chosen for recent games?
-        public List<string> MapHistory { get; set; } = new List<string>();
+        //TODO: Allow for votes on maps, reduce chance of repeate games on the same map.
+        //public HashSet<string> Maps { get; set; } = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+        public MapSelector MapSelector { get; set; } = null;
     }
 }

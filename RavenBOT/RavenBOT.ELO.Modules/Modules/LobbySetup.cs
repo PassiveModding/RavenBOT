@@ -193,6 +193,38 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync($"Minimum points is now disabled for this lobby.");
         }
         
+        [Command("MapMode", RunMode = RunMode.Sync)]
+        public async Task MapModeAsync(MapSelector.MapMode mode)
+        {
+            if (mode == MapSelector.MapMode.Vote)
+            {
+                await ReplyAsync("That mode is not available currently.");
+                return;
+            }
+
+            var lobby = Service.GetLobby(Context.Guild.Id, Context.Channel.Id);
+            if (lobby == null)
+            {
+                await ReplyAsync("Current channel is not a lobby.");
+                return;
+            }
+
+            if (lobby.MapSelector == null)
+            {
+                lobby.MapSelector = new MapSelector();
+            }
+
+            lobby.MapSelector.Mode = mode;
+            Service.SaveLobby(lobby);
+            await ReplyAsync("Mode set.");
+        }
+
+        [Command("MapModes")]
+        public async Task MapModes()
+        {
+            await ReplyAsync(string.Join(", ", Extensions.EnumNames<MapSelector.MapMode>()));
+        }
+
         [Command("AddMap", RunMode = RunMode.Sync)]
         [Alias("Add Map")]
         public async Task AddMapAsync([Remainder]string mapName)
@@ -204,10 +236,41 @@ namespace RavenBOT.ELO.Modules.Modules
                 return;
             }
 
-            lobby.Maps.Add(mapName);
-            lobby.Maps = lobby.Maps.Distinct().ToHashSet();
+            if (lobby.MapSelector == null)
+            {
+                lobby.MapSelector = new MapSelector();
+            }
+
+            lobby.MapSelector.Maps.Add(mapName);
             Service.SaveLobby(lobby);
             await ReplyAsync("Map added.");
+        }
+
+        [Command("DelMap", RunMode = RunMode.Sync)]
+        public async Task RemoveMapAsync([Remainder]string mapName)
+        {
+            var lobby = Service.GetLobby(Context.Guild.Id, Context.Channel.Id);
+            if (lobby == null)
+            {
+                await ReplyAsync("Current channel is not a lobby.");
+                return;
+            }
+
+            if (lobby.MapSelector == null)
+            {
+                await ReplyAsync("There are no maps to remove.");
+                return;
+            }
+
+            if (lobby.MapSelector.Maps.Remove(mapName))
+            {
+                Service.SaveLobby(lobby);
+                await ReplyAsync("Map removed.");
+            }
+            else
+            {
+                await ReplyAsync("There was no map matching that name found.");
+            }
         }
     }
 }

@@ -114,8 +114,6 @@ namespace RavenBOT.ELO.Modules.Modules
                 });
             }
 
-
-
             await PagedReplyAsync(new ReactivePager(pages).ToCallBack());
         }
     }

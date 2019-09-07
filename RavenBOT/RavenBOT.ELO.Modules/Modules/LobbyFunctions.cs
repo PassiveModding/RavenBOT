@@ -13,9 +13,25 @@ namespace RavenBOT.ELO.Modules.Modules
         {
             await ReplyAsync("Queue is full. Picking teams...");
             //Increment the game counter as there is now a new game.
-            CurrentLobby.CurrentGameCount += 1;
+            CurrentLobby.CurrentGameCount++;
             var game = new GameResult(CurrentLobby.CurrentGameCount, Context.Channel.Id, Context.Guild.Id, CurrentLobby.TeamPickMode);
             game.Queue = CurrentLobby.Queue;
+
+            if (CurrentLobby.MapSelector != null)
+            {
+                switch (CurrentLobby.MapSelector.Mode)
+                {
+                    case MapSelector.MapMode.Random:
+                        game.MapName = CurrentLobby.MapSelector.RandomMap(Random, true);
+                        break;
+                    case MapSelector.MapMode.Cycle:
+                        game.MapName = CurrentLobby.MapSelector.NextMap(true);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
             foreach (var userId in game.Queue)
             {
                 //TODO: Fetch and update players later as some could be retrieved later like in the captains function.

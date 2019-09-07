@@ -20,11 +20,24 @@ namespace RavenBOT.ELO.Modules.Modules
             {
                 Color = Color.Blue
             };
+            
+            string maps;
+            if (CurrentLobby.MapSelector != null)
+            {
+                maps = $"\n**Map Mode:** {CurrentLobby.MapSelector.Mode}\n" +
+                        $"**Maps:** {string.Join(", ", CurrentLobby.MapSelector.Maps)}\n" +
+                        $"**Recent Maps:** {string.Join(", ", CurrentLobby.MapSelector.GetHistory())}";
+            }
+            else
+            {
+                maps = "N/A";
+            }
+
             embed.Description = $"**Pick Mode:** {CurrentLobby.TeamPickMode}\n" +
                 $"**Minimum Points to Queue:** {CurrentLobby.MinimumPoints?.ToString() ?? "N/A"}\n" +
                 $"**Games Played:** {CurrentLobby.CurrentGameCount}\n" +
                 $"**Players Per Team:** {CurrentLobby.PlayersPerTeam}\n" +
-                $"**Maps:** {string.Join(", ", CurrentLobby.Maps)}\n" +
+                $"**Map Info:** {maps}\n" +
                 "For Players in Queue use the `Queue` or `Q` Command.";
             await ReplyAsync("", false, embed.Build());
         }
