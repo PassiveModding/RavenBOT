@@ -21,6 +21,23 @@ namespace RavenBOT.ELO.Modules.Modules
             Service = service;
         }
 
+        [Command("CompetitionInfo")]
+        public async Task CompetitionInfo()
+        {
+            var comp = Service.GetOrCreateCompetition(Context.Guild.Id);
+            var infoStr = $"**Register Role:** {MentionUtils.MentionRole(comp.RegisteredRankId)}\n" +
+                        $"**Admin Role:** {comp.AdminRole}\n" +
+                        $"**Moderator Role:** {MentionUtils.MentionRole(comp.ModeratorRole)}\n" +
+                        $"**Update Nicknames:** {comp.UpdateNames}\n" +
+                        $"**Nickname Format:** {comp.NameFormat}\n" +
+                        $"**Block Multiqueuing:** {comp.BlockMultiQueueing}\n" +
+                        $"**Allow negative score:** {comp.AllowNegativeScore}\n" +
+                        $"**Default Loss Amount:** {comp.DefaultLossModifier}\n" +
+                        $"**Default Win Amount:** {comp.DefaultWinModifier}\n" +
+                        $"For rank info use the `ranks` command";
+            await SimpleEmbedAsync(infoStr);
+        }
+
         [Command("SetRegisterRole", RunMode = RunMode.Sync)]
         [Alias("Set RegisterRole", "RegisterRole")]
         [Summary("Sets or displays the current register role")]
@@ -99,7 +116,7 @@ namespace RavenBOT.ELO.Modules.Modules
         [Alias("Add Rank", "UpdateRank")]
         public async Task AddRank(IRole role, int points)
         {
-            var competition = Service.GetOrCreateCompetition(Context.Guild.Id) ?? Service.CreateCompetition(Context.Guild.Id);
+            var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
             competition.Ranks = competition.Ranks.Where(x => x.RoleId != role.Id).ToList();
             competition.Ranks.Add(new Rank
             {
@@ -121,7 +138,7 @@ namespace RavenBOT.ELO.Modules.Modules
         [Alias("Remove Rank", "DelRank")]
         public async Task RemoveRank(ulong roleId)
         {
-            var competition = Service.GetOrCreateCompetition(Context.Guild.Id) ?? Service.CreateCompetition(Context.Guild.Id);
+            var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
             competition.Ranks = competition.Ranks.Where(x => x.RoleId != roleId).ToList();
             Service.SaveCompetition(competition);
             await ReplyAsync("Rank Removed.");
@@ -137,7 +154,7 @@ namespace RavenBOT.ELO.Modules.Modules
         [Command("DefaultWinModifier", RunMode = RunMode.Sync)]
         public async Task CompWinModifier(int amountToAdd)
         {
-            var competition = Service.GetOrCreateCompetition(Context.Guild.Id) ?? Service.CreateCompetition(Context.Guild.Id);
+            var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
             competition.DefaultWinModifier = amountToAdd;
             Service.SaveCompetition(competition);
             await ReplyAsync("Competition Updated.");
@@ -147,7 +164,7 @@ namespace RavenBOT.ELO.Modules.Modules
         [Command("DefaultLossModifier", RunMode = RunMode.Sync)]
         public async Task CompLossModifier(int amountToSubtract)
         {
-            var competition = Service.GetOrCreateCompetition(Context.Guild.Id) ?? Service.CreateCompetition(Context.Guild.Id);
+            var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
             competition.DefaultLossModifier = amountToSubtract;
             Service.SaveCompetition(competition);
             await ReplyAsync("Competition Updated.");
@@ -156,7 +173,7 @@ namespace RavenBOT.ELO.Modules.Modules
         [Command("RankLossModifier", RunMode = RunMode.Sync)]
         public async Task RankLossModifier(IRole role, int amountToSubtract)
         {
-            var competition = Service.GetOrCreateCompetition(Context.Guild.Id) ?? Service.CreateCompetition(Context.Guild.Id);
+            var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
             var rank = competition.Ranks.FirstOrDefault(x => x.RoleId == role.Id);
             if (rank == null)
             {
@@ -172,7 +189,7 @@ namespace RavenBOT.ELO.Modules.Modules
         [Command("RankWinModifier", RunMode = RunMode.Sync)]
         public async Task RankWinModifier(IRole role, int amountToAdd)
         {
-            var competition = Service.GetOrCreateCompetition(Context.Guild.Id) ?? Service.CreateCompetition(Context.Guild.Id);
+            var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
             var rank = competition.Ranks.FirstOrDefault(x => x.RoleId == role.Id);
             if (rank == null)
             {
@@ -188,7 +205,7 @@ namespace RavenBOT.ELO.Modules.Modules
         [Command("UpdateNicknames", RunMode = RunMode.Sync)]
         public async Task UpdateNicknames()
         {
-            var competition = Service.GetOrCreateCompetition(Context.Guild.Id) ?? Service.CreateCompetition(Context.Guild.Id);
+            var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
             competition.UpdateNames = !competition.UpdateNames;
             Service.SaveCompetition(competition);
             await ReplyAsync($"Update Nicknames: {competition.UpdateNames}");

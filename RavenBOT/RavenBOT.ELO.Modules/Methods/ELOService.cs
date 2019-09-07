@@ -25,7 +25,7 @@ namespace RavenBOT.ELO.Modules.Methods
         private IDatabase Database { get; }
         public DiscordShardedClient Client { get; }
 
-        public CompetitionConfig CreateCompetition(ulong guildId)
+        private CompetitionConfig CreateCompetition(ulong guildId)
         {
             var config = new CompetitionConfig(guildId);
             SaveCompetition(config);
