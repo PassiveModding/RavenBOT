@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using RavenBOT.Common;
+using RavenBOT.ELO.Modules.Methods;
 using RavenBOT.ELO.Modules.Models;
 
 namespace RavenBOT.ELO.Modules.Modules
@@ -12,11 +14,29 @@ namespace RavenBOT.ELO.Modules.Modules
     [RavenRequireOwner]
     public class Developer : ReactiveBase
     {
-        public Developer(IDatabase database)
+        public Developer(IDatabase database, Random random, ELOService service)
         {
             Database = database;
+            Random = random;
+            Service = service;
         }
         public IDatabase Database { get; }
+        public Random Random { get; }
+        public ELOService Service { get; }
+
+        [Command("RandomMap")]
+        public async Task RndMap(bool history)
+        {
+            if (!Context.Channel.IsLobby(Service, out var lobby))
+            {
+                return;
+            }
+
+            if (lobby.MapSelector == null) return;
+
+            await ReplyAsync(lobby.MapSelector.RandomMap(Random, history) ?? "N/A");
+            Service.SaveLobby(lobby);
+        }
 
         [Command("ClearAllQueues", RunMode = RunMode.Sync)]
         public async Task ClearAllLobbies()
