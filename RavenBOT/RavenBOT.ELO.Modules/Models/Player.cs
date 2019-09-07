@@ -19,10 +19,12 @@ namespace RavenBOT.ELO.Modules.Models
 
         public string DisplayName
         {
-            get {
+            get
+            {
                 return _DisplayName;
             }
-            set {
+            set
+            {
                 if (string.IsNullOrWhiteSpace(value)) return;
 
                 _DisplayName = value;
@@ -52,7 +54,32 @@ namespace RavenBOT.ELO.Modules.Models
             this.RegistrationDate = DateTime.UtcNow;
         }
 
-        public Player() {}
+        public Player() { }
+
+        public List<Ban> BanHistory { get; set; } = new List<Ban>();
+        public Ban CurrentBan => BanHistory.LastOrDefault();
+        public bool IsBanned => CurrentBan == null ? false : !CurrentBan.IsExpired;
+
+        public class Ban
+        {
+            public Ban(TimeSpan length, ulong moderator, string comment = null)
+            {
+                Moderator = moderator;
+                Length = length;
+                TimeOfBan = DateTime.UtcNow;
+                Comment = comment;
+            }
+
+            public Ban() {}
+            public string Comment { get; set; }
+            public ulong Moderator { get; set; }
+            public TimeSpan Length { get; set; }
+            public DateTime TimeOfBan { get; set; }
+            public DateTime ExpiryTime => TimeOfBan + Length;
+            public TimeSpan RemainingTime => ExpiryTime - DateTime.UtcNow;
+            public bool IsExpired => ManuallyDisabled ? true : ExpiryTime < DateTime.UtcNow;
+            public bool ManuallyDisabled { get; set; } = false;
+        }
 
         /// <summary>
         /// Indicates the user's points.
@@ -62,9 +89,6 @@ namespace RavenBOT.ELO.Modules.Models
         public int Points { get; set; } = 0;
 
         private int _Wins = 0;
-
-        public bool IsBanned => BanExpiry > DateTime.UtcNow;
-        public DateTime BanExpiry { get; set; } = DateTime.MinValue;
 
         public int Wins
         {
@@ -135,7 +159,7 @@ namespace RavenBOT.ELO.Modules.Models
         /// <returns></returns>
         public Dictionary<string, int> AdditionalProperties { get; set; } = new Dictionary<string, int>();
 
-        public(int, int) UpdateValue(string key, ModifyState state, int modifier)
+        public (int, int) UpdateValue(string key, ModifyState state, int modifier)
         {
             int original = 0;
             int newVal = 0;

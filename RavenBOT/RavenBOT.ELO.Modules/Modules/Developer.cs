@@ -24,6 +24,19 @@ namespace RavenBOT.ELO.Modules.Modules
         public Random Random { get; }
         public ELOService Service { get; }
 
+        [Command("BanTest")]
+        public async Task BanTest()
+        {
+            if (!Context.User.IsRegistered(Service, out var player))
+            {
+                return;
+            }
+
+            player.BanHistory.Add(new Player.Ban(TimeSpan.FromHours(1), Context.User.Id, "Test"));
+            player.CurrentBan.Comment = "ok";
+            await ReplyAsync("Done");
+        }
+
         [Command("RandomMap")]
         public async Task RndMap(bool history)
         {

@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -21,8 +22,41 @@ namespace RavenBOT.ELO.Modules.Modules
 
         public ELOService Service { get; }
 
+        [Command("Bans")]
+        public async Task Bans()
+        {
+            var players = Service.GetPlayers(x => x.GuildId == Context.Guild.Id && x.IsBanned);
+            if (players.Length == 0)
+            {
+                await ReplyAsync("There aren't any banned players.");
+                return;
+            }
+            var pages = players.OrderBy(x => x.CurrentBan.RemainingTime).SplitList(20).Select(x =>
+            {
+                var page = new ReactivePage();
+                page.Description = string.Join("\n", x.Select(p => $"{MentionUtils.MentionUser(p.UserId)} - {p.CurrentBan.ExpiryTime.ToShortDateString()} {p.CurrentBan.ExpiryTime.ToShortTimeString()} in {p.CurrentBan.RemainingTime.GetReadableLength()}"));
+                return page;
+            });
+            var pager = new ReactivePager(pages);
+            await PagedReplyAsync(pager.ToCallBack().WithDefaultPagerCallbacks());
+        }
+
+        [Command("Unban", RunMode = RunMode.Sync)]
+        public async Task Unban(SocketGuildUser user)
+        {
+            if (!user.IsRegistered(Service, out var player))
+            {
+                await ReplyAsync("Player is not registered.");
+                return;
+            }
+
+            player.CurrentBan.ManuallyDisabled = true;
+            Service.SavePlayer(player);
+            await ReplyAsync("Unbanned player.");
+        }
+
         [Command("BanUser", RunMode = RunMode.Sync)]
-        public async Task BanUserAsync(TimeSpan time, SocketGuildUser user)
+        public async Task BanUserAsync(TimeSpan time, SocketGuildUser user, string reason = null)
         {
             var player = Service.GetPlayer(Context.Guild.Id, user.Id);
             if (player == null)
@@ -31,9 +65,9 @@ namespace RavenBOT.ELO.Modules.Modules
                 return;
             }
 
-            player.BanExpiry = DateTime.UtcNow + time;
+            player.BanHistory.Add(new Player.Ban(time, Context.User.Id, reason));
             Service.SavePlayer(player);
-            await ReplyAsync($"Player banned from joining games until: {player.BanExpiry.ToShortDateString()} {player.BanExpiry.ToShortTimeString()}");
+            await ReplyAsync($"Player banned from joining games until: {player.CurrentBan.ExpiryTime.ToShortDateString()} {player.CurrentBan.ExpiryTime.ToShortTimeString()} in {player.CurrentBan.RemainingTime.GetReadableLength()}");
         }
 
         [Command("DeleteUser", RunMode = RunMode.Sync)]
