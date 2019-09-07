@@ -113,6 +113,7 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync("", false, responseString.QuickEmbed());
         }
 
+        /*
         [Command("PlayerModify", RunMode = RunMode.Sync)]
         public async Task PlayerModifyAsync(SocketGuildUser user, string value, Player.ModifyState state, int amount)
         {
@@ -136,5 +137,6 @@ namespace RavenBOT.ELO.Modules.Modules
             Service.SavePlayers(players);
             await ReplyAsync("", false, responseString.QuickEmbed());
         }
+        */
     }
 }
