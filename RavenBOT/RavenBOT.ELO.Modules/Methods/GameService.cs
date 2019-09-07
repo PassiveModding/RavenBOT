@@ -103,6 +103,7 @@ namespace RavenBOT.ELO.Modules.Methods
                                 $"Lobby: {game.GetChannel(context.Guild).Mention}\n" +
                                 $"Creation Time: {game.CreationTime.ToShortDateString()} {game.CreationTime.ToShortTimeString()}\n" +
                                 $"Pick Mode: {game.GamePickMode}\n" +
+                                $"{(game.MapName == null ? "" : $"Map: {game.MapName}\n")}" +
                                 gameStateInfo.FixLength(2047);
 
             return embed;
