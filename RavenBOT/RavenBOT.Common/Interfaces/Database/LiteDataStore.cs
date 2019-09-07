@@ -37,7 +37,7 @@ namespace RavenBOT.Common.Interfaces.Database
             {
                 Directory.CreateDirectory(DatabaseFolder);
             }
-            Database = new LiteDatabase(DatabasePath);
+            Database = new LiteDatabase("Filename=" + DatabasePath + "; utc=true;");
         }
 
         public void Store<T>(T document, string name = null)
