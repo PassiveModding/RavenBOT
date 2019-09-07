@@ -184,5 +184,14 @@ namespace RavenBOT.ELO.Modules.Modules
             Service.SaveCompetition(competition);
             await ReplyAsync("Rank Updated.");
         }
+
+        [Command("UpdateNicknames", RunMode = RunMode.Sync)]
+        public async Task UpdateNicknames()
+        {
+            var competition = Service.GetOrCreateCompetition(Context.Guild.Id) ?? Service.CreateCompetition(Context.Guild.Id);
+            competition.UpdateNames = !competition.UpdateNames;
+            Service.SaveCompetition(competition);
+            await ReplyAsync($"Update Nicknames: {competition.UpdateNames}");
+        }
     }
 }
