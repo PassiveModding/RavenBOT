@@ -22,7 +22,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
             if (CurrentPlayer.IsBanned)
             {
-                await ReplyAsync($"You are still banned from matchmaking for another: {(DateTime.UtcNow - CurrentPlayer.BanExpiry).GetReadableLength()}");
+                await ReplyAsync($"You are still banned from matchmaking for another: {(CurrentPlayer.BanExpiry - DateTime.UtcNow).GetReadableLength()}");
                 return;
             }
 
