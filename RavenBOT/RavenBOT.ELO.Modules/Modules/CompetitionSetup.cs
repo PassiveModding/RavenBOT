@@ -31,7 +31,7 @@ namespace RavenBOT.ELO.Modules.Modules
                         $"**Update Nicknames:** {comp.UpdateNames}\n" +
                         $"**Nickname Format:** {comp.NameFormat}\n" +
                         $"**Block Multiqueuing:** {comp.BlockMultiQueueing}\n" +
-                        $"**Allow negative score:** {comp.AllowNegativeScore}\n" +
+                        $"**Allow Negative Score:** {comp.AllowNegativeScore}\n" +
                         $"**Default Loss Amount:** {comp.DefaultLossModifier}\n" +
                         $"**Default Win Amount:** {comp.DefaultWinModifier}\n" +
                         $"For rank info use the `ranks` command";

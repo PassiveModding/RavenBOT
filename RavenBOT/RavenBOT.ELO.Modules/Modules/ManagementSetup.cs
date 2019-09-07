@@ -40,7 +40,7 @@ namespace RavenBOT.ELO.Modules.Modules
         public async Task SetAdminAsync(SocketRole adminRole = null)
         {
             var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
-            competition.ModeratorRole = adminRole?.Id ?? 0;
+            competition.AdminRole = adminRole?.Id ?? 0;
             Service.SaveCompetition(competition);
             if (adminRole != null)
             {
