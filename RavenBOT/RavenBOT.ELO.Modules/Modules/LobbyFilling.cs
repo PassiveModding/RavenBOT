@@ -1,8 +1,10 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using RavenBOT.Common;
 using RavenBOT.ELO.Modules.Models;
 
 namespace RavenBOT.ELO.Modules.Modules
@@ -15,6 +17,12 @@ namespace RavenBOT.ELO.Modules.Modules
         {
             if (!await CheckLobbyAsync() || !await CheckRegisteredAsync())
             {
+                return;
+            }
+
+            if (CurrentPlayer.IsBanned)
+            {
+                await ReplyAsync($"You are still banned from matchmaking for another: {(DateTime.UtcNow - CurrentPlayer.BanExpiry).GetReadableLength()}");
                 return;
             }
 

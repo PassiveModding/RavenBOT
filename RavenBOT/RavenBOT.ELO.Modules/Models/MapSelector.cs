@@ -21,7 +21,7 @@ namespace RavenBOT.ELO.Modules.Models
 
         public MapMode Mode { get; set; } = MapMode.Random;
 
-        private List<string> History = new List<string>(5);
+        public List<string> History { get; set; } = new List<string>(5);
 
         public List<string> GetHistory()
         {

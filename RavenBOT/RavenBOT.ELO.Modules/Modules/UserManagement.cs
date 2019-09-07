@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord.Addons.Interactive;
@@ -19,6 +20,21 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         public ELOService Service { get; }
+
+        [Command("BanUser", RunMode = RunMode.Sync)]
+        public async Task BanUserAsync(TimeSpan time, SocketGuildUser user)
+        {
+            var player = Service.GetPlayer(Context.Guild.Id, user.Id);
+            if (player == null)
+            {
+                await ReplyAsync("User is not registered.");
+                return;
+            }
+
+            player.BanExpiry = DateTime.UtcNow + time;
+            Service.SavePlayer(player);
+            await ReplyAsync($"Player banned from joining games until: {player.BanExpiry.ToShortDateString()} {player.BanExpiry.ToShortTimeString()}");
+        }
 
         [Command("DeleteUser", RunMode = RunMode.Sync)]
         [Alias("DelUser")]

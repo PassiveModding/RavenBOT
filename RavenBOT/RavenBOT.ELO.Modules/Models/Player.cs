@@ -63,6 +63,9 @@ namespace RavenBOT.ELO.Modules.Models
 
         private int _Wins = 0;
 
+        public bool IsBanned => BanExpiry > DateTime.UtcNow;
+        public DateTime BanExpiry { get; set; } = DateTime.MinValue;
+
         public int Wins
         {
             get
