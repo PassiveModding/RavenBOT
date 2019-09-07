@@ -98,7 +98,8 @@ namespace RavenBOT.ELO.Modules.Modules
                         ELOService.GameFlag.lobby,
                         ELOService.GameFlag.map,
                         ELOService.GameFlag.time,
-                        ELOService.GameFlag.usermentions);
+                        ELOService.GameFlag.usermentions,
+                        ELOService.GameFlag.gamestate);
 
                 await ReplyAsync(res.Item1, false, res.Item2.Build());
                 if (CurrentLobby.GameReadyAnnouncementChannel != 0)

@@ -114,6 +114,8 @@ namespace RavenBOT.ELO.Modules.Methods
                 embed.AddField("Remaining Players", string.Join(" ", game.GetQueueRemainingPlayers()));
             }
 
+            embed.Description = desc;
+
 
 
             return (message, embed);
