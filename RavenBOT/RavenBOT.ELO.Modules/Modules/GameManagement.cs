@@ -394,6 +394,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
 
         [Command("Cancel", RunMode = RunMode.Sync)]
+        [Alias("CancelGame")]
         [Preconditions.RequireModerator]
         public async Task CancelAsync(SocketTextChannel lobbyChannel, int gameNumber, [Remainder]string comment = null)
         {
@@ -401,6 +402,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("Cancel", RunMode = RunMode.Sync)]
+        [Alias("CancelGame")]
         [Preconditions.RequireModerator]
         public async Task CancelAsync(int gameNumber, SocketTextChannel lobbyChannel = null, [Remainder]string comment = null)
         {

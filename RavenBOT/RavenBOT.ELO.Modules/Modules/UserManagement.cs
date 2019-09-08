@@ -23,6 +23,7 @@ namespace RavenBOT.ELO.Modules.Modules
         public ELOService Service { get; }
 
         [Command("Bans")]
+        [Alias("Banlist")]
         public async Task Bans()
         {
             var players = Service.GetPlayers(x => x.GuildId == Context.Guild.Id && x.IsBanned);
@@ -56,6 +57,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("BanUser", RunMode = RunMode.Sync)]
+        [Alias("Ban")]
         public async Task BanUserAsync(TimeSpan time, SocketGuildUser user, string reason = null)
         {
             var player = Service.GetPlayer(Context.Guild.Id, user.Id);
