@@ -29,6 +29,8 @@ namespace RavenBOT.ELO.Modules.Models
 
         public int? MinimumPoints { get; set; } = null;
 
+        public bool DmUsersOnGameReady { get; set; } = false;
+
         public int PlayersPerTeam { get; set; } = 5;
 
         public HashSet<ulong> Queue { get; set; } = new HashSet<ulong>();

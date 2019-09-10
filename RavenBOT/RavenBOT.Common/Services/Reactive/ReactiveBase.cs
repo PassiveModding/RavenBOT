@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System;
 using System.Threading.Tasks;
 using Discord;
@@ -17,5 +18,11 @@ namespace RavenBOT.Common
 
         public Task<IUserMessage> ReplyAndDeleteAsync(string content, Embed embed = null, TimeSpan? timeout = null)
                             => ReactiveService.ReplyAndDeleteAsync(Context, content, embed, timeout);
+
+        public Task<Dictionary<ulong, IUserMessage>> MessageUsersAsync(ulong[] userIds, string content, Embed embed = null)
+                            => ReactiveService.MessageUsersAsync(Context, userIds, content, embed);
+
+        public Task<Dictionary<ulong, IUserMessage>> MessageUsersAsync(ulong[] userIds, Func<ulong, string> contentFunc, Embed embed = null)
+                            => ReactiveService.MessageUsersAsync(Context, userIds, contentFunc, embed);
     }
 }

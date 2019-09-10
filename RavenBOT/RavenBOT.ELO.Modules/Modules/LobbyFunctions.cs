@@ -110,6 +110,11 @@ namespace RavenBOT.ELO.Modules.Modules
                         await channel.SendMessageAsync(res.Item1, false, res.Item2.Build());
                     }
                 }
+
+                if (CurrentLobby.DmUsersOnGameReady)
+                {
+                    await MessageUsersAsync(game.Queue.ToArray(), x => MentionUtils.MentionUser(x), res.Item2.Build());
+                }
             }
 
             Service.SaveGame(game);

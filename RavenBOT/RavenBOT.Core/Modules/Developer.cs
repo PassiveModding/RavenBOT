@@ -67,6 +67,21 @@ namespace RavenBOT.Core.Modules
             await Context.Client.SetActivityAsync(new Game(game));
         }
 
+        [Command("ForceLeave")]
+        public async Task ForceLeave(ulong guildId)
+        {
+            var guild = Context.Client.GetGuild(guildId);
+            if (guild != null)
+            {
+                await guild.LeaveAsync();
+                await ReplyAsync("Left");
+            }
+            else
+            {
+                await ReplyAsync("Could not leave.");
+            }
+        }
+
         [Command("EmulateUser")]
         public async Task SetGame(SocketGuildUser user, [Remainder]string message)
         {

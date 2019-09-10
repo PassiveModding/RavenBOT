@@ -293,5 +293,15 @@ namespace RavenBOT.ELO.Modules.Modules
                 await ReplyAsync("There was no map matching that name found.");
             }
         }
+
+        [Command("ToggleDms")]
+        public async Task ToggleDmsAsync()
+        {
+            if (!Context.Channel.IsLobby(Service, out var lobby)) return;
+
+            lobby.DmUsersOnGameReady = !lobby.DmUsersOnGameReady;
+            Service.SaveLobby(lobby);
+            await ReplyAsync($"DM when games are ready: {lobby.DmUsersOnGameReady}");
+        }
     }
 }

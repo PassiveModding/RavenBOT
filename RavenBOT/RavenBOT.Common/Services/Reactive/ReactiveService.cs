@@ -38,6 +38,56 @@ namespace RavenBOT.Common
                 return message;
         }
 
+        public async Task<Dictionary<ulong, IUserMessage>> MessageUsersAsync(ShardedCommandContext context, ulong[] userIds, string message, Embed embed = null)
+        {
+            var responses = new Dictionary<ulong, IUserMessage>();
+            foreach (var userId in userIds)
+            {
+                var user = context.Client.GetUser(userId);
+                IUserMessage messageResponse = null;
+                if (user != null)
+                {
+                    try
+                    {
+                        messageResponse = await user.SendMessageAsync(message, false, embed);
+                    }
+                    catch
+                    {
+                        messageResponse = null;
+                    }
+                }
+
+                responses.Add(userId, messageResponse);
+            }
+
+            return responses;
+        }
+
+        public async Task<Dictionary<ulong, IUserMessage>> MessageUsersAsync(ShardedCommandContext context, ulong[] userIds, Func<ulong, string> message, Embed embed = null)
+        {
+            var responses = new Dictionary<ulong, IUserMessage>();
+            foreach (var userId in userIds)
+            {
+                var user = context.Client.GetUser(userId);
+                IUserMessage messageResponse = null;
+                if (user != null)
+                {
+                    try
+                    {
+                        messageResponse = await user.SendMessageAsync(message(userId), false, embed);
+                    }
+                    catch
+                    {
+                        messageResponse = null;
+                    }
+                }
+
+                responses.Add(userId, messageResponse);
+            }
+
+            return responses;
+        }
+
         public async Task<IUserMessage> ReplyAsync(ShardedCommandContext context, string message, Embed embed)
         {
             return await context.Channel.SendMessageAsync(message, false, embed);
