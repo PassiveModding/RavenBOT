@@ -81,7 +81,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("SetPickOrder", RunMode = RunMode.Sync)]
-        [Alias("Set PickOrder", "Set PickOrder")]
+        [Alias("Set PickOrder", "Set Pick Order")]
         public async Task SetPickOrderAsync(GameResult.CaptainPickOrder orderMode)
         {
             var lobby = Service.GetLobby(Context.Guild.Id, Context.Channel.Id);
