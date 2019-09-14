@@ -22,11 +22,23 @@ namespace RavenBOT.Modules.Guild
 
         public PrefixService PrefixService { get; }
         public ModuleManagementService ModuleManager { get; }
+        public GuildService GuildService { get; }
 
-        public GuildConfiguration(PrefixService prefixService, ModuleManagementService mms)
+        public GuildConfiguration(PrefixService prefixService, ModuleManagementService mms, GuildService guildService)
         {
             PrefixService = prefixService;
             ModuleManager = mms;
+            GuildService = guildService;
+        }
+
+        [Command("UnknownCommandResponse")]
+        [Summary("Toggle the unknown command response message")]
+        public async Task ToggleUnknownCommandAsync()
+        {
+            var currentConfig = GuildService.GetConfig(Context.Guild.Id);
+            currentConfig.UnknownCommandResponse = !currentConfig.UnknownCommandResponse;
+            await ReplyAsync($"Ignore Unknown Command Responses: {currentConfig.UnknownCommandResponse}");
+            GuildService.SaveConfig(currentConfig);
         }
 
         [Command("SetGuildPrefix")]
