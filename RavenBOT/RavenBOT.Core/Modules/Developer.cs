@@ -8,6 +8,7 @@ using Discord.Webhook;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using RavenBOT.Common;
+using RavenBOT.Migrations;
 
 namespace RavenBOT.Core.Modules
 {
@@ -20,6 +21,14 @@ namespace RavenBOT.Core.Modules
         public Developer(IServiceProvider provider)
         {
             Provider = provider;
+        }
+
+        [Command("MigratePrefixModuleServices")]
+        public async Task MigratePrefixModuleServicesAsync()
+        {
+            var migrationService = Provider.GetRequiredService<GuildServiceMigration>();
+            await migrationService.RunMigration();
+            await ReplyAsync("Complete.");
         }
 
         [Command("EditHelpPreconditionSkips")]
