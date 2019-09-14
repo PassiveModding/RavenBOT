@@ -24,6 +24,9 @@ namespace RavenBOT.Common
 
         public Dictionary<ulong, GuildConfig> Cache = new Dictionary<ulong, GuildConfig>();
 
+        //Used to list servers that have returned null for a guildconfig to reduce database lookups
+        public List<ulong> AntiCache = new List<ulong>();
+
         /// <summary>
         /// Try to load the config from cache, otherwise attempt to load it from the database
         /// Can return null if no config generated.
@@ -36,11 +39,19 @@ namespace RavenBOT.Common
             {
                 return config;
             }
+            else if (AntiCache.Contains(guildId))
+            {
+                return null;
+            }
 
             var res = Database.Load<GuildConfig>(GuildConfig.DocumentName(guildId));
             if (res != null)
             {
                 Cache.Add(guildId, res);
+            }
+            else
+            {
+                AntiCache.Add(guildId);
             }
 
             return res;            
@@ -54,6 +65,7 @@ namespace RavenBOT.Common
         public void SaveConfig(GuildConfig config)
         {
             Cache[config.GuildId] = config;
+            AntiCache.Remove(config.GuildId);
             Database.Store<GuildConfig>(config, GuildConfig.DocumentName(config.GuildId));
         }
 
