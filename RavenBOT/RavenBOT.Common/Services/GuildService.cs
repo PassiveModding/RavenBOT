@@ -56,6 +56,13 @@ namespace RavenBOT.Common
                 return $"GuildRavenConfig-{guildId}";
             }
 
+            public GuildConfig(ulong guildId)
+            {
+                GuildId = guildId;
+            }
+
+            public GuildConfig(){}
+
             public ulong GuildId { get; set; }
 
             public bool UnknownCommandResponse { get; set; } = true;
