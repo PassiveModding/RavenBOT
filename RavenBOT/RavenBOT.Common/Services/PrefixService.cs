@@ -5,8 +5,8 @@ namespace RavenBOT.Common
     public class PrefixService
     {
         private IDatabase Store { get; }
-        private PrefixInfo Info { get; set; } = null;
-        private string DocumentName { get; }
+        public PrefixInfo Info { get; set; } = null;
+        public string DocumentName { get; }
 
         public string DefaultPrefix { get; }
 
