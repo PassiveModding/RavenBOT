@@ -7,6 +7,27 @@ using LiteDB;
 
 namespace RavenBOT.Common.Interfaces.Database
 {
+    /*
+        Some notes about serializing documents with LiteDB:
+        https://stackoverflow.com/questions/39877806/get-litedb-to-inform-us-when-a-property-cannot-be-set
+
+        Classes must be public with a public parameterless constructor
+        Properties must be public
+        Properties can be read-only or read/write
+        The class must have an Id property, Id property or any property with [BsonId] attribute or mapped by fluent api.
+        A property can be decorated with [BsonIgnore] to not be mapped to a document field
+        A property can be decorated with [BsonField] to customize the name of the document field
+        No circular references are allowed
+        Max depth of 20 inner classes
+        Class fields are not converted to document
+
+     */
+
+    /// <summary>
+    /// This class is used as a `hack` for storing any class in LiteDB by adding an external ID property to the class prior to serailization
+    /// This is implemented such that it should never need to be interacted with outside of the LiteDataStore class
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class BaseEntity<T>
     {
         public BaseEntity(T value, string id = null)
