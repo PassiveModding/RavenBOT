@@ -1,4 +1,7 @@
+using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 
 namespace RavenBOT.Common
 {
@@ -8,10 +11,16 @@ namespace RavenBOT.Common
     public class GuildService : IServiceable
     {
         public IDatabase Database { get; }
-        public GuildService(IDatabase database)
+        public BotConfig Config { get; }
+        public LocalManagementService Local { get; }
+
+        public GuildService(IDatabase database, BotConfig config, LocalManagementService local)
         {
             this.Database = database;
+            Config = config;
+            this.Local = local;
         }
+        public string DefaultPrefix => Local.LastConfig.Developer ? Local.LastConfig.DeveloperPrefix : Config.Prefix;
 
         public Dictionary<ulong, GuildConfig> Cache = new Dictionary<ulong, GuildConfig>();
 
@@ -48,6 +57,46 @@ namespace RavenBOT.Common
             Database.Store<GuildConfig>(config, GuildConfig.DocumentName(config.GuildId));
         }
 
+        public string GetPrefix(ulong guildId)
+        {
+            var config = GetConfig(guildId);
+            if (config == null)
+            {
+                return DefaultPrefix;
+            }
+
+            return config.PrefixOverride ?? DefaultPrefix;
+        }
+
+        public bool IsModuleAllowed(ulong guildId, string command)
+        {
+            //ignores blacklist if there is a non valid guild id
+            if (guildId <= 0)
+            {
+                return true;
+            }
+
+            var config = GetConfig(guildId);
+            //Return if there is no config made.
+            if (config == null) return true;
+
+            //Return if there is nothing in the blacklist
+            if (config.ModuleBlacklist.Count == 0)
+            {
+                return true;
+            }
+
+            //Override prefix if the bot is in developer mode
+            var prefix = Local.LastConfig.Developer ? Local.LastConfig.DeveloperPrefix : (config.PrefixOverride ?? DefaultPrefix);
+
+            if (config.ModuleBlacklist.Any(x => command.StartsWith(x, true, CultureInfo.InvariantCulture) || command.StartsWith($"{prefix} {x}", true, CultureInfo.InvariantCulture) || command.StartsWith($"{prefix}{x}", true, CultureInfo.InvariantCulture)))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         public class GuildConfig
         {
             public static string DocumentName(ulong guildId)
@@ -67,7 +116,7 @@ namespace RavenBOT.Common
 
             public bool UnknownCommandResponse { get; set; } = true;
 
-            public HashSet<string> ModuleBlacklist { get; set; } = new HashSet<string>();
+            public HashSet<string> ModuleBlacklist { get; set; } = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
 
             private string _prefixOverride = null;
 
