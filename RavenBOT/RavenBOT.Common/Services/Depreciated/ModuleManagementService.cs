@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -8,6 +9,7 @@ namespace RavenBOT.Common
     {
         public ModuleManagementService(IDatabase database, PrefixService prefixService, bool dev)
         {
+            throw new Exception("Module Management Service is depreciated. Use GuildService Instead.");
             Database = database;
             PrefixService = prefixService;
             Developer = dev;
@@ -46,7 +48,7 @@ namespace RavenBOT.Common
             return setup;
         }
 
-        public bool IsAllowed(ulong guildId, string command)
+        private bool IsAllowed(ulong guildId, string command)
         {
             //ignores blacklist if there is a non valid guild id
             if (guildId <= 0)
@@ -72,7 +74,7 @@ namespace RavenBOT.Common
             return true;
         }
 
-        public void SaveModuleConfig(ModuleConfig config)
+        private void SaveModuleConfig(ModuleConfig config)
         {
             //Remove any empty blacklist items to try and avoid accidental blacklisting of all modules   
             //Also filter out duplicate entries         

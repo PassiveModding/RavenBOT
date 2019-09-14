@@ -115,8 +115,9 @@ namespace RavenBOT
                     return config;
                 })
                 .AddSingleton<DeveloperSettings>()
-                .AddSingleton(x => new ModuleManagementService(x.GetRequiredService<IDatabase>(), x.GetRequiredService<PrefixService>(), localConfig.Developer))
-                .AddSingleton(x => new HelpService(x.GetRequiredService<PrefixService>(), x.GetRequiredService<ModuleManagementService>(), x.GetRequiredService<CommandService>(), x.GetRequiredService<BotConfig>(), x.GetRequiredService<DeveloperSettings>(), x))
+                .AddSingleton<GuildService>()
+                //.AddSingleton(x => new ModuleManagementService(x.GetRequiredService<IDatabase>(), x.GetRequiredService<PrefixService>(), localConfig.Developer))
+                .AddSingleton(x => new HelpService(x.GetRequiredService<CommandService>(), x.GetRequiredService<BotConfig>(), x.GetRequiredService<GuildService>(), x.GetRequiredService<DeveloperSettings>(), x))
                 .AddSingleton(new CommandService(new CommandServiceConfig
                 {
                     ThrowOnError = false,
@@ -125,7 +126,7 @@ namespace RavenBOT
                         DefaultRunMode = RunMode.Async,
                         LogLevel = LogSeverity.Info
                 }))
-                .AddSingleton(x => new PrefixService(x.GetRequiredService<IDatabase>(), localConfig.Developer ? localConfig.DeveloperPrefix : x.GetRequiredService<BotConfig>().Prefix))
+                //.AddSingleton(x => new PrefixService(x.GetRequiredService<IDatabase>(), localConfig.Developer ? localConfig.DeveloperPrefix : x.GetRequiredService<BotConfig>().Prefix))
                 .AddSingleton<EventHandler>()
                 .AddSingleton(x => new LicenseService(x.GetRequiredService<IDatabase>()))
                 .AddSingleton<InteractiveService>()

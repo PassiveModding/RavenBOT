@@ -19,15 +19,10 @@ namespace RavenBOT.Modules.Guild
         }
 
         private CommandInfo Command;
-
-        public PrefixService PrefixService { get; }
-        public ModuleManagementService ModuleManager { get; }
         public GuildService GuildService { get; }
 
-        public GuildConfiguration(PrefixService prefixService, ModuleManagementService mms, GuildService guildService)
+        public GuildConfiguration(GuildService guildService)
         {
-            PrefixService = prefixService;
-            ModuleManager = mms;
             GuildService = guildService;
         }
 
@@ -36,8 +31,8 @@ namespace RavenBOT.Modules.Guild
         public async Task ToggleUnknownCommandAsync()
         {
             var currentConfig = GuildService.GetConfig(Context.Guild.Id);
-            currentConfig.UnknownCommandResponse = !currentConfig.UnknownCommandResponse;
-            await ReplyAsync($"Ignore Unknown Command Responses: {currentConfig.UnknownCommandResponse}");
+            currentConfig.DisplayUnknownCommandResponse = !currentConfig.DisplayUnknownCommandResponse;
+            await ReplyAsync($"Ignore Unknown Command Responses: {currentConfig.DisplayUnknownCommandResponse}");
             GuildService.SaveConfig(currentConfig);
         }
 
@@ -45,14 +40,19 @@ namespace RavenBOT.Modules.Guild
         public async Task SetGuildPrefixAsync([Remainder] string prefix)
         {
             await ReplyAsync($"Guild Prefix set to: {prefix}");
-            PrefixService.SetPrefix(Context.Guild.Id, prefix);
+            var config = GuildService.GetOrCreateConfig(Context.Guild.Id);
+            config.PrefixOverride = prefix;
+            GuildService.SaveConfig(config);
         }
 
         [Command("RemoveGuildPrefix")]
         public async Task ResetGuildPrefixAsync()
         {
-            await ReplyAsync($"Guild Prefix set to: {PrefixService.GetPrefix(0)}");
-            PrefixService.SetPrefix(Context.Guild.Id, null);
+            await ReplyAsync($"Guild Prefix set to: {GuildService.DefaultPrefix}");
+            var config = GuildService.GetConfig(Context.Guild.Id);
+            if (config == null) return;
+            config.PrefixOverride = null;
+            GuildService.SaveConfig(config);
         }
 
         [Command("AddToBlacklist")]
@@ -64,37 +64,50 @@ namespace RavenBOT.Modules.Guild
                 return;
             }
 
-            var config = ModuleManager.GetModuleConfig(Context.Guild.Id);
-            config.Blacklist.Add(name);
-            ModuleManager.SaveModuleConfig(config);
+            var config = GuildService.GetOrCreateConfig(Context.Guild.Id);
+            config.ModuleBlacklist.Add(name);
+            GuildService.SaveConfig(config);
             await ReplyAsync($"Added {name} to the blacklisted command/module list");
         }
 
         [Command("ClearBlacklist")]
         public async Task ClearBlacklist()
         {
-            var config = ModuleManager.GetModuleConfig(Context.Guild.Id);
-            config.Blacklist = new List<string>();
-            ModuleManager.SaveModuleConfig(config);
             await ReplyAsync($"Cleared the module/command blacklist");
+
+            var config = GuildService.GetConfig(Context.Guild.Id);
+            if (config == null) return;
+            config.ModuleBlacklist.Clear();
+            GuildService.SaveConfig(config);
         }
 
         [Command("ShowBlacklist")]
         public async Task ShowBlacklist()
         {
-            var config = ModuleManager.GetModuleConfig(Context.Guild.Id);
-            await ReplyAsync(string.Join("\n", config.Blacklist) ?? "The blacklist is empty");
+            var config = GuildService.GetConfig(Context.Guild.Id);
+            if (config == null || config.ModuleBlacklist.Count == 0) 
+            {
+                await ReplyAsync("Blacklist is empty.");
+                return;
+            }
+
+            await ReplyAsync(string.Join("\n", config.ModuleBlacklist));
         }
 
         [Command("RemoveFromBlacklist")]
         public async Task RemoveFromBlacklist(string name)
         {
-            var config = ModuleManager.GetModuleConfig(Context.Guild.Id);
+            var config = GuildService.GetConfig(Context.Guild.Id);
+            if (config == null)
+            {
+                await ReplyAsync("No Blacklisted items to remove.");
+                return;
+            }
 
-            if (config.Blacklist.Remove(name))
+            if (config.ModuleBlacklist.Remove(name))
             {
                 await ReplyAsync($"Removed {name} from the blacklisted command/module list");
-                ModuleManager.SaveModuleConfig(config);
+                GuildService.SaveConfig(config);
             }
             else
             {

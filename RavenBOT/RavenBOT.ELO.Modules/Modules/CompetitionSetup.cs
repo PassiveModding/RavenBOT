@@ -13,9 +13,9 @@ namespace RavenBOT.ELO.Modules.Modules
     public class CompetitionSetup : ReactiveBase
     {
         public ELOService Service { get; }
-        public PrefixService Prefix { get; }
+        public GuildService Prefix { get; }
 
-        public CompetitionSetup(ELOService service, PrefixService prefix)
+        public CompetitionSetup(ELOService service, GuildService prefix)
         {
             this.Prefix = prefix;
             Service = service;

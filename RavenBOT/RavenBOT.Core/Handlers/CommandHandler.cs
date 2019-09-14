@@ -43,13 +43,13 @@ namespace RavenBOT.Handlers
             }
 
             var argPos = 0;
-            if (!message.HasStringPrefix(LocalManagementService.LastConfig.Developer ? LocalManagementService.LastConfig.DeveloperPrefix : PrefixService.GetPrefix(guildId), ref argPos, System.StringComparison.InvariantCultureIgnoreCase) /*&& !message.HasMentionPrefix(Client.CurrentUser, ref argPos)*/ )
+            if (!message.HasStringPrefix(LocalManagementService.LastConfig.Developer ? LocalManagementService.LastConfig.DeveloperPrefix : GuildService.GetPrefix(guildId), ref argPos, System.StringComparison.InvariantCultureIgnoreCase) /*&& !message.HasMentionPrefix(Client.CurrentUser, ref argPos)*/ )
             {
                 return;
             }
 
             var context = GetCommandContext(Client, message);
-            if (!ModuleManager.IsAllowed(context.Guild?.Id ?? 0, message.Content))
+            if (!GuildService.IsModuleAllowed(context.Guild?.Id ?? 0, message.Content))
             {
                 return;
             }

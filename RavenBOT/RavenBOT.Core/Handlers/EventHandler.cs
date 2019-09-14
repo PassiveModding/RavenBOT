@@ -15,25 +15,23 @@ namespace RavenBOT.Handlers
     public partial class EventHandler
     {
         internal DiscordShardedClient Client { get; }
-        public PrefixService PrefixService { get; }
         internal BotConfig BotConfig { get; }
         internal LogHandler Logger { get; }
         internal CommandService CommandService { get; }
+        public GuildService GuildService { get; }
         public LocalManagementService LocalManagementService { get; }
         internal IServiceProvider Provider { get; }
 
-        internal ModuleManagementService ModuleManager { get; }
 
-        public EventHandler(DiscordShardedClient client, ModuleManagementService moduleManager, PrefixService prefixService, CommandService commandService, LocalManagementService local, BotConfig config, LogHandler handler, IServiceProvider provider)
+        public EventHandler(DiscordShardedClient client, CommandService commandService, GuildService guildService, LocalManagementService local, BotConfig config, LogHandler handler, IServiceProvider provider)
         {
             Client = client;
-            PrefixService = prefixService;
             Logger = handler;
             BotConfig = config;
             CommandService = commandService;
+            GuildService = guildService;
             LocalManagementService = local;
             Provider = provider;
-            ModuleManager = moduleManager;
 
             client.Log += LogAsync;
             //client.Log += async (m) => await LogAsync(m);
@@ -65,7 +63,7 @@ namespace RavenBOT.Handlers
                 return permissions.HasValue ? permissions.Value.ViewChannel && permissions.Value.SendMessages : false;
             }).OrderBy(c => c.Position).FirstOrDefault();
 
-            var prefix = LocalManagementService.LastConfig.Developer ? LocalManagementService.LastConfig.DeveloperPrefix : PrefixService.GetPrefix(guild.Id);
+            var prefix = GuildService.GetPrefix(guild.Id);
 
             await firstChannel?.SendMessageAsync("", false, new EmbedBuilder()
             {
@@ -126,8 +124,11 @@ namespace RavenBOT.Handlers
                 else if (result is SearchResult sResult)
                 {
                     Logger.Log($"{context.Message.Content}\n{result.Error}\n{result.ErrorReason}", new LogContext(context), LogSeverity.Error);
+                    
+                    if (GuildService.GetConfig(context.Guild?.Id ?? 0)?.DisplayUnknownCommandResponse != true) return;
+
                     //Since it is an error you can assume it's an unknown command as SearchResults will only return an error if not found.
-                    var prefix = LocalManagementService.LastConfig.Developer ? LocalManagementService.LastConfig.DeveloperPrefix : PrefixService.GetPrefix(context.Guild?.Id ?? 0);
+                    var prefix = LocalManagementService.LastConfig.Developer ? LocalManagementService.LastConfig.DeveloperPrefix : GuildService.GetPrefix(context.Guild?.Id ?? 0);
                     var stripped = context.Message.Content.Substring(prefix.Length);
                     var dlDistances = new List<Tuple<int, string>>();
                     foreach (var command in CommandService.Commands)

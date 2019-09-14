@@ -22,10 +22,10 @@ namespace RavenBOT.Common
         }
         public string DefaultPrefix => Local.LastConfig.Developer ? Local.LastConfig.DeveloperPrefix : Config.Prefix;
 
-        public Dictionary<ulong, GuildConfig> Cache = new Dictionary<ulong, GuildConfig>();
+        public Dictionary<ulong, GuildConfig> Cache { get; private set; } = new Dictionary<ulong, GuildConfig>();
 
         //Used to list servers that have returned null for a guildconfig to reduce database lookups
-        public List<ulong> AntiCache = new List<ulong>();
+        public List<ulong> AntiCache { get; private set; } = new List<ulong>();
 
         /// <summary>
         /// Try to load the config from cache, otherwise attempt to load it from the database
@@ -55,6 +55,22 @@ namespace RavenBOT.Common
             }
 
             return res;            
+        }
+
+        /// <summary>
+        /// Gets or creates a new guild config. Does not update database values.
+        /// </summary>
+        /// <param name="guildId"></param>
+        /// <returns></returns>
+        public GuildConfig GetOrCreateConfig(ulong guildId)
+        {
+            var config = GetConfig(guildId);
+            if (config == null)
+            {
+                config = new GuildConfig(guildId);
+            }
+
+            return config;
         }
 
         /// <summary>
@@ -126,7 +142,7 @@ namespace RavenBOT.Common
 
             public ulong GuildId { get; set; }
 
-            public bool UnknownCommandResponse { get; set; } = true;
+            public bool DisplayUnknownCommandResponse { get; set; } = true;
 
             public HashSet<string> ModuleBlacklist { get; set; } = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
 

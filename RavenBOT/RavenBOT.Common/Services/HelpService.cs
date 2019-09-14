@@ -12,19 +12,17 @@ namespace RavenBOT.Common
 {
     public partial class HelpService
     {
-        public PrefixService PrefixService { get; }
-        public ModuleManagementService ModuleManager { get; }
         public CommandService CommandService { get; }
         public BotConfig Config { get; }
+        public GuildService GuildService { get; }
         public DeveloperSettings DeveloperSettings { get; }
         public IServiceProvider Provider { get; }
 
-        public HelpService(PrefixService prefixService, ModuleManagementService moduleManager, CommandService cmdService, BotConfig config, DeveloperSettings developerSettings, IServiceProvider provider)
+        public HelpService(CommandService cmdService, BotConfig config, GuildService guildService, DeveloperSettings developerSettings, IServiceProvider provider)
         {
-            PrefixService = prefixService;
-            ModuleManager = moduleManager;
             CommandService = cmdService;
             Config = config;
+            GuildService = guildService;
             DeveloperSettings = developerSettings;
             Provider = provider;
         }
@@ -42,11 +40,11 @@ namespace RavenBOT.Common
             }
 
             //Skip blacklisted modules
-            var moduleConfig = ModuleManager.GetModuleConfig(context?.Guild?.Id ?? 0);
-            if (moduleConfig.Blacklist.Any())
+            var moduleConfig = GuildService.GetConfig(context?.Guild?.Id ?? 0);
+            if (moduleConfig != null && moduleConfig.ModuleBlacklist.Count != 0)
             {
                 //Filter out any blacklisted modules for the server
-                modules = modules.Where(x => moduleConfig.Blacklist.All(bm => !x.Item1.Equals(bm, StringComparison.InvariantCultureIgnoreCase))).ToList();
+                modules = modules.Where(x => moduleConfig.ModuleBlacklist.All(bm => !x.Item1.Equals(bm, StringComparison.InvariantCultureIgnoreCase))).ToList();
             }
 
             if (usePreconditions)

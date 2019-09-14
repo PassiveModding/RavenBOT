@@ -7,17 +7,13 @@ namespace RavenBOT.Migrations
 {
     public class GuildServiceMigration : IServiceable
     {
-        public GuildServiceMigration(IDatabase db, PrefixService pre, ModuleManagementService mod, GuildService guild)
+        public GuildServiceMigration(IDatabase db, GuildService guild)
         {
             Db = db;
-            Pre = pre;
-            Mod = mod;
             Guild = guild;
         }
 
         public IDatabase Db { get; }
-        public PrefixService Pre { get; }
-        public ModuleManagementService Mod { get; }
         public GuildService Guild { get; }
 
         /// <summary>
@@ -26,14 +22,14 @@ namespace RavenBOT.Migrations
         /// <returns></returns>
         public Task RunMigration()
         {
-            var prefixInfo = Db.Load<PrefixService.PrefixInfo>(Pre.DocumentName);
+            var prefixInfo = Db.Load<PrefixService.PrefixInfo>(PrefixService.DocumentName);
             var configs = new List<GuildService.GuildConfig>();
             if (prefixInfo != null)
             {
                 foreach (var config in prefixInfo.Prefixes)
                 {
                     //Ignore configs that just use the default prefix.
-                    if (config.Value.Equals(Pre.DefaultPrefix, System.StringComparison.InvariantCultureIgnoreCase)) continue;
+                    if (config.Value.Equals(Guild.Config.Prefix, System.StringComparison.InvariantCultureIgnoreCase)) continue;
 
                     var newConfig = new GuildService.GuildConfig(config.Key);
                     newConfig.PrefixOverride = config.Value;
@@ -71,8 +67,8 @@ namespace RavenBOT.Migrations
         /// <returns></returns>
         public Task MigratePrefixes(PrefixService.PrefixInfo info, bool forced)
         {
-            var currentDoc = Db.Load<PrefixService.PrefixInfo>(Pre.DocumentName);
-            var defaultPrefix = Pre.DefaultPrefix;
+            var currentDoc = Db.Load<PrefixService.PrefixInfo>(PrefixService.DocumentName);
+            var defaultPrefix = Guild.Config.Prefix;
             if (currentDoc != null)
             {
                 foreach (var config in currentDoc.Prefixes)

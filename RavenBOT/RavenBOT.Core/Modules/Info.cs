@@ -15,14 +15,14 @@ namespace RavenBOT.Modules
     public class Main : InteractiveBase<ShardedCommandContext>
     {
         public CommandService CommandService { get; }
-        public PrefixService PrefixService { get; }
+        public GuildService PrefixService { get; }
         public HelpService HelpService { get; }
         public DiscordShardedClient Client { get; }
         public IServiceProvider Provider { get; }
         public DeveloperSettings DeveloperSettings { get; }
         public HttpClient HttpClient { get; }
 
-        private Main(CommandService commandService, HttpClient http, PrefixService prefixService, DeveloperSettings devSettings, HelpService helpService, DiscordShardedClient client, IServiceProvider provider)
+        private Main(CommandService commandService, HttpClient http, GuildService prefixService, DeveloperSettings devSettings, HelpService helpService, DiscordShardedClient client, IServiceProvider provider)
         {
             CommandService = commandService;
             PrefixService = prefixService;
@@ -36,7 +36,7 @@ namespace RavenBOT.Modules
 
         public async Task ShardReady(DiscordSocketClient client)
         {
-            await client.SetActivityAsync(new Game($"{PrefixService.GetPrefix(0)}help"));
+            await client.SetActivityAsync(new Game($"{PrefixService.DefaultPrefix}help"));
         }
 
         [Command("Invite")]

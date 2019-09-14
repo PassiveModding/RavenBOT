@@ -15,11 +15,11 @@ namespace RavenBOT.Modules.Captcha.Methods
     {
         private IDatabase Database { get; }
         private DiscordShardedClient Client { get; }
-        public PrefixService PrefixService { get; }
+        public GuildService PrefixService { get; }
         public LocalManagementService LocalManagementService { get; }
         private Random Random { get; }
 
-        public CaptchaService(IDatabase database, DiscordShardedClient client, PrefixService prefixService, LocalManagementService localManagementService)
+        public CaptchaService(IDatabase database, DiscordShardedClient client, GuildService prefixService, LocalManagementService localManagementService)
         {
             Database = database;
 

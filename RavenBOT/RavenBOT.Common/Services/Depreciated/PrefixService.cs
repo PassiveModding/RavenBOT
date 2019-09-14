@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace RavenBOT.Common
@@ -6,13 +7,13 @@ namespace RavenBOT.Common
     {
         private IDatabase Store { get; }
         public PrefixInfo Info { get; set; } = null;
-        public string DocumentName { get; }
+        public static string DocumentName = "PrefixSetup";
 
         public string DefaultPrefix { get; }
 
         public PrefixService(IDatabase store, string defaultPrefix)
         {
-            DocumentName = "PrefixSetup";
+            throw new Exception("Prefix Service is depreciated. Use GuildService");
             Store = store;
             DefaultPrefix = defaultPrefix;
         }
