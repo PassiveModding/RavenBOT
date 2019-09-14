@@ -66,6 +66,9 @@ namespace RavenBOT.Common
             public ulong GuildId { get; set; }
 
             public bool UnknownCommandResponse { get; set; } = true;
+
+            public HashSet<string> ModuleBlacklist { get; set; } = new HashSet<string>();
+
             private string _prefixOverride = null;
 
             public string PrefixOverride
