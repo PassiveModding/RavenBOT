@@ -94,7 +94,7 @@ namespace RavenBOT.Modules.AutoMod.Models.Moderation
             {
                 if (max <= CacheSize)
                 {
-                    SecondsToCheck = max;
+                    MessagesPerTime = max;
                     return true;
                 }
 

@@ -66,7 +66,7 @@ namespace RavenBOT.Modules.AutoMod.Modules
             if (result)
             {
                 ModerationService.SaveModerationConfig(config);
-                await ReplyAsync($"Max Messages per {config.SpamSettings.SecondsToCheck} Seconds Set.");
+                await ReplyAsync($"Max Messages per {config.SpamSettings.SecondsToCheck} Seconds Set to {config.SpamSettings.MessagesPerTime}");
             }
             else
             {
@@ -82,7 +82,7 @@ namespace RavenBOT.Modules.AutoMod.Modules
             var config = ModerationService.GetModerationConfig(Context.Guild.Id);
             config.SpamSettings.SecondsToCheck = seconds;
             ModerationService.SaveModerationConfig(config);
-            await ReplyAsync("Time Limit Set.");
+            await ReplyAsync($"Max Messages per {config.SpamSettings.SecondsToCheck} Seconds Set. {config.SpamSettings.MessagesPerTime}/{config.SpamSettings.SecondsToCheck}s");
         }
     }
 }
