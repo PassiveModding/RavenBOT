@@ -34,7 +34,7 @@ namespace RavenBOT.ELO.Modules.Modules
             }
 
             embed.Description = $"**Pick Mode:** {CurrentLobby.TeamPickMode}\n" +
-                $"{(CurrentLobby.MinimumPoints >= 1 ? $"**Minimum Points to Queue** {CurrentLobby.MinimumPoints?.ToString()}\n" : "")}" +
+                $"{(CurrentLobby.MinimumPoints != null ? $"**Minimum Points to Queue:** {CurrentLobby.MinimumPoints}\n" : "")}" +
                 $"**Games Played:** {CurrentLobby.CurrentGameCount}\n" +
                 $"**Players Per Team:** {CurrentLobby.PlayersPerTeam}\n" +
                 $"**__Map Info__** {maps}\n" +
