@@ -29,6 +29,8 @@ namespace RavenBOT.ELO.Modules.Models
         //TODO: Automatically generate registration role instead of requiring one to be set?
         public ulong RegisteredRankId { get; set; } = 0;
 
+        public int ManualGameCounter { get; set; }
+
         public string NameFormat { get; set; } = "[{score}] {name}";
         public bool UpdateNames { get; set; } = true;
 

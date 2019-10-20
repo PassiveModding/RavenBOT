@@ -93,6 +93,29 @@ namespace RavenBOT.ELO.Modules.Methods
             return Database.Query<GameResult>(x => x.GuildId == guildId && x.LobbyId == channelId).ToArray();
         }
 
+        #region ManualGames
+        public ManualGameResult GetManualGame(ulong guildId, int gameId)
+        {
+            return Database.Load<ManualGameResult>(ManualGameResult.DocumentName(gameId, guildId));
+        }
+
+        public void RemoveManualGame(ManualGameResult game)
+        {
+            Database.Remove<ManualGameResult>(ManualGameResult.DocumentName(game.GameId, game.GuildId));
+        }
+
+        public void SaveManualGame(ManualGameResult game)
+        {
+            Database.Store<ManualGameResult>(game, ManualGameResult.DocumentName(game.GameId, game.GuildId));
+        }
+
+        public ManualGameResult[] GetManualGames(ulong guildId, ulong channelId, int? limit = null)
+        {
+            
+            return Database.Query<ManualGameResult>(x => x.GuildId == guildId).ToArray();
+        }
+        #endregion
+
         public Lobby[] GetLobbies(ulong guildId)
         {
             return Database.Query<Lobby>(x => x.GuildId == guildId).ToArray();
