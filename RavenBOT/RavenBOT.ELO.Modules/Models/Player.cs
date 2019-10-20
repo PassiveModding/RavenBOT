@@ -28,11 +28,11 @@ namespace RavenBOT.ELO.Modules.Models
                 if (string.IsNullOrWhiteSpace(value)) return;
 
                 _DisplayName = value;
-                DisplayNameHistory.Add(DateTime.UtcNow, value);
+                NameLog.Add(DateTime.UtcNow.Ticks, value);
             }
         }
 
-        public Dictionary<DateTime, string> DisplayNameHistory { get; set; } = new Dictionary<DateTime, string>();
+        public Dictionary<long, string> NameLog { get; set; } = new Dictionary<long, string>();
 
         /// <summary>
         /// The user ID
@@ -150,6 +150,7 @@ namespace RavenBOT.ELO.Modules.Models
         }
 
         public DateTime RegistrationDate { get; set; }
+        public long RegistrationDateValue => RegistrationDate.Ticks;
 
         /// <summary>
         /// A set of additional integer values that can be defined in the current server.

@@ -170,7 +170,7 @@ namespace RavenBOT.Common
                 UserId = userId;
                 TotalUsed = 0;
                 Licenses = new List<ILicense>();
-                UserHistory = new Dictionary<DateTime, string>();
+                History = new Dictionary<long, string>();
                 UpdateHistory("User Profile Generated");
             }
 
@@ -189,11 +189,12 @@ namespace RavenBOT.Common
 
             public int TotalUsed { get; set; }
 
-            public Dictionary<DateTime, string> UserHistory { get; set; }
+            public Dictionary<long, string> History { get; set; }
+            
 
             public void UpdateHistory(string info)
             {
-                UserHistory.Add(DateTime.UtcNow, info);
+                History.Add(DateTime.UtcNow.Ticks, info);
             }
 
             public bool RedeemLicense(ILicense timedLicense)
@@ -263,7 +264,7 @@ namespace RavenBOT.Common
                 Id = $"{Prefix}-{type}-{userId}";
                 UserId = userId;
                 Licenses = new List<ILicense>();
-                UserHistory = new Dictionary<DateTime, string>();
+                History = new Dictionary<long, string>();
                 UpdateHistory("User Profile Generated");
                 ExpireTime = DateTime.MinValue;
             }
@@ -280,11 +281,11 @@ namespace RavenBOT.Common
 
             public List<ILicense> Licenses { get; set; }
 
-            public Dictionary<DateTime, string> UserHistory { get; set; }
+            public Dictionary<long, string> History { get; set; }
 
             public void UpdateHistory(string info)
             {
-                UserHistory.Add(DateTime.UtcNow, info);
+                History.Add(DateTime.UtcNow.Ticks, info);
             }
 
             public bool RedeemLicense(ILicense timedLicense)
@@ -345,7 +346,7 @@ namespace RavenBOT.Common
             ulong UserId { get; set; }
             string ProfileType { get; set; }
             List<ILicense> Licenses { get; set; }
-            Dictionary<DateTime, string> UserHistory { get; set; }
+            Dictionary<long, string> History { get; set; }
             void UpdateHistory(string info);
             bool RedeemLicense(ILicense timedLicense);
         }

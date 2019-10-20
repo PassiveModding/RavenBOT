@@ -365,9 +365,9 @@ namespace RavenBOT.Modules.Translation.Modules
         {
             var profile = TranslateService.License.GetQuantifiableUser(TranslateService.TranslateType, Context.Guild.Id);
             var history = "";
-            foreach (var historyEntry in profile.UserHistory)
+            foreach (var historyEntry in profile.History)
             {
-                history += $"[{historyEntry.Key.ToShortDateString()} {historyEntry.Key.ToShortTimeString()}] {historyEntry.Value}\n";
+                history += $"[{(new DateTime(historyEntry.Key)).ToShortDateString()} {(new DateTime(historyEntry.Key)).ToShortTimeString()}] {historyEntry.Value}\n";
             }
 
             await ReplyAsync(history.FixLength());
