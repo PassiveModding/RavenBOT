@@ -174,7 +174,8 @@ namespace RavenBOT.Common.Interfaces.Database
                 {
                     foreach (var document in documents)
                     {
-                        session.Store(document, docName(document));
+                        var name = docName(document);
+                        session.Store(document, name);
                     }
                 }
 
@@ -221,7 +222,6 @@ namespace RavenBOT.Common.Interfaces.Database
                 {
                     Console.WriteLine(e);
                 }
-
             }
         }
 
