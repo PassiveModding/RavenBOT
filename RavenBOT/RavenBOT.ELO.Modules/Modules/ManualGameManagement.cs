@@ -34,7 +34,7 @@ namespace RavenBOT.ELO.Modules.Modules
         [Command("Lose", RunMode = RunMode.Sync)]
         public async Task LoseAsync(params SocketGuildUser[] users)
         {
-            await UpdateTeamScoresAsync(true, users.Select(x => x.Id).ToHashSet());
+            await UpdateTeamScoresAsync(false, users.Select(x => x.Id).ToHashSet());
         }
 
         //TODO: Undo manual game
