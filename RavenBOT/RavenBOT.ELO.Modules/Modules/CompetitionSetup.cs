@@ -162,20 +162,32 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("DefaultWinModifier", RunMode = RunMode.Sync)]
-        public async Task CompWinModifier(int amountToAdd)
+        public async Task CompWinModifier(int? amountToAdd = null)
         {
             var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
-            competition.DefaultWinModifier = amountToAdd;
+
+            if (!amountToAdd.HasValue)
+            {
+                await ReplyAsync($"DefaultWinModifier: {competition.DefaultWinModifier}");
+                return;
+            }
+            competition.DefaultWinModifier = amountToAdd.Value;
             Service.SaveCompetition(competition);
             await ReplyAsync("Competition Updated.");
         }
 
         
         [Command("DefaultLossModifier", RunMode = RunMode.Sync)]
-        public async Task CompLossModifier(int amountToSubtract)
+        public async Task CompLossModifier(int? amountToSubtract = null)
         {
             var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
-            competition.DefaultLossModifier = amountToSubtract;
+            
+            if (!amountToSubtract.HasValue)
+            {
+                await ReplyAsync($"DefaultLossModifier: {competition.DefaultLossModifier}");
+                return;
+            }
+            competition.DefaultLossModifier = amountToSubtract.Value;
             Service.SaveCompetition(competition);
             await ReplyAsync("Competition Updated.");
         }
