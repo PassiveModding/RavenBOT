@@ -29,6 +29,8 @@ namespace RavenBOT.ELO.Modules.Modules
         public async Task WinAsync(params SocketGuildUser[] users)
         {
             await UpdateTeamScoresAsync(true, users.Select(x => x.Id).ToHashSet());
+
+            var cmds = new CommandService();
         }
 
         [Command("Lose", RunMode = RunMode.Sync)]
@@ -66,7 +68,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 if (win)
                 {
                     updateVal = maxRank?.WinModifier ?? competition.DefaultWinModifier;
-                    player.Points += updateVal;
+                    player.SetPoints(competition, player.Points + updateVal);
                     player.Wins++;
                     newRank = competition.MaxRank(player.Points);
                     if (newRank != null)
@@ -85,7 +87,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 {
                     //Ensure the update value is positive as it will be subtracted from the user's points.
                     updateVal = Math.Abs(maxRank?.LossModifier ?? competition.DefaultLossModifier);
-                    player.Points -= updateVal;
+                    player.SetPoints(competition, player.Points - updateVal);
                     player.Losses++;
                     //Set the update value to a negative value for returning purposes.
                     updateVal = -updateVal;
@@ -195,7 +197,6 @@ namespace RavenBOT.ELO.Modules.Modules
             game.ScoreUpdates = updates.ToDictionary(x => x.Item1.UserId, x => x.Item2);
             embed.Description = sb.ToString();
             Service.SaveManualGame(game);
-
             await ReplyAsync("", false, embed.Build());
         }
     }

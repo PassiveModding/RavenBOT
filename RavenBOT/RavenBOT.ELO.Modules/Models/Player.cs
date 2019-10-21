@@ -86,7 +86,32 @@ namespace RavenBOT.ELO.Modules.Models
         /// This is the primary value used to rank users.
         /// </summary>
         /// <value></value>
-        public int Points { get; set; } = 0;
+        private int _points = 0;
+        public int Points 
+        { 
+            get
+            {
+                return _points; 
+            } 
+            set 
+            {
+                //Unfortunately there isn't an efficient way to check if the competition is 'no-negative' and I cannot make this a readonly value as it would cause issues with LiteDB.
+                //All code that assigns points should run through the SetPoints function
+                _points = value;
+            }
+        }
+
+        public void SetPoints(CompetitionConfig comp, int points)
+        {
+            if (comp.AllowNegativeScore)
+            {
+                _points = points;
+            }
+            else
+            {
+                _points = NoNegative(points);
+            }
+        }
 
         private int _Wins = 0;
 
@@ -166,6 +191,7 @@ namespace RavenBOT.ELO.Modules.Models
             int newVal = 0;
 
             //TODO: Test the matching of default to the key (for case-insensitive search)
+            //TODO: Recognise points/wins/losses/draws etc. and update the actual values
 
             //TODO: Potentially add option to disable negative values for each additional property rather than just points specifically
             var valMatch = AdditionalProperties.FirstOrDefault(x => x.Key.Equals(key, StringComparison.InvariantCultureIgnoreCase));

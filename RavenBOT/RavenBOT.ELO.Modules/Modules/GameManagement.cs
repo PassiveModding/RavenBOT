@@ -263,13 +263,13 @@ namespace RavenBOT.ELO.Modules.Modules
                 {
                     //Points lost, so add them back
                     player.Losses--;
-                    player.Points += Math.Abs(score.Value);
+                    player.SetPoints(competition, player.Points + Math.Abs(score.Value));
                 }
                 else
                 {
                     //Points gained so remove them
                     player.Wins--;
-                    player.Points -= score.Value;
+                    player.SetPoints(competition, player.Points - Math.Abs(score.Value));
                 }
 
                 //Save the player profile after updating scores.
@@ -737,7 +737,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 if (win)
                 {
                     updateVal = maxRank?.WinModifier ?? competition.DefaultWinModifier;
-                    player.Points += updateVal;
+                    player.SetPoints(competition, player.Points + updateVal);
                     player.Wins++;
                     newRank = competition.MaxRank(player.Points);
                     if (newRank != null)
@@ -756,7 +756,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 {
                     //Ensure the update value is positive as it will be subtracted from the user's points.
                     updateVal = Math.Abs(maxRank?.LossModifier ?? competition.DefaultLossModifier);
-                    player.Points -= updateVal;
+                    player.SetPoints(competition, player.Points - updateVal);
                     player.Losses++;
                     //Set the update value to a negative value for returning purposes.
                     updateVal = -updateVal;
