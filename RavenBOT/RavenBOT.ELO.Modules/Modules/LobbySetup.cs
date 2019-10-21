@@ -267,6 +267,33 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync("Map added.");
         }
 
+        [Command("AddMaps", RunMode = RunMode.Sync)]
+        [Alias("Add Maps")]
+        public async Task AddMapsAsync([Remainder]string commaSeparatedMapNames)
+        {
+            var mapNames = commaSeparatedMapNames.Split(',');
+            if (!mapNames.Any()) return;
+
+            var lobby = Service.GetLobby(Context.Guild.Id, Context.Channel.Id);
+            if (lobby == null)
+            {
+                await ReplyAsync("Current channel is not a lobby.");
+                return;
+            }
+
+            if (lobby.MapSelector == null)
+            {
+                lobby.MapSelector = new MapSelector();
+            }
+
+            foreach (var map in mapNames)
+            {
+                lobby.MapSelector.Maps.Add(map);
+            }
+            Service.SaveLobby(lobby);
+            await ReplyAsync("Map(s) added.");
+        }
+
         [Command("DelMap", RunMode = RunMode.Sync)]
         public async Task RemoveMapAsync([Remainder]string mapName)
         {
