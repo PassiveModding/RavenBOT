@@ -114,6 +114,11 @@ namespace RavenBOT.ELO.Modules.Methods
             
             return Database.Query<ManualGameResult>(x => x.GuildId == guildId).ToArray();
         }
+
+        public ManualGameResult[] GetManualGames(Expression<Func<ManualGameResult, bool>> queryFunc)
+        {            
+            return Database.Query<ManualGameResult>(queryFunc).ToArray();
+        }
         #endregion
 
         public Lobby[] GetLobbies(ulong guildId)
