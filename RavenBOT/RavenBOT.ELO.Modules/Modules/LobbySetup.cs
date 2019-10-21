@@ -124,6 +124,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("SetGameReadyAnnouncementChannel")]
+        [Alias("GameReadyAnnouncementsChannel", "GameReadyAnnouncements", "ReadyAnnouncements", "SetReadyAnnouncements")]
         public async Task GameReadyAnnouncementChannel(SocketTextChannel destinationChannel = null)
         {
             if (destinationChannel == null)
@@ -151,6 +152,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("SetGameResultAnnouncementChannel")]
+        [Alias("SetGameResultAnnouncements", "GameResultAnnouncements")]
         public async Task GameResultAnnouncementChannel(SocketTextChannel destinationChannel = null)
         {
             if (destinationChannel == null)
