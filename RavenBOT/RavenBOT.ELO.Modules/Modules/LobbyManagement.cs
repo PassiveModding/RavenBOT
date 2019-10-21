@@ -146,7 +146,7 @@ namespace RavenBOT.ELO.Modules.Modules
             }
             else
             {
-                if (Context.Guild.CurrentUser.GuildPermissions.AddReactions)
+                if (Context.Guild.CurrentUser.GuildPermissions.AddReactions && CurrentLobby.ReactOnJoinLeave)
                 {
                     await Context.Message.AddReactionAsync(new Emoji("✅"));
                 }

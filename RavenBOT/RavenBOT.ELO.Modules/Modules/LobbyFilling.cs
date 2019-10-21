@@ -78,7 +78,7 @@ namespace RavenBOT.ELO.Modules.Modules
             }
             else
             {
-                if (Context.Guild.CurrentUser.GetPermissions(Context.Channel as SocketTextChannel).AddReactions)
+                if (Context.Guild.CurrentUser.GetPermissions(Context.Channel as SocketTextChannel).AddReactions && CurrentLobby.ReactOnJoinLeave)
                 {
                     try
                     {
@@ -121,7 +121,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 CurrentLobby.Queue.Remove(Context.User.Id);
                 Service.SaveLobby(CurrentLobby);
 
-                if (Context.Guild.CurrentUser.GetPermissions(Context.Channel as SocketTextChannel).AddReactions)
+                if (Context.Guild.CurrentUser.GetPermissions(Context.Channel as SocketTextChannel).AddReactions && CurrentLobby.ReactOnJoinLeave)
                 {
                     try
                     {
