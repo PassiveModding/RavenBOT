@@ -73,6 +73,22 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync($"Pick mode set.");
         }
 
+        
+        [Command("ReactOnJoinLeave", RunMode = RunMode.Sync)]
+        public async Task ReactOnJoinLeaveAsync(bool react)
+        {
+            var lobby = Service.GetLobby(Context.Guild.Id, Context.Channel.Id);
+            if (lobby == null)
+            {
+                await ReplyAsync("Channel is not a lobby.");
+                return;
+            }
+
+            lobby.ReactOnJoinLeave = react;
+            Service.SaveLobby(lobby);
+            await ReplyAsync($"React on join/leave set.");
+        }
+
         [Command("PickModes")]
         //[Alias("Pick Modes")] ignore this as it can potentially conflict with the lobby Pick command.
         public async Task DisplayPickModesAsync()
