@@ -151,6 +151,16 @@ namespace RavenBOT.ELO.Modules.Modules
             await RemoveRank(role.Id);
         }
 
+        [Command("AllowNegativeScore", RunMode = RunMode.Sync)]
+        [Alias("AllowNegative")]
+        public async Task AllowNegative(bool allowNegative)
+        {
+            var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
+            competition.AllowNegativeScore = allowNegative;
+            Service.SaveCompetition(competition);
+            await ReplyAsync($"Allow Negative Score: {allowNegative}");
+        }
+
         [Command("DefaultWinModifier", RunMode = RunMode.Sync)]
         public async Task CompWinModifier(int amountToAdd)
         {
