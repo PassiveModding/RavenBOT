@@ -248,9 +248,9 @@ namespace RavenBOT.ELO.Modules.Modules
 
         public async Task UpdateScores(Lobby lobby, GameResult game, CompetitionConfig competition)
         {
-            foreach (var score in game.UpdatedScores)
+            foreach (var score in game.ScoreUpdates)
             {
-                var player = Service.GetPlayer(Context.Guild.Id, score.Item1);
+                var player = Service.GetPlayer(Context.Guild.Id, score.Key);
                 if (player == null)
                 {
                     //Skip if for whatever reason the player profile cannot be found.
@@ -259,17 +259,17 @@ namespace RavenBOT.ELO.Modules.Modules
 
                 var currentRank = competition.MaxRank(player.Points);
 
-                if (score.Item2 < 0)
+                if (score.Value < 0)
                 {
                     //Points lost, so add them back
                     player.Losses--;
-                    player.Points += Math.Abs(score.Item2);
+                    player.Points += Math.Abs(score.Value);
                 }
                 else
                 {
                     //Points gained so remove them
                     player.Wins--;
-                    player.Points -= score.Item2;
+                    player.Points -= score.Value;
                 }
 
                 //Save the player profile after updating scores.
@@ -349,7 +349,7 @@ namespace RavenBOT.ELO.Modules.Modules
             }
 
             game.GameState = GameResult.State.Undecided;
-            game.UpdatedScores = new HashSet <(ulong, int)> ();
+            game.ScoreUpdates = new Dictionary <ulong, int> ();
             Service.SaveGame(game);
         }
 
@@ -431,7 +431,7 @@ namespace RavenBOT.ELO.Modules.Modules
             game.GameState = GameResult.State.Canceled;
             game.Submitter = Context.User.Id;
             game.Comment = comment;
-            game.UpdatedScores = new HashSet<(ulong, int)>();
+            game.ScoreUpdates = new Dictionary<ulong, int>();
             Service.SaveGame(game);
 
             await AnnounceResultAsync(lobby, game);
@@ -474,7 +474,7 @@ namespace RavenBOT.ELO.Modules.Modules
             game.GameState = GameResult.State.Draw;
             game.Submitter = Context.User.Id;
             game.Comment = comment;
-            game.UpdatedScores = new HashSet<(ulong, int)>();
+            game.ScoreUpdates = new Dictionary<ulong, int>();
             Service.SaveGame(game);
 
             await DrawPlayersAsync(game.Team1.Players);
@@ -630,9 +630,9 @@ namespace RavenBOT.ELO.Modules.Modules
                     });
                 }
             }
-
+            
             game.GameState = GameResult.State.Decided;
-            game.UpdatedScores = allUsers.Select(x => (x.Item1.UserId, x.Item2)).ToHashSet();
+            game.ScoreUpdates = allUsers.ToDictionary(x => x.Item1.UserId, y => y.Item2);
             game.WinningTeam = winningTeamNumber;
             game.Comment = comment;
             game.Submitter = Context.User.Id;

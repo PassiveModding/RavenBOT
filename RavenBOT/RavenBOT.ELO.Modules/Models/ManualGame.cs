@@ -41,6 +41,6 @@ namespace RavenBOT.ELO.Modules.Models
             Legacy
         }
 
-        public HashSet<(ulong, int)> UpdatedScores { get; set; } = new HashSet<(ulong, int)>();
+        public Dictionary<ulong, int> ScoreUpdates { get; set; } = new Dictionary<ulong, int>();
     }
 }

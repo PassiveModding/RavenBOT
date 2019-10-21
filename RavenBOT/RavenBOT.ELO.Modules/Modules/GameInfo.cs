@@ -90,12 +90,12 @@ namespace RavenBOT.ELO.Modules.Modules
             foreach (var page in gamePages)
             {
                 var content = page.Select(x => {
-                    if (x.UpdatedScores.Count == 0) return null;
+                    if (x.ScoreUpdates.Count == 0) return null;
 
-                    var scoreInfos = x.UpdatedScores.Select(s =>
+                    var scoreInfos = x.ScoreUpdates.Select(s =>
                         {
                             //TODO: reduce string construction nesting.
-                           return $"{MentionUtils.MentionUser(s.Item1)} {(s.Item2 >= 0 ? "+" + s : s.ToString())}";
+                           return $"{MentionUtils.MentionUser(s.Key)} {(s.Value >= 0 ? "+" + s : s.ToString())}";
                         });
 
                     if (x.GameState != ManualGameResult.ManualGameState.Legacy)
@@ -107,7 +107,7 @@ namespace RavenBOT.ELO.Modules.Modules
                     else
                     {
                         //TODO: Is it necessary to check ALL users or maybe just first?
-                        if (x.UpdatedScores.All(val => val.Item2 >= 0))
+                        if (x.ScoreUpdates.All(val => val.Value >= 0))
                         {
                             return new EmbedFieldBuilder()
                                 .WithName($"#{x.GameId}: Win")

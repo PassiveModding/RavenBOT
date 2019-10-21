@@ -132,7 +132,8 @@ namespace RavenBOT.ELO.Modules.Models
         }
 
         //Indicates user IDs and the amount of points added/removed from them when the game result was decided.
-        public HashSet<(ulong, int)> UpdatedScores { get; set; } = new HashSet<(ulong, int)>();
+        //public HashSet<(ulong, int)> UpdatedScores { get; set; } = new HashSet<(ulong, int)>();
+        public Dictionary<ulong, int> ScoreUpdates { get; set; } = new Dictionary<ulong, int>();
 
         /// <summary>
         /// Returns the channel that this game was created in

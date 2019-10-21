@@ -188,7 +188,7 @@ namespace RavenBOT.ELO.Modules.Modules
             var game = new ManualGameResult(competition.ManualGameCounter, Context.Guild.Id);
             game.Submitter = Context.User.Id;
             game.GameState = win ? ManualGameResult.ManualGameState.Win : ManualGameResult.ManualGameState.Lose;
-            game.UpdatedScores = updates.Select(x => (x.Item1.UserId, x.Item2)).ToHashSet();
+            game.ScoreUpdates = updates.ToDictionary(x => x.Item1.UserId, x => x.Item2);
             embed.Description = sb.ToString();
             Service.SaveManualGame(game);
 

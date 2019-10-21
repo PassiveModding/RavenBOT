@@ -189,8 +189,8 @@ namespace RavenBOT.ELO.Modules.Methods
                     var eUser = GetPlayer(context.Guild.Id, player);
                     if (eUser == null) continue; 
 
-                    var pointUpdate = game.UpdatedScores.FirstOrDefault(x => x.Item1 == player);
-                    pointsAwarded.Add($"{eUser.DisplayName} - +{pointUpdate.Item2}");
+                    var pointUpdate = game.ScoreUpdates.FirstOrDefault(x => x.Key == player);
+                    pointsAwarded.Add($"{eUser.DisplayName} - +{pointUpdate.Value}");
                 }
 
                 var losers = game.GetLosingTeam();
@@ -200,8 +200,8 @@ namespace RavenBOT.ELO.Modules.Methods
                     var eUser = GetPlayer(context.Guild.Id, player);
                     if (eUser == null) continue; 
 
-                    var pointUpdate = game.UpdatedScores.FirstOrDefault(x => x.Item1 == player);
-                    pointsAwarded.Add($"{eUser.DisplayName} - {pointUpdate.Item2}");
+                    var pointUpdate = game.ScoreUpdates.FirstOrDefault(x => x.Key == player);
+                    pointsAwarded.Add($"{eUser.DisplayName} - {pointUpdate.Value}");
                 }
                 gameStateInfo = $"Result: Team {game.WinningTeam} Won\n" +
                     $"Team 1:\n{await game.Team1.GetTeamInfo(context.Guild)}\n"+
