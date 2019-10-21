@@ -22,6 +22,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("CompetitionInfo")]
+        [Alias("CompetitionSettings", "GameSettings")]
         public async Task CompetitionInfo()
         {
             var comp = Service.GetOrCreateCompetition(Context.Guild.Id);
