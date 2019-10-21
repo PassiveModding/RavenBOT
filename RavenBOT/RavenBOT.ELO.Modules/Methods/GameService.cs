@@ -20,7 +20,7 @@ namespace RavenBOT.ELO.Modules.Methods
             usermentions,
             submitter
         }
-        public (string, EmbedBuilder) GetGameMessageAsync(SocketCommandContext context, GameResult game, string title = null, params GameFlag[] flags)
+        public (string, EmbedBuilder) GetGameMessage(SocketCommandContext context, GameResult game, string title = null, params GameFlag[] flags)
         {
             bool usermentions = flags.Contains(GameFlag.usermentions);
 
