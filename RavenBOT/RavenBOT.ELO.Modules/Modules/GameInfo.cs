@@ -95,7 +95,7 @@ namespace RavenBOT.ELO.Modules.Modules
                     var scoreInfos = x.UpdatedScores.Select(s =>
                         {
                             //TODO: reduce string construction nesting.
-                           return $"{MentionUtils.MentionUser(s.Item1)} {(s.Item2 > 0 ? "+" + s : s.ToString())}";
+                           return $"{MentionUtils.MentionUser(s.Item1)} {(s.Item2 >= 0 ? "+" + s : s.ToString())}";
                         });
 
                     if (x.GameState != ManualGameResult.ManualGameState.Legacy)
@@ -107,7 +107,7 @@ namespace RavenBOT.ELO.Modules.Modules
                     else
                     {
                         //TODO: Is it necessary to check ALL users or maybe just first?
-                        if (x.UpdatedScores.All(val => val.Item2 > 0))
+                        if (x.UpdatedScores.All(val => val.Item2 >= 0))
                         {
                             return new EmbedFieldBuilder()
                                 .WithName($"#{x.GameId}: Win")
