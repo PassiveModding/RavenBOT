@@ -88,6 +88,31 @@ namespace RavenBOT.Common
             return responses;
         }
 
+        public async Task<Dictionary<ulong, IUserMessage>> MessageUsersAsync(ShardedCommandContext context, ulong[] userIds, Func<ulong, string> message, Func<ulong, Embed> embed = null)
+        {
+            var responses = new Dictionary<ulong, IUserMessage>();
+            foreach (var userId in userIds)
+            {
+                var user = context.Client.GetUser(userId);
+                IUserMessage messageResponse = null;
+                if (user != null)
+                {
+                    try
+                    {
+                        messageResponse = await user.SendMessageAsync(message(userId), false, embed(userId));
+                    }
+                    catch
+                    {
+                        messageResponse = null;
+                    }
+                }
+
+                responses.Add(userId, messageResponse);
+            }
+
+            return responses;
+        }
+
         public async Task<IUserMessage> ReplyAsync(ShardedCommandContext context, string message, Embed embed)
         {
             return await context.Channel.SendMessageAsync(message, false, embed);

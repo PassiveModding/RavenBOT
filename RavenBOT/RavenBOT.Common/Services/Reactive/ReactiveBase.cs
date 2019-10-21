@@ -24,5 +24,8 @@ namespace RavenBOT.Common
 
         public Task<Dictionary<ulong, IUserMessage>> MessageUsersAsync(ulong[] userIds, Func<ulong, string> contentFunc, Embed embed = null)
                             => ReactiveService.MessageUsersAsync(Context, userIds, contentFunc, embed);
+
+        public Task<Dictionary<ulong, IUserMessage>> MessageUsersAsync(ulong[] userIds, Func<ulong, string> contentFunc, Func<ulong, Embed> embed = null)
+                            => ReactiveService.MessageUsersAsync(Context, userIds, contentFunc, embed);
     }
 }
