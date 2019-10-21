@@ -212,7 +212,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
         
         [Command("MapMode", RunMode = RunMode.Sync)]
-        public async Task MapModeAsync(MapSelector.MapMode mode)
+        public async Task MapModeAsync(MapSelector.MapMode? mode = null)
         {
             if (mode == MapSelector.MapMode.Vote)
             {
@@ -231,8 +231,14 @@ namespace RavenBOT.ELO.Modules.Modules
             {
                 lobby.MapSelector = new MapSelector();
             }
+            
+            if (!mode.HasValue)
+            {
+                await ReplyAsync($"Current Map Mode: {lobby.MapSelector?.Mode}");
+                return;
+            }
 
-            lobby.MapSelector.Mode = mode;
+            lobby.MapSelector.Mode = mode.Value;
             Service.SaveLobby(lobby);
             await ReplyAsync("Mode set.");
         }
