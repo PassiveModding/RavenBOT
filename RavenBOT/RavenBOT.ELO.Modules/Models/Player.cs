@@ -21,7 +21,7 @@ namespace RavenBOT.ELO.Modules.Models
         {
             get
             {
-                return _DisplayName;
+                return Discord.Format.Sanitize(_DisplayName);
             }
             set
             {
