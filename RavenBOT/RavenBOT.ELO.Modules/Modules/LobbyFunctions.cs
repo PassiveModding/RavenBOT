@@ -236,7 +236,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
         public string[] GetMentionList(IEnumerable<SocketGuildUser> users)
         {
-            return users.Select(x => x?.Mention ?? $"[{x.Id}]").ToArray();
+            return users.Where(x => x != null).Select(x => x?.Mention ?? $"[{x.Id}]").ToArray();
         }
 
     }
