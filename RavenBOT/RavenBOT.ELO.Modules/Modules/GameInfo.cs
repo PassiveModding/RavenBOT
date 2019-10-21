@@ -95,7 +95,7 @@ namespace RavenBOT.ELO.Modules.Modules
                     var scoreInfos = x.ScoreUpdates.Select(s =>
                         {
                             //TODO: reduce string construction nesting.
-                           return $"{MentionUtils.MentionUser(s.Key)} {(s.Value >= 0 ? "+" + s : s.ToString())}";
+                           return $"{MentionUtils.MentionUser(s.Key)} {(s.Value >= 0 ? "+" + s.Value : s.Value.ToString())}";
                         });
 
                     if (x.GameState != ManualGameResult.ManualGameState.Legacy)
