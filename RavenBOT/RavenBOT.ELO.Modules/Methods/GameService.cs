@@ -20,7 +20,7 @@ namespace RavenBOT.ELO.Modules.Methods
             usermentions,
             submitter
         }
-        public async Task<(string, EmbedBuilder)> GetGameMessageAsync(SocketCommandContext context, GameResult game, string title = null, params GameFlag[] flags)
+        public (string, EmbedBuilder) GetGameMessageAsync(SocketCommandContext context, GameResult game, string title = null, params GameFlag[] flags)
         {
             bool usermentions = flags.Contains(GameFlag.usermentions);
 
@@ -88,7 +88,7 @@ namespace RavenBOT.ELO.Modules.Methods
             if (winningteam)
             {
                 var teamInfo = game.GetWinningTeam();
-                embed.AddField($"Winning Team, Team #{teamInfo.Item1}", await teamInfo.Item2.GetTeamInfo(context.Guild));
+                embed.AddField($"Winning Team, Team #{teamInfo.Item1}", teamInfo.Item2.GetTeamInfo(context.Guild));
                 if (teamInfo.Item1 == 1)
                 {
                     team1 = false;
@@ -101,12 +101,12 @@ namespace RavenBOT.ELO.Modules.Methods
 
             if (team1)
             {
-                embed.AddField("Team 1", await game.Team1.GetTeamInfo(context.Guild));
+                embed.AddField("Team 1", game.Team1.GetTeamInfo(context.Guild));
             }
 
             if (team2)
             {
-                embed.AddField("Team 2", await game.Team2.GetTeamInfo(context.Guild));
+                embed.AddField("Team 2", game.Team2.GetTeamInfo(context.Guild));
             }
 
             if (remainingPlayers)
@@ -122,20 +122,21 @@ namespace RavenBOT.ELO.Modules.Methods
         }
 
 
-        public async Task<EmbedBuilder> GetGameEmbedAsync(SocketCommandContext context, GameResult game)
+        public EmbedBuilder GetGameEmbed(SocketCommandContext context, GameResult game)
         {
             var embed = new EmbedBuilder();
             var gameStateInfo = "";
 
             //This is needed to ensure that all members can be gotten in larger servers.
-            await context.Guild.DownloadUsersAsync();
+            //TODO: Assess if this is necessary
+            //await context.Guild.DownloadUsersAsync();
 
             if (game.GameState == GameResult.State.Picking)
             {
                 gameStateInfo = $"State: Picking Teams\n" +
-                                $"Team 1:\n{await game.Team1.GetTeamInfo(context.Guild)}\n"+
-                                $"Team 2:\n{await game.Team2.GetTeamInfo(context.Guild)}\n"+
-                                $"Remaining Players:\n{await game.GetQueueRemainingPlayersString(context.Guild)}\n";
+                                $"Team 1:\n{game.Team1.GetTeamInfo(context.Guild)}\n"+
+                                $"Team 2:\n{game.Team2.GetTeamInfo(context.Guild)}\n"+
+                                $"Remaining Players:\n{game.GetQueueRemainingPlayersString(context.Guild)}\n";
             }
             else if (game.GameState == GameResult.State.Canceled)
             {
@@ -146,36 +147,36 @@ namespace RavenBOT.ELO.Modules.Methods
                     if (remainingPlayers.Any())
                     {
                         gameStateInfo = $"State: Cancelled\n" +
-                            $"Team 1:\n{await game.Team1.GetTeamInfo(context.Guild)}\n"+
-                            $"Team 2:\n{await game.Team2.GetTeamInfo(context.Guild)}\n"+
-                            $"Remaining Players:\n{string.Join("\n", await context.Guild.GetUserMentionListAsync(remainingPlayers))}\n";
+                            $"Team 1:\n{game.Team1.GetTeamInfo(context.Guild)}\n"+
+                            $"Team 2:\n{game.Team2.GetTeamInfo(context.Guild)}\n"+
+                            $"Remaining Players:\n{string.Join("\n", context.Guild.GetUserMentionList(remainingPlayers))}\n";
                     }
                     else
                     {
                         //TODO: Address repeat response below
                         gameStateInfo = $"State: Canceled\n" +
-                            $"Team 1:\n{await game.Team1.GetTeamInfo(context.Guild)}\n"+
-                            $"Team 2:\n{await game.Team2.GetTeamInfo(context.Guild)}";
+                            $"Team 1:\n{game.Team1.GetTeamInfo(context.Guild)}\n"+
+                            $"Team 2:\n{game.Team2.GetTeamInfo(context.Guild)}";
                     }
                 }
                 else
                 {
                     gameStateInfo = $"State: Canceled\n" +
-                        $"Team 1:\n{await game.Team1.GetTeamInfo(context.Guild)}\n"+
-                        $"Team 2:\n{await game.Team2.GetTeamInfo(context.Guild)}";
+                        $"Team 1:\n{game.Team1.GetTeamInfo(context.Guild)}\n"+
+                        $"Team 2:\n{game.Team2.GetTeamInfo(context.Guild)}";
                 }               
             }
             else if (game.GameState == GameResult.State.Draw)
             {
                 gameStateInfo = $"Result: Draw\n" +
-                    $"Team 1:\n{await game.Team1.GetTeamInfo(context.Guild)}\n"+
-                    $"Team 2:\n{await game.Team2.GetTeamInfo(context.Guild)}";
+                    $"Team 1:\n{game.Team1.GetTeamInfo(context.Guild)}\n"+
+                    $"Team 2:\n{game.Team2.GetTeamInfo(context.Guild)}";
             }
             else if (game.GameState == GameResult.State.Undecided)
             {
                 gameStateInfo = $"State: Undecided\n" +
-                    $"Team 1:\n{await game.Team1.GetTeamInfo(context.Guild)}\n"+
-                    $"Team 2:\n{await game.Team2.GetTeamInfo(context.Guild)}";
+                    $"Team 1:\n{game.Team1.GetTeamInfo(context.Guild)}\n"+
+                    $"Team 2:\n{game.Team2.GetTeamInfo(context.Guild)}";
             }
             else if (game.GameState == GameResult.State.Decided)
             {
@@ -204,8 +205,8 @@ namespace RavenBOT.ELO.Modules.Methods
                     pointsAwarded.Add($"{eUser.DisplayName} - {pointUpdate.Value}");
                 }
                 gameStateInfo = $"Result: Team {game.WinningTeam} Won\n" +
-                    $"Team 1:\n{await game.Team1.GetTeamInfo(context.Guild)}\n"+
-                    $"Team 2:\n{await game.Team2.GetTeamInfo(context.Guild)}\n" +
+                    $"Team 1:\n{game.Team1.GetTeamInfo(context.Guild)}\n"+
+                    $"Team 2:\n{game.Team2.GetTeamInfo(context.Guild)}\n" +
                     //TODO: Paginate this and add to second page if message is too long.
                     $"Points Awarded:\n{string.Join("\n", pointsAwarded)}";
             }

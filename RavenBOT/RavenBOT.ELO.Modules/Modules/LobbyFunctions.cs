@@ -94,7 +94,7 @@ namespace RavenBOT.ELO.Modules.Modules
             //TODO: Assign team members to specific roles and create a channel for chat within.
             if (CurrentLobby.TeamPickMode == Lobby.PickMode.TryBalance || CurrentLobby.TeamPickMode == Lobby.PickMode.Random)
             {
-                var res = await Service.GetGameMessageAsync(Context, game, $"Game #{game.GameId} Started", 
+                var res = Service.GetGameMessageAsync(Context, game, $"Game #{game.GameId} Started", 
                         ELOService.GameFlag.lobby,
                         ELOService.GameFlag.map,
                         ELOService.GameFlag.time,

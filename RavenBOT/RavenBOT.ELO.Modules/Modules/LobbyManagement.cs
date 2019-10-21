@@ -257,7 +257,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 //Teams have been filled.
                 game.GameState = GameResult.State.Undecided;
 
-                var res = await Service.GetGameMessageAsync(Context, game, $"Game #{game.GameId} Started",
+                var res = Service.GetGameMessageAsync(Context, game, $"Game #{game.GameId} Started",
                         ELOService.GameFlag.gamestate,
                         ELOService.GameFlag.lobby,
                         ELOService.GameFlag.map,
@@ -279,7 +279,7 @@ namespace RavenBOT.ELO.Modules.Modules
             }
             else
             {
-                var res = await Service.GetGameMessageAsync(Context, game, "Player(s) picked.",
+                var res = Service.GetGameMessageAsync(Context, game, "Player(s) picked.",
                         ELOService.GameFlag.gamestate);
                 await ReplyAsync(PickResponse ?? "", false, res.Item2.Build());
             }

@@ -241,7 +241,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
         public async Task AnnounceResultAsync(Lobby lobby, GameResult game)
         {
-            var embed = await Service.GetGameEmbedAsync(Context, game);
+            var embed = Service.GetGameEmbed(Context, game);
             await AnnounceResultAsync(lobby, embed);
         }
 

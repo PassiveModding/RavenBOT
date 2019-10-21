@@ -109,7 +109,7 @@ namespace RavenBOT.ELO.Modules.Models
             public ulong Captain { get; set; } = 0;
             public HashSet<ulong> Players { get; set; } = new HashSet<ulong>();
 
-            public async Task<string> GetTeamInfo(SocketGuild guild)
+            public string GetTeamInfo(SocketGuild guild)
             {
                 var resStr = "";
                 //Only show captain info if a captain has been set.
@@ -120,7 +120,7 @@ namespace RavenBOT.ELO.Modules.Models
 
                 if (Players.Any())
                 {
-                    resStr += $"Players: {string.Join("\n", await guild.GetUserMentionListAsync(Players.Where(x => x != Captain)))}";
+                    resStr += $"Players: {string.Join("\n", guild.GetUserMentionList(Players.Where(x => x != Captain)))}";
                 }
                 else
                 {
@@ -155,14 +155,14 @@ namespace RavenBOT.ELO.Modules.Models
             return Queue.Where(x => Team1.Captain != x && !Team1.Players.Contains(x) && Team2.Captain != x && !Team2.Players.Contains(x));
         }
 
-        public async Task<string> GetQueueRemainingPlayersString(SocketGuild guild)
+        public string GetQueueRemainingPlayersString(SocketGuild guild)
         {
-            return string.Join("\n", await guild.GetUserMentionListAsync(GetQueueRemainingPlayers()));
+            return string.Join("\n", guild.GetUserMentionList(GetQueueRemainingPlayers()));
         }
 
-        public async Task<string> GetQueueMentionList(SocketGuild guild)
+        public string GetQueueMentionList(SocketGuild guild)
         {
-            return string.Join("\n", await guild.GetUserMentionListAsync(Queue));
+            return string.Join("\n", guild.GetUserMentionList(Queue));
         }
 
         public (int, Team) GetWinningTeam()

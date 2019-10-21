@@ -126,11 +126,14 @@ namespace RavenBOT.Common
             }
         }
         
-        public static async Task<IEnumerable<string>> GetUserMentionListAsync(this SocketGuild guild, IEnumerable<ulong> userIds)
+        public static IEnumerable<string> GetUserMentionList(this SocketGuild guild, IEnumerable<ulong> userIds)
         {           
-            await guild.DownloadUsersAsync(); 
+            //await guild.DownloadUsersAsync(); 
+            
             return userIds.Select(x => 
             {
+                return MentionUtils.MentionUser(x);
+                /*
                 var u = guild.GetUser(x);
                 string val;
                 if (u == null)
@@ -142,7 +145,7 @@ namespace RavenBOT.Common
                     val = u.Mention;
                 }
 
-                return val;
+                return val;*/
             });
         }
 
