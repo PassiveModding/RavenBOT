@@ -31,6 +31,16 @@ namespace RavenBOT.ELO.Modules.Models
 
         public ulong Submitter { get; set; }
 
+        public ManualGameState GameState { get; set; } = ManualGameState.Legacy;
+
+        public enum ManualGameState
+        {
+            Win,
+            Lose,
+            Draw,
+            Legacy
+        }
+
         public HashSet<(ulong, int)> UpdatedScores { get; set; } = new HashSet<(ulong, int)>();
     }
 }
