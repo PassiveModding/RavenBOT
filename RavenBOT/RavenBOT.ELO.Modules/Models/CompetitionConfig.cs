@@ -20,7 +20,6 @@ namespace RavenBOT.ELO.Modules.Models
         }
 
         public ulong GuildId { get; set; }
-
         public ulong AdminRole { get; set; }
         public ulong ModeratorRole { get; set; }
 
