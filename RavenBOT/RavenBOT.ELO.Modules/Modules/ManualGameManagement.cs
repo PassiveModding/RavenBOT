@@ -110,6 +110,9 @@ namespace RavenBOT.ELO.Modules.Modules
                 var gUser = Context.Guild.GetUser(userId);
                 if (gUser == null) continue;
 
+                #region ReducedUpdate
+                await Service.UpdateUserAsync(competition, player, gUser);
+                /*
                 //Create the new user display name template
                 var displayName = competition.GetNickname(player);
 
@@ -166,8 +169,9 @@ namespace RavenBOT.ELO.Modules.Modules
                             //Set the user's roles to the modified list which removes and lost ranks and adds any gained ranks
                             x.RoleIds = roleIds.Where(r => r != Context.Guild.EveryoneRole.Id).ToArray();
                         }
-                    });
-                }
+                    });                    
+                }*/
+                #endregion
 
                 var rankUpdate = "";
                 if (maxRank != null || newRank != null)

@@ -571,6 +571,9 @@ namespace RavenBOT.ELO.Modules.Modules
                 var gUser = Context.Guild.GetUser(user.Item1.UserId);
                 if (gUser == null) continue;
 
+                #region ReducedUpdate
+                await Service.UpdateUserAsync(competition, user.Item1, gUser);
+                /*
                 //Create the new user display name template
                 var displayName = competition.GetNickname(user.Item1);
 
@@ -629,6 +632,8 @@ namespace RavenBOT.ELO.Modules.Modules
                         }
                     });
                 }
+                */
+                #endregion
             }
             
             game.GameState = GameResult.State.Decided;
