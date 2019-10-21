@@ -72,6 +72,67 @@ namespace RavenBOT.ELO.Modules.Modules
             await DisplayGameAsync(game);
         }
 
+        [Command("ManualGameList")]
+        [Alias("Manual Game List", "ManualGamesList", "ShowManualGames", "ListManualGames")]
+        [Summary("Displays statuses for the last 100 manual games in the server")]
+        public async Task ManualGameList()
+        {
+            var games = Service.GetManualGames(x => x.GuildId == Context.Guild.Id).OrderByDescending(x => x.GameId).Take(100);
+
+            if (games.Count() == 0)
+            {
+                await ReplyAsync("There aren't any manual games in history.");
+                return;
+            }
+
+            var gamePages = games.SplitList(5);
+            var pages = new List<ReactivePage>();
+            foreach (var page in gamePages)
+            {
+                var content = page.Select(x => {
+                    if (x.UpdatedScores.Count == 0) return null;
+
+                    var scoreInfos = x.UpdatedScores.Select(s =>
+                        {
+                            //TODO: reduce string construction nesting.
+                           return $"{MentionUtils.MentionUser(s.Item1)} {(s.Item2 > 0 ? "+" + s : s.ToString())}";
+                        });
+
+                    if (x.GameState != ManualGameResult.ManualGameState.Legacy)
+                    {
+                        return new EmbedFieldBuilder()
+                            .WithName($"#{x.GameId}: {x.GameState}")
+                            .WithValue(string.Join("\n", scoreInfos) + $"\n **Submitted by: {MentionUtils.MentionUser(x.Submitter)}**");
+                    }
+                    else
+                    {
+                        //TODO: Is it necessary to check ALL users or maybe just first?
+                        if (x.UpdatedScores.All(val => val.Item2 > 0))
+                        {
+                            return new EmbedFieldBuilder()
+                                .WithName($"#{x.GameId}: Win")
+                                .WithValue(string.Join("\n", scoreInfos) + $"\n **Submitted by: {MentionUtils.MentionUser(x.Submitter)}**");
+                        }
+                        else
+                        {
+                            return new EmbedFieldBuilder()
+                                .WithName($"#{x.GameId}: Lose")
+                                .WithValue(string.Join("\n", scoreInfos) + $"\n **Submitted by: {MentionUtils.MentionUser(x.Submitter)}**");
+                        }
+                    }
+                }).Where(x => x != null).ToList();
+
+                if (content.Count == 0) continue;
+
+                pages.Add(new ReactivePage
+                {
+                    Fields = content
+                });
+            }
+
+            await PagedReplyAsync(new ReactivePager(pages).ToCallBack().WithDefaultPagerCallbacks());
+        }
+
         [Command("GameList")]
         [Alias("Game List", "GamesList", "ShowGames", "ListGames")]
         [Summary("Displays statuses for the last 100 games in the lobby")]
@@ -114,7 +175,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 });
             }
 
-            await PagedReplyAsync(new ReactivePager(pages).ToCallBack());
+            await PagedReplyAsync(new ReactivePager(pages).ToCallBack().WithDefaultPagerCallbacks());
         }
     }
 }
