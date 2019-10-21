@@ -123,12 +123,6 @@ namespace RavenBOT.ELO.Modules.Modules
         public async Task<GameResult> PickOneAsync(GameResult game, SocketGuildUser[] users)
         {
             var uc = users.Count();
-            if (uc != 1)
-            {
-                await ReplyAsync("You can only pick one player at a time here.");
-                return null;
-            }
-
             var team = game.GetTeam();
 
             if (Context.User.Id != team.Captain)
@@ -137,7 +131,12 @@ namespace RavenBOT.ELO.Modules.Modules
                 return null;
             }
 
-            if (uc != 1)
+            if (uc == 0)
+            {
+                await ReplyAsync("You must specify a player to pick.");
+                return null;
+            }
+            else if (uc != 1)
             {
                 await ReplyAsync("You can only specify one player for this pick.");
                 return null;
@@ -169,7 +168,12 @@ namespace RavenBOT.ELO.Modules.Modules
                     return null;
                 }
 
-                if (uc != 1)
+                if (uc == 0)
+                {
+                    await ReplyAsync("You must specify a player to pick.");
+                    return null;
+                }
+                else if (uc != 1)
                 {
                     await ReplyAsync("You can only specify one player for the initial pick.");
                     return null;
@@ -209,7 +213,12 @@ namespace RavenBOT.ELO.Modules.Modules
                     return null;
                 }
 
-                if (uc != 1)
+                if (uc == 0)
+                {
+                    await ReplyAsync("You must specify a player to pick.");
+                    return null;
+                }
+                else if (uc != 1)
                 {
                     await ReplyAsync("You can only specify one player for this pick.");
                     return null;
