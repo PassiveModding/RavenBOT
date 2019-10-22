@@ -10,7 +10,6 @@
   <ItemGroup>
     <PackageReference Include="Discord.Addons.PassiveInteractive" Version="2.0.4"/>
     <PackageReference Include="Discord.Net" Version="2.1.1"/>
-    <PackageReference Include="NAudio" Version="1.9.0"/>
     <PackageReference Include="RavenDB.Client" Version="4.2.0"/>
     <PackageReference Include="RavenDB.Embedded" Version="4.2.0"/>
     <PackageReference Include="LiteDB" Version="4.1.4"/>
