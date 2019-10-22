@@ -72,6 +72,31 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync($"Player banned from joining games until: {player.CurrentBan.ExpiryTime.ToShortDateString()} {player.CurrentBan.ExpiryTime.ToShortTimeString()} in {player.CurrentBan.RemainingTime.GetReadableLength()}");
         }
 
+        [Command("RenameUser", RunMode = RunMode.Sync)]
+        [Alias("ForceRename")]
+        public async Task RenameUserAsync(SocketGuildUser user, [Remainder]string newname)
+        {
+            if (!user.IsRegistered(Service, out var player))
+            {
+                await ReplyAsync("User isn't registered.");
+                return;
+            }
+
+            player.DisplayName = newname;
+            Service.SavePlayer(player);
+
+            var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
+            var responses = await Service.UpdateUserAsync(competition, player, user);
+            if (responses.Any())
+            {
+                await SimpleEmbedAsync("User's profile has been renamed\n" + string.Join("\n", responses), Color.Red);
+            }
+            else
+            {
+                await SimpleEmbedAsync("User's profile has been renamed successfully.");
+            }
+        }
+
         [Command("DeleteUser", RunMode = RunMode.Sync)]
         [Alias("DelUser")]
         public async Task DeleteUserAsync(SocketGuildUser user)
