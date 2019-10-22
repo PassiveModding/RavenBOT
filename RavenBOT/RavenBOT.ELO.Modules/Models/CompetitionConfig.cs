@@ -63,6 +63,7 @@ namespace RavenBOT.ELO.Modules.Models
         public bool AllowNegativeScore { get; set; } = false;
         
         public bool AllowReRegister { get; set; } = true;
+        public bool AllowSelfRename { get; set; } = true;
 
         //TODO: Consider adding a setter to ensure value is always positive.
         public int DefaultWinModifier { get; set; } = 10;

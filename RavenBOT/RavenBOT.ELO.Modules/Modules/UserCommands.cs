@@ -59,20 +59,26 @@ namespace RavenBOT.ELO.Modules.Modules
         [Command("Rename", RunMode = RunMode.Sync)]
         public async Task RenameAsync([Remainder]string name = null)
         {
-            if (name == null)
-            {
-                await ReplyAsync("You must specify a new name in order to be renamed.");
-                return;
-            }
 
-            var player = Service.GetPlayer(Context.Guild.Id, Context.User.Id);
-            if (player == null)
-            {
+
+            if (!Context.User.IsRegistered(Service, out var player))
+            {              
                 await ReplyAsync("You are not registered yet.");
                 return;
             }
 
             var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
+            if (!competition.AllowSelfRename)
+            {
+                await ReplyAsync("You are not allowed to rename yourself");
+                return;
+            }
+
+            if (name == null)
+            {
+                await ReplyAsync("You must specify a new name in order to be renamed.");
+                return;
+            }
             
             var originalDisplayName = player.DisplayName;
             player.DisplayName = name;
