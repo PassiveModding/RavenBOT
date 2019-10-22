@@ -214,6 +214,20 @@ namespace RavenBOT.ELO.Modules.Modules
             Service.SaveCompetition(competition);
             await ReplyAsync($"Allow re-register: {reRegister.Value}");
         }
+                
+        [Command("AllowSelfRename", RunMode = RunMode.Sync)]
+        public async Task AllowSelfRenameAsync(bool? selfRename = null)
+        {
+            var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
+            if (selfRename == null)
+            {
+                await ReplyAsync($"Allow Self Rename: {competition.AllowSelfRename}");
+                return;
+            }
+            competition.AllowSelfRename = selfRename.Value;
+            Service.SaveCompetition(competition);
+            await ReplyAsync($"Allow Self Rename: {selfRename.Value}");
+        }
 
         [Command("DefaultWinModifier", RunMode = RunMode.Sync)]
         public async Task CompWinModifier(int? amountToAdd = null)
