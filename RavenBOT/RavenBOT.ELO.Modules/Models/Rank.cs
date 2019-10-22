@@ -1,3 +1,5 @@
+using System;
+
 namespace RavenBOT.ELO.Modules.Models
 {
     public class Rank
@@ -13,12 +15,14 @@ namespace RavenBOT.ELO.Modules.Models
             return _LossModifier;
         } set
         {
-            if (value < 0)
+            if (value.HasValue)
             {
-                value = -value;
+                _LossModifier = Math.Abs(value.Value);
             }
-
-            _LossModifier = value;
+            else
+            {
+                _LossModifier = value;
+            }
         } }
     }
 }

@@ -85,8 +85,8 @@ namespace RavenBOT.ELO.Modules.Modules
                 }
                 else
                 {
-                    //Ensure the update value is positive as it will be subtracted from the user's points.
-                    updateVal = Math.Abs(maxRank?.LossModifier ?? competition.DefaultLossModifier);
+                    //Loss modifier is always positive so subtract it
+                    updateVal = maxRank?.LossModifier ?? competition.DefaultLossModifier;
                     player.SetPoints(competition, player.Points - updateVal);
                     player.Losses++;
                     //Set the update value to a negative value for returning purposes.
