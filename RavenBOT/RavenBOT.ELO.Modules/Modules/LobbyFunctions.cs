@@ -113,7 +113,27 @@ namespace RavenBOT.ELO.Modules.Modules
 
                 if (CurrentLobby.DmUsersOnGameReady)
                 {
-                    await MessageUsersAsync(game.Queue.ToArray(), x => MentionUtils.MentionUser(x), res.Item2.Build());
+                    await MessageUsersAsync(game.Queue.ToArray(), x => MentionUtils.MentionUser(x), x =>
+                    {
+                        var msg2 = Service.GetGameMessage(Context, game, $"Game #{game.GameId} Started",
+                        ELOService.GameFlag.map,
+                        ELOService.GameFlag.time,
+                        ELOService.GameFlag.usermentions,
+                        ELOService.GameFlag.gamestate);
+
+                        string teamName;
+                        if (game.Team1.Players.Contains(x))
+                        {
+                            teamName = "Team1";
+                        }
+                        else
+                        {
+                            teamName = "Team2";
+                        }
+
+                        msg2.Item2.AddField("Game Info", $"Lobby: {MentionUtils.MentionChannel(game.LobbyId)}\nGame: {game.GameId}\nTeam: {teamName}\n{MentionUtils.MentionChannel(game.LobbyId)} {game.GameId} {teamName}");
+                        return msg2.Item2.Build();
+                    });
                 }
             }
 
