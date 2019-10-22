@@ -77,6 +77,45 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync($"Register role set to {role.Mention}");
         }
 
+        [Command("SetRegisterMessage", RunMode = RunMode.Sync)]
+        [Alias("Set RegisterMessage", "RegisterMessage")]
+        public async Task SetRegisterMessageAsync([Remainder] string message = null)
+        {
+            if (message == null)
+            {
+                message = "You have registered as `{name}`, all roles/name updates have been applied if applicable.";
+            }
+            var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
+            competition.RegisterMessageTemplate = message;
+            var testProfile = new Player(0, 0, "Player");
+            testProfile.Wins = 5;
+            testProfile.Losses = 2;
+            testProfile.Draws = 1;
+            testProfile.Points = 600;
+            var exampleNick = competition.GetNickname(testProfile);
+
+            Service.SaveCompetition(competition);
+            await ReplyAsync($"Register Message set.\nExample:\n{exampleNick}");
+        }
+
+        [Command("RegisterMessageFormats")]
+        [Alias("RegisterFormats")]
+        public async Task ShowRegistrationFormatsAsync()
+        {
+            var response = "**Register Message Formats**\n" + // Use Title
+                "{score} - Total points\n" +
+                "{name} - Registration name\n" +
+                "{wins} - Total wins\n" +
+                "{draws} - Total draws\n" +
+                "{losses} - Total losses\n" +
+                "{games} - Games played\n\n" +
+                "Example:\n" +
+                "`RegisterMessageFormats Thank you for registering {name}` `Thank you for registering Player`\n" +
+                "NOTE: Format is limited to 1024 characters long";
+
+            await SimpleEmbedAsync(response);
+        }
+
         [Command("SetNicknameFormat", RunMode = RunMode.Sync)]
         [Alias("Set NicknameFormat", "NicknameFormat", "NameFormat", "SetNameFormat")]
         public async Task SetNicknameFormatAsync([Remainder] string format)
