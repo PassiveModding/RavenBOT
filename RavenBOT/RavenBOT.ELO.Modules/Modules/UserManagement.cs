@@ -58,7 +58,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
         [Command("BanUser", RunMode = RunMode.Sync)]
         [Alias("Ban")]
-        public async Task BanUserAsync(TimeSpan time, SocketGuildUser user, string reason = null)
+        public async Task BanUserAsync(TimeSpan time, SocketGuildUser user, [Remainder]string reason = null)
         {
             var player = Service.GetPlayer(Context.Guild.Id, user.Id);
             if (player == null)
