@@ -193,12 +193,17 @@ namespace RavenBOT.ELO.Modules.Modules
 
         [Command("AllowNegativeScore", RunMode = RunMode.Sync)]
         [Alias("AllowNegative")]
-        public async Task AllowNegative(bool allowNegative)
+        public async Task AllowNegativeAsync(bool? allowNegative = null)
         {
             var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
-            competition.AllowNegativeScore = allowNegative;
+            if (allowNegative == null)
+            {
+                await ReplyAsync($"Allow Negative Score: {competition.AllowNegativeScore}");
+                return;
+            }
+            competition.AllowNegativeScore = allowNegative.Value;
             Service.SaveCompetition(competition);
-            await ReplyAsync($"Allow Negative Score: {allowNegative}");
+            await ReplyAsync($"Allow Negative Score: {allowNegative.Value}");
         }
 
         [Command("AllowReRegister", RunMode = RunMode.Sync)]
