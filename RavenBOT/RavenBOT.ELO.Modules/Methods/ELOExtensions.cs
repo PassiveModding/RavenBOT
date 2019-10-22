@@ -18,6 +18,32 @@ namespace RavenBOT.ELO.Modules.Methods
             return lobby != null;
         }
 
+        public static bool CanRename(this SocketGuildUser user, SocketGuildUser target)
+        {
+            if (user.GuildPermissions.ManageNicknames)
+            {
+                if (user.Hierarchy > target.Hierarchy)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public static bool CanManageRoles(this SocketGuildUser user, SocketGuildUser target)
+        {
+            if (user.GuildPermissions.ManageRoles)
+            {
+                if (user.Hierarchy > target.Hierarchy)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public static bool IsRegistered(this IUser user, ELOService service, out Player player)
         {
             if (!(user is SocketGuildUser gUser))
