@@ -5,6 +5,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using RavenBOT.Common;
 using RavenBOT.ELO.Modules.Methods;
+using RavenBOT.ELO.Modules.Models;
 
 namespace RavenBOT.ELO.Modules.Modules
 {
@@ -22,20 +23,32 @@ namespace RavenBOT.ELO.Modules.Modules
         [Alias("reg")]
         public async Task RegisterAsync([Remainder]string name = null)
         {
+            
             if (name == null)
             {
                 name = Context.User.Username;
             }
 
-            //TODO: Add option to prevent re-registering
             //TODO: Add precondition for premium  
+            
+            var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
+            if (Context.User.IsRegistered(Service, out var player))
+            {
+                if (!competition.AllowReRegister)
+                {
+                    await ReplyAsync("You are not allowed to re-register.");
+                    return;
+                }
+            }
+            else
+            {
+                player = Service.CreatePlayer(Context.Guild.Id, Context.User.Id, name);
+            }
 
-            var player = Service.GetPlayer(Context.Guild.Id, Context.User.Id) ?? Service.CreatePlayer(Context.Guild.Id, Context.User.Id, name);
             player.DisplayName = name;
 
-            var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
             var responses = await Service.UpdateUserAsync(competition, player, Context.User as SocketGuildUser);
-            
+
             await ReplyAsync(competition.FormatRegisterMessage(player));
             if (responses.Count > 0)
             {
