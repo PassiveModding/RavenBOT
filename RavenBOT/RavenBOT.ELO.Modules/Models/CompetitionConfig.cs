@@ -28,7 +28,20 @@ namespace RavenBOT.ELO.Modules.Models
         //TODO: Automatically generate registration role instead of requiring one to be set?
         public ulong RegisteredRankId { get; set; } = 0;
 
-        public int ManualGameCounter { get; set; }
+        public int ManualGameCounter { get; set; } = 0;
+
+        public string RegisterMessageTemplate { get; set; } = "You have registered as `{name}`, all roles/name updates have been applied if applicable.";
+        public string FormatRegisterMessage(Player player)
+        {
+            return RegisterMessageTemplate
+                    .Replace("{score}", player.Points.ToString(), StringComparison.InvariantCultureIgnoreCase)
+                    .Replace("{name}", player.DisplayName, StringComparison.InvariantCultureIgnoreCase)
+                    .Replace("{wins}", player.Wins.ToString(), StringComparison.InvariantCultureIgnoreCase)                    
+                    .Replace("{losses}", player.Losses.ToString(), StringComparison.InvariantCultureIgnoreCase)
+                    .Replace("{draws}", player.Draws.ToString(), StringComparison.InvariantCultureIgnoreCase)
+                    .Replace("{games}", player.Games.ToString(), StringComparison.InvariantCultureIgnoreCase)
+                    .FixLength(1024);
+        }
 
         public string NameFormat { get; set; } = "[{score}] {name}";
         public bool UpdateNames { get; set; } = true;

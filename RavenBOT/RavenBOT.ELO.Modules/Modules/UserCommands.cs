@@ -29,15 +29,17 @@ namespace RavenBOT.ELO.Modules.Modules
 
             //TODO: Add option to prevent re-registering
             //TODO: Add precondition for premium  
-            //TODO: Fix name not being set when re-registering
 
             var player = Service.GetPlayer(Context.Guild.Id, Context.User.Id) ?? Service.CreatePlayer(Context.Guild.Id, Context.User.Id, name);
+            player.DisplayName = name;
+
             var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
             var responses = await Service.UpdateUserAsync(competition, player, Context.User as SocketGuildUser);
-            await ReplyAsync($"You have registered as `{name}`, all roles/name updates have been applied if applicable.");
+            
+            await ReplyAsync(competition.FormatRegisterMessage(player));
             if (responses.Count > 0)
             {
-                await ReplyAsync("", false, String.Join("\n", responses).QuickEmbed());
+                await SimpleEmbedAsync(string.Join("\n", responses));
             }
         }
 
