@@ -35,7 +35,7 @@ namespace RavenBOT.ELO.Modules.Modules
             var pages = players.OrderBy(x => x.CurrentBan.RemainingTime).SplitList(20).Select(x =>
             {
                 var page = new ReactivePage();
-                page.Description = string.Join("\n", x.Select(p => $"{MentionUtils.MentionUser(p.UserId)} - {p.CurrentBan.ExpiryTime.ToShortDateString()} {p.CurrentBan.ExpiryTime.ToShortTimeString()} in {p.CurrentBan.RemainingTime.GetReadableLength()}"));
+                page.Description = string.Join("\n", x.Select(p => $"{MentionUtils.MentionUser(p.UserId)} - {p.CurrentBan.ExpiryTime.ToString("dd MMM yyyy")} {p.CurrentBan.ExpiryTime.ToShortTimeString()} in {p.CurrentBan.RemainingTime.GetReadableLength()}"));
                 return page;
             });
             var pager = new ReactivePager(pages);
@@ -69,7 +69,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
             player.BanHistory.Add(new Player.Ban(time, Context.User.Id, reason));
             Service.SavePlayer(player);
-            await ReplyAsync($"Player banned from joining games until: {player.CurrentBan.ExpiryTime.ToShortDateString()} {player.CurrentBan.ExpiryTime.ToShortTimeString()} in {player.CurrentBan.RemainingTime.GetReadableLength()}");
+            await ReplyAsync($"Player banned from joining games until: {player.CurrentBan.ExpiryTime.ToString("dd MMM yyyy")} {player.CurrentBan.ExpiryTime.ToShortTimeString()} in {player.CurrentBan.RemainingTime.GetReadableLength()}");
         }
 
         [Command("RenameUser", RunMode = RunMode.Sync)]

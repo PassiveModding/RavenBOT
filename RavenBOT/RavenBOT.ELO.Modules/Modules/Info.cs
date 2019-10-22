@@ -72,7 +72,7 @@ namespace RavenBOT.ELO.Modules.Modules
                             $"Losses: {player.Losses}\n"+
                             $"Draws: {player.Draws}\n"+
                             $"Games: {player.Games}\n"+
-                            $"Registered At: {player.RegistrationDate.ToShortDateString()} {player.RegistrationDate.ToShortTimeString()}\n"+
+                            $"Registered At: {player.RegistrationDate.ToString("dd MMM yyyy")} {player.RegistrationDate.ToShortTimeString()}\n"+
                             $"{string.Join("\n", player.AdditionalProperties.Select(x => $"{x.Key}: {x.Value}"))}";
 
                             //TODO: Add game history (last 5) to this response
