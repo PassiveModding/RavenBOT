@@ -268,7 +268,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("RankLossModifier", RunMode = RunMode.Sync)]
-        public async Task RankLossModifier(IRole role, int amountToSubtract)
+        public async Task RankLossModifier(IRole role, int? amountToSubtract = null)
         {
             var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
             var rank = competition.Ranks.FirstOrDefault(x => x.RoleId == role.Id);
@@ -280,11 +280,18 @@ namespace RavenBOT.ELO.Modules.Modules
 
             rank.LossModifier = amountToSubtract;
             Service.SaveCompetition(competition);
-            await ReplyAsync("Rank Updated.");
+            if (!amountToSubtract.HasValue)
+            {
+                await ReplyAsync($"This rank will now use the server's default loss value (-{competition.DefaultLossModifier}) when subtracting points.");
+            }
+            else
+            {
+                await ReplyAsync($"When a player with this rank loses they will lose {amountToSubtract} points");
+            }
         }
 
         [Command("RankWinModifier", RunMode = RunMode.Sync)]
-        public async Task RankWinModifier(IRole role, int amountToAdd)
+        public async Task RankWinModifier(IRole role, int? amountToAdd = null)
         {
             var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
             var rank = competition.Ranks.FirstOrDefault(x => x.RoleId == role.Id);
@@ -296,7 +303,14 @@ namespace RavenBOT.ELO.Modules.Modules
 
             rank.WinModifier = amountToAdd;
             Service.SaveCompetition(competition);
-            await ReplyAsync("Rank Updated.");
+            if (!amountToAdd.HasValue)
+            {
+                await ReplyAsync($"This rank will now use the server's default win value (+{competition.DefaultWinModifier}) when adding points.");
+            }
+            else
+            {
+                await ReplyAsync($"When a player with this rank wins they will gain {amountToAdd} points");
+            }
         }
 
         [Command("UpdateNicknames", RunMode = RunMode.Sync)]
