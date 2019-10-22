@@ -202,7 +202,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("AllowReRegister", RunMode = RunMode.Sync)]
-        public async Task AllowNegative(bool? reRegister = null)
+        public async Task AllowReRegisterAsync(bool? reRegister = null)
         {
             var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
             if (reRegister == null)
