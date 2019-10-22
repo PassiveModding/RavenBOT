@@ -33,7 +33,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 return;
             }
 
-            var msg = comp.Ranks.OrderByDescending(x => x.Points).Select(x => $"{Context.Guild.GetRole(x.RoleId)?.Mention ?? $"[{x.RoleId}]"} - ({x.Points}) W: ({x.WinModifier ?? comp.DefaultWinModifier} L: ({x.LossModifier ?? comp.DefaultLossModifier}))").ToArray();
+            var msg = comp.Ranks.OrderByDescending(x => x.Points).Select(x => $"{Context.Guild.GetRole(x.RoleId)?.Mention ?? $"[{x.RoleId}]"} - ({x.Points}) W: ({x.WinModifier ?? comp.DefaultWinModifier} L: (-{x.LossModifier ?? comp.DefaultLossModifier}))").ToArray();
             await ReplyAsync("", false, string.Join("\n", msg).QuickEmbed());
         }
 
