@@ -33,8 +33,10 @@ namespace RavenBOT.ELO.Modules.Modules
                         $"**Nickname Format:** {comp.NameFormat}\n" +
                         $"**Block Multiqueuing:** {comp.BlockMultiQueueing}\n" +
                         $"**Allow Negative Score:** {comp.AllowNegativeScore}\n" +
-                        $"**Default Loss Amount:** {comp.DefaultLossModifier}\n" +
+                        $"**Default Loss Amount:** -{comp.DefaultLossModifier}\n" +
                         $"**Default Win Amount:** {comp.DefaultWinModifier}\n" +
+                        $"**Allow Self Rename:** {comp.AllowSelfRename}\n" +
+                        $"**Allow Re-registering:** {comp.AllowReRegister}\n" +
                         $"For rank info use the `ranks` command";
             await SimpleEmbedAsync(infoStr);
         }
