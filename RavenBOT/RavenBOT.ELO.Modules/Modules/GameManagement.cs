@@ -680,19 +680,19 @@ namespace RavenBOT.ELO.Modules.Modules
                     continue;
                 }
 
-                SocketRole originalRole = null;
-                SocketRole newRole = null;
+                string originalRole = null;
+                string newRole = null;
                 if (player.Item3 != null)
                 {
-                    originalRole = Context.Guild.GetRole(player.Item3.RoleId);
+                    originalRole = MentionUtils.MentionRole(player.Item3.RoleId);
                 }
 
                 if (player.Item5 != null)
                 {
-                    newRole = Context.Guild.GetRole(player.Item5.RoleId);
+                    newRole = MentionUtils.MentionRole(player.Item5.RoleId);
                 }
 
-                sb.AppendLine($"{player.Item1.DisplayName} **Points:** {player.Item1.Points} **Points Received:** {player.Item2} Rank: {originalRole?.Mention ?? "N.A"} => {newRole?.Mention ?? "N/A"}");
+                sb.AppendLine($"{player.Item1.DisplayName} **Points:** {player.Item1.Points} **Points Received:** {player.Item2} Rank: {originalRole ?? "N.A"} => {newRole ?? "N/A"}");
 
             }
 

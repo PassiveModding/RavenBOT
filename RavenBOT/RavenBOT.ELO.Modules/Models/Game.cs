@@ -115,7 +115,7 @@ namespace RavenBOT.ELO.Modules.Models
                 //Only show captain info if a captain has been set.
                 if (Captain != 0)
                 {
-                    resStr += $"Captain: {guild.GetUser(Captain)?.Mention ?? $"[{Captain}]"}\n";
+                    resStr += $"Captain: {MentionUtils.MentionUser(Captain)}\n";
                 }
 
                 if (Players.Any())

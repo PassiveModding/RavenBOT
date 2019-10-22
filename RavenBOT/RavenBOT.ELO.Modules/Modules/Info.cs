@@ -33,7 +33,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 return;
             }
 
-            var msg = comp.Ranks.OrderByDescending(x => x.Points).Select(x => $"{Context.Guild.GetRole(x.RoleId)?.Mention ?? $"[{x.RoleId}]"} - ({x.Points}) W: ({x.WinModifier ?? comp.DefaultWinModifier} L: (-{x.LossModifier ?? comp.DefaultLossModifier}))").ToArray();
+            var msg = comp.Ranks.OrderByDescending(x => x.Points).Select(x => $"{MentionUtils.MentionRole(x.RoleId)} - ({x.Points}) W: ({x.WinModifier ?? comp.DefaultWinModifier} L: (-{x.LossModifier ?? comp.DefaultLossModifier}))").ToArray();
             await ReplyAsync("", false, string.Join("\n", msg).QuickEmbed());
         }
 
@@ -58,11 +58,7 @@ namespace RavenBOT.ELO.Modules.Modules
             string rankStr = null;
             if (rank != null)
             {
-                var guildRole = Context.Guild.GetRole(rank.RoleId);
-                if (guildRole != null)
-                {
-                    rankStr = $"Rank: {guildRole.Mention} ({rank.Points})\n";
-                }
+                rankStr = $"Rank: {MentionUtils.MentionRole(rank.RoleId)} ({rank.Points})\n";
             }
 
             var response = $"{player.DisplayName} Stats\n" + // Use Title?

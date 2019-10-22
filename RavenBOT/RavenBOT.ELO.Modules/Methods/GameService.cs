@@ -247,7 +247,7 @@ namespace RavenBOT.ELO.Modules.Methods
 
 
             embed.Description = $"GameId: {game.GameId}\n" +
-                                $"Lobby: {game.GetChannel(context.Guild).Mention}\n" +
+                                $"Lobby: {MentionUtils.MentionChannel(game.LobbyId)}\n" +
                                 $"Creation Time: {game.CreationTime.ToString("dd MMM yyyy")} {game.CreationTime.ToShortTimeString()}\n" +
                                 $"Pick Mode: {game.GamePickMode}\n" +
                                 $"{(game.MapName == null ? "" : $"Map: {game.MapName}\n")}" +

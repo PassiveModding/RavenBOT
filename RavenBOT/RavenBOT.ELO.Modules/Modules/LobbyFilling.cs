@@ -40,7 +40,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 var lobbyMatches = lobbies.Where(x => x.Queue.Contains(Context.User.Id));
                 if (lobbyMatches.Any())
                 {
-                    var guildChannels = lobbyMatches.Select(x => Context.Guild.GetTextChannel(x.ChannelId)?.Mention ?? $"[{x.ChannelId}]");
+                    var guildChannels = lobbyMatches.Select(x => MentionUtils.MentionChannel(x.ChannelId));
                     await ReplyAsync($"MultiQueuing is not enabled in this server.\nPlease leave: {string.Join("\n", guildChannels)}");
                     return;
                 }
