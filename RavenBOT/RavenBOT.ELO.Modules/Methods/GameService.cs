@@ -121,6 +121,40 @@ namespace RavenBOT.ELO.Modules.Methods
             return (message, embed);
         }
 
+        public EmbedBuilder GetGameEmbed(SocketCommandContext context, ManualGameResult game)
+        {
+            var embed = new EmbedBuilder();
+
+            if (game.GameState == ManualGameResult.ManualGameState.Win)
+            {
+                embed.Color = Color.Green;
+                embed.Title = "Win";
+            }
+            else if (game.GameState == ManualGameResult.ManualGameState.Lose)
+            {
+                embed.Color = Color.Red;
+                embed.Title = "Lose";
+            }
+            else if (game.GameState == ManualGameResult.ManualGameState.Draw)
+            {
+                embed.Color = Color.Gold;
+                embed.Title = "Draw";
+            }
+            else
+            {                
+                embed.Color = Color.Blue;
+                embed.Title = "Legacy";
+            }
+
+
+            embed.Description = $"GameId: {game.GameId}\n" +
+                                $"Creation Time: {game.CreationTime.ToString("dd MMM yyyy")} {game.CreationTime.ToShortTimeString()}\n" +
+                                $"Comment: {game.Comment ?? "N/A"}\n" +
+                                $"Submitted By: {MentionUtils.MentionUser(game.Submitter)}\n" +
+                                string.Join("\n", game.ScoreUpdates.Select(x => $"{MentionUtils.MentionUser(x.Key)} {x.Value}")).FixLength(1024);
+
+            return embed;
+        }
 
         public EmbedBuilder GetGameEmbed(SocketCommandContext context, GameResult game)
         {

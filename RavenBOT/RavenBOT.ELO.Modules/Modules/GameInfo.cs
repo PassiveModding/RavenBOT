@@ -38,6 +38,12 @@ namespace RavenBOT.ELO.Modules.Modules
             await DisplayGameAsync(game);
         }
 
+        public async Task DisplayGameAsync(ManualGameResult game)
+        {
+            var embed = Service.GetGameEmbed(Context, game);
+
+            await ReplyAsync("", false, embed.Build());
+        }
 
         public async Task DisplayGameAsync(GameResult game)
         {
@@ -48,7 +54,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
         [Command("GameInfo")]
         [Alias("Game Info", "Show Game", "ShowGame", "sg")]
-        public async Task GameListAsync(int gameNumber, SocketGuildChannel lobbyChannel = null) //add functionality to specify lobby
+        public async Task GameInfoAsync(int gameNumber, SocketGuildChannel lobbyChannel = null) //add functionality to specify lobby
         {
             if (lobbyChannel == null)
             {
@@ -66,6 +72,20 @@ namespace RavenBOT.ELO.Modules.Modules
             if (game == null)
             {
                 await ReplyAsync("Invalid Game Id");
+                return;
+            }
+
+            await DisplayGameAsync(game);
+        }
+
+        [Command("MaualGameInfo")]
+        [Alias("Manual Game Info", "Show Manual Game", "ShowManualGame", "smg")]
+        public async Task ManualGameInfoAsync(int gameNumber)
+        {
+            var game = Service.GetManualGame(Context.Guild.Id, gameNumber);
+            if (game == null)
+            {
+                await ReplyAsync("Specified game number is invalid.");
                 return;
             }
 
