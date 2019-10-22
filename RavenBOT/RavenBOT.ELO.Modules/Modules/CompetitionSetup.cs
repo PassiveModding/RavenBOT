@@ -201,6 +201,20 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync($"Allow Negative Score: {allowNegative}");
         }
 
+        [Command("AllowReRegister", RunMode = RunMode.Sync)]
+        public async Task AllowNegative(bool? reRegister = null)
+        {
+            var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
+            if (reRegister == null)
+            {
+                await ReplyAsync($"Allow re-register: {competition.AllowReRegister}");
+                return;
+            }
+            competition.AllowReRegister = reRegister.Value;
+            Service.SaveCompetition(competition);
+            await ReplyAsync($"Allow re-register: {reRegister.Value}");
+        }
+
         [Command("DefaultWinModifier", RunMode = RunMode.Sync)]
         public async Task CompWinModifier(int? amountToAdd = null)
         {
