@@ -78,7 +78,7 @@ namespace RavenBOT.ELO.Modules.Modules
             await DisplayGameAsync(game);
         }
 
-        [Command("MaualGameInfo")]
+        [Command("ManualGameInfo")]
         [Alias("Manual Game Info", "Show Manual Game", "ShowManualGame", "smg")]
         public async Task ManualGameInfoAsync(int gameNumber)
         {
