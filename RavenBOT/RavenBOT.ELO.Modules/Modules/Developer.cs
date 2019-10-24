@@ -49,6 +49,15 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync("Running... This will not send a message upon completion.");
         }
 
+        [Command("TogglePremium", RunMode = RunMode.Async)]
+        public async Task TogglePremium()
+        {
+            var config = PremiumService.GetConfig();
+            config.Enabled = !config.Enabled;
+            PremiumService.SaveConfig(config);
+            await ReplyAsync($"Premium Enabled: {config.Enabled}");
+        }
+
         [Command("BanTest", RunMode = RunMode.Sync)]
         public async Task BanTest()
         {
