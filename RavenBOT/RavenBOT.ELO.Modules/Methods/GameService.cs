@@ -251,6 +251,7 @@ namespace RavenBOT.ELO.Modules.Methods
                                 $"Creation Time: {game.CreationTime.ToString("dd MMM yyyy")} {game.CreationTime.ToShortTimeString()}\n" +
                                 $"Pick Mode: {game.GamePickMode}\n" +
                                 $"{(game.MapName == null ? "" : $"Map: {game.MapName}\n")}" +
+                                $"{(game.Comment == null ? "" : $"Comment: {game.Comment}\n")}" +
                                 gameStateInfo.FixLength(2047);
 
             return embed;
