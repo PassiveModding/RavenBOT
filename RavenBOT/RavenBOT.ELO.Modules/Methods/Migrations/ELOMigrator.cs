@@ -2,49 +2,51 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ELO.Models;
+using RavenBOT.Common;
 using RavenBOT.Common.Interfaces.Database;
 using RavenBOT.ELO.Modules.Models;
-using RavenBOT.ELO.Modules.Modules;
 using RavenBOT.ELO.Modules.Premium;
 
 namespace RavenBOT.ELO.Modules.Methods.Migrations
 {
-    public class ELOMigrator
+    public class ELOMigrator : IServiceable
     {
-        private LiteDataStore currentDatabase;
+        private IDatabase currentDatabase;
         private RavenDatabase oldDatabase;
 
-        public ELOMigrator(string configPath, LiteDataStore currentDatabase, LegacyIntegration legacy)
+        public ELOMigrator(IDatabase currentDatabase, LegacyIntegration legacy)
         {
             //This has been written with the face that old database is RDB and current is LiteDB.
             this.oldDatabase = new RavenDatabase();
-            RavenDatabase.ConfigPath = configPath;
+            //ConfigPath is default for migrator.
+            //RavenDatabase.ConfigPath = configPath;
             this.currentDatabase = currentDatabase;
             Legacy = legacy;
         }
 
-        public TokenModel GetTokenModel()
-        {
-            var model = oldDatabase.Load<TokenModel>("tokens");
-            return model;
-        }
-
-        public void RedeemToken(ulong guildId, string token)
+        public bool RedeemToken(ulong guildId, string token)
         {
             var model = GetTokenModel();
             var match = model.TokenList.FirstOrDefault(x => x.Token == token);
-            if (match == null) return;
+            if (match == null) return false;
 
             var configSave = Legacy.GetPremiumConfig(guildId);
             configSave.ExpiryDate.Add(TimeSpan.FromDays(match.Days));
             Legacy.SaveConfig(configSave);
             model.TokenList.Remove(match);
             SaveTokenModel(model);
+            return true;
+        }
+
+        public TokenModel GetTokenModel()
+        {
+            var model = currentDatabase.Load<TokenModel>("legacyELOTokens");
+            return model;
         }
 
         public void SaveTokenModel(TokenModel model)
         {
-            oldDatabase.Store(model, "tokens");
+            currentDatabase.Store(model, "legacyELOTokens");
         }
 
         public class TokenModel
@@ -69,6 +71,12 @@ namespace RavenBOT.ELO.Modules.Methods.Migrations
 
         public void RunMigration()
         {
+            var tokenModel = oldDatabase.Load<TokenModel>("tokens");
+            if (tokenModel != null)
+            {
+                oldDatabase.Store(tokenModel, "legacyELOTokens");
+            }
+
             var configs = oldDatabase.Query<GuildModel>();
             foreach (var config in configs)
             {

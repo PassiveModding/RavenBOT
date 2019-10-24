@@ -1,9 +1,11 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using RavenBOT.Common;
 using RavenBOT.ELO.Modules.Methods;
+using RavenBOT.ELO.Modules.Methods.Migrations;
 using RavenBOT.ELO.Modules.Models;
 using RavenBOT.ELO.Modules.Premium;
 
@@ -16,11 +18,13 @@ namespace RavenBOT.ELO.Modules.Modules
         public ELOService Service { get; }
         public GuildService Prefix { get; }
         public PatreonIntegration PatreonIntegration { get; }
+        public ELOMigrator Migrator { get; }
 
-        public CompetitionSetup(ELOService service, GuildService prefix, PatreonIntegration patreonIntegration)
+        public CompetitionSetup(ELOService service, GuildService prefix, PatreonIntegration patreonIntegration, ELOMigrator migrator)
         {
             this.Prefix = prefix;
             PatreonIntegration = patreonIntegration;
+            Migrator = migrator;
             Service = service;
         }
 
@@ -28,6 +32,25 @@ namespace RavenBOT.ELO.Modules.Modules
         public async Task ClaimPremiumAsync()
         {
             await PatreonIntegration.Claim(Context);
+        }
+
+        [Command("RedeemLegacyToken", RunMode = RunMode.Sync)]
+        public async Task RedeemLegacyTokenAsync([Remainder]string token = null)
+        {
+            if (token == null)
+            {
+                await ReplyAsync("This is used to redeem tokens that were created using the old ELO version.");
+                return;
+            }
+
+            if (Migrator.RedeemToken(Context.Guild.Id, token))
+            {
+                await ReplyAsync("Token redeemed.");
+            }
+            else
+            {
+                await ReplyAsync("Invalid token provided.");
+            }
         }
 
         [Command("RegistrationLimit")]
