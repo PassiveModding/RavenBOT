@@ -134,13 +134,15 @@ namespace RavenBOT.ELO.Modules.Modules
                     }
                 }
 
-                
-                if (Context.Guild.CurrentUser.GuildPermissions.ManageNicknames)
+                if (competition.UpdateNames)
                 {
-                    if (user.Nickname != null)
+                    if (Context.Guild.CurrentUser.GuildPermissions.ManageNicknames)
                     {
-                        //TODO: Combine role and nick modification to reduce discord requests
-                        await user.ModifyAsync(x => x.Nickname = null);
+                        if (user.Nickname != null)
+                        {
+                            //TODO: Combine role and nick modification to reduce discord requests
+                            await user.ModifyAsync(x => x.Nickname = null);
+                        }
                     }
                 }
             }
