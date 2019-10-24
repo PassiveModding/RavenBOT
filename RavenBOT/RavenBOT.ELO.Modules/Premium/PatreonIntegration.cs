@@ -11,9 +11,12 @@ namespace RavenBOT.ELO.Modules.Premium
     public class PatreonIntegration : IServiceable
     {
         public IDatabase Database { get; }
-        public PatreonIntegration(IDatabase database)
+        public LegacyIntegration Legacy { get; }
+
+        public PatreonIntegration(IDatabase database, LegacyIntegration legacy)
         {
-            this.Database = database;
+            Database = database;
+            Legacy = legacy;
         }
 
         private PatreonConfig lastConfig = null;
@@ -41,6 +44,16 @@ namespace RavenBOT.ELO.Modules.Premium
         {
             var config = GetConfig();
             if (!config.Enabled) return int.MaxValue;
+
+            //Add legacy support
+            var legacyUpgrade = Legacy.GetPremiumConfig(guild.Id);
+            if (legacyUpgrade != null)
+            {
+                if (legacyUpgrade.IsPremium())
+                {
+                    return int.MaxValue;
+                }
+            }
 
             var guildUpgrade = Database.Load<ClaimProfile>(ClaimProfile.DocumentName(guild.Id));
             if (guildUpgrade == null) return config.DefaultRegistrationLimit;
