@@ -59,6 +59,7 @@ namespace RavenBOT.ELO.Modules.Models
         }
 
         public bool BlockMultiQueueing { get; set; } = false;
+        public int RegistrationCount { get; set; } = 0;
 
         public bool AllowNegativeScore { get; set; } = false;
         

@@ -4,9 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Discord.Addons.Interactive;
 using Discord.Commands;
+using Discord.WebSocket;
 using RavenBOT.Common;
 using RavenBOT.ELO.Modules.Methods;
 using RavenBOT.ELO.Modules.Models;
+using RavenBOT.ELO.Modules.Premium;
 
 namespace RavenBOT.ELO.Modules.Modules
 {
@@ -14,17 +16,40 @@ namespace RavenBOT.ELO.Modules.Modules
     [RavenRequireOwner]
     public class Developer : ReactiveBase
     {
-        public Developer(IDatabase database, Random random, ELOService service)
+        public Developer(IDatabase database, Random random, ELOService service, PatreonIntegration prem)
         {
             Database = database;
             Random = random;
             Service = service;
+            PremiumService = prem;
         }
         public IDatabase Database { get; }
         public Random Random { get; }
         public ELOService Service { get; }
+        public PatreonIntegration PremiumService { get; }
 
-        [Command("BanTest")]
+        [Command("AddPremiumRole", RunMode = RunMode.Sync)]
+        public async Task AddRoleAsync(SocketRole role, int maxCount)
+        {
+            var config = PremiumService.GetConfig();
+            config.GuildId = Context.Guild.Id;
+            config.Roles.Add(role.Id, new PatreonIntegration.PatreonConfig.ELORole
+            {
+                RoleId = role.Id,
+                MaxRegistrationCount = maxCount
+            });
+            PremiumService.SaveConfig(config);
+            await ReplyAsync("Done.");
+        }
+
+        [Command("SetRegistrationCounts", RunMode = RunMode.Async)]
+        public async Task SetCounts()
+        {
+            Service.UpdateCompetitionSetups();
+            await ReplyAsync("Running... This will not send a message upon completion.");
+        }
+
+        [Command("BanTest", RunMode = RunMode.Sync)]
         public async Task BanTest()
         {
             if (!Context.User.IsRegistered(Service, out var player))

@@ -7,6 +7,7 @@ using RavenBOT.Common.Interfaces;
 using RavenBOT.ELO.Modules.Models;
 using System;
 using RavenBOT.Common.Interfaces.Database;
+using System.Threading;
 
 namespace RavenBOT.ELO.Modules.Methods
 {
@@ -17,6 +18,8 @@ namespace RavenBOT.ELO.Modules.Methods
         {
             Database = database;
             Client = client;
+            //Due in 1 minute, repeat every 6 hours
+            CompetitionUpdateTimer = new Timer(UpdateCompetitionSetups, null, 60000, 1000 * 60 * 60 * 6);
         }
 
         //TODO: Hook channel deleted event to automatically delete lobbies

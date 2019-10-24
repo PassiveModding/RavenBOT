@@ -5,6 +5,7 @@ using Discord.Commands;
 using RavenBOT.Common;
 using RavenBOT.ELO.Modules.Methods;
 using RavenBOT.ELO.Modules.Models;
+using RavenBOT.ELO.Modules.Premium;
 
 namespace RavenBOT.ELO.Modules.Modules
 {
@@ -14,11 +15,25 @@ namespace RavenBOT.ELO.Modules.Modules
     {
         public ELOService Service { get; }
         public GuildService Prefix { get; }
+        public PatreonIntegration PatreonIntegration { get; }
 
-        public CompetitionSetup(ELOService service, GuildService prefix)
+        public CompetitionSetup(ELOService service, GuildService prefix, PatreonIntegration patreonIntegration)
         {
             this.Prefix = prefix;
+            PatreonIntegration = patreonIntegration;
             Service = service;
+        }
+
+        [Command("ClaimPremium")]
+        public async Task ClaimPremiumAsync()
+        {
+            await PatreonIntegration.Claim(Context);
+        }
+
+        [Command("RegistrationLimit")]
+        public async Task GetRegisterLimit()
+        {
+            await ReplyAsync($"Current Limit is a maximum of: {PatreonIntegration.GetRegistrationLimit(Context)}");
         }
 
         [Command("CompetitionInfo")]

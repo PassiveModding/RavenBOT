@@ -112,6 +112,8 @@ namespace RavenBOT.ELO.Modules.Modules
 
             //Remove user ranks, register role and nickname
             Service.RemovePlayer(player);
+            competition.RegistrationCount--;
+            Service.SaveCompetition(competition);
 
             if (user.Hierarchy < Context.Guild.CurrentUser.Hierarchy)
             {

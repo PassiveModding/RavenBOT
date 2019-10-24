@@ -6,6 +6,7 @@ using Discord.WebSocket;
 using RavenBOT.Common;
 using RavenBOT.ELO.Modules.Methods;
 using RavenBOT.ELO.Modules.Models;
+using RavenBOT.ELO.Modules.Premium;
 
 namespace RavenBOT.ELO.Modules.Modules
 {
@@ -13,10 +14,12 @@ namespace RavenBOT.ELO.Modules.Modules
     public class UserCommands : ReactiveBase
     {
         public ELOService Service { get; }
+        public PatreonIntegration Premium { get; }
 
-        public UserCommands(ELOService service)
+        public UserCommands(ELOService service, PatreonIntegration prem)
         {
             Service = service;
+            Premium = prem;
         }
 
         [Command("Register", RunMode = RunMode.Sync)]
@@ -28,9 +31,7 @@ namespace RavenBOT.ELO.Modules.Modules
             {
                 name = Context.User.Username;
             }
-
-            //TODO: Add precondition for premium  
-            
+          
             var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
             if (Context.User.IsRegistered(Service, out var player))
             {
@@ -42,7 +43,14 @@ namespace RavenBOT.ELO.Modules.Modules
             }
             else
             {
+                var limit = Premium.GetRegistrationLimit(Context);
+                if (limit < competition.RegistrationCount)
+                {
+                    await ReplyAsync($"This server has exceeded the maximum registration count of {limit}, it must be upgraded to premium to allow additional registrations");
+                }
                 player = Service.CreatePlayer(Context.Guild.Id, Context.User.Id, name);
+                competition.RegistrationCount++;
+                Service.SaveCompetition(competition);
             }
 
             player.DisplayName = name;
