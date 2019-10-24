@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using RavenBOT.Common;
 using RavenBOT.ELO.Modules.Methods;
 using RavenBOT.ELO.Modules.Models;
+using static RavenBOT.ELO.Modules.Models.GameResult;
 
 namespace RavenBOT.ELO.Modules.Modules
 {
@@ -132,13 +133,13 @@ namespace RavenBOT.ELO.Modules.Modules
                 {
                     //team1 win
                     Service.SaveGame(game);
-                    await GameAsync(gameNumber, 1, lobbyChannel, "Decided by vote.");
+                    await GameAsync(gameNumber, TeamSelection.team1, lobbyChannel, "Decided by vote.");
                 }
                 else if (team2WinCount == game.Votes.Count)
                 {
                     //team2 win
                     Service.SaveGame(game);
-                    await GameAsync(gameNumber, 2, lobbyChannel, "Decided by vote.");
+                    await GameAsync(gameNumber, TeamSelection.team2, lobbyChannel, "Decided by vote.");
                 }
                 else if (drawCount == game.Votes.Count)
                 {
@@ -501,22 +502,24 @@ namespace RavenBOT.ELO.Modules.Modules
         [Command("Game", RunMode = RunMode.Sync)]
         [Alias("g")]
         [Preconditions.RequireModerator]
-        public async Task GameAsync(SocketTextChannel lobbyChannel, int gameNumber, int winningTeamNumber, [Remainder]string comment = null)
+        public async Task GameAsync(SocketTextChannel lobbyChannel, int gameNumber, TeamSelection winning_team, [Remainder]string comment = null)
         {
-            await GameAsync(winningTeamNumber, gameNumber, lobbyChannel, comment);
+            await GameAsync(gameNumber, winning_team, lobbyChannel, comment);
         }
 
         [Command("Game", RunMode = RunMode.Sync)]
         [Alias("g")]
         [Preconditions.RequireModerator]
-        public async Task GameAsync(int gameNumber, int winningTeamNumber, SocketTextChannel lobbyChannel = null, [Remainder]string comment = null)
+        public async Task GameAsync(int gameNumber, TeamSelection winning_team, SocketTextChannel lobbyChannel = null, [Remainder]string comment = null)
         {
-            //TODO: Needs a way of cancelling games and calling draws
-            if (winningTeamNumber != 1 && winningTeamNumber != 2)
+            //Not sure if this is needed due to inclusion of TeamSelection now.
+            /*
+            if (winning_team != 1 && winning_team != 2)
             {
                 await ReplyAsync("Team number must be either number `1` or `2`");
                 return;
             }
+            */
 
             if (lobbyChannel == null)
             {
@@ -550,7 +553,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
             List < (Player, int, Rank, RankChangeState, Rank) > winList;
             List < (Player, int, Rank, RankChangeState, Rank) > loseList;
-            if (winningTeamNumber == 1)
+            if (winning_team == TeamSelection.team1)
             {
                 winList = UpdateTeamScoresAsync(competition, true, game.Team1.Players);
                 loseList = UpdateTeamScoresAsync(competition, false, game.Team2.Players);
@@ -638,7 +641,7 @@ namespace RavenBOT.ELO.Modules.Modules
             
             game.GameState = GameResult.State.Decided;
             game.ScoreUpdates = allUsers.ToDictionary(x => x.Item1.UserId, y => y.Item2);
-            game.WinningTeam = winningTeamNumber;
+            game.WinningTeam = (int)winning_team;
             game.Comment = comment;
             game.Submitter = Context.User.Id;
             Service.SaveGame(game);
@@ -646,7 +649,7 @@ namespace RavenBOT.ELO.Modules.Modules
             var winField = new EmbedFieldBuilder
             {
                 //TODO: Is this necessary to show which team the winning team was?
-                Name = $"Winning Team, Team{winningTeamNumber}",
+                Name = $"Winning Team, Team{(int)winning_team}",
                 Value = GetResponseContent(winList).FixLength(1023)
             };
             var loseField = new EmbedFieldBuilder
