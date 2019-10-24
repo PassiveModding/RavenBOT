@@ -58,6 +58,24 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync($"Premium Enabled: {config.Enabled}");
         }
 
+        [Command("SetPatreonUrl", RunMode = RunMode.Async)]
+        public async Task SetPatreonUrl([Remainder]string url)
+        {
+            var config = PremiumService.GetConfig();
+            config.PageUrl = url;
+            PremiumService.SaveConfig(config);
+            await ReplyAsync($"Set.");
+        }
+
+        [Command("SetPatreonGuildInvite", RunMode = RunMode.Async)]
+        public async Task SetPatreonGuildInvite([Remainder]string url)
+        {
+            var config = PremiumService.GetConfig();
+            config.ServerInvite = url;
+            PremiumService.SaveConfig(config);
+            await ReplyAsync($"Set.");
+        }
+
         [Command("BanTest", RunMode = RunMode.Sync)]
         public async Task BanTest()
         {

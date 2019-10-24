@@ -90,7 +90,7 @@ namespace RavenBOT.ELO.Modules.Premium
             var patreonUser = patreonGuild.GetUser(context.User.Id);
             if (patreonUser == null)
             {
-                await context.Channel.SendMessageAsync("You must join the premium server and get a patreon role before being able to claim an upgrade.");
+                await context.Channel.SendMessageAsync($"You must join the premium server {config.ServerInvite} and get a patreon role {config.PageUrl} before being able to claim an upgrade.");
                 return;
             }
 
@@ -180,7 +180,8 @@ namespace RavenBOT.ELO.Modules.Premium
             public ulong GuildId { get; set; }
             public int DefaultRegistrationLimit { get; set; } = 20;
             public bool Enabled { get; set; } = true;
-
+            public string ServerInvite { get; set; }
+            public string PageUrl { get; set; }
         }
 
         public class ClaimProfile
