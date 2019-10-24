@@ -47,6 +47,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 if (limit < competition.RegistrationCount)
                 {
                     await ReplyAsync($"This server has exceeded the maximum registration count of {limit}, it must be upgraded to premium to allow additional registrations");
+                    return;
                 }
                 player = Service.CreatePlayer(Context.Guild.Id, Context.User.Id, name);
                 competition.RegistrationCount++;
