@@ -200,6 +200,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 }
 
                 team.Players.Add(team.Captain);
+                offTeam.Players.Add(offTeam.Captain);
                 team.Players.Add(users.First().Id);
                 game.Picks++;
                 PickResponse = $"{MentionUtils.MentionUser(offTeam.Captain)} can select **2** players for the next pick.";
