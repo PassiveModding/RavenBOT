@@ -23,7 +23,7 @@ namespace RavenBOT.Common
 
             //if the user profile is non-existent, create it and add it to the database
             uProfile = new TimedUserProfile(type, userId);
-            Store.Store(uProfile);
+            Store.Store(uProfile, $"TimedProfile-{type}-{userId}");
             return uProfile;
         }
 
@@ -35,13 +35,24 @@ namespace RavenBOT.Common
 
             //if the user profile is non-existent, create it and add it to the database
             uProfile = new QuantifiableUserProfile(type, userId);
-            Store.Store(uProfile);
+            Store.Store(uProfile, $"QuantifiableProfile-{type}-{userId}");
             return uProfile;
         }
 
         public void SaveUser(IUserProfile profile)
         {
-            Store.Store(profile);
+            if (profile is QuantifiableUserProfile qProfile)
+            {
+                Store.Store(profile, $"QuantifiableProfile-{qProfile.ProfileType}-{qProfile.UserId}");
+            }
+            else if (profile is TimedUserProfile tProfile)
+            {
+                Store.Store(profile, $"TimedProfile-{tProfile.ProfileType}-{tProfile.UserId}");
+            }
+            else
+            {
+                throw new NotImplementedException("Unsupported profile type.");
+            }
         }
 
         public enum RedemptionResult
@@ -67,8 +78,8 @@ namespace RavenBOT.Common
             }
 
             profile.RedeemLicense(license);
-            Store.Store(profile);
-            Store.Store(license);
+            Store.Store(profile, $"TimedProfile-{profile.ProfileType}-{profile.UserId}");
+            Store.Store(license, $"TimedLicense-{profile.ProfileType}-{key}");
             return RedemptionResult.Success;
         }
 
@@ -87,8 +98,8 @@ namespace RavenBOT.Common
             }
 
             profile.RedeemLicense(license);
-            Store.Store(profile);
-            Store.Store(license);
+            Store.Store(profile, $"QuantifiableProfile-{profile.ProfileType}-{profile.UserId}");
+            Store.Store(license, $"QuantifiableLicense-{profile.ProfileType}-{key}");
             return RedemptionResult.Success;
         }
 
@@ -112,7 +123,7 @@ namespace RavenBOT.Common
                 }
             }
 
-            Store.StoreMany(newLicenses);
+            Store.StoreMany(newLicenses, x => $"QuantifiableLicense-{x.LicenseType}-{x.Key}");
 
             return newLicenses;
         }
@@ -138,7 +149,7 @@ namespace RavenBOT.Common
                 }
             }
 
-            Store.StoreMany(newLicenses);
+            Store.StoreMany(newLicenses, x => $"TimedLicense-{x.LicenseType}-{x.Key}");
 
             return newLicenses;
         }
@@ -189,7 +200,7 @@ namespace RavenBOT.Common
 
             public int TotalUsed { get; set; }
 
-            public Dictionary<long, string> History { get; set; }
+            public Dictionary<long, string> History { get; set; } = new Dictionary<long, string>();
             
 
             public void UpdateHistory(string info)
