@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using ELO.Models;
 using RavenBOT.Common.Interfaces.Database;
@@ -20,6 +21,48 @@ namespace RavenBOT.ELO.Modules.Methods.Migrations
             RavenDatabase.ConfigPath = configPath;
             this.currentDatabase = currentDatabase;
             Legacy = legacy;
+        }
+
+        public TokenModel GetTokenModel()
+        {
+            var model = oldDatabase.Load<TokenModel>("tokens");
+            return model;
+        }
+
+        public void RedeemToken(ulong guildId, string token)
+        {
+            var model = GetTokenModel();
+            var match = model.TokenList.FirstOrDefault(x => x.Token == token);
+            if (match == null) return;
+
+            var configSave = Legacy.GetPremiumConfig(guildId);
+            configSave.ExpiryDate.Add(TimeSpan.FromDays(match.Days));
+            Legacy.SaveConfig(configSave);
+            model.TokenList.Remove(match);
+            SaveTokenModel(model);
+        }
+
+        public void SaveTokenModel(TokenModel model)
+        {
+            oldDatabase.Store(model, "tokens");
+        }
+
+        public class TokenModel
+        {
+            public List<TokenClass> TokenList { get; set; } = new List<TokenClass>();
+            
+            public class TokenClass
+            {
+                /// <summary>
+                ///     Gets or sets the Token
+                /// </summary>
+                public string Token { get; set; }
+
+                /// <summary>
+                ///     Gets or sets the days till expires
+                /// </summary>
+                public int Days { get; set; }
+            }
         }
 
         public LegacyIntegration Legacy { get; }
@@ -57,7 +100,7 @@ namespace RavenBOT.ELO.Modules.Methods.Migrations
                     newComp.AdminRole = config.Settings.Moderation.AdminRoles.FirstOrDefault();
                     newComp.ModeratorRole = config.Settings.Moderation.ModRoles.FirstOrDefault();
                     //TODO: Remove user on afk   
-                    
+
                     if (config.Settings.Premium.Expiry > DateTime.UtcNow)
                     {
                         Legacy.SaveConfig(new LegacyIntegration.LegacyPremium
