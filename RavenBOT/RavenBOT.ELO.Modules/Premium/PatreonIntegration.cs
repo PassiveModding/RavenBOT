@@ -40,6 +40,8 @@ namespace RavenBOT.ELO.Modules.Premium
         public int GetRegistrationLimit(ShardedCommandContext context)
         {
             var config = GetConfig();
+            if (!config.Enabled) return int.MaxValue;
+
             var guildUpgrade = Database.Load<ClaimProfile>(ClaimProfile.DocumentName(context.Guild.Id));
             if (guildUpgrade == null) return config.DefaultRegistrationLimit;
 
@@ -54,10 +56,12 @@ namespace RavenBOT.ELO.Modules.Premium
         }
 
         public async Task Claim(ShardedCommandContext context)
-        {
+        {            
             //Assumed context, claim is being applied to the server where it's being claimed in
             //TODO: Check if this fetches user from cache.
             var config = GetConfig();
+            if (!config.Enabled) return;
+
             var patreonGuild = context.Client.GetGuild(config.GuildId);
             if (patreonGuild == null)
             {
@@ -157,6 +161,8 @@ namespace RavenBOT.ELO.Modules.Premium
             //public ulong BaseRole { get; set; }
             public ulong GuildId { get; set; }
             public int DefaultRegistrationLimit { get; set; } = 20;
+            public bool Enabled { get; set; } = true;
+
         }
 
         public class ClaimProfile
