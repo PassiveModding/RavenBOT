@@ -369,5 +369,15 @@ namespace RavenBOT.ELO.Modules.Modules
             Service.SaveLobby(lobby);
             await ReplyAsync($"DM when games are ready: {lobby.DmUsersOnGameReady}");
         }
+
+        [Command("SetDescription")]
+        public async Task SetDescriptionAsync([Remainder]string description)
+        {
+            if (!Context.Channel.IsLobby(Service, out var lobby)) return;
+
+            lobby.Description = description;
+            Service.SaveLobby(lobby);
+            await ReplyAsync("Lobby description set.");
+        }
     }
 }
