@@ -132,13 +132,13 @@ namespace RavenBOT.ELO.Modules.Modules
                 {
                     //team1 win
                     Service.SaveGame(game);
-                    await GameAsync(1, gameNumber, lobbyChannel, "Decided by vote.");
+                    await GameAsync(gameNumber, 1, lobbyChannel, "Decided by vote.");
                 }
                 else if (team2WinCount == game.Votes.Count)
                 {
                     //team2 win
                     Service.SaveGame(game);
-                    await GameAsync(2, gameNumber, lobbyChannel, "Decided by vote.");
+                    await GameAsync(gameNumber, 2, lobbyChannel, "Decided by vote.");
                 }
                 else if (drawCount == game.Votes.Count)
                 {
@@ -501,7 +501,7 @@ namespace RavenBOT.ELO.Modules.Modules
         [Command("Game", RunMode = RunMode.Sync)]
         [Alias("g")]
         [Preconditions.RequireModerator]
-        public async Task GameAsync(SocketTextChannel lobbyChannel, int winningTeamNumber, int gameNumber, [Remainder]string comment = null)
+        public async Task GameAsync(SocketTextChannel lobbyChannel, int gameNumber, int winningTeamNumber, [Remainder]string comment = null)
         {
             await GameAsync(winningTeamNumber, gameNumber, lobbyChannel, comment);
         }
@@ -509,7 +509,7 @@ namespace RavenBOT.ELO.Modules.Modules
         [Command("Game", RunMode = RunMode.Sync)]
         [Alias("g")]
         [Preconditions.RequireModerator]
-        public async Task GameAsync(int winningTeamNumber, int gameNumber, SocketTextChannel lobbyChannel = null, [Remainder]string comment = null)
+        public async Task GameAsync(int gameNumber, int winningTeamNumber, SocketTextChannel lobbyChannel = null, [Remainder]string comment = null)
         {
             //TODO: Needs a way of cancelling games and calling draws
             if (winningTeamNumber != 1 && winningTeamNumber != 2)
