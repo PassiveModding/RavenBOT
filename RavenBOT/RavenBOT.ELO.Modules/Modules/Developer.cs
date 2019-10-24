@@ -7,6 +7,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using RavenBOT.Common;
 using RavenBOT.ELO.Modules.Methods;
+using RavenBOT.ELO.Modules.Methods.Migrations;
 using RavenBOT.ELO.Modules.Models;
 using RavenBOT.ELO.Modules.Premium;
 
@@ -16,17 +17,30 @@ namespace RavenBOT.ELO.Modules.Modules
     [RavenRequireOwner]
     public class Developer : ReactiveBase
     {
-        public Developer(IDatabase database, Random random, ELOService service, PatreonIntegration prem)
+        public Developer(IDatabase database, Random random, ELOService service, PatreonIntegration prem, ELOMigrator migrator)
         {
             Database = database;
             Random = random;
             Service = service;
             PremiumService = prem;
+            Migrator = migrator;
         }
         public IDatabase Database { get; }
         public Random Random { get; }
         public ELOService Service { get; }
         public PatreonIntegration PremiumService { get; }
+        public ELOMigrator Migrator { get; }
+
+        [Command("RunMigrationTask", RunMode = RunMode.Sync)]
+        public async Task RunMigrationTaskAsync(SocketRole role, int maxCount)
+        {
+            await ReplyAsync("Running migration.");
+            var _ = Task.Run(async () => 
+            {
+                Migrator.RunMigration();
+                await ReplyAsync("Done.");
+            });
+        }
 
         [Command("AddPremiumRole", RunMode = RunMode.Sync)]
         public async Task AddRoleAsync(SocketRole role, int maxCount)
