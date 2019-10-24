@@ -3,21 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using Discord.WebSocket;
 using RavenBOT.Common;
-using RavenBOT.Common.Interfaces;
 using RavenBOT.ELO.Modules.Models;
 using System;
-using RavenBOT.Common.Interfaces.Database;
 using System.Threading;
+using RavenBOT.ELO.Modules.Premium;
 
 namespace RavenBOT.ELO.Modules.Methods
 {
     public partial class ELOService : IServiceable
     {
         //TODO: Event hook for player joins/updates?
-        public ELOService(IDatabase database, DiscordShardedClient client)
+        public ELOService(IDatabase database, DiscordShardedClient client, PatreonIntegration premium)
         {
             Database = database;
             Client = client;
+            Premium = premium;
+            Client.ReactionAdded += ReactiveRegistration;
             //Due in 1 minute, repeat every 6 hours
             CompetitionUpdateTimer = new Timer(UpdateCompetitionSetups, null, 60000, 1000 * 60 * 60 * 6);
         }

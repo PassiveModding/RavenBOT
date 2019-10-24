@@ -1,7 +1,10 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Discord;
+using Discord.WebSocket;
 using RavenBOT.ELO.Modules.Models;
+using RavenBOT.ELO.Modules.Premium;
 
 namespace RavenBOT.ELO.Modules.Methods
 {
@@ -22,5 +25,64 @@ namespace RavenBOT.ELO.Modules.Methods
                 }
             });
         }
+        
+        public readonly Emoji registrationConfirmEmoji = new Emoji("✅");
+        public class ReactiveRegistrationMessage
+        {
+            public static string DocumentName(ulong guildId)
+            {
+                return $"ELORegisterMessage-{guildId}";
+            }
+
+            public ulong GuildId { get; set; }
+            public ulong MessageId { get; set; }
+        }
+
+        public ReactiveRegistrationMessage GetReactiveRegistrationMessage(ulong guildId)
+        {
+            return Database.Load<ReactiveRegistrationMessage>(ReactiveRegistrationMessage.DocumentName(guildId));
+        }
+        public void SaveReactiveRegistrationMessage(ReactiveRegistrationMessage config)
+        {
+            Database.Store(config, ReactiveRegistrationMessage.DocumentName(config.GuildId));
+        }
+
+        private async Task ReactiveRegistration(Cacheable<IUserMessage, ulong> messageCache, ISocketMessageChannel channel, SocketReaction reaction)
+        {            
+            if (reaction.Emote.Name != registrationConfirmEmoji.Name) return;
+            if (!reaction.User.IsSpecified) return;
+            if (!(channel is SocketTextChannel guildChannel)) return;
+            var user = reaction.User.Value;
+            if (user.IsBot || user.IsWebhook) return;
+            var config = Database.Load<ReactiveRegistrationMessage>(ReactiveRegistrationMessage.DocumentName(guildChannel.Guild.Id));
+            if (config == null) return;
+            if (messageCache.Id != config.MessageId) return;
+
+            var competition = GetOrCreateCompetition(guildChannel.Guild.Id);
+            if (user.IsRegistered(this, out var player))
+            {
+                return;
+            }
+
+            var limit = Premium.GetRegistrationLimit(Client, guildChannel.Guild);
+            if (limit < competition.RegistrationCount)
+            {
+                await channel.SendMessageAsync($"{user.Mention} - This server has exceeded the maximum registration count of {limit}, it must be upgraded to premium to allow additional registrations");
+                return;
+            }
+            player = CreatePlayer(guildChannel.Guild.Id, user.Id, user.Username);
+            competition.RegistrationCount++;
+            SaveCompetition(competition);
+
+            var responses = await UpdateUserAsync(competition, player, user as SocketGuildUser);
+
+            await guildChannel.SendMessageAsync($"{user.Mention} - " + competition.FormatRegisterMessage(player));
+            if (responses.Count > 0)
+            {
+                await guildChannel.SendMessageAsync($"{user.Mention} - " + string.Join("\n", responses));
+            }
+        }
+
+        public PatreonIntegration Premium { get; }
     }
 }

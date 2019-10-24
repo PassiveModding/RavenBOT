@@ -336,5 +336,22 @@ namespace RavenBOT.ELO.Modules.Modules
             Service.SaveCompetition(competition);
             await ReplyAsync($"Update Nicknames: {competition.UpdateNames}");
         }
+
+        
+        [Command("CreateReactionRegistration", RunMode = RunMode.Sync)]
+        public async Task CreateReactAsync([Remainder]string message = null)
+        {
+            var config = Service.GetReactiveRegistrationMessage(Context.Guild.Id);
+            if (config == null)
+            {
+                config = new ELOService.ReactiveRegistrationMessage();
+                config.GuildId = Context.Guild.Id;
+            }
+
+            var response = await SimpleEmbedAsync(message);
+            config.MessageId = response.Id;
+            Service.SaveReactiveRegistrationMessage(config);
+            await response.AddReactionAsync(Service.registrationConfirmEmoji);
+        }
     }
 }
