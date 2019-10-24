@@ -37,15 +37,15 @@ namespace RavenBOT.ELO.Modules.Premium
             return userRole;
         }
 
-        public int GetRegistrationLimit(ShardedCommandContext context)
+        public int GetRegistrationLimit(DiscordShardedClient client, SocketGuild guild)
         {
             var config = GetConfig();
             if (!config.Enabled) return int.MaxValue;
 
-            var guildUpgrade = Database.Load<ClaimProfile>(ClaimProfile.DocumentName(context.Guild.Id));
+            var guildUpgrade = Database.Load<ClaimProfile>(ClaimProfile.DocumentName(guild.Id));
             if (guildUpgrade == null) return config.DefaultRegistrationLimit;
 
-            var patreonGuild = context.Client.GetGuild(config.GuildId); 
+            var patreonGuild = client.GetGuild(config.GuildId); 
             var patreonUser = patreonGuild?.GetUser(guildUpgrade.UserId);
             if (patreonUser == null) return config.DefaultRegistrationLimit;
 
@@ -53,6 +53,11 @@ namespace RavenBOT.ELO.Modules.Premium
             if (patreonRole.Value == null) return config.DefaultRegistrationLimit;
 
             return patreonRole.Value.MaxRegistrationCount;
+        }
+
+        public int GetRegistrationLimit(ShardedCommandContext context)
+        {
+            return GetRegistrationLimit(context.Client, context.Guild);
         }
 
         public async Task Claim(ShardedCommandContext context)
