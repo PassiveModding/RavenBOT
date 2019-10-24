@@ -22,6 +22,7 @@ namespace RavenBOT.ELO.Modules.Models
 
         public ulong GuildId { get; set; }
         public ulong ChannelId { get; set; }
+        public string Description { get; set; }
 
         public ulong GameReadyAnnouncementChannel { get; set; }
 
