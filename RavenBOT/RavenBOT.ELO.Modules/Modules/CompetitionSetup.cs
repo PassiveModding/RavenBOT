@@ -31,12 +31,14 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("ClaimPremium", RunMode = RunMode.Sync)]
+        [Summary("Claim a patreon premium subscription")]
         public async Task ClaimPremiumAsync()
         {
             await PatreonIntegration.Claim(Context);
         }
 
         [Command("RedeemLegacyToken", RunMode = RunMode.Sync)]
+        [Summary("Redeem a 16 digit token for the old version of ELO")]
         public async Task RedeemLegacyTokenAsync([Remainder]string token = null)
         {
             if (token == null)
@@ -56,6 +58,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("LegacyExpiration", RunMode = RunMode.Sync)]
+        [Summary("Displays the expiry date of any legacy subscription")]
         public async Task LegacyExpirationAsync()
         {
             var config = Legacy.GetPremiumConfig(Context.Guild.Id);
@@ -77,27 +80,31 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("RegistrationLimit", RunMode = RunMode.Async)]
+        [Summary("Displays the maximum amount of registrations for the server")]
         public async Task GetRegisterLimit()
         {
-            await ReplyAsync($"Current Limit is a maximum of: {PatreonIntegration.GetRegistrationLimit(Context)}");
+            await ReplyAsync($"Current registration limit is a maximum of: {PatreonIntegration.GetRegistrationLimit(Context)}");
         }
 
         [Command("CompetitionInfo", RunMode = RunMode.Async)]
         [Alias("CompetitionSettings", "GameSettings")]
+        [Summary("Displays information about the current servers competition settings")]
         public async Task CompetitionInfo()
         {
             var comp = Service.GetOrCreateCompetition(Context.Guild.Id);
-            var infoStr = $"**Register Role:** {MentionUtils.MentionRole(comp.RegisteredRankId)}\n" +
-                        $"**Admin Role:** {comp.AdminRole}\n" +
-                        $"**Moderator Role:** {MentionUtils.MentionRole(comp.ModeratorRole)}\n" +
+            var infoStr = $"**Register Role:** {(comp.RegisteredRankId == 0 ? "N/A" : MentionUtils.MentionRole(comp.RegisteredRankId))}\n" +
+                        $"**Admin Role:** {(comp.AdminRole == 0 ? "N/A" : MentionUtils.MentionRole(comp.AdminRole))}\n" +
+                        $"**Moderator Role:** {(comp.ModeratorRole == 0 ? "N/A" : MentionUtils.MentionRole(comp.ModeratorRole))}\n" +
                         $"**Update Nicknames:** {comp.UpdateNames}\n" +
                         $"**Nickname Format:** {comp.NameFormat}\n" +
                         $"**Block Multiqueuing:** {comp.BlockMultiQueueing}\n" +
                         $"**Allow Negative Score:** {comp.AllowNegativeScore}\n" +
                         $"**Default Loss Amount:** -{comp.DefaultLossModifier}\n" +
-                        $"**Default Win Amount:** {comp.DefaultWinModifier}\n" +
+                        $"**Default Win Amount:** +{comp.DefaultWinModifier}\n" +
                         $"**Allow Self Rename:** {comp.AllowSelfRename}\n" +
                         $"**Allow Re-registering:** {comp.AllowReRegister}\n" +
+                        $"**Registered User Count:** {comp.RegistrationCount}\n" +
+                        $"**Manual Game Count:** {comp.ManualGameCounter}\n" +
                         $"For rank info use the `ranks` command";
             await SimpleEmbedAsync(infoStr);
         }
@@ -142,6 +149,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
         [Command("SetRegisterMessage", RunMode = RunMode.Sync)]
         [Alias("Set RegisterMessage", "RegisterMessage")]
+        [Summary("Sets the message shown to users when they register")]
         public async Task SetRegisterMessageAsync([Remainder] string message = null)
         {
             if (message == null)
@@ -163,6 +171,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
         [Command("RegisterMessageFormats", RunMode = RunMode.Async)]
         [Alias("RegisterFormats")]
+        [Summary("Shows replacements that can be used in the register message")]
         public async Task ShowRegistrationFormatsAsync()
         {
             var response = "**Register Message Formats**\n" + // Use Title
@@ -181,6 +190,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
         [Command("SetNicknameFormat", RunMode = RunMode.Sync)]
         [Alias("Set NicknameFormat", "NicknameFormat", "NameFormat", "SetNameFormat")]
+        [Summary("Sets how user nicknames are formatted")]
         public async Task SetNicknameFormatAsync([Remainder] string format)
         {
             var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
@@ -198,6 +208,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
         [Command("NicknameFormats", RunMode = RunMode.Async)]
         [Alias("NameFormats")]
+        [Summary("Shows replacements that can be used in the user nickname formats")]
         public async Task ShowNicknameFormatsAsync()
         {
             var response = "**NickNameFormats**\n" + // Use Title
@@ -217,6 +228,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
         [Command("AddRank", RunMode = RunMode.Sync)]
         [Alias("Add Rank", "UpdateRank")]
+        [Summary("Adds a new rank with the specified amount of points")]
         public async Task AddRank(IRole role, int points)
         {
             var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
@@ -232,6 +244,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
         [Command("AddRank", RunMode = RunMode.Sync)]
         [Alias("Add Rank", "UpdateRank")]
+        [Summary("Adds a new rank with the specified amount of points")]
         public async Task AddRank(int points, IRole role)
         {
             await AddRank(role, points);
@@ -239,6 +252,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
         [Command("RemoveRank", RunMode = RunMode.Sync)]
         [Alias("Remove Rank", "DelRank")]
+        [Summary("Removes a rank based of the role's id")]
         public async Task RemoveRank(ulong roleId)
         {
             var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
@@ -249,6 +263,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
         [Command("RemoveRank", RunMode = RunMode.Sync)]
         [Alias("Remove Rank", "DelRank")]
+        [Summary("Removes a rank")]
         public async Task RemoveRank(IRole role)
         {
             await RemoveRank(role.Id);
@@ -256,12 +271,13 @@ namespace RavenBOT.ELO.Modules.Modules
 
         [Command("AllowNegativeScore", RunMode = RunMode.Sync)]
         [Alias("AllowNegative")]
+        [Summary("Sets whether negative scores are allowed")]
         public async Task AllowNegativeAsync(bool? allowNegative = null)
         {
             var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
             if (allowNegative == null)
             {
-                await ReplyAsync($"Allow Negative Score: {competition.AllowNegativeScore}");
+                await ReplyAsync($"Current Allow Negative Score Setting: {competition.AllowNegativeScore}");
                 return;
             }
             competition.AllowNegativeScore = allowNegative.Value;
@@ -270,12 +286,13 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("AllowReRegister", RunMode = RunMode.Sync)]
+        [Summary("Sets whether users are allowed to run the register command multiple times")]
         public async Task AllowReRegisterAsync(bool? reRegister = null)
         {
             var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
             if (reRegister == null)
             {
-                await ReplyAsync($"Allow re-register: {competition.AllowReRegister}");
+                await ReplyAsync($"Current Allow re-register Setting: {competition.AllowReRegister}");
                 return;
             }
             competition.AllowReRegister = reRegister.Value;
@@ -284,12 +301,13 @@ namespace RavenBOT.ELO.Modules.Modules
         }
                 
         [Command("AllowSelfRename", RunMode = RunMode.Sync)]
+        [Summary("Sets whether users are allowed to use the rename command")]
         public async Task AllowSelfRenameAsync(bool? selfRename = null)
         {
             var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
             if (selfRename == null)
             {
-                await ReplyAsync($"Allow Self Rename: {competition.AllowSelfRename}");
+                await ReplyAsync($"Current Allow Self Rename Setting: {competition.AllowSelfRename}");
                 return;
             }
             competition.AllowSelfRename = selfRename.Value;
@@ -298,13 +316,14 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("DefaultWinModifier", RunMode = RunMode.Sync)]
+        [Summary("Sets the default amount of points users can earn when winning.")]
         public async Task CompWinModifier(int? amountToAdd = null)
         {
             var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
 
             if (!amountToAdd.HasValue)
             {
-                await ReplyAsync($"DefaultWinModifier: {competition.DefaultWinModifier}");
+                await ReplyAsync($"Current DefaultWinModifier Setting: {competition.DefaultWinModifier}");
                 return;
             }
             competition.DefaultWinModifier = amountToAdd.Value;
@@ -314,13 +333,14 @@ namespace RavenBOT.ELO.Modules.Modules
 
         
         [Command("DefaultLossModifier", RunMode = RunMode.Sync)]
+        [Summary("Sets the default amount of points users lose when the lose a game.")]
         public async Task CompLossModifier(int? amountToSubtract = null)
         {
             var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
             
             if (!amountToSubtract.HasValue)
             {
-                await ReplyAsync($"DefaultLossModifier: {competition.DefaultLossModifier}");
+                await ReplyAsync($"Current DefaultLossModifier Setting: {competition.DefaultLossModifier}");
                 return;
             }
             competition.DefaultLossModifier = amountToSubtract.Value;
@@ -329,6 +349,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("RankLossModifier", RunMode = RunMode.Sync)]
+        [Summary("Sets the amount of points lost for a user with the specified rank.")]
         public async Task RankLossModifier(IRole role, int? amountToSubtract = null)
         {
             var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
@@ -352,6 +373,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("RankWinModifier", RunMode = RunMode.Sync)]
+        [Summary("Sets the amount of points lost for a user with the specified rank.")]
         public async Task RankWinModifier(IRole role, int? amountToAdd = null)
         {
             var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
@@ -375,16 +397,23 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("UpdateNicknames", RunMode = RunMode.Sync)]
-        public async Task UpdateNicknames()
+        [Summary("Sets whether the bot will update user nicknames.")]
+        public async Task UpdateNicknames(bool? updateNicknames = null)
         {
             var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
-            competition.UpdateNames = !competition.UpdateNames;
+            if (updateNicknames == null)
+            {
+                await ReplyAsync($"Current Update Nicknames Setting: {competition.UpdateNames}");
+                return;
+            }
+            competition.UpdateNames = updateNicknames.Value;
             Service.SaveCompetition(competition);
             await ReplyAsync($"Update Nicknames: {competition.UpdateNames}");
         }
 
         
         [Command("CreateReactionRegistration", RunMode = RunMode.Sync)]
+        [Summary("Creates a message which users can react to in order to register")]
         public async Task CreateReactAsync([Remainder]string message = null)
         {
             var config = Service.GetReactiveRegistrationMessage(Context.Guild.Id);
