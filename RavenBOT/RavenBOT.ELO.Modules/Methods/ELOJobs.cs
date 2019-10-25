@@ -67,7 +67,12 @@ namespace RavenBOT.ELO.Modules.Methods
             var limit = Premium.GetRegistrationLimit(Client, guildChannel.Guild);
             if (limit < competition.RegistrationCount)
             {
-                await channel.SendMessageAsync($"{user.Mention} - This server has exceeded the maximum registration count of {limit}, it must be upgraded to premium to allow additional registrations");
+                var maxErrorMsg = await channel.SendMessageAsync($"{user.Mention} - This server has exceeded the maximum registration count of {limit}, it must be upgraded to premium to allow additional registrations");
+                var errTask = Task.Run(async () =>
+                {
+                    await Task.Delay(5000);
+                    await maxErrorMsg.DeleteAsync();
+                });
                 return;
             }
             player = CreatePlayer(guildChannel.Guild.Id, user.Id, user.Username);
@@ -76,11 +81,12 @@ namespace RavenBOT.ELO.Modules.Methods
 
             var responses = await UpdateUserAsync(competition, player, user as SocketGuildUser);
 
-            await guildChannel.SendMessageAsync($"{user.Mention} - " + competition.FormatRegisterMessage(player));
-            if (responses.Count > 0)
-            {
-                await guildChannel.SendMessageAsync($"{user.Mention} - " + string.Join("\n", responses));
-            }
+            var responseMsg = await guildChannel.SendMessageAsync($"{user.Mention} - " + competition.FormatRegisterMessage(player) + $"\n{string.Join("\n", responses)}");
+            var resTask = Task.Run(async () =>
+                {
+                    await Task.Delay(5000);
+                    await responseMsg.DeleteAsync();
+                });
         }
 
         public PatreonIntegration Premium { get; }
