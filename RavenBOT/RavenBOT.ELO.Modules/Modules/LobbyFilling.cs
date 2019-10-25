@@ -86,12 +86,12 @@ namespace RavenBOT.ELO.Modules.Modules
                     }
                     catch
                     {
-                        await ReplyAsync($"Added {CurrentPlayer.DisplayName} to queue. **[{CurrentLobby.Queue.Count}/{CurrentLobby.PlayersPerTeam*2}]**");
+                        await ReplyAsync($"Added {CurrentPlayer.GetDisplayNameSafe()} to queue. **[{CurrentLobby.Queue.Count}/{CurrentLobby.PlayersPerTeam*2}]**");
                     }
                 }
                 else
                 {
-                    await ReplyAsync($"Added {CurrentPlayer.DisplayName} to queue. **[{CurrentLobby.Queue.Count}/{CurrentLobby.PlayersPerTeam*2}]**");
+                    await ReplyAsync($"Added {CurrentPlayer.GetDisplayNameSafe()} to queue. **[{CurrentLobby.Queue.Count}/{CurrentLobby.PlayersPerTeam*2}]**");
                 }
             }
 
@@ -129,12 +129,12 @@ namespace RavenBOT.ELO.Modules.Modules
                     }
                     catch
                     {
-                        await ReplyAsync($"Removed {CurrentPlayer.DisplayName} from queue. **[{CurrentLobby.Queue.Count}/{CurrentLobby.PlayersPerTeam*2}]**");
+                        await ReplyAsync($"Removed {CurrentPlayer.GetDisplayNameSafe()} from queue. **[{CurrentLobby.Queue.Count}/{CurrentLobby.PlayersPerTeam*2}]**");
                     }
                 }
                 else
                 {
-                    await ReplyAsync($"Removed {CurrentPlayer.DisplayName} from queue. **[{CurrentLobby.Queue.Count}/{CurrentLobby.PlayersPerTeam*2}]**");
+                    await ReplyAsync($"Removed {CurrentPlayer.GetDisplayNameSafe()} from queue. **[{CurrentLobby.Queue.Count}/{CurrentLobby.PlayersPerTeam*2}]**");
                 }
             }
             else

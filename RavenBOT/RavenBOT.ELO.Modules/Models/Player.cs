@@ -17,11 +17,16 @@ namespace RavenBOT.ELO.Modules.Models
         /// <value></value>
         private string _DisplayName;
 
+        public string GetDisplayNameSafe()
+        {
+            return Discord.Format.Sanitize(_DisplayName);
+        }
+
         public string DisplayName
         {
             get
             {
-                return Discord.Format.Sanitize(_DisplayName);
+                return _DisplayName;
             }
             set
             {

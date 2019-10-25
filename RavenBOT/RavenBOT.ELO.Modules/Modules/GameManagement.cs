@@ -679,7 +679,7 @@ namespace RavenBOT.ELO.Modules.Modules
             {
                 if (player.Item4 == RankChangeState.None) 
                 {
-                    sb.AppendLine($"{player.Item1.DisplayName} **Points:** {player.Item1.Points} **Points Received:** {player.Item2}");
+                    sb.AppendLine($"{player.Item1.GetDisplayNameSafe()} **Points:** {player.Item1.Points} **Points Received:** {player.Item2}");
                     continue;
                 }
 
@@ -695,7 +695,7 @@ namespace RavenBOT.ELO.Modules.Modules
                     newRole = MentionUtils.MentionRole(player.Item5.RoleId);
                 }
 
-                sb.AppendLine($"{player.Item1.DisplayName} **Points:** {player.Item1.Points} **Points Received:** {player.Item2} Rank: {originalRole ?? "N.A"} => {newRole ?? "N/A"}");
+                sb.AppendLine($"{player.Item1.GetDisplayNameSafe()} **Points:** {player.Item1.Points} **Points Received:** {player.Item2} Rank: {originalRole ?? "N.A"} => {newRole ?? "N/A"}");
 
             }
 

@@ -33,7 +33,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
             if (player.NameLog.Any())
             {
-                await SimpleEmbedAsync($"Current: {player.DisplayName}\n" + string.Join("\n", player.NameLog.Select(x => 
+                await SimpleEmbedAsync($"Current: {player.GetDisplayNameSafe()}\n" + string.Join("\n", player.NameLog.Select(x => 
                 {
                     var time = new DateTime(x.Key);
                     return $"{time.ToString("dd MMM yyyy")} {time.ToShortTimeString()} - {x.Value}";
