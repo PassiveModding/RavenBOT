@@ -125,7 +125,9 @@ namespace RavenBOT.Handlers
                 {
                     Logger.Log($"{context.Message.Content}\n{result.Error}\n{result.ErrorReason}", new LogContext(context), LogSeverity.Error);
                     
-                    if (GuildService.GetConfig(context.Guild?.Id ?? 0)?.DisplayUnknownCommandResponse != true) return;
+                    var config = GuildService.GetConfig(context.Guild?.Id ?? 0);
+                    if (config != null && !config.DisplayUnknownCommandResponse) return;
+                    //if (GuildService.GetConfig(context.Guild?.Id ?? 0)?.DisplayUnknownCommandResponse != true) return;
 
                     //Since it is an error you can assume it's an unknown command as SearchResults will only return an error if not found.
                     var prefix = LocalManagementService.LastConfig.Developer ? LocalManagementService.LastConfig.DeveloperPrefix : GuildService.GetPrefix(context.Guild?.Id ?? 0);

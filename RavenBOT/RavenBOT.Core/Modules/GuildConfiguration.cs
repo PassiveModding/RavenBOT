@@ -30,7 +30,7 @@ namespace RavenBOT.Modules.Guild
         [Summary("Toggle the unknown command response message")]
         public async Task ToggleUnknownCommandAsync()
         {
-            var currentConfig = GuildService.GetConfig(Context.Guild.Id);
+            var currentConfig = GuildService.GetOrCreateConfig(Context.Guild.Id);
             currentConfig.DisplayUnknownCommandResponse = !currentConfig.DisplayUnknownCommandResponse;
             await ReplyAsync($"Ignore Unknown Command Responses: {currentConfig.DisplayUnknownCommandResponse}");
             GuildService.SaveConfig(currentConfig);
