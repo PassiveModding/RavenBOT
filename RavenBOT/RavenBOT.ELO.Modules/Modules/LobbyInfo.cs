@@ -103,7 +103,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 var mentionList = GetMentionList(GetUserList(Context.Guild, CurrentLobby.Queue));
                 var embed = new EmbedBuilder();
                 embed.Title = $"{Context.Channel.Name} [{CurrentLobby.Queue.Count}/{CurrentLobby.PlayersPerTeam * 2}]";
-                embed.Description = $"Game: #{CurrentLobby.CurrentGameCount}\n" +
+                embed.Description = $"Game: #{CurrentLobby.CurrentGameCount + 1}\n" +
                     string.Join("\n", mentionList);
                 await ReplyAsync("", false, embed.Build());
             }
