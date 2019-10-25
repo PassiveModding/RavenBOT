@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using ELO.Models;
 using RavenBOT.Common;
@@ -12,14 +13,10 @@ namespace RavenBOT.ELO.Modules.Methods.Migrations
     public class ELOMigrator : IServiceable
     {
         private IDatabase currentDatabase;
-        private RavenDatabase oldDatabase;
+        private RavenDatabase oldDatabase = null;
 
         public ELOMigrator(IDatabase currentDatabase, LegacyIntegration legacy)
         {
-            //This has been written with the face that old database is RDB and current is LiteDB.
-            this.oldDatabase = new RavenDatabase();
-            //ConfigPath is default for migrator.
-            //RavenDatabase.ConfigPath = configPath;
             this.currentDatabase = currentDatabase;
             Legacy = legacy;
         }
@@ -78,8 +75,24 @@ namespace RavenBOT.ELO.Modules.Methods.Migrations
 
         public LegacyIntegration Legacy { get; }
 
-        public void RunMigration()
+        public void RunMigration(string ravenDBConfig)
         {
+            if (oldDatabase == null)
+            {
+                if (File.Exists(ravenDBConfig))
+                {
+                    RavenDatabase.ConfigPath = ravenDBConfig;
+
+                    //This has been written with the face that old database is RDB and current is LiteDB.
+                    oldDatabase = new RavenDatabase();
+                    //ConfigPath is default for migrator.
+                }
+                else
+                {
+                    return;
+                }
+            }
+
             try
             {
 
@@ -127,6 +140,7 @@ namespace RavenBOT.ELO.Modules.Methods.Migrations
                                 newComp.BlockMultiQueueing = config.Settings.GameSettings.BlockMultiQueuing;
                                 newComp.AdminRole = config.Settings.Moderation.AdminRoles.FirstOrDefault();
                                 newComp.ModeratorRole = config.Settings.Moderation.ModRoles.FirstOrDefault();
+                                newComp.RegistrationCount = config.Users.Count;
                                 //TODO: Remove user on afk   
 
                                 if (config.Settings.Premium.Expiry > DateTime.UtcNow)
