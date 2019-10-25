@@ -25,6 +25,7 @@ namespace RavenBOT.ELO.Modules.Models
         public string Description { get; set; }
 
         public ulong GameReadyAnnouncementChannel { get; set; }
+        public bool MentionUsersInReadyAnnouncement { get; set; } = true;
 
         public ulong GameResultAnnouncementChannel { get; set; }
 

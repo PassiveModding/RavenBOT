@@ -118,7 +118,19 @@ namespace RavenBOT.ELO.Modules.Modules
                     var channel = Context.Guild.GetTextChannel(CurrentLobby.GameReadyAnnouncementChannel);
                     if (channel != null)
                     {
-                        await channel.SendMessageAsync(res.Item1, false, res.Item2.Build());
+                        if (CurrentLobby.MentionUsersInReadyAnnouncement)
+                        {
+                            await channel.SendMessageAsync(res.Item1, false, res.Item2.Build());
+                        }
+                        else
+                        {
+                            var res2 = Service.GetGameMessage(Context, game, $"Game #{game.GameId} Started", 
+                                ELOService.GameFlag.lobby,
+                                ELOService.GameFlag.map,
+                                ELOService.GameFlag.time,
+                                ELOService.GameFlag.gamestate);
+                            await channel.SendMessageAsync(res2.Item1, false, res2.Item2.Build());
+                        }
                     }
                 }
 

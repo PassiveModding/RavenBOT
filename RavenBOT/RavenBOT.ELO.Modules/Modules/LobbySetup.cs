@@ -420,5 +420,27 @@ namespace RavenBOT.ELO.Modules.Modules
                 await ReplyAsync("Channel is not a lobby.");
             }
         }
+
+        [Command("MentionUsersInReadyAnnouncement", RunMode = RunMode.Sync)]
+        [Summary("Sets whether players are pinged in the ready announcement.")]
+        [RavenRequireBotPermission(GuildPermission.ManageMessages)]
+        public async Task MentionUsersReadyAsync(bool? mentionUsers = null)
+        {
+            if (Context.Channel.IsLobby(Service, out var lobby))
+            {            
+                if (mentionUsers == null)
+                {
+                    await ReplyAsync($"Current Mention Users Setting: {lobby.MentionUsersInReadyAnnouncement}");
+                    return;
+                }
+                lobby.MentionUsersInReadyAnnouncement = mentionUsers.Value;
+                Service.SaveLobby(lobby);
+                await ReplyAsync($"Mention Users: {mentionUsers.Value}");
+            }
+            else
+            {
+                await ReplyAsync("Channel is not a lobby.");
+            }
+        }
     }
 }
