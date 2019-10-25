@@ -143,34 +143,40 @@ namespace RavenBOT.ELO.Modules.Modules
                 var losers = game.GetLosingTeam();
                 foreach (var player in winners.Item2.Players)
                 {
-                    if (!playerInfos.TryGetValue(player, out var playerMatch))
+                    if (game.ScoreUpdates.ContainsKey(player))
                     {
-                        playerMatch = (player, game.ScoreUpdates[player], 1, 0, 1);
-                    }
-                    else
-                    {
-                        playerMatch.Item2 += game.ScoreUpdates[player];
-                        playerMatch.Item3++;
-                        playerMatch.Item5++;
-                    }
+                        if (!playerInfos.TryGetValue(player, out var playerMatch))
+                        {
+                            playerMatch = (player, game.ScoreUpdates[player], 1, 0, 1);
+                        }
+                        else
+                        {
+                            playerMatch.Item2 += game.ScoreUpdates[player];
+                            playerMatch.Item3++;
+                            playerMatch.Item5++;
+                        }
 
-                    playerInfos[player] = playerMatch;
+                        playerInfos[player] = playerMatch;                       
+                    }
                 }
 
                 foreach (var player in losers.Item2.Players)
                 {
-                    if (!playerInfos.TryGetValue(player, out var playerMatch))
+                    if (game.ScoreUpdates.ContainsKey(player))
                     {
-                        playerMatch = (player, game.ScoreUpdates[player], 0, 1, 1);
-                    }
-                    else
-                    {
-                        playerMatch.Item2 += game.ScoreUpdates[player];
-                        playerMatch.Item4++;
-                        playerMatch.Item5++;
-                    }
+                        if (!playerInfos.TryGetValue(player, out var playerMatch))
+                        {
+                            playerMatch = (player, game.ScoreUpdates[player], 0, 1, 1);
+                        }
+                        else
+                        {
+                            playerMatch.Item2 += game.ScoreUpdates[player];
+                            playerMatch.Item4++;
+                            playerMatch.Item5++;
+                        }
 
-                    playerInfos[player] = playerMatch;
+                        playerInfos[player] = playerMatch;
+                    }
                 }
             }
 
