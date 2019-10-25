@@ -164,6 +164,11 @@ namespace RavenBOT.ELO.Modules.Methods.Migrations
                                     newLobby.GameReadyAnnouncementChannel = config.Settings.GameSettings.AnnouncementsChannel;
                                     newLobby.PlayersPerTeam = lobby.UserLimit / 2;
                                     newLobby.Description = lobby.Description;
+                                    if (lobby.Maps.Any())
+                                    {
+                                        newLobby.MapSelector = new MapSelector();
+                                        newLobby.MapSelector.Maps = lobby.Maps.ToHashSet();
+                                    }
                                     //TODO: Lobby requeue delay      
 
                                     currentDatabase.Store(newLobby, Lobby.DocumentName(config.ID, lobby.ChannelID));
