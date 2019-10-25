@@ -115,7 +115,7 @@ namespace RavenBOT.ELO.Modules.Modules
             }
 
             Service.SavePlayer(player);
-            await ReplyAsync($"Your profile has been renamed from {originalDisplayName} to {name}");            
+            await ReplyAsync($"Your profile has been renamed from {Discord.Format.Sanitize(originalDisplayName)} to {player.GetDisplayNameSafe()}");            
         }
     }
 }
