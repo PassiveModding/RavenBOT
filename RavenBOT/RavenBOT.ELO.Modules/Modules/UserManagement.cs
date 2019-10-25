@@ -22,7 +22,30 @@ namespace RavenBOT.ELO.Modules.Modules
 
         public ELOService Service { get; }
 
-        [Command("Bans")]
+        [Command("NameHistory", RunMode = RunMode.Async)]
+        public async Task NameHistoryAsync(SocketGuildUser user)
+        {
+            if (!user.IsRegistered(Service, out var player))
+            {
+                await ReplyAsync("Player is not registered.");
+                return;
+            }
+
+            if (player.NameLog.Any())
+            {
+                await SimpleEmbedAsync($"Current: {player.DisplayName}\n" + string.Join("\n", player.NameLog.Select(x => 
+                {
+                    var time = new DateTime(x.Key);
+                    return $"{time.ToString("dd MMM yyyy")} {time.ToShortTimeString()} - {x.Value}";
+                })));
+            }
+            else
+            {
+                await ReplyAsync("There are no name changes in history for this user.");
+            }
+        }
+
+        [Command("Bans", RunMode = RunMode.Async)]
         [Alias("Banlist")]
         public async Task Bans()
         {
