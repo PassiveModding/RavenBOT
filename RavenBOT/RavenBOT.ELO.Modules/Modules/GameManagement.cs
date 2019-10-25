@@ -500,15 +500,6 @@ namespace RavenBOT.ELO.Modules.Modules
 
         private async Task GameVoteAsync(int gameNumber, TeamSelection winning_team, SocketTextChannel lobbyChannel = null, [Remainder]string comment = null)
         {
-            //Not sure if this is needed due to inclusion of TeamSelection now.
-            /*
-            if (winning_team != 1 && winning_team != 2)
-            {
-                await ReplyAsync("Team number must be either number `1` or `2`");
-                return;
-            }
-            */
-
             if (lobbyChannel == null)
             {
                 //If no lobby is provided, assume that it is the current channel.
@@ -779,7 +770,7 @@ namespace RavenBOT.ELO.Modules.Modules
             {
                 if (player.Item4 == RankChangeState.None) 
                 {
-                    sb.AppendLine($"{player.Item1.GetDisplayNameSafe()} **Points:** {player.Item1.Points} **Points Received:** {player.Item2}");
+                    sb.AppendLine($"{player.Item1.GetDisplayNameSafe()} **Points:** {player.Item1.Points - player.Item2}{(player.Item2 >= 0 ? $" + {player.Item2}" : $" - {Math.Abs(player.Item2)}")} = {player.Item1.Points}");
                     continue;
                 }
 
@@ -795,7 +786,7 @@ namespace RavenBOT.ELO.Modules.Modules
                     newRole = MentionUtils.MentionRole(player.Item5.RoleId);
                 }
 
-                sb.AppendLine($"{player.Item1.GetDisplayNameSafe()} **Points:** {player.Item1.Points} **Points Received:** {player.Item2} Rank: {originalRole ?? "N.A"} => {newRole ?? "N/A"}");
+                sb.AppendLine($"{player.Item1.GetDisplayNameSafe()} **Points:** {player.Item1.Points - player.Item2}{(player.Item2 >= 0 ? $" + {player.Item2}" : $" - {Math.Abs(player.Item2)}")} = {player.Item1.Points} **Rank:** {originalRole ?? "N.A"} => {newRole ?? "N/A"}");
 
             }
 
