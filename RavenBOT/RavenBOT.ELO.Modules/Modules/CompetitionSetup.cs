@@ -19,12 +19,14 @@ namespace RavenBOT.ELO.Modules.Modules
         public GuildService Prefix { get; }
         public PatreonIntegration PatreonIntegration { get; }
         public ELOMigrator Migrator { get; }
+        public LegacyIntegration Legacy { get; }
 
-        public CompetitionSetup(ELOService service, GuildService prefix, PatreonIntegration patreonIntegration, ELOMigrator migrator)
+        public CompetitionSetup(ELOService service, GuildService prefix, PatreonIntegration patreonIntegration, ELOMigrator migrator, LegacyIntegration legacy)
         {
             this.Prefix = prefix;
             PatreonIntegration = patreonIntegration;
             Migrator = migrator;
+            Legacy = legacy;
             Service = service;
         }
 
@@ -50,6 +52,27 @@ namespace RavenBOT.ELO.Modules.Modules
             else
             {
                 await ReplyAsync("Invalid token provided.");
+            }
+        }
+
+        [Command("LegacyExpiration", RunMode = RunMode.Sync)]
+        public async Task LegacyExpirationAsync()
+        {
+            var config = Legacy.GetPremiumConfig(Context.Guild.Id);
+            if (config != null)
+            {
+                if (config.IsPremium())
+                {
+                    await ReplyAsync($"Expires on: {config.ExpiryDate.ToString("dd MMM yyyy")} {config.ExpiryDate.ToShortTimeString()}\nRemaining: {config.Remaining().GetReadableLength()}");
+                }
+                else
+                {
+                    await ReplyAsync("Legacy premium has already expired.");
+                }
+            }
+            else
+            {
+                await ReplyAsync("This server does not have a legacy premium subscription.");
             }
         }
 
