@@ -133,13 +133,13 @@ namespace RavenBOT.ELO.Modules.Modules
                 {
                     //team1 win
                     Service.SaveGame(game);
-                    await GameAsync(gameNumber, TeamSelection.team1, lobbyChannel, "Decided by vote.");
+                    await GameVoteAsync(gameNumber, TeamSelection.team1, lobbyChannel, "Decided by vote.");
                 }
                 else if (team2WinCount == game.Votes.Count)
                 {
                     //team2 win
                     Service.SaveGame(game);
-                    await GameAsync(gameNumber, TeamSelection.team2, lobbyChannel, "Decided by vote.");
+                    await GameVoteAsync(gameNumber, TeamSelection.team2, lobbyChannel, "Decided by vote.");
                 }
                 else if (drawCount == game.Votes.Count)
                 {
@@ -496,6 +496,106 @@ namespace RavenBOT.ELO.Modules.Modules
             }
 
             return Task.CompletedTask;
+        }
+
+        private async Task GameVoteAsync(int gameNumber, TeamSelection winning_team, SocketTextChannel lobbyChannel = null, [Remainder]string comment = null)
+        {
+            //Not sure if this is needed due to inclusion of TeamSelection now.
+            /*
+            if (winning_team != 1 && winning_team != 2)
+            {
+                await ReplyAsync("Team number must be either number `1` or `2`");
+                return;
+            }
+            */
+
+            if (lobbyChannel == null)
+            {
+                //If no lobby is provided, assume that it is the current channel.
+                lobbyChannel = Context.Channel as SocketTextChannel;
+            }
+
+            var lobby = Service.GetLobby(Context.Guild.Id, lobbyChannel.Id);
+            if (lobby == null)
+            {
+                //Reply error not a lobby.
+                await ReplyAsync("Channel is not a lobby.");
+                return;
+            }
+
+            var game = Service.GetGame(Context.Guild.Id, lobby.ChannelId, gameNumber);
+            if (game == null)
+            {
+                //Reply not valid game number.
+                await ReplyAsync($"GameID is invalid. Most recent game is {lobby.CurrentGameCount}");
+                return;
+            }
+
+            if (game.GameState == GameResult.State.Decided || game.GameState == GameResult.State.Draw)
+            {
+                await ReplyAsync("Game results cannot currently be overwritten without first running the `undogame` command.");
+                return;
+            }
+
+            var competition = Service.GetOrCreateCompetition(Context.Guild.Id);
+
+            List < (Player, int, Rank, RankChangeState, Rank) > winList;
+            List < (Player, int, Rank, RankChangeState, Rank) > loseList;
+            if (winning_team == TeamSelection.team1)
+            {
+                winList = UpdateTeamScoresAsync(competition, true, game.Team1.Players);
+                loseList = UpdateTeamScoresAsync(competition, false, game.Team2.Players);
+            }
+            else
+            {
+                loseList = UpdateTeamScoresAsync(competition, false, game.Team1.Players);
+                winList = UpdateTeamScoresAsync(competition, true, game.Team2.Players);
+            }
+
+            var allUsers = new List < (Player, int, Rank, RankChangeState, Rank) > ();
+            allUsers.AddRange(winList);
+            allUsers.AddRange(loseList);
+
+            foreach (var user in allUsers)
+            {
+                //Ignore user updates if they aren't found in the server.
+                var gUser = Context.Guild.GetUser(user.Item1.UserId);
+                if (gUser == null) continue;
+
+                await Service.UpdateUserAsync(competition, user.Item1, gUser);
+            }
+            
+            game.GameState = GameResult.State.Decided;
+            game.ScoreUpdates = allUsers.ToDictionary(x => x.Item1.UserId, y => y.Item2);
+            game.WinningTeam = (int)winning_team;
+            game.Comment = comment;
+            game.Submitter = Context.User.Id;
+            Service.SaveGame(game);
+
+            var winField = new EmbedFieldBuilder
+            {
+                //TODO: Is this necessary to show which team the winning team was?
+                Name = $"Winning Team, Team{(int)winning_team}",
+                Value = GetResponseContent(winList).FixLength(1023)
+            };
+            var loseField = new EmbedFieldBuilder
+            {
+                Name = $"Losing Team",
+                Value = GetResponseContent(loseList).FixLength(1023)
+            };
+            var response = new EmbedBuilder
+            {
+                Fields = new List<EmbedFieldBuilder> { winField, loseField },
+                //TODO: Remove this if from the vote command
+                Title = $"GameID: {gameNumber}"
+            };
+
+            if (!string.IsNullOrWhiteSpace(comment))
+            {
+                response.AddField("Comment", comment.FixLength(1023));
+            }
+
+            await AnnounceResultAsync(lobby, response);
         }
 
         
