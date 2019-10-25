@@ -37,8 +37,8 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync("", false, string.Join("\n", msg).QuickEmbed());
         }
 
-        [Command("Info", RunMode = RunMode.Async)] // Please make default command name "Stats"
-        [Alias("Profile", "GetUser")]
+        [Command("Profile", RunMode = RunMode.Async)] // Please make default command name "Stats"
+        [Alias("Info", "GetUser")]
         public async Task InfoAsync(SocketGuildUser user = null)    
         {
             if (user == null)
@@ -49,7 +49,14 @@ namespace RavenBOT.ELO.Modules.Modules
             var player = Service.GetPlayer(Context.Guild.Id, user.Id);
             if (player == null)
             {
-                await ReplyAsync("You are not registered.");
+                if (user.Id == Context.User.Id)
+                {
+                    await ReplyAsync("You are not registered.");
+                }
+                else
+                {
+                    await ReplyAsync("That user is not registered.");
+                }
                 return;
             }
             
