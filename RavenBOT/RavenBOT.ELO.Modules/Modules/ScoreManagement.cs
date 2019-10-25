@@ -22,7 +22,7 @@ namespace RavenBOT.ELO.Modules.Modules
             Service = service;
         }
 
-        [Command("ModifyStates")]
+        [Command("ModifyStates", RunMode = RunMode.Async)]
         public async Task ModifyStatesAsync()
         {
             await ReplyAsync(string.Join("\n", Extensions.EnumNames<Player.ModifyState>()));

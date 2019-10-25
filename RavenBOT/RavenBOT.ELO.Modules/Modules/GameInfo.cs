@@ -12,7 +12,7 @@ namespace RavenBOT.ELO.Modules.Modules
 {
     public partial class Info
     {
-        [Command("LastGame")]
+        [Command("LastGame", RunMode = RunMode.Async)]
         [Alias("Last Game", "Latest Game", "LatestGame", "lg")]
         public async Task LastGameAsync(SocketGuildChannel lobbyChannel = null)
         {
@@ -52,7 +52,7 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync("", false, embed.Build());
         }
 
-        [Command("GameInfo")]
+        [Command("GameInfo", RunMode = RunMode.Async)]
         [Alias("Game Info", "Show Game", "ShowGame", "sg")]
         public async Task GameInfoAsync(int gameNumber, SocketGuildChannel lobbyChannel = null) //add functionality to specify lobby
         {
@@ -78,7 +78,7 @@ namespace RavenBOT.ELO.Modules.Modules
             await DisplayGameAsync(game);
         }
 
-        [Command("ManualGameInfo")]
+        [Command("ManualGameInfo", RunMode = RunMode.Async)]
         [Alias("Manual Game Info", "Show Manual Game", "ShowManualGame", "smg")]
         public async Task ManualGameInfoAsync(int gameNumber)
         {
@@ -92,7 +92,7 @@ namespace RavenBOT.ELO.Modules.Modules
             await DisplayGameAsync(game);
         }
 
-        [Command("ManualGameList")]
+        [Command("ManualGameList", RunMode = RunMode.Async)]
         [Alias("Manual Game List", "ManualGamesList", "ShowManualGames", "ListManualGames")]
         [Summary("Displays statuses for the last 100 manual games in the server")]
         public async Task ManualGameList()
@@ -153,7 +153,7 @@ namespace RavenBOT.ELO.Modules.Modules
             await PagedReplyAsync(new ReactivePager(pages).ToCallBack().WithDefaultPagerCallbacks());
         }
 
-        [Command("GameList")]
+        [Command("GameList", RunMode = RunMode.Async)]
         [Alias("Game List", "GamesList", "ShowGames", "ListGames")]
         [Summary("Displays statuses for the last 100 games in the lobby")]
         public async Task GameListAsync(SocketGuildChannel lobbyChannel = null)

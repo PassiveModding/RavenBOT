@@ -89,7 +89,7 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync($"React on join/leave set.");
         }
 
-        [Command("PickModes")]
+        [Command("PickModes", RunMode = RunMode.Async)]
         //[Alias("Pick Modes")] ignore this as it can potentially conflict with the lobby Pick command.
         public async Task DisplayPickModesAsync()
         {
@@ -113,7 +113,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
 
-        [Command("PickOrders")]
+        [Command("PickOrders", RunMode = RunMode.Async)]
         public async Task DisplayPickOrdersAsync()
         {
             var res = "`PickOne` - Captains each alternate picking one player until there are none remaining\n" +
@@ -123,7 +123,7 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync(res);
         }
 
-        [Command("SetGameReadyAnnouncementChannel")]
+        [Command("SetGameReadyAnnouncementChannel", RunMode = RunMode.Sync)]
         [Alias("GameReadyAnnouncementsChannel", "GameReadyAnnouncements", "ReadyAnnouncements", "SetReadyAnnouncements")]
         public async Task GameReadyAnnouncementChannel(SocketTextChannel destinationChannel = null)
         {
@@ -151,7 +151,7 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync($"Game ready announcements for the current lobby will be sent to {destinationChannel.Mention}");
         }
 
-        [Command("SetGameResultAnnouncementChannel")]
+        [Command("SetGameResultAnnouncementChannel", RunMode = RunMode.Sync)]
         [Alias("SetGameResultAnnouncements", "GameResultAnnouncements")]
         public async Task GameResultAnnouncementChannel(SocketTextChannel destinationChannel = null)
         {
@@ -258,13 +258,13 @@ namespace RavenBOT.ELO.Modules.Modules
             return;
         }         
 
-        [Command("MapModes")]
+        [Command("MapModes", RunMode = RunMode.Async)]
         public async Task MapModes()
         {
             await ReplyAsync(string.Join(", ", Extensions.EnumNames<MapSelector.MapMode>()));
         }
 
-        [Command("ClearMaps")]
+        [Command("ClearMaps", RunMode = RunMode.Sync)]
         public async Task MapClear()
         {
             var lobby = Service.GetLobby(Context.Guild.Id, Context.Channel.Id);
@@ -360,7 +360,7 @@ namespace RavenBOT.ELO.Modules.Modules
             }
         }
 
-        [Command("ToggleDms")]
+        [Command("ToggleDms", RunMode = RunMode.Sync)]
         public async Task ToggleDmsAsync()
         {
             if (!Context.Channel.IsLobby(Service, out var lobby)) return;
@@ -370,7 +370,7 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync($"DM when games are ready: {lobby.DmUsersOnGameReady}");
         }
 
-        [Command("SetDescription")]
+        [Command("SetDescription", RunMode = RunMode.Sync)]
         public async Task SetDescriptionAsync([Remainder]string description)
         {
             if (!Context.Channel.IsLobby(Service, out var lobby)) return;

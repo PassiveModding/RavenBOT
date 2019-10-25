@@ -23,7 +23,7 @@ namespace RavenBOT.ELO.Modules.Modules
             Service = service;
         }
 
-        [Command("Ranks")]
+        [Command("Ranks", RunMode = RunMode.Async)]
         public async Task ShowRanksAsync()
         {
             var comp = Service.GetOrCreateCompetition(Context.Guild.Id);
@@ -37,7 +37,7 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync("", false, string.Join("\n", msg).QuickEmbed());
         }
 
-        [Command("Info")] // Please make default command name "Stats"
+        [Command("Info", RunMode = RunMode.Async)] // Please make default command name "Stats"
         [Alias("Profile", "GetUser")]
         public async Task InfoAsync(SocketGuildUser user = null)    
         {
@@ -78,7 +78,7 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync("", false, response.QuickEmbed());
         }
 
-        [Command("Leaderboard")]
+        [Command("Leaderboard", RunMode = RunMode.Async)]
         [Alias("lb", "top20")]
         //TODO: Ratelimiting as this is a data heavy command.
         public async Task LeaderboardAsync()

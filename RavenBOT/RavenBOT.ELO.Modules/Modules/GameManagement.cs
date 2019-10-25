@@ -31,7 +31,7 @@ namespace RavenBOT.ELO.Modules.Modules
         //Game (Mods/admins submit game results), could potentially accept a comment for the result as well (ie for proof of wins)
         //UndoGame (would need to use the amount of points added to the user rather than calculate at command run time)
 
-        [Command("Results")]
+        [Command("Results", RunMode = RunMode.Async)]
         public async Task ShowResultsAsync()
         {
             await ReplyAsync(string.Join("\n", Extensions.EnumNames<GameResult.Vote.VoteState>()));

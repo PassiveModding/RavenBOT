@@ -87,7 +87,7 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync("Queue Cleared.");
         }
 
-        [Command("ForceJoin")]
+        [Command("ForceJoin", RunMode = RunMode.Sync)]
         [Summary("Forcefully adds a user to queue, bypasses minimum points")]
         [Preconditions.RequireModerator]
         public async Task ForceJoinAsync(SocketGuildUser user)
@@ -159,7 +159,7 @@ namespace RavenBOT.ELO.Modules.Modules
             Service.SaveLobby(CurrentLobby);
         }
 
-        [Command("ForceRemove")]
+        [Command("ForceRemove", RunMode = RunMode.Sync)]
         [Preconditions.RequireModerator]
         public async Task ForceRemoveAsync(SocketGuildUser user)
         {

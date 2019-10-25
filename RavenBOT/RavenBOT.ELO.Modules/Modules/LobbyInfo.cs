@@ -8,7 +8,7 @@ namespace RavenBOT.ELO.Modules.Modules
 {
     public partial class LobbyManagement
     {
-        [Command("Lobby")]
+        [Command("Lobby", RunMode = RunMode.Async)]
         public async Task LobbyInfoAsync()
         {
             if (!await CheckLobbyAsync() || !await CheckRegisteredAsync())
@@ -20,7 +20,7 @@ namespace RavenBOT.ELO.Modules.Modules
             {
                 Color = Color.Blue
             };
-            
+
             string maps;
             if (CurrentLobby.MapSelector != null)
             {
@@ -42,7 +42,7 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync("", false, embed.Build());
         }
 
-        [Command("Queue")]
+        [Command("Queue", RunMode = RunMode.Async)]
         [Alias("Q", "lps", "listplayers", "playerlist", "who")]
         public async Task ShowQueueAsync()
         {
@@ -56,9 +56,9 @@ namespace RavenBOT.ELO.Modules.Modules
             {
                 if (game.GameState == Models.GameResult.State.Picking)
                 {
-                var gameEmbed = new EmbedBuilder
-                {
-                Title = $"Current Teams."
+                    var gameEmbed = new EmbedBuilder
+                    {
+                        Title = $"Current Teams."
                     };
 
                     var t1Users = GetMentionList(GetUserList(Context.Guild, game.Team1.Players));
@@ -76,7 +76,7 @@ namespace RavenBOT.ELO.Modules.Modules
             {
                 var mentionList = GetMentionList(GetUserList(Context.Guild, CurrentLobby.Queue));
                 var embed = new EmbedBuilder();
-                embed.Title = $"{Context.Channel.Name} [{CurrentLobby.Queue.Count}/{CurrentLobby.PlayersPerTeam*2}]";
+                embed.Title = $"{Context.Channel.Name} [{CurrentLobby.Queue.Count}/{CurrentLobby.PlayersPerTeam * 2}]";
                 embed.Description = $"Game: #{CurrentLobby.CurrentGameCount}\n" +
                     string.Join("\n", mentionList);
                 await ReplyAsync("", false, embed.Build());

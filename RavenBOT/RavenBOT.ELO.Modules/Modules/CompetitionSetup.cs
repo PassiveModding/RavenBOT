@@ -28,7 +28,7 @@ namespace RavenBOT.ELO.Modules.Modules
             Service = service;
         }
 
-        [Command("ClaimPremium")]
+        [Command("ClaimPremium", RunMode = RunMode.Sync)]
         public async Task ClaimPremiumAsync()
         {
             await PatreonIntegration.Claim(Context);
@@ -53,13 +53,13 @@ namespace RavenBOT.ELO.Modules.Modules
             }
         }
 
-        [Command("RegistrationLimit")]
+        [Command("RegistrationLimit", RunMode = RunMode.Async)]
         public async Task GetRegisterLimit()
         {
             await ReplyAsync($"Current Limit is a maximum of: {PatreonIntegration.GetRegistrationLimit(Context)}");
         }
 
-        [Command("CompetitionInfo")]
+        [Command("CompetitionInfo", RunMode = RunMode.Async)]
         [Alias("CompetitionSettings", "GameSettings")]
         public async Task CompetitionInfo()
         {
@@ -138,7 +138,7 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync($"Register Message set.\nExample:\n{exampleNick}");
         }
 
-        [Command("RegisterMessageFormats")]
+        [Command("RegisterMessageFormats", RunMode = RunMode.Async)]
         [Alias("RegisterFormats")]
         public async Task ShowRegistrationFormatsAsync()
         {
@@ -173,7 +173,7 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync($"Nickname Format set.\nExample: `{exampleNick}`");
         }
 
-        [Command("NicknameFormats")]
+        [Command("NicknameFormats", RunMode = RunMode.Async)]
         [Alias("NameFormats")]
         public async Task ShowNicknameFormatsAsync()
         {
