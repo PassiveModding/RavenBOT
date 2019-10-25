@@ -32,7 +32,7 @@ namespace RavenBOT.ELO.Modules.Modules
         public ELOMigrator Migrator { get; }
 
         [Command("RunMigrationTask", RunMode = RunMode.Sync)]
-        public async Task RunMigrationTaskAsync(SocketRole role, int maxCount)
+        public async Task RunMigrationTaskAsync()
         {
             await ReplyAsync("Running migration.");
             var _ = Task.Run(async () => 
