@@ -398,5 +398,27 @@ namespace RavenBOT.ELO.Modules.Modules
                 await ReplyAsync("Channel is not a lobby.");
             }
         }
+
+        [Command("HideQueue", RunMode = RunMode.Sync)]
+        [Summary("Sets whether players in queue are shown.")]
+        [RavenRequireBotPermission(GuildPermission.ManageMessages)]
+        public async Task AllowNegativeAsync(bool? hideQueue = null)
+        {
+            if (Context.Channel.IsLobby(Service, out var lobby))
+            {            
+                if (hideQueue == null)
+                {
+                    await ReplyAsync($"Current Hide Queue Setting: {lobby.HideQueue}");
+                    return;
+                }
+                lobby.HideQueue = hideQueue.Value;
+                Service.SaveLobby(lobby);
+                await ReplyAsync($"Hide Queue: {hideQueue.Value}");
+            }
+            else
+            {
+                await ReplyAsync("Channel is not a lobby.");
+            }
+        }
     }
 }

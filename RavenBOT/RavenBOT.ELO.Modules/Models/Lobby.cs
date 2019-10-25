@@ -32,7 +32,7 @@ namespace RavenBOT.ELO.Modules.Models
 
         public bool DmUsersOnGameReady { get; set; } = false;
         public bool ReactOnJoinLeave { get; set; } = true;
-
+        public bool HideQueue { get; set; } = false;
 
         public int PlayersPerTeam { get; set; } = 5;
 

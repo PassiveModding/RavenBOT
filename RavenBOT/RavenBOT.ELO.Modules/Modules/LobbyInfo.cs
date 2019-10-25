@@ -100,6 +100,12 @@ namespace RavenBOT.ELO.Modules.Modules
 
             if (CurrentLobby.Queue.Count > 0)
             {
+                if (CurrentLobby.HideQueue)
+                {
+                    await Context.Message.DeleteAsync();
+                    await ReplyAsync($"**[{CurrentLobby.Queue.Count}/{CurrentLobby.PlayersPerTeam * 2}]**");
+                    return;
+                }
                 var mentionList = GetMentionList(GetUserList(Context.Guild, CurrentLobby.Queue));
                 var embed = new EmbedBuilder();
                 embed.Title = $"{Context.Channel.Name} [{CurrentLobby.Queue.Count}/{CurrentLobby.PlayersPerTeam * 2}]";
