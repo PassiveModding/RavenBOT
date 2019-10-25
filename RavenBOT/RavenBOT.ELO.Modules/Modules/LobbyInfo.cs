@@ -11,6 +11,29 @@ namespace RavenBOT.ELO.Modules.Modules
 {
     public partial class LobbyManagement
     {
+        [Command("Maps", RunMode = RunMode.Async)]
+        [Alias("MapList")]
+        public async Task MapsAsync()
+        {
+            if (!await CheckLobbyAsync())
+            {
+                return;
+            }
+            string maps;
+            if (CurrentLobby.MapSelector != null)
+            {
+                maps = $"\n**Map Mode:** {CurrentLobby.MapSelector.Mode}\n" +
+                        $"**Maps:** {string.Join(", ", CurrentLobby.MapSelector.Maps)}\n" +
+                        $"**Recent Maps:** {string.Join(", ", CurrentLobby.MapSelector.GetHistory())}";
+            }
+            else
+            {
+                maps = "N/A";
+            }
+
+            await SimpleEmbedAsync(maps);
+        }
+
         [Command("Lobby", RunMode = RunMode.Async)]
         public async Task LobbyInfoAsync()
         {
