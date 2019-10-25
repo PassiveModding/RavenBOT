@@ -63,6 +63,14 @@ namespace RavenBOT.ELO.Modules.Modules
             await ReplyAsync("Running... This will not send a message upon completion.");
         }
 
+
+        [Command("LastLegacyPremium", RunMode = RunMode.Async)]
+        public async Task LastLegacyPremium()
+        {
+            var date = Migrator.Legacy.GetLatestExpiryDate();
+            await ReplyAsync($"Expires on: {date.ToString("dd MMM yyyy")} {date.ToShortTimeString()}\nRemaining: {(date - DateTime.UtcNow).GetReadableLength()}");
+        }
+
         [Command("TogglePremium", RunMode = RunMode.Async)]
         public async Task TogglePremium()
         {
