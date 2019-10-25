@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
@@ -86,5 +88,100 @@ namespace RavenBOT.ELO.Modules.Modules
                 await ReplyAsync("", false, "The queue is empty.".QuickEmbed());
             }
         }
+
+        [Command("LobbyLeaderboard", RunMode = RunMode.Async)]
+        public async Task ShowLobbyLeaderboardAsync()
+        {
+            if (!await CheckLobbyAsync())
+            {
+                return;
+            }
+
+            var lobbyGames = Service.GetGames(Context.Guild.Id, Context.Channel.Id);
+
+            //userId, points, wins, losses, games
+            var playerInfos = new Dictionary<ulong, (ulong, int, int, int, int)>();
+            foreach (var game in lobbyGames.Where(x => x.GameState == Models.GameResult.State.Decided))
+            {
+                var winners = game.GetWinningTeam();
+                var losers = game.GetLosingTeam();
+                foreach (var player in winners.Item2.Players)
+                {
+                    if (!playerInfos.TryGetValue(player, out var playerMatch))
+                    {
+                        playerMatch = (player, game.ScoreUpdates[player], 1, 0, 1);
+                    }
+                    else
+                    {
+                        playerMatch.Item2 += game.ScoreUpdates[player];
+                        playerMatch.Item3++;
+                        playerMatch.Item5++;
+                    }
+
+                    playerInfos[player] = playerMatch;
+                }
+
+                foreach (var player in losers.Item2.Players)
+                {
+                    if (!playerInfos.TryGetValue(player, out var playerMatch))
+                    {
+                        playerMatch = (player, game.ScoreUpdates[player], 0, 1, 1);
+                    }
+                    else
+                    {
+                        playerMatch.Item2 += game.ScoreUpdates[player];
+                        playerMatch.Item4++;
+                        playerMatch.Item5++;
+                    }
+
+                    playerInfos[player] = playerMatch;
+                }
+            }
+
+            var infos = playerInfos.OrderByDescending(x => x.Value.Item2).Select(x => x.Value);
+            var groups = infos.SplitList(20).ToArray();
+            var pages = GetPages(groups);
+
+            await PagedReplyAsync(new ReactivePager
+            {
+                Pages = pages
+            }.ToCallBack().WithDefaultPagerCallbacks());
+        }
+
+        public List<ReactivePage> GetPages(IEnumerable<(ulong, int, int, int, int)>[] groups)
+        {
+            //Start the index at 1 because we are ranking players here ie. first place.
+            int index = 1;
+            var pages = new List<ReactivePage>(groups.Length);
+            foreach (var group in groups)
+            {
+                var playerGroup = group.ToArray();
+                var lines = GetPlayerLines(playerGroup, index);
+                index = lines.Item1;
+                var page = new ReactivePage();
+                page.Title = $"{Context.Channel.Name} - Leaderboard";
+                page.Description = lines.Item2;
+                pages.Add(page);
+            }
+
+            return pages;
+        }
+
+        //Returns the updated index and the formatted player lines
+        public (int, string) GetPlayerLines((ulong, int, int, int, int)[] players, int startValue)
+        {
+            var sb = new StringBuilder();
+            
+            //Iterate through the players and add their summary line to the list.
+            foreach (var player in players)
+            {
+                sb.AppendLine($"{startValue}: {MentionUtils.MentionUser(player.Item1)} - {player.Item2}");
+                startValue++;
+            }
+
+            //Return the updated start value and the list of player lines.
+            return (startValue, sb.ToString());
+        }
+        
     }
 }
