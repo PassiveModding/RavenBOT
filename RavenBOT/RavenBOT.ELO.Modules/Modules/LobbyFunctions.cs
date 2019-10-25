@@ -66,7 +66,18 @@ namespace RavenBOT.ELO.Modules.Modules
                     game.Team2.Captain = captains.Item2;
 
                     //TODO: Timer from when captains are mentioned to first pick time. Cancel game if command is not run.
-                    await ReplyAsync($"Captains have been picked. Use the `pick` or `p` command to choose your players.\nCaptain 1: {MentionUtils.MentionUser(game.Team1.Captain)}\nCaptain 2: {MentionUtils.MentionUser(game.Team2.Captain)}");
+                    var gameEmbed = new EmbedBuilder
+                    {
+                        Title = $"Current Teams."
+                    };
+
+                    var t1Users = GetMentionList(GetUserList(Context.Guild, game.Team1.Players));
+                    var t2Users = GetMentionList(GetUserList(Context.Guild, game.Team2.Players));
+                    var remainingPlayers = GetMentionList(GetUserList(Context.Guild, game.Queue.Where(x => !game.Team1.Players.Contains(x) && !game.Team2.Players.Contains(x))));
+                    gameEmbed.AddField("Team 1", $"Captain: {MentionUtils.MentionUser(game.Team1.Captain)}\n{string.Join("\n", t1Users)}");
+                    gameEmbed.AddField("Team 2", $"Captain: {MentionUtils.MentionUser(game.Team2.Captain)}\n{string.Join("\n", t2Users)}");
+                    gameEmbed.AddField("Remaining Players", string.Join("\n", remainingPlayers));
+                    await ReplyAsync($"Captains have been picked. Use the `pick` or `p` command to choose your players.\nCaptain 1: {MentionUtils.MentionUser(game.Team1.Captain)}\nCaptain 2: {MentionUtils.MentionUser(game.Team2.Captain)}", false, gameEmbed.Build());
                     break;
                 case Lobby.PickMode.Random:
                     game.GameState = GameResult.State.Undecided;
