@@ -218,6 +218,11 @@ namespace RavenBOT.ELO.Modules.Modules
             {
                 await ReplyAsync("That mode is not available currently.");
                 return;
+
+                //Three options:
+                //Last known map (if available)
+                //Two random maps
+                //Players vote on the maps and most voted is announced?
             }
 
             var lobby = Service.GetLobby(Context.Guild.Id, Context.Channel.Id);
