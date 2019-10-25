@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
+using Discord.WebSocket;
 using RavenBOT.Common;
 
 namespace RavenBOT.ELO.Modules.Modules
@@ -90,14 +91,26 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("LobbyLeaderboard", RunMode = RunMode.Async)]
-        public async Task ShowLobbyLeaderboardAsync()
+        public async Task ShowLobbyLeaderboardAsync(ISocketMessageChannel channel = null)
         {
-            if (!await CheckLobbyAsync())
+            if (channel == null)
             {
+                channel = Context.Channel;
+            }
+
+            var lobby = Service.GetLobby(Context.Guild.Id, channel.Id);
+            if (lobby == null)
+            {
+                await ReplyAsync("Channel is not a lobby.");
                 return;
             }
 
-            var lobbyGames = Service.GetGames(Context.Guild.Id, Context.Channel.Id);
+            var lobbyGames = Service.GetGames(Context.Guild.Id, channel.Id);
+            if (lobbyGames.Count() == 0)
+            {
+                await ReplyAsync("There have been no games played in the given lobby.");
+                return;
+            }
 
             //userId, points, wins, losses, games
             var playerInfos = new Dictionary<ulong, (ulong, int, int, int, int)>();
@@ -140,7 +153,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
             var infos = playerInfos.OrderByDescending(x => x.Value.Item2).Select(x => x.Value);
             var groups = infos.SplitList(20).ToArray();
-            var pages = GetPages(groups);
+            var pages = GetPages(groups, channel);
 
             await PagedReplyAsync(new ReactivePager
             {
@@ -148,7 +161,7 @@ namespace RavenBOT.ELO.Modules.Modules
             }.ToCallBack().WithDefaultPagerCallbacks());
         }
 
-        public List<ReactivePage> GetPages(IEnumerable<(ulong, int, int, int, int)>[] groups)
+        public List<ReactivePage> GetPages(IEnumerable<(ulong, int, int, int, int)>[] groups, ISocketMessageChannel channel)
         {
             //Start the index at 1 because we are ranking players here ie. first place.
             int index = 1;
@@ -159,7 +172,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 var lines = GetPlayerLines(playerGroup, index);
                 index = lines.Item1;
                 var page = new ReactivePage();
-                page.Title = $"{Context.Channel.Name} - Leaderboard";
+                page.Title = $"{channel.Name} - Leaderboard";
                 page.Description = lines.Item2;
                 pages.Add(page);
             }
