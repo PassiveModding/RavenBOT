@@ -30,8 +30,12 @@ namespace RavenBOT.ELO.Modules.Methods.Migrations
             var match = model.TokenList.FirstOrDefault(x => x.Token == token);
             if (match == null) return false;
 
-            var configSave = Legacy.GetPremiumConfig(guildId);
-            configSave.ExpiryDate.Add(TimeSpan.FromDays(match.Days));
+            var configSave = Legacy.GetPremiumConfig(guildId) ?? new LegacyIntegration.LegacyPremium
+            {
+                GuildId = guildId,
+                ExpiryDate = DateTime.UtcNow - TimeSpan.FromMinutes(5)
+            };
+            configSave.ExpiryDate = configSave.ExpiryDate + TimeSpan.FromDays(match.Days);
             Legacy.SaveConfig(configSave);
             model.TokenList.Remove(match);
             SaveTokenModel(model);
@@ -52,7 +56,7 @@ namespace RavenBOT.ELO.Modules.Methods.Migrations
         public class TokenModel
         {
             public List<TokenClass> TokenList { get; set; } = new List<TokenClass>();
-            
+
             public class TokenClass
             {
                 /// <summary>
@@ -71,93 +75,101 @@ namespace RavenBOT.ELO.Modules.Methods.Migrations
 
         public void RunMigration()
         {
-            var tokenModel = oldDatabase.Load<TokenModel>("tokens");
-            if (tokenModel != null)
+            try
             {
-                oldDatabase.Store(tokenModel, "legacyELOTokens");
-            }
 
-            var configs = oldDatabase.Query<GuildModel>();
-            foreach (var config in configs)
-            {
-                try
+                var tokenModel = oldDatabase.Load<TokenModel>("tokens");
+                if (tokenModel != null)
                 {
-                    //Do not use if new competition already exists
-                    var newComp = currentDatabase.Load<CompetitionConfig>(CompetitionConfig.DocumentName(config.ID));
-                    if (newComp != null) continue;
+                    currentDatabase.Store(tokenModel, "legacyELOTokens");
+                }
 
-                    //Do not set this due to incompatibilities with new replacements
-                    //newComp.NameFormat = config.Settings.Registration.NameFormat;
-                    newComp.UpdateNames = true;
-                    newComp.RegisterMessageTemplate = config.Settings.Registration.Message;
-                    newComp.RegisteredRankId = config.Ranks.FirstOrDefault(x => x.IsDefault)?.RoleID ?? 0;
-                    newComp.Ranks = config.Ranks.Select(x => new Rank
+                var configs = oldDatabase.Query<GuildModel>();
+                foreach (var config in configs)
+                {
+                    try
                     {
-                        RoleId = x.RoleID,
-                        WinModifier = x.WinModifier,
-                        LossModifier = x.LossModifier,
-                        Points = x.Threshold
-                    }).ToList();
-                    newComp.GuildId = config.ID;
-                    newComp.DefaultWinModifier = config.Settings.Registration.DefaultWinModifier;
-                    newComp.DefaultLossModifier = config.Settings.Registration.DefaultLossModifier;
-                    newComp.AllowReRegister = config.Settings.Registration.AllowMultiRegistration;
-                    newComp.AllowSelfRename = config.Settings.Registration.AllowMultiRegistration;
-                    newComp.AllowNegativeScore = config.Settings.GameSettings.AllowNegativeScore;
-                    newComp.BlockMultiQueueing = config.Settings.GameSettings.BlockMultiQueuing;
-                    newComp.AdminRole = config.Settings.Moderation.AdminRoles.FirstOrDefault();
-                    newComp.ModeratorRole = config.Settings.Moderation.ModRoles.FirstOrDefault();
-                    //TODO: Remove user on afk   
+                        //Do not use if new competition already exists
+                        var newComp = currentDatabase.Load<CompetitionConfig>(CompetitionConfig.DocumentName(config.ID));
+                        if (newComp != null) continue;
 
-                    if (config.Settings.Premium.Expiry > DateTime.UtcNow)
-                    {
-                        Legacy.SaveConfig(new LegacyIntegration.LegacyPremium
+                        //Do not set this due to incompatibilities with new replacements
+                        //newComp.NameFormat = config.Settings.Registration.NameFormat;
+                        newComp.UpdateNames = true;
+                        newComp.RegisterMessageTemplate = config.Settings.Registration.Message;
+                        newComp.RegisteredRankId = config.Ranks.FirstOrDefault(x => x.IsDefault)?.RoleID ?? 0;
+                        newComp.Ranks = config.Ranks.Select(x => new Rank
                         {
-                            GuildId = config.ID,
-                            ExpiryDate = config.Settings.Premium.Expiry
-                        });
-                    }
+                            RoleId = x.RoleID,
+                            WinModifier = x.WinModifier,
+                            LossModifier = x.LossModifier,
+                            Points = x.Threshold
+                        }).ToList();
+                        newComp.GuildId = config.ID;
+                        newComp.DefaultWinModifier = config.Settings.Registration.DefaultWinModifier;
+                        newComp.DefaultLossModifier = config.Settings.Registration.DefaultLossModifier;
+                        newComp.AllowReRegister = config.Settings.Registration.AllowMultiRegistration;
+                        newComp.AllowSelfRename = config.Settings.Registration.AllowMultiRegistration;
+                        newComp.AllowNegativeScore = config.Settings.GameSettings.AllowNegativeScore;
+                        newComp.BlockMultiQueueing = config.Settings.GameSettings.BlockMultiQueuing;
+                        newComp.AdminRole = config.Settings.Moderation.AdminRoles.FirstOrDefault();
+                        newComp.ModeratorRole = config.Settings.Moderation.ModRoles.FirstOrDefault();
+                        //TODO: Remove user on afk   
 
-                    currentDatabase.Store(newComp, CompetitionConfig.DocumentName(config.ID));
-                    
-                    foreach (var lobby in config.Lobbies)
-                    {
-                        var newLobby = new Lobby();
-                        newLobby.GuildId = config.ID;
-                        newLobby.ChannelId = lobby.ChannelID;
-                        newLobby.DmUsersOnGameReady = config.Settings.GameSettings.DMAnnouncements;
-                        newLobby.GameResultAnnouncementChannel = config.Settings.GameSettings.AnnouncementsChannel;
-                        newLobby.GameReadyAnnouncementChannel = config.Settings.GameSettings.AnnouncementsChannel;
-                        newLobby.PlayersPerTeam = lobby.UserLimit/2;
-                        newLobby.Description = lobby.Description;
-                        //TODO: Lobby requeue delay      
-
-                        currentDatabase.Store(newLobby, Lobby.DocumentName(config.ID, lobby.ChannelID));
-                    }
-
-                    foreach (var user in config.Users)
-                    {
-                        var newUser = new Player(user.UserID, config.ID, user.Username);
-                        newUser.Points = user.Stats.Points;
-                        newUser.Wins = user.Stats.Wins;
-                        newUser.Losses = user.Stats.Losses;
-                        newUser.Draws = user.Stats.Draws;
-
-                        //TODO: Kills/Deaths/Assists
-
-                        if (user.Banned != null && user.Banned.Banned)
+                        if (config.Settings.Premium.Expiry > DateTime.UtcNow)
                         {
-                            var length = user.Banned.ExpiryTime - DateTime.UtcNow;
-                            newUser.BanHistory.Add(new Player.Ban(length, user.Banned.Moderator, user.Banned.Reason));
+                            Legacy.SaveConfig(new LegacyIntegration.LegacyPremium
+                            {
+                                GuildId = config.ID,
+                                ExpiryDate = config.Settings.Premium.Expiry
+                            });
                         }
 
-                        currentDatabase.Store(newUser, Player.DocumentName(config.ID, user.UserID));
+                        currentDatabase.Store(newComp, CompetitionConfig.DocumentName(config.ID));
+
+                        foreach (var lobby in config.Lobbies)
+                        {
+                            var newLobby = new Lobby();
+                            newLobby.GuildId = config.ID;
+                            newLobby.ChannelId = lobby.ChannelID;
+                            newLobby.DmUsersOnGameReady = config.Settings.GameSettings.DMAnnouncements;
+                            newLobby.GameResultAnnouncementChannel = config.Settings.GameSettings.AnnouncementsChannel;
+                            newLobby.GameReadyAnnouncementChannel = config.Settings.GameSettings.AnnouncementsChannel;
+                            newLobby.PlayersPerTeam = lobby.UserLimit / 2;
+                            newLobby.Description = lobby.Description;
+                            //TODO: Lobby requeue delay      
+
+                            currentDatabase.Store(newLobby, Lobby.DocumentName(config.ID, lobby.ChannelID));
+                        }
+
+                        foreach (var user in config.Users)
+                        {
+                            var newUser = new Player(user.UserID, config.ID, user.Username);
+                            newUser.Points = user.Stats.Points;
+                            newUser.Wins = user.Stats.Wins;
+                            newUser.Losses = user.Stats.Losses;
+                            newUser.Draws = user.Stats.Draws;
+
+                            //TODO: Kills/Deaths/Assists
+
+                            if (user.Banned != null && user.Banned.Banned)
+                            {
+                                var length = user.Banned.ExpiryTime - DateTime.UtcNow;
+                                newUser.BanHistory.Add(new Player.Ban(length, user.Banned.Moderator, user.Banned.Reason));
+                            }
+
+                            currentDatabase.Store(newUser, Player.DocumentName(config.ID, user.UserID));
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
                     }
                 }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
             }
         }
     }
