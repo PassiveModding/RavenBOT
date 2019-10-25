@@ -26,7 +26,7 @@ namespace RavenBOT.Modules.Games.Modules
         {
             var guildobj = GameService.GetGameServer(Context.Guild.Id);
 
-            // Initially we check wether or not the user is able to bet
+            // Initially we check whether or not the user is able to bet
             if (bet <= 0)
             {
                 await ReplyAsync($"Please place a bet, ie. 10 points!");

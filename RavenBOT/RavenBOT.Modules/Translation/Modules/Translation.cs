@@ -208,7 +208,7 @@ namespace RavenBOT.Modules.Translation.Modules
         [Priority(100)]
         [RavenRequireContext(ContextType.Guild)]
         [Command("Toggle DM Translations")]
-        [Summary("Toggles wether to direct message users translations rather then sending them to the channel")]
+        [Summary("Toggles whether to direct message users translations rather then sending them to the channel")]
         [RavenRequireUserPermission(GuildPermission.Administrator)]
         public async Task ToggleDmReactions()
         {

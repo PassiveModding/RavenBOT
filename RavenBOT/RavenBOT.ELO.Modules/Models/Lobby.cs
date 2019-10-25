@@ -55,7 +55,7 @@ namespace RavenBOT.ELO.Modules.Models
         }
 
         /// <summary>
-        /// Checks wether the specified pickmode is captains
+        /// Checks whether the specified pickmode is captains
         /// </summary>
         /// <param name="pickMode"></param>
         /// <returns></returns>
