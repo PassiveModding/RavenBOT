@@ -7,6 +7,7 @@ using RavenBOT.ELO.Modules.Models;
 using System;
 using System.Threading;
 using RavenBOT.ELO.Modules.Premium;
+using System.Threading.Tasks;
 
 namespace RavenBOT.ELO.Modules.Methods
 {
@@ -19,11 +20,11 @@ namespace RavenBOT.ELO.Modules.Methods
             Client = client;
             Premium = premium;
             Client.ReactionAdded += ReactiveRegistration;
+            Client.ChannelDestroyed += ChannelDeleted;
             //Due in 1 minute, repeat every 6 hours
             CompetitionUpdateTimer = new Timer(UpdateCompetitionSetups, null, 60000, 1000 * 60 * 60 * 6);
         }
 
-        //TODO: Hook channel deleted event to automatically delete lobbies
         //TODO: Caching for users and other related objects.
 
         private IDatabase Database { get; }
@@ -35,6 +36,21 @@ namespace RavenBOT.ELO.Modules.Methods
             SaveCompetition(config);
 
             return config;
+        }
+
+        // Deletes the lobby and all associated games
+        public void DeleteLobby(ulong guildId, ulong channelId)
+        {
+            var lobbyMatch = Database.Load<Lobby>(Lobby.DocumentName(guildId, channelId));
+            if (lobbyMatch == null) return;
+            
+            Database.Remove<Lobby>(Lobby.DocumentName(guildId, channelId));
+
+            var games = GetGames(guildId, channelId);
+            foreach (var game in games)
+            {
+                RemoveGame(game);                  
+            }
         }
 
         public CompetitionConfig GetOrCreateCompetition(ulong guildId)

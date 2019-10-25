@@ -379,5 +379,19 @@ namespace RavenBOT.ELO.Modules.Modules
             Service.SaveLobby(lobby);
             await ReplyAsync("Lobby description set.");
         }
+
+        [Command("DeleteLobby", RunMode = RunMode.Sync)]
+        public async Task DeleteLobbyAsync()
+        {
+            if (Context.Channel.IsLobby(Service, out var lobby))
+            {
+                Service.DeleteLobby(Context.Guild.Id, Context.Channel.Id);
+                await ReplyAsync("Lobby and all games played in it have been removed.");
+            }
+            else
+            {
+                await ReplyAsync("Channel is not a lobby.");
+            }
+        }
     }
 }

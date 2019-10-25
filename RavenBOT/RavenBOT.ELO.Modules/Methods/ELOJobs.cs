@@ -84,5 +84,17 @@ namespace RavenBOT.ELO.Modules.Methods
         }
 
         public PatreonIntegration Premium { get; }
+
+        private Task ChannelDeleted(SocketChannel channel)
+        {
+            if (!(channel is SocketTextChannel gChannel))
+            {
+                return Task.CompletedTask;
+            }
+
+            DeleteLobby(gChannel.Guild.Id, gChannel.Id);
+
+            return Task.CompletedTask;
+        }
     }
 }
