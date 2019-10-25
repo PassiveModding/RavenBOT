@@ -25,7 +25,7 @@ namespace RavenBOT.Common.Interfaces.Database
             public bool Embedded { get; set; } = true;
         }
 
-        private IDocumentStore DocumentStore { get; set; }
+        public IDocumentStore DocumentStore { get; set; }
         private RavenDatabaseConfig Config { get; }
         private static readonly string ConfigDirectory = Path.Combine(AppContext.BaseDirectory, "setup");
         public static string ConfigPath = Path.Combine(ConfigDirectory, "RavenConfig.json");
