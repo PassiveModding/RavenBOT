@@ -27,11 +27,8 @@ namespace RavenBOT.ELO.Modules.Modules
 
         //TODO: Ensure correct commands require mod/admin perms
 
-        //GameResult (Allow players to vote on result), needs to be an optional command, requires both team captains to vote
-        //Game (Mods/admins submit game results), could potentially accept a comment for the result as well (ie for proof of wins)
-        //UndoGame (would need to use the amount of points added to the user rather than calculate at command run time)
-
         [Command("Results", RunMode = RunMode.Async)]
+        [Summary("Shows possible vote options for the Result command")]
         public async Task ShowResultsAsync()
         {
             await ReplyAsync(string.Join("\n", Extensions.EnumNames<GameResult.Vote.VoteState>()));
@@ -39,12 +36,14 @@ namespace RavenBOT.ELO.Modules.Modules
 
 
         [Command("Result", RunMode = RunMode.Sync)]
+        [Summary("Vote on the specified game's outcome in the specified lobby")]
         public async Task GameResultAsync(SocketTextChannel lobbyChannel, int gameNumber, string voteState)
         {
             await GameResultAsync(gameNumber, voteState, lobbyChannel);
         }
 
         [Command("Result", RunMode = RunMode.Sync)]
+        [Summary("Vote on the specified game's outcome in the current (or specified) lobby")]
         public async Task GameResultAsync(int gameNumber, string voteState, SocketTextChannel lobbyChannel = null)
         {
             if (lobbyChannel == null)
@@ -172,6 +171,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
         [Command("UndoGame", RunMode = RunMode.Sync)]
         [Alias("Undo Game")]
+        [Summary("Undoes the specified game in the specified lobby")]
         [Preconditions.RequireModerator]
         public async Task UndoGameAsync(SocketTextChannel lobbyChannel , int gameNumber)
         {
@@ -180,6 +180,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
         [Command("UndoGame", RunMode = RunMode.Sync)]
         [Alias("Undo Game")]
+        [Summary("Undoes the specified game in the current (or specified) lobby")]
         [Preconditions.RequireModerator]
         public async Task UndoGameAsync(int gameNumber, SocketTextChannel lobbyChannel = null)
         {
@@ -354,8 +355,11 @@ namespace RavenBOT.ELO.Modules.Modules
             Service.SaveGame(game);
         }
 
+
+        /*
         [Command("DeleteGame", RunMode = RunMode.Sync)]
         [Alias("Delete Game", "DelGame")]
+        [Summary("Deletes the specified game from history")]
         [Preconditions.RequireAdmin]
         //TODO: Explain that this does not affect the users who were in the game if it had a result. this is only for removing the game log from the database
         public async Task DelGame(SocketTextChannel lobbyChannel, int gameNumber)
@@ -365,6 +369,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
         [Command("DeleteGame", RunMode = RunMode.Sync)]
         [Alias("Delete Game", "DelGame")]
+        [Summary("Deletes the specified game from history")]
         [Preconditions.RequireAdmin]
         //TODO: Explain that this does not affect the users who were in the game if it had a result. this is only for removing the game log from the database
         public async Task DelGame(int gameNumber, SocketTextChannel lobbyChannel = null)
@@ -392,10 +397,11 @@ namespace RavenBOT.ELO.Modules.Modules
             Service.RemoveGame(game);
             await ReplyAsync("Game Deleted.", false, JsonConvert.SerializeObject(game, Formatting.Indented).FixLength(2047).QuickEmbed());
         }
-
+        */
 
         [Command("Cancel", RunMode = RunMode.Sync)]
         [Alias("CancelGame")]
+        [Summary("Cancels the specified game in the specified lobby with an optional comment.")]
         [Preconditions.RequireModerator]
         public async Task CancelAsync(SocketTextChannel lobbyChannel, int gameNumber, [Remainder]string comment = null)
         {
@@ -404,6 +410,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
         [Command("Cancel", RunMode = RunMode.Sync)]
         [Alias("CancelGame")]
+        [Summary("Cancels the specified game in the current (or specified) lobby with an optional comment.")]
         [Preconditions.RequireModerator]
         public async Task CancelAsync(int gameNumber, SocketTextChannel lobbyChannel = null, [Remainder]string comment = null)
         {
@@ -440,6 +447,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
 
         [Command("Draw", RunMode = RunMode.Sync)]
+        [Summary("Calls a draw for the specified game in the specified lobby with an optional comment.")]
         [Preconditions.RequireModerator]
         public async Task DrawAsync(SocketTextChannel lobbyChannel, int gameNumber, [Remainder]string comment = null)
         {
@@ -447,6 +455,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("Draw", RunMode = RunMode.Sync)]
+        [Summary("Calls a draw for the specified in the current (or specified) lobby with an optional comment.")]
         [Preconditions.RequireModerator]
         public async Task DrawAsync(int gameNumber, SocketTextChannel lobbyChannel = null, [Remainder]string comment = null)
         {
@@ -592,6 +601,7 @@ namespace RavenBOT.ELO.Modules.Modules
         
         [Command("Game", RunMode = RunMode.Sync)]
         [Alias("g")]
+        [Summary("Calls a win for the specified team in the specified game and lobby with an optional comment")]
         [Preconditions.RequireModerator]
         public async Task GameAsync(SocketTextChannel lobbyChannel, int gameNumber, TeamSelection winning_team, [Remainder]string comment = null)
         {
@@ -600,18 +610,10 @@ namespace RavenBOT.ELO.Modules.Modules
 
         [Command("Game", RunMode = RunMode.Sync)]
         [Alias("g")]
+        [Summary("Calls a win for the specified team in the specified game and current (or specified) lobby with an optional comment")]
         [Preconditions.RequireModerator]
         public async Task GameAsync(int gameNumber, TeamSelection winning_team, SocketTextChannel lobbyChannel = null, [Remainder]string comment = null)
         {
-            //Not sure if this is needed due to inclusion of TeamSelection now.
-            /*
-            if (winning_team != 1 && winning_team != 2)
-            {
-                await ReplyAsync("Team number must be either number `1` or `2`");
-                return;
-            }
-            */
-
             if (lobbyChannel == null)
             {
                 //If no lobby is provided, assume that it is the current channel.
@@ -665,69 +667,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 var gUser = Context.Guild.GetUser(user.Item1.UserId);
                 if (gUser == null) continue;
 
-                #region ReducedUpdate
                 await Service.UpdateUserAsync(competition, user.Item1, gUser);
-                /*
-                //Create the new user display name template
-                var displayName = competition.GetNickname(user.Item1);
-
-                //TODO: Check if the user can have their nickname set.
-                bool nickNameUpdate = false;
-                if (competition.UpdateNames && gUser.Nickname != null)
-                {
-                    if (!gUser.Nickname.Equals(displayName))
-                    {
-                        nickNameUpdate = true;
-                    }
-                }
-
-                //Remove the original role id
-                var roleIds = gUser.Roles.Select(x => x.Id).ToList();
-
-                //Add the new role id to the user roleids
-                if (user.Item5 != null)
-                {
-                    roleIds.Add(user.Item5.RoleId);
-                }
-
-                //Check to see if the user's rank was changed and update accordingly
-                //TODO: Check edge cases for when the user's rank is below the registered rank?
-                //Potentially ensure that registered rank is not removed from user.
-                //TODO: Look into if a user receives more points and skips a level what will happen.
-                if (user.Item4 != RankChangeState.None)
-                {
-                    if (user.Item3 != null)
-                    {
-                        roleIds.Remove(user.Item3.RoleId);
-                    }
-                }
-
-                bool updateRoles = false;
-                //Compare the updated roles against the original roles for equality                
-                if (!Enumerable.SequenceEqual(roleIds.Distinct().OrderBy(x => x), gUser.Roles.Select(x => x.Id).OrderBy(x => x)))
-                {
-                    updateRoles = true;
-                }
-
-                //TODO: Test if logic within modifyasync works as intended.
-                if (updateRoles || nickNameUpdate)
-                {
-                    await gUser.ModifyAsync(x =>
-                    {
-                        if (nickNameUpdate)
-                        {
-                            x.Nickname = displayName;
-                        }
-
-                        if (updateRoles)
-                        {
-                            //Set the user's roles to the modified list which removes and lost ranks and adds any gained ranks
-                            x.RoleIds = roleIds.Where(r => r != Context.Guild.EveryoneRole.Id).ToArray();
-                        }
-                    });
-                }
-                */
-                #endregion
             }
             
             game.GameState = GameResult.State.Decided;
