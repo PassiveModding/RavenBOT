@@ -26,6 +26,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("Win", RunMode = RunMode.Sync)]
+        [Summary("Adds a win and updates points for the specified users.")]
         public async Task WinAsync(params SocketGuildUser[] users)
         {
             await UpdateTeamScoresAsync(true, users.Select(x => x.Id).ToHashSet());
@@ -34,6 +35,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("Lose", RunMode = RunMode.Sync)]
+        [Summary("Adds a loss and updates points for the specified users.")]
         public async Task LoseAsync(params SocketGuildUser[] users)
         {
             await UpdateTeamScoresAsync(false, users.Select(x => x.Id).ToHashSet());
@@ -112,68 +114,7 @@ namespace RavenBOT.ELO.Modules.Modules
                 var gUser = Context.Guild.GetUser(userId);
                 if (gUser == null) continue;
 
-                #region ReducedUpdate
                 await Service.UpdateUserAsync(competition, player, gUser);
-                /*
-                //Create the new user display name template
-                var displayName = competition.GetNickname(player);
-
-                //TODO: Check if the user can have their nickname set.
-                bool nickNameUpdate = false;
-                if (competition.UpdateNames && gUser.Nickname != null)
-                {
-                    if (!gUser.Nickname.Equals(displayName))
-                    {
-                        nickNameUpdate = true;
-                    }
-                }
-
-                //Remove the original role id
-                var roleIds = gUser.Roles.Select(x => x.Id).ToList();
-
-                //Add the new role id to the user roleids
-                if (newRank != null)
-                {
-                    roleIds.Add(newRank.RoleId);
-                }
-
-                //Check to see if the user's rank was changed and update accordingly
-                //TODO: Check edge cases for when the user's rank is below the registered rank?
-                //Potentially ensure that registered rank is not removed from user.
-                //TODO: Look into if a user receives more points and skips a level what will happen.
-                if (state != RankChangeState.None)
-                {
-                    if (maxRank != null)
-                    {
-                        roleIds.Remove(maxRank.RoleId);
-                    }
-                }
-
-                bool updateRoles = false;
-                //Compare the updated roles against the original roles for equality                
-                if (!Enumerable.SequenceEqual(roleIds.Distinct().OrderBy(x => x), gUser.Roles.Select(x => x.Id).OrderBy(x => x)))
-                {
-                    updateRoles = true;
-                }
-
-                //TODO: Test if logic within modifyasync works as intended.
-                if (updateRoles || nickNameUpdate)
-                {
-                    await gUser.ModifyAsync(x =>
-                    {
-                        if (nickNameUpdate)
-                        {
-                            x.Nickname = displayName;
-                        }
-
-                        if (updateRoles)
-                        {
-                            //Set the user's roles to the modified list which removes and lost ranks and adds any gained ranks
-                            x.RoleIds = roleIds.Where(r => r != Context.Guild.EveryoneRole.Id).ToArray();
-                        }
-                    });                    
-                }*/
-                #endregion
 
                 var rankUpdate = "";
                 if (maxRank != null || newRank != null)
