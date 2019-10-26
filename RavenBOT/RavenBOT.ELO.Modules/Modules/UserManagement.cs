@@ -23,6 +23,7 @@ namespace RavenBOT.ELO.Modules.Modules
         public ELOService Service { get; }
 
         [Command("NameHistory", RunMode = RunMode.Async)]
+        [Summary("Displays name update history for the specified user.")]
         public async Task NameHistoryAsync(SocketGuildUser user)
         {
             if (!user.IsRegistered(Service, out var player))
@@ -47,6 +48,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
         [Command("Bans", RunMode = RunMode.Async)]
         [Alias("Banlist")]
+        [Summary("Shows all bans for the current server.")]
         public async Task Bans()
         {
             var players = Service.GetPlayers(x => x.GuildId == Context.Guild.Id && x.IsBanned);
@@ -66,6 +68,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("Unban", RunMode = RunMode.Sync)]
+        [Summary("Unbans the specified user.")]
         public async Task Unban(SocketGuildUser user)
         {
             if (!user.IsRegistered(Service, out var player))
@@ -81,6 +84,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
         [Command("BanUser", RunMode = RunMode.Sync)]
         [Alias("Ban")]
+        [Summary("Bans the specified user for the specified amount of time, optional reason.")]
         public async Task BanUserAsync(TimeSpan time, SocketGuildUser user, [Remainder]string reason = null)
         {
             var player = Service.GetPlayer(Context.Guild.Id, user.Id);
@@ -97,6 +101,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
         [Command("RenameUser", RunMode = RunMode.Sync)]
         [Alias("ForceRename")]
+        [Summary("Renames the specified user.")]
         public async Task RenameUserAsync(SocketGuildUser user, [Remainder]string newname)
         {
             if (!user.IsRegistered(Service, out var player))
@@ -122,6 +127,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
         [Command("DeleteUser", RunMode = RunMode.Sync)]
         [Alias("DelUser")]
+        [Summary("Deletes the specified user from the ELO competition, NOTE: Will not affect the LobbyLeaderboard command")]
         public async Task DeleteUserAsync(SocketGuildUser user)
         {
             var player = Service.GetPlayer(Context.Guild.Id, user.Id);
