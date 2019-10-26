@@ -24,6 +24,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
         [Command("CreateLobby", RunMode = RunMode.Sync)]
         [Alias("Create Lobby")]
+        [Summary("Creates a lobby with the specified players per team and specified pick mode")]
         public async Task CreateLobbyAsync(int playersPerTeam = 5, Lobby.PickMode pickMode = Lobby.PickMode.Captains_RandomHighestRanked)
         {
             if (Service.GetLobby(Context.Guild.Id, Context.Channel.Id) != null)
@@ -43,6 +44,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
         [Command("SetPlayerCount", RunMode = RunMode.Sync)]
         [Alias("Set Player Count", "Set PlayerCount")]
+        [Summary("Sets the amount of players per team.")]
         public async Task SetPlayerAsync(int playersPerTeam)
         {
             var lobby = Service.GetLobby(Context.Guild.Id, Context.Channel.Id);
@@ -59,6 +61,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
         [Command("SetPickMode", RunMode = RunMode.Sync)]
         [Alias("Set PickMode", "Set Pick Mode")]
+        [Summary("Sets how players will be picked for teams in the current lobby.")]
         public async Task SetPickModeAsync(Lobby.PickMode pickMode)
         {
             var lobby = Service.GetLobby(Context.Guild.Id, Context.Channel.Id);
@@ -75,6 +78,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
         
         [Command("ReactOnJoinLeave", RunMode = RunMode.Sync)]
+        [Summary("Sets whether the bot will react or send a message when users join or leave a lobby.")]
         public async Task ReactOnJoinLeaveAsync(bool react)
         {
             var lobby = Service.GetLobby(Context.Guild.Id, Context.Channel.Id);
@@ -90,6 +94,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("PickModes", RunMode = RunMode.Async)]
+        [Summary("Displays all pick modes to use with the SetPickMode command")]
         //[Alias("Pick Modes")] ignore this as it can potentially conflict with the lobby Pick command.
         public async Task DisplayPickModesAsync()
         {
@@ -98,6 +103,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
         [Command("SetPickOrder", RunMode = RunMode.Sync)]
         [Alias("Set PickOrder", "Set Pick Order")]
+        [Summary("Sets how captains pick players.")]
         public async Task SetPickOrderAsync(GameResult.CaptainPickOrder orderMode)
         {
             var lobby = Service.GetLobby(Context.Guild.Id, Context.Channel.Id);
@@ -113,7 +119,8 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
 
-        [Command("PickOrders", RunMode = RunMode.Async)]
+        [Command("PickOrders", RunMode = RunMode.Async)]        
+        [Summary("Shows pickorder settings for the SetPickOrder command")]
         public async Task DisplayPickOrdersAsync()
         {
             var res = "`PickOne` - Captains each alternate picking one player until there are none remaining\n" +
@@ -125,6 +132,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
         [Command("SetGameReadyAnnouncementChannel", RunMode = RunMode.Sync)]
         [Alias("GameReadyAnnouncementsChannel", "GameReadyAnnouncements", "ReadyAnnouncements", "SetReadyAnnouncements")]
+        [Summary("Set a channel to send game ready announcements for the current lobby to.")]
         public async Task GameReadyAnnouncementChannel(SocketTextChannel destinationChannel = null)
         {
             if (destinationChannel == null)
@@ -153,6 +161,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
         [Command("SetGameResultAnnouncementChannel", RunMode = RunMode.Sync)]
         [Alias("SetGameResultAnnouncements", "GameResultAnnouncements")]
+        [Summary("Set a channel to send game result announcements for the current lobby to.")]
         public async Task GameResultAnnouncementChannel(SocketTextChannel destinationChannel = null)
         {
             if (destinationChannel == null)
@@ -180,6 +189,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("SetMinimumPoints", RunMode = RunMode.Sync)]
+        [Summary("Set the minimum amount of points required to queue for the current lobby.")]
         public async Task SetMinimumPointsAsync(int points)
         {
             var lobby = Service.GetLobby(Context.Guild.Id, Context.Channel.Id);
@@ -196,6 +206,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("ResetMinimumPoints", RunMode = RunMode.Sync)]
+        [Summary("Resets minimum points to join the lobby, allowing all players to join.")]
         public async Task ResetMinPointsAsync()
         {
             var lobby = Service.GetLobby(Context.Guild.Id, Context.Channel.Id);
@@ -212,6 +223,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
         
         [Command("MapMode", RunMode = RunMode.Sync)]
+        [Summary("Sets the map selection mode for the lobby.")]
         public async Task MapModeAsync(MapSelector.MapMode mode)
         {
             if (mode == MapSelector.MapMode.Vote)
@@ -245,6 +257,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }     
 
         [Command("MapMode", RunMode = RunMode.Async)]
+        [Summary("Shows the current map selection mode for the lobby.")]
         public async Task MapModeAsync()
         {
             var lobby = Service.GetLobby(Context.Guild.Id, Context.Channel.Id);
@@ -264,12 +277,14 @@ namespace RavenBOT.ELO.Modules.Modules
         }         
 
         [Command("MapModes", RunMode = RunMode.Async)]
+        [Summary("Shows all available map selection modes.")]
         public async Task MapModes()
         {
             await ReplyAsync(string.Join(", ", Extensions.EnumNames<MapSelector.MapMode>()));
         }
 
         [Command("ClearMaps", RunMode = RunMode.Sync)]
+        [Summary("Removes all maps set for the current lobby.")]
         public async Task MapClear()
         {
             var lobby = Service.GetLobby(Context.Guild.Id, Context.Channel.Id);
@@ -292,6 +307,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
         [Command("AddMap", RunMode = RunMode.Sync)]
         [Alias("Add Map")]
+        [Summary("Adds a single map to the maps list.")]
         public async Task AddMapAsync([Remainder]string mapName)
         {
             var lobby = Service.GetLobby(Context.Guild.Id, Context.Channel.Id);
@@ -313,6 +329,8 @@ namespace RavenBOT.ELO.Modules.Modules
 
         [Command("AddMaps", RunMode = RunMode.Sync)]
         [Alias("Add Maps")]
+        [Summary("Adds multiple maps to the map list.")]
+        [Remarks("Separate the names using commas.")]
         public async Task AddMapsAsync([Remainder]string commaSeparatedMapNames)
         {
             var mapNames = commaSeparatedMapNames.Split(',');
@@ -339,6 +357,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("DelMap", RunMode = RunMode.Sync)]
+        [Summary("Removes the specified map from the map list.")]
         public async Task RemoveMapAsync([Remainder]string mapName)
         {
             var lobby = Service.GetLobby(Context.Guild.Id, Context.Channel.Id);
@@ -366,6 +385,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("ToggleDms", RunMode = RunMode.Sync)]
+        [Summary("Sets whether the bot will dm players when a game is ready.")]
         public async Task ToggleDmsAsync()
         {
             if (!Context.Channel.IsLobby(Service, out var lobby)) return;
@@ -376,6 +396,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("SetDescription", RunMode = RunMode.Sync)]
+        [Summary("Sets the lobbys description.")]
         public async Task SetDescriptionAsync([Remainder]string description)
         {
             if (!Context.Channel.IsLobby(Service, out var lobby)) return;
@@ -386,6 +407,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("DeleteLobby", RunMode = RunMode.Sync)]
+        [Summary("Deletes the current lobby and all game played in it.")]
         public async Task DeleteLobbyAsync()
         {
             if (Context.Channel.IsLobby(Service, out var lobby))
