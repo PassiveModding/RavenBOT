@@ -13,6 +13,7 @@ namespace RavenBOT.ELO.Modules.Modules
     {
         [Command("Maps", RunMode = RunMode.Async)]
         [Alias("MapList")]
+        [Summary("Displays map information")]
         public async Task MapsAsync()
         {
             if (!await CheckLobbyAsync())
@@ -35,6 +36,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("Lobby", RunMode = RunMode.Async)]
+        [Summary("Displays information about the current lobby.")]
         public async Task LobbyInfoAsync()
         {
             if (!await CheckLobbyAsync() || !await CheckRegisteredAsync())
@@ -70,6 +72,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
         [Command("Queue", RunMode = RunMode.Async)]
         [Alias("Q", "lps", "listplayers", "playerlist", "who")]
+        [Summary("Displays information about the current queue or current game being picked.")]
         public async Task ShowQueueAsync()
         {
             if (!await CheckLobbyAsync())
@@ -120,6 +123,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("LobbyLeaderboard", RunMode = RunMode.Async)]
+        [Summary("Displays a leaderboard with stats for the current lobby only.")]
         public async Task ShowLobbyLeaderboardAsync(ISocketMessageChannel channel = null)
         {
             if (channel == null)
