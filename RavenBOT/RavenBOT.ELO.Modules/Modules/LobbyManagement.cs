@@ -65,6 +65,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
         [Command("ClearQueue", RunMode = RunMode.Sync)]
         [Alias("Clear Queue", "clearq", "clearque")]
+        [Summary("Clears the current queue.")]
         [Preconditions.RequireModerator]
         public async Task ClearQueueAsync()
         {
@@ -160,6 +161,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("ForceRemove", RunMode = RunMode.Sync)]
+        [Summary("Forcefully removes a player for the queue")]
         [Preconditions.RequireModerator]
         public async Task ForceRemoveAsync(SocketGuildUser user)
         {
@@ -193,6 +195,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
         [Command("Pick", RunMode = RunMode.Sync)]
         [Alias("p")]
+        [Summary("Picks the specified player(s) for your team.")]
         public async Task PickPlayerAsync(params SocketGuildUser[] users)
         {
             if (!await CheckLobbyAsync() || !await CheckRegisteredAsync())

@@ -13,6 +13,7 @@ namespace RavenBOT.ELO.Modules.Modules
     {
         [Command("Join", RunMode = RunMode.Sync)]
         [Alias("JoinLobby", "Join Lobby", "j", "sign", "play", "ready")]
+        [Summary("Join the queue in the current lobby.")]
         public async Task JoinLobbyAsync()
         {
             if (!await CheckLobbyAsync() || !await CheckRegisteredAsync())
@@ -179,6 +180,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
         [Command("Leave", RunMode = RunMode.Sync)]
         [Alias("LeaveLobby", "Leave Lobby", "l", "out", "unsign", "remove", "unready")]
+        [Summary("Leave the queue in the current lobby.")]
         public async Task LeaveLobbyAsync()
         {
             if (!await CheckLobbyAsync() || !await CheckRegisteredAsync())
