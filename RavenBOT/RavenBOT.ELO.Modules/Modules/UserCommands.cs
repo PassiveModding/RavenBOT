@@ -24,6 +24,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
         [Command("Register", RunMode = RunMode.Sync)]
         [Alias("reg")]
+        [Summary("Register for the ELO competition.")]
         public async Task RegisterAsync([Remainder]string name = null)
         {
             
@@ -66,6 +67,7 @@ namespace RavenBOT.ELO.Modules.Modules
         }
 
         [Command("Rename", RunMode = RunMode.Sync)]
+        [Summary("Rename yourself.")]
         public async Task RenameAsync([Remainder]string name = null)
         {
 
