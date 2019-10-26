@@ -282,7 +282,7 @@ namespace RavenBOT.ELO.Modules.Modules
             }
             competition.AllowNegativeScore = allowNegative.Value;
             Service.SaveCompetition(competition);
-            await ReplyAsync($"Allow Negative Score: {allowNegative.Value}");
+            await ReplyAsync($"Allow Negative Score set to {allowNegative.Value}");
         }
 
         [Command("AllowReRegister", RunMode = RunMode.Sync)]
@@ -297,7 +297,7 @@ namespace RavenBOT.ELO.Modules.Modules
             }
             competition.AllowReRegister = reRegister.Value;
             Service.SaveCompetition(competition);
-            await ReplyAsync($"Allow re-register: {reRegister.Value}");
+            await ReplyAsync($"Allow re-register set to {reRegister.Value}");
         }
                 
         [Command("AllowSelfRename", RunMode = RunMode.Sync)]
@@ -312,7 +312,7 @@ namespace RavenBOT.ELO.Modules.Modules
             }
             competition.AllowSelfRename = selfRename.Value;
             Service.SaveCompetition(competition);
-            await ReplyAsync($"Allow Self Rename: {selfRename.Value}");
+            await ReplyAsync($"Allow Self Rename set to {selfRename.Value}");
         }
 
         [Command("DefaultWinModifier", RunMode = RunMode.Sync)]
@@ -328,7 +328,7 @@ namespace RavenBOT.ELO.Modules.Modules
             }
             competition.DefaultWinModifier = amountToAdd.Value;
             Service.SaveCompetition(competition);
-            await ReplyAsync("Competition Updated.");
+            await ReplyAsync($"Default Win Modifier set to {competition.DefaultWinModifier}");
         }
 
         
@@ -345,7 +345,7 @@ namespace RavenBOT.ELO.Modules.Modules
             }
             competition.DefaultLossModifier = amountToSubtract.Value;
             Service.SaveCompetition(competition);
-            await ReplyAsync("Competition Updated.");
+            await ReplyAsync($"Default Loss Modifier set to {competition.DefaultLossModifier}");
         }
 
         [Command("RankLossModifier", RunMode = RunMode.Sync)]
@@ -408,7 +408,7 @@ namespace RavenBOT.ELO.Modules.Modules
             }
             competition.UpdateNames = updateNicknames.Value;
             Service.SaveCompetition(competition);
-            await ReplyAsync($"Update Nicknames: {competition.UpdateNames}");
+            await ReplyAsync($"Update Nicknames set to {competition.UpdateNames}");
         }
 
         
