@@ -14,6 +14,7 @@ namespace RavenBOT.ELO.Modules.Modules
     {
         [Command("LastGame", RunMode = RunMode.Async)]
         [Alias("Last Game", "Latest Game", "LatestGame", "lg")]
+        [Summary("Shows information about the most recent game in the current (or specified) lobby")]
         public async Task LastGameAsync(SocketGuildChannel lobbyChannel = null)
         {
             if (lobbyChannel == null)
@@ -54,6 +55,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
         [Command("GameInfo", RunMode = RunMode.Async)]
         [Alias("Game Info", "Show Game", "ShowGame", "sg")]
+        [Summary("Shows information about the specified game in the current (or specified) lobby")]
         public async Task GameInfoAsync(int gameNumber, SocketGuildChannel lobbyChannel = null) //add functionality to specify lobby
         {
             if (lobbyChannel == null)
@@ -80,6 +82,7 @@ namespace RavenBOT.ELO.Modules.Modules
 
         [Command("ManualGameInfo", RunMode = RunMode.Async)]
         [Alias("Manual Game Info", "Show Manual Game", "ShowManualGame", "smg")]
+        [Summary("Shows information about the specified manual game")]
         public async Task ManualGameInfoAsync(int gameNumber)
         {
             var game = Service.GetManualGame(Context.Guild.Id, gameNumber);
