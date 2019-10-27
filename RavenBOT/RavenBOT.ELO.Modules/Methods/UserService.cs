@@ -22,6 +22,9 @@ namespace RavenBOT.ELO.Modules.Methods
                     var maxRank = rankMatches.Max(x => x.Points);
                     var match = rankMatches.First(x => x.Points == maxRank);
 
+                    //Remove other rank roles.
+                    var gRoles = user.Guild.Roles.Where(x => rankMatches.Any(r => r.RoleId == x.Id) && x.Id != match.RoleId && x.IsEveryone == false && x.IsManaged == false && x.Position < user.Guild.CurrentUser.Hierarchy).ToList();
+
                     //Check to see if the player already has the role
                     if (!user.Roles.Any(x => x.Id == match.RoleId))
                     {
@@ -32,6 +35,14 @@ namespace RavenBOT.ELO.Modules.Methods
                             if (role.Position < user.Guild.CurrentUser.Hierarchy)
                             {
                                 await user.AddRoleAsync(role);
+                                await user.ModifyAsync(x =>
+                                {
+                                    var ids = user.Roles.Select(r => r.Id).ToList();
+                                    ids.RemoveAll(r => gRoles.Any(g => g.Id == r));
+                                    ids.Add(role.Id);
+
+                                    x.RoleIds = ids;
+                                });
                                 noted.Add($"{user.Mention} received the {(role.IsMentionable ? role.Mention : role.Name)} rank");
                             }
                             else
@@ -48,6 +59,7 @@ namespace RavenBOT.ELO.Modules.Methods
                     }
                 }
 
+                //Ensure the user has the registerd role if it exists.
                 if (comp.RegisteredRankId != 0)
                 {
                     if (!user.Roles.Any(x => x.Id == comp.RegisteredRankId))
