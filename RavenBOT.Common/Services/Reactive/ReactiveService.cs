@@ -118,12 +118,35 @@ namespace RavenBOT.Common
             return await context.Channel.SendMessageAsync(message, false, embed);
         }
 
+        public async Task<IUserMessage> ReplyAsync(ShardedCommandContext context, Embed embed)
+        {
+            return await context.Channel.SendMessageAsync("", false, embed);
+        }
+
+        public async Task<IUserMessage> ReplyAsync(ShardedCommandContext context, EmbedBuilder embed)
+        {
+            return await context.Channel.SendMessageAsync("", false, embed.Build());
+        }
+
+
         public async Task<IUserMessage> SimpleEmbedAsync(ShardedCommandContext context, string content, Color? color = null)
         {
             var embed = new EmbedBuilder();
             embed.Description = content.FixLength(2047);
             embed.Color = color ?? Color.Default;
             return await context.Channel.SendMessageAsync("", false, embed.Build());
+        }
+
+        public async Task<IUserMessage> SimpleEmbedAndDeleteAsync(ShardedCommandContext context, string content, Color? color = null, TimeSpan? timeout = null)
+        {
+            var embed = new EmbedBuilder();
+            embed.Description = content.FixLength(2047);
+            embed.Color = color ?? Color.Default;
+            var message = await ReplyAsync(context, content, embed.Build());
+            _ = Task.Delay(timeout ?? TimeSpan.FromSeconds(15))
+                .ContinueWith(_ => message.DeleteAsync().ConfigureAwait(false))
+                .ConfigureAwait(false);
+            return message;
         }
 
         private async Task HandleReactionAsync(Cacheable<IUserMessage, ulong> message, ISocketMessageChannel channel, SocketReaction reaction)
