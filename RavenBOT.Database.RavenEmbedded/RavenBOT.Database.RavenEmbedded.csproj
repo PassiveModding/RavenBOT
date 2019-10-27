@@ -2,6 +2,11 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Description>RavenDB Embedded server implementation for RavenBOT's IDatabase interface</Description>
+    <PackageProjectUrl>https://github.com/PassiveModding/RavenBOT</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/PassiveModding/RavenBOT</RepositoryUrl>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
   
   <ItemGroup>
@@ -10,6 +15,13 @@
   
   <ItemGroup>
     <ProjectReference Include="..\RavenBOT.Common\RavenBOT.Common.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

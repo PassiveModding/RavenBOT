@@ -2,6 +2,11 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
+    <PackageProjectUrl>https://github.com/PassiveModding/RavenBOT/tree/RavenBOT-Libraries/RavenBOT.Core</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/PassiveModding/RavenBOT</RepositoryUrl>
+    <Description>Core RavenBOT handlers and modules</Description>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,6 +20,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\RavenBOT.Common\RavenBOT.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

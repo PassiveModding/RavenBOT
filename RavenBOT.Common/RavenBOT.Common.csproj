@@ -2,6 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageProjectUrl>https://github.com/PassiveModding/RavenBOT/tree/RavenBOT-Libraries/RavenBOT.Common</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/PassiveModding/RavenBOT</RepositoryUrl>
+    <PackageReleaseNotes />
+    <Description>Common services and classes for discord.net bots that implement RavenBOT</Description>
+    <Copyright />
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -9,6 +16,13 @@
     <PackageReference Include="Discord.Net.Core" Version="2.1.1" />
     <PackageReference Include="Discord.Net.WebSocket" Version="2.1.1" />
     <PackageReference Include="morelinq" Version="3.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
