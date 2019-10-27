@@ -142,7 +142,7 @@ namespace RavenBOT.Common
             var embed = new EmbedBuilder();
             embed.Description = content.FixLength(2047);
             embed.Color = color ?? Color.Default;
-            var message = await ReplyAsync(context, content, embed.Build());
+            var message = await context.Channel.SendMessageAsync("", false, embed.Build());
             _ = Task.Delay(timeout ?? TimeSpan.FromSeconds(15))
                 .ContinueWith(_ => message.DeleteAsync().ConfigureAwait(false))
                 .ConfigureAwait(false);

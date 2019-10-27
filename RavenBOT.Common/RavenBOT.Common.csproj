@@ -9,6 +9,9 @@
     <Description>Common services and classes for discord.net bots that implement RavenBOT</Description>
     <Copyright />
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
