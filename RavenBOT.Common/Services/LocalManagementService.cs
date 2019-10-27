@@ -28,6 +28,7 @@ namespace RavenBOT.Common
 
         public void SaveConfig(LocalConfig config)
         {
+            LastConfig = config;
             File.WriteAllText(ConfigPath, JsonConvert.SerializeObject(config, Formatting.Indented));
         }
 
