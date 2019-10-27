@@ -19,7 +19,7 @@ namespace RavenBOT.Common
         }
 
         private void TryGetInfo()
-        {         
+        {
             if (Info == null)
             {
                 var doc = Store.Load<PrefixInfo>(DocumentName);
@@ -29,8 +29,8 @@ namespace RavenBOT.Common
                     Store.Store(doc, DocumentName);
                 }
 
-                Info = doc;                
-            }   
+                Info = doc;
+            }
         }
 
         public string GetPrefix(ulong guildId)
@@ -48,7 +48,7 @@ namespace RavenBOT.Common
 
         public class PrefixInfo
         {
-            public PrefixInfo() {}
+            public PrefixInfo() { }
             public Dictionary<ulong, string> Prefixes { get; set; } = new Dictionary<ulong, string>();
 
             public void SetPrefix(ulong guildId, string prefix)

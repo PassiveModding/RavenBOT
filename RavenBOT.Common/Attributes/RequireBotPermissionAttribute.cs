@@ -1,14 +1,14 @@
-using System;
-using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
+using System;
+using System.Threading.Tasks;
 
 namespace RavenBOT.Common
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
     public class RavenRequireBotPermissionAttribute : PreconditionBase
     {
-        
+
         /// <summary>
         ///     Gets the specified <see cref="Discord.GuildPermission" /> of the precondition.
         /// </summary>

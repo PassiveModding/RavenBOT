@@ -1,8 +1,8 @@
+using Discord;
+using Discord.Commands;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Discord;
-using Discord.Commands;
 
 namespace RavenBOT.Common
 {
@@ -56,7 +56,7 @@ namespace RavenBOT.Common
 
         private readonly TimeSpan invokeLimitPeriod;
 
-        private readonly Dictionary < (ulong, ulong?), CommandTimeout > invokeTracker = new Dictionary < (ulong, ulong?), CommandTimeout > ();
+        private readonly Dictionary<(ulong, ulong?), CommandTimeout> invokeTracker = new Dictionary<(ulong, ulong?), CommandTimeout>();
 
         private readonly bool noLimitForAdmins;
 

@@ -1,8 +1,8 @@
-using System;
-using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using RavenBOT.Common;
+using System;
+using System.Threading.Tasks;
 
 namespace RavenBOT.Core.Modules
 {
@@ -83,7 +83,7 @@ namespace RavenBOT.Core.Modules
         public async Task ShowBlacklist()
         {
             var config = GuildService.GetConfig(Context.Guild.Id);
-            if (config == null || config.ModuleBlacklist.Count == 0) 
+            if (config == null || config.ModuleBlacklist.Count == 0)
             {
                 await ReplyAsync("Blacklist is empty.");
                 return;

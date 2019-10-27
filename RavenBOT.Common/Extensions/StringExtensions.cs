@@ -1,8 +1,8 @@
+using Discord;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Discord;
 
 namespace RavenBOT.Common
 {
@@ -23,7 +23,7 @@ namespace RavenBOT.Common
             return new EmbedBuilder
             {
                 Description = message.FixLength(2047),
-                    Color = color ?? Discord.Color.Blue
+                Color = color ?? Discord.Color.Blue
             }.Build();
         }
 
@@ -80,10 +80,10 @@ namespace RavenBOT.Common
 
         public static string GetReadableLength(this TimeSpan length)
         {
-            int days = (int) length.TotalDays;
-            int hours = (int) length.TotalHours - days * 24;
-            int minutes = (int) length.TotalMinutes - days * 24 * 60 - hours * 60;
-            int seconds = (int) length.TotalSeconds - days * 24 * 60 * 60 - hours * 60 * 60 - minutes * 60;
+            int days = (int)length.TotalDays;
+            int hours = (int)length.TotalHours - days * 24;
+            int minutes = (int)length.TotalMinutes - days * 24 * 60 - hours * 60;
+            int seconds = (int)length.TotalSeconds - days * 24 * 60 * 60 - hours * 60 * 60 - minutes * 60;
 
             return $"{(days > 0 ? $"{days} Day(s) " : "")}{(hours > 0 ? $"{hours} Hour(s) " : "")}{(minutes > 0 ? $"{minutes} Minute(s) " : "")}{(seconds > 0 ? $"{seconds} Second(s)" : "")}";
         }

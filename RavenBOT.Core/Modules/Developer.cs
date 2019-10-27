@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.Webhook;
@@ -9,6 +5,10 @@ using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using RavenBOT.Common;
 using RavenBOT.Migrations;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace RavenBOT.Core.Modules
 {

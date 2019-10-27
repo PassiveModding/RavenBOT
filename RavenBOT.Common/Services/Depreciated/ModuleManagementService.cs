@@ -30,7 +30,7 @@ namespace RavenBOT.Common
             {
                 GuildId = guildId;
             }
-            public ModuleConfig() {}
+            public ModuleConfig() { }
 
             public ulong GuildId { get; set; }
             public List<string> Blacklist { get; set; } = new List<string>();

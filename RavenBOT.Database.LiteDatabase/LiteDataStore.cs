@@ -1,8 +1,8 @@
+using LiteDB;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using LiteDB;
 
 namespace RavenBOT.Common.Interfaces.Database
 {
@@ -35,7 +35,7 @@ namespace RavenBOT.Common.Interfaces.Database
             Value = value;
         }
 
-        public BaseEntity() {}
+        public BaseEntity() { }
 
         public string Id { get; set; }
         public T Value { get; set; }
@@ -85,7 +85,7 @@ namespace RavenBOT.Common.Interfaces.Database
 
         public void StoreInCollection<T>(LiteCollection<BaseEntity<T>> collection, T document, string name = null)
         {
-            lock(locker)
+            lock (locker)
             {
                 collection.Upsert(new BaseEntity<T>(document, name));
             }
@@ -110,7 +110,7 @@ namespace RavenBOT.Common.Interfaces.Database
 
         public T Load<T>(string documentName) where T : class
         {
-            lock(locker)
+            lock (locker)
             {
                 var collection = GetCollection<T>();
                 try
@@ -145,7 +145,7 @@ namespace RavenBOT.Common.Interfaces.Database
 
         public void RemoveDocument<T>(T document)
         {
-            lock(locker)
+            lock (locker)
             {
                 var collection = GetCollection<T>();
                 collection.Delete(x => x.Equals(document));
@@ -160,7 +160,7 @@ namespace RavenBOT.Common.Interfaces.Database
 
         public void Remove<T>(string documentName)
         {
-            lock(locker)
+            lock (locker)
             {
                 var collection = GetCollection<T>();
                 collection.Delete(x => x.Id == documentName);
@@ -169,7 +169,7 @@ namespace RavenBOT.Common.Interfaces.Database
 
         public void RemoveManyDocuments<T>(List<T> documents)
         {
-            lock(locker)
+            lock (locker)
             {
                 var collection = GetCollection<T>();
                 collection.Delete(x => documents.Contains(x.Value));
@@ -178,7 +178,7 @@ namespace RavenBOT.Common.Interfaces.Database
 
         public void RemoveMany<T>(List<string> docNames)
         {
-            lock(locker)
+            lock (locker)
             {
                 var collection = GetCollection<T>();
                 foreach (var name in docNames)
@@ -197,7 +197,7 @@ namespace RavenBOT.Common.Interfaces.Database
         public bool Any<T>(Expression<Func<T, bool>> queryFunc)
         {
             lock (locker)
-            {     
+            {
                 //TODO: Check that this is valid           
                 var collection = GetCollection<T>();
                 var func = queryFunc.Compile();

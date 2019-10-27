@@ -1,6 +1,6 @@
-using System;
 using Discord;
 using Discord.WebSocket;
+using System;
 
 namespace RavenBOT.Common
 {

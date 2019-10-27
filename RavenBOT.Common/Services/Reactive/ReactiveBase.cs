@@ -1,9 +1,9 @@
-using System.Collections.Generic;
-using System;
-using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace RavenBOT.Common
 {
@@ -14,7 +14,7 @@ namespace RavenBOT.Common
         public Task<IUserMessage> PagedReplyAsync(ReactivePagerCallback pagerCallback)
                             => ReactiveService.SendPagedMessageAsync(Context, pagerCallback);
 
-        public Task<IUserMessage> SimpleEmbedAsync(string content, Color? color = null) 
+        public Task<IUserMessage> SimpleEmbedAsync(string content, Color? color = null)
                             => ReactiveService.SimpleEmbedAsync(Context, content, color);
 
         public Task<IUserMessage> ReplyAndDeleteAsync(string content, Embed embed = null, TimeSpan? timeout = null)

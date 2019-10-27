@@ -1,11 +1,11 @@
+using Discord;
+using Discord.Commands;
+using MoreLinq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Discord;
-using Discord.Commands;
-using MoreLinq;
 
 namespace RavenBOT.Common
 {
@@ -187,7 +187,7 @@ namespace RavenBOT.Common
                 {
                     page.Fields.Add(new EmbedFieldBuilder
                     {
-                        Name = "Module Preconditions", 
+                        Name = "Module Preconditions",
                         Value = GetPreconditionSummaries(modPreconditons) ?? "N/A"
                     });
                 }
@@ -233,7 +233,7 @@ namespace RavenBOT.Common
 
         public string GetPreconditionSummaries(IEnumerable<PreconditionAttribute> preconditions)
         {
-            var preconditionString = string.Join("\n", preconditions.Select(x => 
+            var preconditionString = string.Join("\n", preconditions.Select(x =>
                 {
                     if (x is PreconditionBase preBase)
                     {
@@ -249,7 +249,7 @@ namespace RavenBOT.Common
         }
 
         public async Task<bool> CheckPreconditionsAsync(ShardedCommandContext context, CommandInfo command, DeveloperSettings.Settings settings)
-        {            
+        {
             if (context == null)
             {
                 return true;

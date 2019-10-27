@@ -1,7 +1,7 @@
-using System;
-using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
+using System;
+using System.Threading.Tasks;
 
 namespace RavenBOT.Common
 {
@@ -18,7 +18,7 @@ namespace RavenBOT.Common
                         return PreconditionResult.FromError("Command can only be run by the owner of the bot.");
                     return PreconditionResult.FromSuccess();
                 default:
-                    return PreconditionResult.FromError($"{nameof(RequireOwnerAttribute)} is not supported by this {nameof(TokenType)}.");                    
+                    return PreconditionResult.FromError($"{nameof(RequireOwnerAttribute)} is not supported by this {nameof(TokenType)}.");
             }
         }
 

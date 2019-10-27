@@ -1,7 +1,7 @@
-using System.Collections.Generic;
-using System.Linq;
 using Discord.Commands;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace RavenBOT.Common
 {
@@ -71,7 +71,7 @@ namespace RavenBOT.Common
                     Preconditions = x.Preconditions.Select(p => GetPreconditionOverview(p)).ToList()
                 }).ToList()
             });
-            
+
             return JsonConvert.SerializeObject(overviews, Formatting.Indented);
         }
     }

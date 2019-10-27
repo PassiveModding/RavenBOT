@@ -54,7 +54,7 @@ namespace RavenBOT.Common
                 AntiCache.Add(guildId);
             }
 
-            return res;            
+            return res;
         }
 
         /// <summary>
@@ -138,7 +138,7 @@ namespace RavenBOT.Common
                 GuildId = guildId;
             }
 
-            public GuildConfig(){}
+            public GuildConfig() { }
 
             public ulong GuildId { get; set; }
 

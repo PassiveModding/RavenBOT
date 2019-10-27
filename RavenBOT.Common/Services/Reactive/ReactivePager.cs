@@ -1,7 +1,6 @@
-using System.Collections;
+using Discord;
 using System;
 using System.Collections.Generic;
-using Discord;
 
 namespace RavenBOT.Common
 {
@@ -10,7 +9,7 @@ namespace RavenBOT.Common
     /// </summary>
     public class ReactivePager
     {
-        public ReactivePager(){}
+        public ReactivePager() { }
         public ReactivePager(IEnumerable<ReactivePage> pages)
         {
             Pages = pages;

@@ -1,14 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using RavenBOT.Common;
 using RavenBOT.Core.Modules;
 using RavenBOT.Core.TypeReaders.EmojiReader;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace RavenBOT.Handlers
 {
@@ -69,8 +69,8 @@ namespace RavenBOT.Handlers
             await firstChannel?.SendMessageAsync("", false, new EmbedBuilder()
             {
                 Title = $"{Client.CurrentUser.Username}",
-                    Description = $"Get started by using the help command: `{prefix}help`",
-                    Color = Color.Green
+                Description = $"Get started by using the help command: `{prefix}help`",
+                Color = Color.Green
             }.Build());
         }
 
@@ -82,7 +82,7 @@ namespace RavenBOT.Handlers
             }
             else
             {
-                
+
 
                 if (result is ExecuteResult exResult)
                 {
@@ -90,23 +90,23 @@ namespace RavenBOT.Handlers
                     await context.Channel.SendMessageAsync("", false, new EmbedBuilder
                     {
                         Title = $"Command Execution Error{(result.Error.HasValue ? $": {result.Error.Value}" : "")}",
-                            Description = $"Message: {context.Message.Content.FixLength(512)}\n" +
+                        Description = $"Message: {context.Message.Content.FixLength(512)}\n" +
                             "__**Error**__\n" +
                             $"{result.ErrorReason.FixLength(512)}\n" +
                             $"{exResult.Exception}".FixLength(1024),
-                            Color = Color.LightOrange
+                        Color = Color.LightOrange
                     }.Build());
                 }
                 else if (result is PreconditionResult preResult)
-                { 
+                {
                     Logger.Log($"{context.Message.Content}\n{result.Error}\n{result.ErrorReason}", new LogContext(context), LogSeverity.Error);
                     await context.Channel.SendMessageAsync("", false, new EmbedBuilder
                     {
                         Title = $"Command Precondition Error{(result.Error.HasValue ? $": {result.Error.Value}" : "")}",
-                            Description = $"Message: {context.Message.Content.FixLength(512)}\n" +
+                        Description = $"Message: {context.Message.Content.FixLength(512)}\n" +
                             "__**Error**__\n" +
                             $"{result.ErrorReason.FixLength(512)}\n".FixLength(1024),
-                            Color = Color.LightOrange
+                        Color = Color.LightOrange
                     }.Build());
                 }
                 else if (result is RuntimeResult runResult)
@@ -116,16 +116,16 @@ namespace RavenBOT.Handlers
                     await context.Channel.SendMessageAsync("", false, new EmbedBuilder
                     {
                         Title = $"Command Runtime Error{(result.Error.HasValue ? $": {result.Error.Value}" : "")}",
-                            Description = $"Message: {context.Message.Content.FixLength(512)}\n" +
+                        Description = $"Message: {context.Message.Content.FixLength(512)}\n" +
                             "__**Error**__\n" +
                             $"{runResult.Reason.FixLength(512)}\n".FixLength(1024),
-                            Color = Color.LightOrange
+                        Color = Color.LightOrange
                     }.Build());
                 }
                 else if (result is SearchResult sResult)
                 {
                     Logger.Log($"{context.Message.Content}\n{result.Error}\n{result.ErrorReason}", new LogContext(context), LogSeverity.Error);
-                    
+
                     var config = GuildService.GetConfig(context.Guild?.Id ?? 0);
                     if (config != null && !config.DisplayUnknownCommandResponse) return;
                     //if (GuildService.GetConfig(context.Guild?.Id ?? 0)?.DisplayUnknownCommandResponse != true) return;
@@ -152,9 +152,9 @@ namespace RavenBOT.Handlers
                     await context.Channel.SendMessageAsync("", false, new EmbedBuilder()
                     {
                         Title = $"Unknown Command",
-                            Description = $"Message: {context.Message.Content.FixLength(512)}\n" +
+                        Description = $"Message: {context.Message.Content.FixLength(512)}\n" +
                             $"Similar commands: \n{string.Join("\n", similar)}",
-                            Color = Color.Red
+                        Color = Color.Red
                     }.Build());
                 }
                 else if (result is ParseResult pResult)
@@ -172,11 +172,11 @@ namespace RavenBOT.Handlers
                         await context.Channel.SendMessageAsync("", false, new EmbedBuilder
                         {
                             Title = $"Argument Error {result.Error.Value}",
-                                Description = $"`{commandInfo.Value.Aliases.First()}{string.Join(" ", commandInfo.Value.Parameters.Select(x => x.ParameterInformation()))}`\n" +
+                            Description = $"`{commandInfo.Value.Aliases.First()}{string.Join(" ", commandInfo.Value.Parameters.Select(x => x.ParameterInformation()))}`\n" +
                                 $"Message: {context.Message.Content.FixLength(512)}\n" +
                                 "__**Error**__\n" +
                                 $"{result.ErrorReason.FixLength(512)}",
-                                Color = Color.DarkRed
+                            Color = Color.DarkRed
 
                         }.Build());
                     }
@@ -185,10 +185,10 @@ namespace RavenBOT.Handlers
                         await context.Channel.SendMessageAsync("", false, new EmbedBuilder
                         {
                             Title = $"Command Parse Error{(result.Error.HasValue ? $": {result.Error.Value}" : "")}",
-                                Description = $"Message: {context.Message.Content.FixLength(512)}\n" +
+                            Description = $"Message: {context.Message.Content.FixLength(512)}\n" +
                                 "__**Error**__\n" +
                                 $"{result.ErrorReason.FixLength(512)}\n".FixLength(1024),
-                                Color = Color.LightOrange
+                            Color = Color.LightOrange
                         }.Build());
                     }
                 }
@@ -198,10 +198,10 @@ namespace RavenBOT.Handlers
                     await context.Channel.SendMessageAsync("", false, new EmbedBuilder
                     {
                         Title = $"Command Error{(result.Error.HasValue ? $": {result.Error.Value}" : "")}",
-                            Description = $"Message: {context.Message.Content.FixLength(512)}\n" +
+                        Description = $"Message: {context.Message.Content.FixLength(512)}\n" +
                             "__**Error**__\n" +
                             $"{result.ErrorReason.FixLength(512)}\n".FixLength(1024),
-                            Color = Color.LightOrange
+                        Color = Color.LightOrange
                     }.Build());
                 }
             }
@@ -215,7 +215,7 @@ namespace RavenBOT.Handlers
             await Client.StartAsync();
             await RegisterModulesAsync();
             var preconditionWarnings = new List<string>();
-            foreach (var command in  CommandService.Commands)
+            foreach (var command in CommandService.Commands)
             {
                 foreach (var precondition in command.Preconditions)
                 {
@@ -239,7 +239,7 @@ namespace RavenBOT.Handlers
 
             if (preconditionWarnings.Any())
             {
-                var warnString = "The following commands/modules have preconditions that do not " + 
+                var warnString = "The following commands/modules have preconditions that do not " +
                                  $"inherit {typeof(PreconditionBase)} and will not display in the help commands\n" +
                                  string.Join("\n", preconditionWarnings);
                 Logger.Log(warnString, LogSeverity.Warning);
@@ -248,8 +248,8 @@ namespace RavenBOT.Handlers
 
         public async Task RegisterModulesAsync()
         {
-            await CommandService.AddModuleAsync(typeof(Developer), Provider); 
-            await CommandService.AddModuleAsync(typeof(GuildConfiguration), Provider); 
+            await CommandService.AddModuleAsync(typeof(Developer), Provider);
+            await CommandService.AddModuleAsync(typeof(GuildConfiguration), Provider);
             await CommandService.AddModuleAsync(typeof(Main), Provider);
             await CommandService.AddModulesAsync(Assembly.GetEntryAssembly(), Provider);
         }

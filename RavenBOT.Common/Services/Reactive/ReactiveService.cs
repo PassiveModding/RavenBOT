@@ -1,16 +1,16 @@
-using System.Collections.Generic;
-using System;
-using System.Threading.Tasks;
 using Discord;
-using Discord.WebSocket;
 using Discord.Commands;
+using Discord.WebSocket;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace RavenBOT.Common
 {
     public class ReactiveService : IDisposable, IServiceable
     {
         public DiscordShardedClient Client { get; }
-        
+
         private readonly Dictionary<ulong, IReactiveCallback> callbacks;
         public ReactiveService(DiscordShardedClient client)
         {
@@ -35,7 +35,7 @@ namespace RavenBOT.Common
             _ = Task.Delay(timeout ?? TimeSpan.FromSeconds(15))
                 .ContinueWith(_ => message.DeleteAsync().ConfigureAwait(false))
                 .ConfigureAwait(false);
-                return message;
+            return message;
         }
 
         public async Task<Dictionary<ulong, IUserMessage>> MessageUsersAsync(ShardedCommandContext context, ulong[] userIds, string message, Embed embed = null)

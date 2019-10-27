@@ -1,10 +1,10 @@
-using System.Collections.Generic;
-using System.Linq;
-using System;
-using System.Threading.Tasks;
+using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Discord;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace RavenBOT.Common
 {
@@ -15,7 +15,7 @@ namespace RavenBOT.Common
             _timeout = timeout;
             Pager = pager;
             Callbacks = new Dictionary<IEmote, Func<ReactivePagerCallback, SocketReaction, Task<bool>>>();
-            pages = Pager.Pages.Count();            
+            pages = Pager.Pages.Count();
         }
         public RunMode RunMode => RunMode.Async;
 
@@ -152,7 +152,7 @@ namespace RavenBOT.Common
         {
             if (collection.Count() == 0)
             {
-                collection = new ReactivePage[]{new ReactivePage()};
+                collection = new ReactivePage[] { new ReactivePage() };
             }
             Pager.Pages = collection;
             page = 1;
@@ -221,7 +221,7 @@ namespace RavenBOT.Common
             var embed = BuildEmbed();
             var message = await _context.Channel.SendMessageAsync(Pager.Content, embed: embed).ConfigureAwait(false);
             Message = message;
-            
+
             //Only attempt to add reaction if the bot has permissions to do so.
             var canReact = _context.Guild?.CurrentUser.GetPermissions(context.Channel as SocketTextChannel).AddReactions;
 
@@ -230,7 +230,7 @@ namespace RavenBOT.Common
                 if (Callbacks.Any())
                 {
                     await Message.AddReactionsAsync(Callbacks.Select(x => x.Key).ToArray());
-                }                      
+                }
             }
         }
 
@@ -248,11 +248,11 @@ namespace RavenBOT.Common
 
         public ReactivePagerCallback WithDefaultPagerCallbacks()
         {
-            Callbacks.Add(new Emoji("⏮") , (x, y) => FirstAsync(y));
-            Callbacks.Add(new Emoji("◀") , (x, y) => PreviousAsync(y));
-            Callbacks.Add(new Emoji("▶") , (x, y) => NextAsync(y));
-            Callbacks.Add(new Emoji("⏭") , (x, y) => LastAsync(y));
-            Callbacks.Add(new Emoji("⏹") , (x, y) => TrashAsync());
+            Callbacks.Add(new Emoji("⏮"), (x, y) => FirstAsync(y));
+            Callbacks.Add(new Emoji("◀"), (x, y) => PreviousAsync(y));
+            Callbacks.Add(new Emoji("▶"), (x, y) => NextAsync(y));
+            Callbacks.Add(new Emoji("⏭"), (x, y) => LastAsync(y));
+            Callbacks.Add(new Emoji("⏹"), (x, y) => TrashAsync());
             return this;
         }
     }

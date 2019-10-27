@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using Discord.Commands;
 
 namespace RavenBOT.Common
@@ -9,6 +7,6 @@ namespace RavenBOT.Common
     public abstract class PreconditionBase : PreconditionAttribute
     {
         public abstract string PreviewText();
-        public abstract string Name(); 
+        public abstract string Name();
     }
 }

@@ -1,11 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 using MoreLinq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace RavenBOT.Common
 {
@@ -59,7 +58,7 @@ namespace RavenBOT.Common
         {
             var bounds = new { Height = s.Length + 1, Width = t.Length + 1 };
 
-            int[, ] matrix = new int[bounds.Height, bounds.Width];
+            int[,] matrix = new int[bounds.Height, bounds.Width];
 
             for (int height = 0; height < bounds.Height; height++) { matrix[height, 0] = height; };
             for (int width = 0; width < bounds.Width; width++) { matrix[0, width] = width; };
@@ -127,8 +126,8 @@ namespace RavenBOT.Common
         }
 
         public static IEnumerable<string> GetUserMentionList(IEnumerable<ulong> userIds)
-        {    
-            return userIds.Select(x => 
+        {
+            return userIds.Select(x =>
             {
                 return MentionUtils.MentionUser(x);
             });

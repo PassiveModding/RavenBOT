@@ -1,6 +1,6 @@
+using Discord;
 using System;
 using System.Linq;
-using Discord;
 
 namespace RavenBOT.Core.TypeReaders.EmojiReader
 {

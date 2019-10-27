@@ -1,8 +1,8 @@
-using System;
-using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using System;
+using System.Threading.Tasks;
 
 namespace RavenBOT.Handlers
 {
@@ -21,7 +21,7 @@ namespace RavenBOT.Handlers
                 if (message.Author.IsBot || message.Author.IsWebhook)
                 {
                     return;
-                }                
+                }
             }
             else
             {
@@ -57,7 +57,7 @@ namespace RavenBOT.Handlers
             var result = await CommandService.ExecuteAsync(context, argPos, Provider);
         }
 
-        public Func<DiscordShardedClient, SocketUserMessage, ICommandContext> GetCommandContext = (c, m) => new ShardedCommandContext(c, m);        
+        public Func<DiscordShardedClient, SocketUserMessage, ICommandContext> GetCommandContext = (c, m) => new ShardedCommandContext(c, m);
     }
 
 
