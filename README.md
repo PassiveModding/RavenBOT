@@ -7,10 +7,4 @@
 </p>
 </p>
 
-A modular Discord.NET bot with interchangeable database solutions and independent module support.
-### `Core Features`
-Database support, sharding, modularity, licensing, custom prefix support
-### `Module Features`
-Translations, moderation, music, reminders, birthday announcements, automated moderation, levels, partner messages, nsfw, image lookup, event logging and much more!
-### `Contributing`
-Feel free to make a pull request, report issues etc. I would love to see everyone's input!
+# This is the RavenBOT Library code. It is used as a framework for development for Raven, ELO and Cloner
