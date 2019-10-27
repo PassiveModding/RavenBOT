@@ -6,7 +6,6 @@
 *.user
 *.userosscache
 *.sln.docstates
-*Cloner*
 *.vscode/*
 
 # User-specific files (MonoDevelop/Xamarin Studio)
@@ -261,4 +260,3 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
-RavenBOT/RavenBOT.ELO.Modules/Models/Leaderboard/LeaderboardHandler.cs
