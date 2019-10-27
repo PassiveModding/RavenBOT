@@ -39,6 +39,7 @@ namespace RavenBOT.ELO.Modules.Methods
                                 {
                                     var ids = user.Roles.Select(r => r.Id).ToList();
                                     ids.RemoveAll(r => gRoles.Any(g => g.Id == r));
+                                    ids.Remove(user.Guild.EveryoneRole.Id);
                                     ids.Add(role.Id);
 
                                     x.RoleIds = ids;
