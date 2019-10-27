@@ -188,9 +188,9 @@ namespace RavenBOT.ELO.Modules.Modules
                 var content = page.Select(x => {
                     if (x.GameState == GameResult.State.Decided)
                     {
-                        return $"#{x.GameId}: Team {x.WinningTeam}";
+                        return $"`#{x.GameId}:` Team {x.WinningTeam}";
                     }
-                    return $"#{x.GameId}: {x.GameState}";
+                    return $"`#{x.GameId}:` {x.GameState}";
                 });
                 pages.Add(new ReactivePage
                 {
