@@ -2,23 +2,23 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageProjectUrl>https://github.com/PassiveModding/RavenBOT/tree/RavenBOT-Libraries/RavenBOT.Common</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/PassiveModding/RavenBOT/tree/RavenBOT-Libraries/RavenBOT.Core</PackageProjectUrl>
     <RepositoryUrl>https://github.com/PassiveModding/RavenBOT</RepositoryUrl>
-    <PackageReleaseNotes />
-    <Description>Common services and classes for discord.net bots that implement RavenBOT</Description>
-    <Copyright />
+    <Description>Core RavenBOT handlers and modules</Description>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
-    <Version>1.0.4.0</Version>
+    <Version>1.0.2</Version>
+    <PackageReleaseNotes>Updated to work with fixed version of RavenBOT.Common</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Discord.Net.Commands" Version="2.1.1" />
     <PackageReference Include="Discord.Net.Core" Version="2.1.1" />
+    <PackageReference Include="Discord.Net.Webhook" Version="2.1.1" />
     <PackageReference Include="Discord.Net.WebSocket" Version="2.1.1" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.6.0" />
     <PackageReference Include="morelinq" Version="3.2.0" />
+    <PackageReference Include="RavenBOT.Common" Version="1.0.2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,6 +26,10 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RavenBOT.Common\RavenBOT.Common.csproj" />
   </ItemGroup>
 
 </Project>

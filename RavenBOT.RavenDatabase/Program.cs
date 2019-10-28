@@ -37,7 +37,7 @@ namespace RavenBOT
             }            
 
             var localManagement = new LocalManagementService();
-            IDatabase database = new LiteDataStore(localManagement);
+            IDatabase database = new RavenDatabase(localManagement);
 
             var types = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(s => s.GetTypes())

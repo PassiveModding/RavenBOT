@@ -7,14 +7,12 @@
     <PackageProjectUrl>https://github.com/PassiveModding/RavenBOT</PackageProjectUrl>
     <RepositoryUrl>https://github.com/PassiveModding/RavenBOT</RepositoryUrl>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <Version>1.0.4.0</Version>
   </PropertyGroup>
   
   <ItemGroup>
+    <PackageReference Include="RavenBOT.Common" Version="1.0.2" />
     <PackageReference Include="RavenDB.Embedded" Version="4.2.0" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ProjectReference Include="..\RavenBOT.Common\RavenBOT.Common.csproj" />
   </ItemGroup>
   
   <ItemGroup>

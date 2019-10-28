@@ -11,11 +11,8 @@
     <PackageReference Include="Discord.Net.Core" Version="2.1.1" />
     <PackageReference Include="Discord.Net.WebSocket" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\RavenBOT.Core\RavenBOT.Core.csproj" />
-    <ProjectReference Include="..\RavenBOT.Database.LiteDatabase\RavenBOT.Database.LiteDatabase.csproj" />
+    <PackageReference Include="RavenBOT.Core" Version="1.0.2" />
+    <PackageReference Include="RavenBOT.Database.LiteDatabase" Version="1.0.0" />
   </ItemGroup>
   
 </Project>
