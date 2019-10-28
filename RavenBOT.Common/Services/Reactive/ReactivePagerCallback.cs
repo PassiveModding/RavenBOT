@@ -72,10 +72,12 @@ namespace RavenBOT.Common
                 }
             }
 
+            /*
             if (!Pager.Pages.Any())
             {
                 return true;
             }
+            */
 
             if (!Callbacks.Any())
             {
