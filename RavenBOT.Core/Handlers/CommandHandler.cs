@@ -9,7 +9,7 @@ namespace RavenBOT.Handlers
     //Command handling section of the event handler
     public partial class EventHandler
     {
-        private async Task MessageReceivedAsync(SocketMessage discordMessage)
+        public virtual async Task MessageReceivedAsync(SocketMessage discordMessage)
         {
             if (!(discordMessage is SocketUserMessage message))
             {
@@ -48,7 +48,7 @@ namespace RavenBOT.Handlers
                 return;
             }
 
-            var context = GetCommandContext(Client, message);
+            var context = new ShardedCommandContext(Client, message);
             if (!GuildService.IsModuleAllowed(context.Guild?.Id ?? 0, message.Content))
             {
                 return;
@@ -56,9 +56,5 @@ namespace RavenBOT.Handlers
 
             var result = await CommandService.ExecuteAsync(context, argPos, Provider);
         }
-
-        public Func<DiscordShardedClient, SocketUserMessage, ICommandContext> GetCommandContext = (c, m) => new ShardedCommandContext(c, m);
     }
-
-
 }

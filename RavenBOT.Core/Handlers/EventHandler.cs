@@ -15,12 +15,12 @@ namespace RavenBOT.Handlers
     //Login setup and logging events
     public partial class EventHandler
     {
-        internal DiscordShardedClient Client { get; }
-        internal LogHandler Logger { get; }
-        internal CommandService CommandService { get; }
+        public DiscordShardedClient Client { get; }
+        public LogHandler Logger { get; }
+        public CommandService CommandService { get; }
         public GuildService GuildService { get; }
         public LocalManagementService LocalManagementService { get; }
-        internal IServiceProvider Provider { get; }
+        public IServiceProvider Provider { get; }
 
 
         public EventHandler(DiscordShardedClient client, CommandService commandService, GuildService guildService, LocalManagementService local, LogHandler handler, IServiceProvider provider)
@@ -42,7 +42,7 @@ namespace RavenBOT.Handlers
             //commandService.CommandExecuted += async (cI, c, r) => await CommandExecutedAsync(cI, c, r);
         }
 
-        internal async Task JoinedGuildAsync(SocketGuild guild)
+        public virtual async Task JoinedGuildAsync(SocketGuild guild)
         {
             if (!LocalManagementService.LastConfig.IsAcceptable(guild.Id))
             {
@@ -72,7 +72,7 @@ namespace RavenBOT.Handlers
             }.Build());
         }
 
-        internal async Task CommandExecutedAsync(Optional<CommandInfo> commandInfo, ICommandContext context, IResult result)
+        public virtual async Task CommandExecutedAsync(Optional<CommandInfo> commandInfo, ICommandContext context, IResult result)
         {
             if (result.IsSuccess)
             {
@@ -205,7 +205,7 @@ namespace RavenBOT.Handlers
             }
         }
 
-        public async Task InitializeAsync()
+        public virtual async Task InitializeAsync()
         {
             CommandService.AddTypeReader(typeof(Emoji), new EmojiTypeReader());
 
@@ -244,7 +244,7 @@ namespace RavenBOT.Handlers
             }
         }
 
-        public async Task RegisterModulesAsync()
+        public virtual async Task RegisterModulesAsync()
         {
             await CommandService.AddModuleAsync(typeof(Developer), Provider);
             await CommandService.AddModuleAsync(typeof(GuildConfiguration), Provider);
@@ -252,19 +252,19 @@ namespace RavenBOT.Handlers
             await CommandService.AddModulesAsync(Assembly.GetEntryAssembly(), Provider);
         }
 
-        internal Task ShardConnectedAsync(DiscordSocketClient shard)
+        public virtual Task ShardConnectedAsync(DiscordSocketClient shard)
         {
             Logger.Log($"Shard {shard.ShardId} connected! Guilds:{shard.Guilds.Count} Users:{shard.Guilds.Sum(x => x.MemberCount)}");
             return Task.CompletedTask;
         }
 
-        internal Task ShardReadyAsync(DiscordSocketClient shard)
+        public virtual Task ShardReadyAsync(DiscordSocketClient shard)
         {
             Logger.Log($"Shard {shard.ShardId} ready! Guilds:{shard.Guilds.Count} Users:{shard.Guilds.Sum(x => x.MemberCount)}");
             return Task.CompletedTask;
         }
 
-        internal Task LogAsync(LogMessage message)
+        public virtual Task LogAsync(LogMessage message)
         {
             if (message.Message?.Contains("Rate limit triggered", StringComparison.InvariantCultureIgnoreCase) == true)
             {
