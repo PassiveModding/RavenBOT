@@ -43,6 +43,14 @@ namespace RavenBOT.Common
             if (config == null)
             {
                 config = new LocalConfig();
+                Console.WriteLine("Please enter your bot token (found at https://discordapp.com/developers/applications/ )");
+                config.Token = Console.ReadLine();
+
+                Console.WriteLine("Input a bot name (this will be used for certain database tasks)");
+                config.Name = Console.ReadLine();
+
+                Console.WriteLine("Input a bot prefix (this will be used to run commands, ie. prefix = f. command will be f.command)");
+                config.Prefix = Console.ReadLine();
 
                 Console.WriteLine("Please indicate Y for developer mode or N for regular mode. (This will override the default prefix with a different one)");
                 var devMode = Console.ReadLine();
@@ -86,6 +94,11 @@ namespace RavenBOT.Common
 
         public class LocalConfig
         {
+
+            public string Token { get; set; }
+            public string Prefix { get; set; }
+            public string Name { get; set; }
+
             public bool Developer { get; set; } = false;
 
             public bool IgnoreBotInput { get; set; } = true;

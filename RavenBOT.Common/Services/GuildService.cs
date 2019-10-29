@@ -11,16 +11,14 @@ namespace RavenBOT.Common
     public class GuildService : IServiceable
     {
         public IDatabase Database { get; }
-        public BotConfig Config { get; }
         public LocalManagementService Local { get; }
 
-        public GuildService(IDatabase database, BotConfig config, LocalManagementService local)
+        public GuildService(IDatabase database, LocalManagementService local)
         {
             this.Database = database;
-            Config = config;
             this.Local = local;
         }
-        public string DefaultPrefix => Local.LastConfig.Developer ? Local.LastConfig.DeveloperPrefix : Config.Prefix;
+        public string DefaultPrefix => Local.LastConfig.Developer ? Local.LastConfig.DeveloperPrefix : Local.LastConfig.Prefix;
 
         public Dictionary<ulong, GuildConfig> Cache { get; private set; } = new Dictionary<ulong, GuildConfig>();
 

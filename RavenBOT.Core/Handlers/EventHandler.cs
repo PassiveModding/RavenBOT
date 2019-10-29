@@ -16,7 +16,6 @@ namespace RavenBOT.Handlers
     public partial class EventHandler
     {
         internal DiscordShardedClient Client { get; }
-        internal BotConfig BotConfig { get; }
         internal LogHandler Logger { get; }
         internal CommandService CommandService { get; }
         public GuildService GuildService { get; }
@@ -24,11 +23,10 @@ namespace RavenBOT.Handlers
         internal IServiceProvider Provider { get; }
 
 
-        public EventHandler(DiscordShardedClient client, CommandService commandService, GuildService guildService, LocalManagementService local, BotConfig config, LogHandler handler, IServiceProvider provider)
+        public EventHandler(DiscordShardedClient client, CommandService commandService, GuildService guildService, LocalManagementService local, LogHandler handler, IServiceProvider provider)
         {
             Client = client;
             Logger = handler;
-            BotConfig = config;
             CommandService = commandService;
             GuildService = guildService;
             LocalManagementService = local;
@@ -211,7 +209,7 @@ namespace RavenBOT.Handlers
         {
             CommandService.AddTypeReader(typeof(Emoji), new EmojiTypeReader());
 
-            await Client.LoginAsync(TokenType.Bot, BotConfig.Token);
+            await Client.LoginAsync(TokenType.Bot, LocalManagementService.GetConfig().Token);
             await Client.StartAsync();
             await RegisterModulesAsync();
             var preconditionWarnings = new List<string>();

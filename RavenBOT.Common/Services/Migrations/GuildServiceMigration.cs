@@ -29,7 +29,7 @@ namespace RavenBOT.Migrations
                 foreach (var config in prefixInfo.Prefixes)
                 {
                     //Ignore configs that just use the default prefix.
-                    if (config.Value.Equals(Guild.Config.Prefix, System.StringComparison.InvariantCultureIgnoreCase)) continue;
+                    if (config.Value.Equals(Guild.Local.LastConfig.Prefix, System.StringComparison.InvariantCultureIgnoreCase)) continue;
 
                     var newConfig = new GuildService.GuildConfig(config.Key);
                     newConfig.PrefixOverride = config.Value;
@@ -68,7 +68,7 @@ namespace RavenBOT.Migrations
         public Task MigratePrefixes(PrefixService.PrefixInfo info, bool forced)
         {
             var currentDoc = Db.Load<PrefixService.PrefixInfo>(PrefixService.DocumentName);
-            var defaultPrefix = Guild.Config.Prefix;
+            var defaultPrefix = Guild.Local.LastConfig.Prefix;
             if (currentDoc != null)
             {
                 foreach (var config in currentDoc.Prefixes)

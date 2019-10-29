@@ -12,15 +12,15 @@ namespace RavenBOT.Common
     public partial class HelpService
     {
         public CommandService CommandService { get; }
-        public BotConfig Config { get; }
+        public LocalManagementService Local { get; }
         public GuildService GuildService { get; }
         public DeveloperSettings DeveloperSettings { get; }
         public IServiceProvider Provider { get; }
 
-        public HelpService(CommandService cmdService, BotConfig config, GuildService guildService, DeveloperSettings developerSettings, IServiceProvider provider)
+        public HelpService(CommandService cmdService, LocalManagementService local, GuildService guildService, DeveloperSettings developerSettings, IServiceProvider provider)
         {
             CommandService = cmdService;
-            Config = config;
+            Local = local;
             GuildService = guildService;
             DeveloperSettings = developerSettings;
             Provider = provider;
