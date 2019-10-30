@@ -20,7 +20,7 @@ namespace RavenBOT.Common
             Provider = provider;
         }
 
-        public async Task<List<Tuple<string, List<CommandInfo>>>> GetFilteredModulesAsync(ShardedCommandContext context = null, bool usePreconditions = true, List<string> moduleFilter = null)
+        public virtual async Task<List<Tuple<string, List<CommandInfo>>>> GetFilteredModulesAsync(ShardedCommandContext context = null, bool usePreconditions = true, List<string> moduleFilter = null)
         {
             var commandCollection = CommandService.Commands.ToList();
 
@@ -66,7 +66,7 @@ namespace RavenBOT.Common
             return modules;
         }
 
-        public async Task<ReactivePager> PagedHelpAsync(ShardedCommandContext context, bool usePreconditions = true, List<string> moduleFilter = null, string additionalField = null)
+        public virtual async Task<ReactivePager> PagedHelpAsync(ShardedCommandContext context, bool usePreconditions = true, List<string> moduleFilter = null, string additionalField = null)
         {
             var modules = await GetFilteredModulesAsync(context, usePreconditions, moduleFilter);
 
@@ -216,7 +216,7 @@ namespace RavenBOT.Common
             return pager;
         }
 
-        public string GetPreconditionSummaries(IEnumerable<PreconditionAttribute> preconditions)
+        public virtual string GetPreconditionSummaries(IEnumerable<PreconditionAttribute> preconditions)
         {
             var preconditionString = string.Join("\n", preconditions.Select(x =>
                 {
@@ -233,7 +233,7 @@ namespace RavenBOT.Common
             return preconditionString;
         }
 
-        public async Task<bool> CheckPreconditionsAsync(ShardedCommandContext context, CommandInfo command, string[] preconditionSkipTypes = null)
+        public virtual async Task<bool> CheckPreconditionsAsync(ShardedCommandContext context, CommandInfo command, string[] preconditionSkipTypes = null)
         {
             if (context == null)
             {
