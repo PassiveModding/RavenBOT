@@ -209,7 +209,7 @@ namespace RavenBOT.Common
             return null;
         }
 
-        private virtual static async Task HandleNextMessageAsync(SocketMessage message, SocketCommandContext context, TaskCompletionSource<SocketMessage> eventTrigger, Func<SocketCommandContext, SocketMessage, Task<bool>> judge)
+        private static async Task HandleNextMessageAsync(SocketMessage message, SocketCommandContext context, TaskCompletionSource<SocketMessage> eventTrigger, Func<SocketCommandContext, SocketMessage, Task<bool>> judge)
         {
             var result = await judge(context, message).ConfigureAwait(false);
             if (result)
