@@ -95,11 +95,14 @@ namespace RavenBOT.Core.Modules
         public async Task SetGame(SocketGuildUser user, [Remainder]string message)
         {
             await Context.Message.DeleteAsync();
-            var wh = await (Context.Channel as SocketTextChannel).CreateWebhookAsync("Hook");
+            var stc = Context.Channel as SocketTextChannel;
+            var wh = await stc.CreateWebhookAsync("Hook");
             using (var client = new DiscordWebhookClient(wh))
             {
                 await client.SendMessageAsync(message, false, null, user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl());
+                await client.DeleteWebhookAsync();
             }
+            
         }
 
         [Command("GetInvite")]
