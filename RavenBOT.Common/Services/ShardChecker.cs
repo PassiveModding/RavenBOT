@@ -6,8 +6,12 @@ using System.Threading.Tasks;
 
 namespace RavenBOT.Common
 {
-    public class ShardChecker : IServiceable
+    /// <summary>
+    /// Class for firing an event when all shards are ready since this is not offered by d.net
+    /// </summary>
+    public class ShardChecker
     {
+        //TODO: Unsub from shardReady event once allshardsfired is set to true
         public ShardChecker(DiscordShardedClient client)
         {
             client.ShardReady += ShardReadyAsync;

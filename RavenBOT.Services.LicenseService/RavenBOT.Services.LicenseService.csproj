@@ -1,25 +1,24 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Description>RavenDB Embedded server implementation for RavenBOT's IDatabase interface</Description>
+    <Version>2.0.0</Version>
     <PackageProjectUrl>https://github.com/PassiveModding/RavenBOT</PackageProjectUrl>
     <RepositoryUrl>https://github.com/PassiveModding/RavenBOT</RepositoryUrl>
+    <Description>A licensing handler that utilises RavenBOT.Common's</Description>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <Version>2.0.0</Version>
   </PropertyGroup>
-  
-  <ItemGroup>
-    <PackageReference Include="RavenBOT.Common" Version="1.0.4" />
-    <PackageReference Include="RavenDB.Embedded" Version="4.2.0" />
-  </ItemGroup>
-  
+
   <ItemGroup>
     <None Include="..\LICENSE">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="RavenBOT.Common" Version="2.0.0" />
   </ItemGroup>
 
 </Project>
