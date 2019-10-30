@@ -22,9 +22,6 @@ namespace RavenBOT.Common.Interfaces.Database
         }
 
         public IDocumentStore DocumentStore { get; set; }
-        public LocalManagementService LocalManagementService { get; }
-
-        public string ConfigKey = "RavenConfig";
 
         public void StartServer(RavenDatabaseConfig config)
         {
@@ -62,51 +59,9 @@ namespace RavenBOT.Common.Interfaces.Database
             DocumentStore.Initialize();
         }
 
-        public RavenDatabase(LocalManagementService localManagementService)
+        public RavenDatabase(RavenDatabaseConfig config)
         {
-            LocalManagementService = localManagementService;
-            StartServer(GetOrInitializeConfig());
-        }
-
-        public RavenDatabaseConfig GetOrInitializeConfig()
-        {
-            var localConfig = LocalManagementService.GetConfig();
-            if (localConfig.AdditionalConfigs.ContainsKey(ConfigKey))
-            {
-                return localConfig.GetConfig<RavenDatabaseConfig>(ConfigKey);
-            }
-            else
-            {
-                var newConfig = new RavenDatabaseConfig();
-                Console.WriteLine("Please input your database name (DEFAULT: RavenBOT)");
-                var databaseName = Console.ReadLine();
-                if (string.IsNullOrWhiteSpace(databaseName))
-                {
-                    databaseName = "RavenBOT";
-                }
-
-                newConfig.DatabaseName = databaseName;
-                Console.WriteLine("Please input the url to your RavenDB instance (DEFAULT: http://127.0.0.1:8080)");
-                var databaseUrl = Console.ReadLine();
-                if (string.IsNullOrWhiteSpace(databaseUrl))
-                {
-                    databaseUrl = "http://127.0.0.1:8080";
-                }
-
-                newConfig.DatabaseUrls = new List<string>
-                {
-                    databaseUrl
-                };
-
-                Console.WriteLine("Please input the path to your certificate for the database (Leave blank if you are using an unauthenticated deployment of ravendb)");
-                newConfig.CertificatePath = Console.ReadLine();
-
-                Console.WriteLine($"New Config Created! It can be found at \"{LocalManagementService.ConfigPath}\" under AdditionalConfigs[{ConfigKey}] please delete or edit it if you wish to modify the database url or name");
-
-                localConfig.AdditionalConfigs.Add(ConfigKey, newConfig);
-                LocalManagementService.SaveConfig(localConfig);
-                return newConfig;
-            }
+            StartServer(config);
         }
 
         public void Store<T>(T document, string name = null)

@@ -5,11 +5,9 @@ VisualStudioVersion = 16.0.29324.140
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RavenBOT.Common", "RavenBOT.Common\RavenBOT.Common.csproj", "{72C7C0B1-D00F-4B9C-BE59-39A54BEAB407}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RavenBOT.Services.LicenseService", "RavenBOT.Services.LicenseService\RavenBOT.Services.LicenseService.csproj", "{DE50F05E-7CA1-4A5D-A55F-F7E190FDA4E5}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RavenBOT.Services.Reactive", "RavenBOT.Services.Reactive\RavenBOT.Services.Reactive.csproj", "{564EDDBC-8ADA-4A5D-92A8-ABC9FC768A04}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RavenBOT.Services.ConfigManager", "RavenBOT.Services.ConfigManager\RavenBOT.Services.ConfigManager.csproj", "{1A6E8F17-9D4D-4BE3-BEE9-89287B5AF3B2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RavenBOT.Services.ConfigManager", "RavenBOT.Services.ConfigManager\RavenBOT.Services.ConfigManager.csproj", "{1A6E8F17-9D4D-4BE3-BEE9-89287B5AF3B2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RavenBOT.Database.LiteDatabase", "RavenBOT.Database.LiteDatabase\RavenBOT.Database.LiteDatabase.csproj", "{A81FD1C0-F827-48ED-8958-4F2FB246E009}"
 EndProject
@@ -31,10 +29,6 @@ Global
 		{72C7C0B1-D00F-4B9C-BE59-39A54BEAB407}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{72C7C0B1-D00F-4B9C-BE59-39A54BEAB407}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{72C7C0B1-D00F-4B9C-BE59-39A54BEAB407}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DE50F05E-7CA1-4A5D-A55F-F7E190FDA4E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DE50F05E-7CA1-4A5D-A55F-F7E190FDA4E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DE50F05E-7CA1-4A5D-A55F-F7E190FDA4E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DE50F05E-7CA1-4A5D-A55F-F7E190FDA4E5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{564EDDBC-8ADA-4A5D-92A8-ABC9FC768A04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{564EDDBC-8ADA-4A5D-92A8-ABC9FC768A04}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{564EDDBC-8ADA-4A5D-92A8-ABC9FC768A04}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -43,8 +43,6 @@ namespace RavenBOT.Common.Interfaces.Database
 
     public class LiteDataStore : IDatabase
     {
-        public static string ConfigKey = "LiteDBConfig";
-
         public class LiteDBConfig
         {
             public string LiteDBFile { get; set; }
@@ -53,28 +51,9 @@ namespace RavenBOT.Common.Interfaces.Database
         public LiteDatabase Database { get; }
 
         private static readonly object locker = new object();
-        public LiteDataStore(LocalManagementService localManagementService)
+        public LiteDataStore(LiteDBConfig config)
         {
-            var config = localManagementService.GetConfig();
-            if (config.AdditionalConfigs.ContainsKey(ConfigKey))
-            {
-                var dbConfig = config.GetConfig<LiteDBConfig>(ConfigKey);
-                Database = new LiteDatabase("Filename=" + dbConfig.LiteDBFile + "; utc=true;");
-            }
-            else
-            {
-                var newConfig = new LiteDBConfig();
-                Console.WriteLine("Please input the desired path for your database.");
-                var dbPath = Console.ReadLine();
-                if (string.IsNullOrWhiteSpace(dbPath))
-                {
-                    dbPath = "./LiteDB.db";
-                }
-                newConfig.LiteDBFile = dbPath;
-                config.AdditionalConfigs.Add(ConfigKey, newConfig);
-                localManagementService.SaveConfig(config);
-                Database = new LiteDatabase("Filename=" + newConfig.LiteDBFile + "; utc=true;");
-            }
+            Database = new LiteDatabase("Filename=" + config.LiteDBFile + "; utc=true;");
         }
 
         public void Store<T>(T document, string name = null)
