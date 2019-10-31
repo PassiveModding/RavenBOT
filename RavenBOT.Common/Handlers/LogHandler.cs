@@ -6,7 +6,7 @@ namespace RavenBOT.Common
 {
     public class LogHandler
     {
-        public event Action<string> Message;
+        public event Action<string, LogSeverity> Message;
 
         public Color LogSeverityAsColor(LogSeverity severity)
         {
@@ -45,7 +45,7 @@ namespace RavenBOT.Common
         {
             try
             {
-                Message.Invoke(MakeLogMessage(message, severity));
+                Message.Invoke(MakeLogMessage(message, severity), severity);
             }
             catch (Exception e)
             {
@@ -69,7 +69,7 @@ namespace RavenBOT.Common
 
             try
             {
-                Message.Invoke(MakeLogMessage(message, severity));
+                Message.Invoke(MakeLogMessage(message, severity), severity);
             }
             catch (Exception e)
             {
