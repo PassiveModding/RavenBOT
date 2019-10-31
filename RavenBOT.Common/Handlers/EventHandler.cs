@@ -28,12 +28,15 @@ namespace RavenBOT.Common
             CommandService = provider.GetService<CommandService>() ?? new CommandService();
             ShardChecker = provider.GetService<ShardChecker>() ?? new ShardChecker(Client);
             ShardChecker.AllShardsReady += AllShardsReadyAsync;
+            Client.ShardConnected += ShardConnectedAsync;
+            Client.ShardReady += ShardReadyAsync;
         }
 
         public virtual Task AllShardsReadyAsync()
         {
             Client.MessageReceived += MessageReceivedAsync;
             Client.JoinedGuild += JoinedGuildAsync;
+            Logger.Log("All shards ready, message received and joined guild events are now subscribed.");
             return Task.CompletedTask;
         }
 

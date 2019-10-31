@@ -1,12 +1,13 @@
 ﻿using Discord;
 using Discord.Commands;
 using System;
+using System.Threading.Tasks;
 
 namespace RavenBOT.Common
 {
     public class LogHandler
     {
-        public event Action<string, LogSeverity> Message;
+        public event Func<string, LogSeverity, Task> Message;
 
         public Color LogSeverityAsColor(LogSeverity severity)
         {
