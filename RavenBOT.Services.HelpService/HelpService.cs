@@ -20,7 +20,7 @@ namespace RavenBOT.Common
             Provider = provider;
         }
 
-        public virtual async Task<List<Tuple<string, List<CommandInfo>>>> GetFilteredModulesAsync(ShardedCommandContext context = null, bool usePreconditions = true, List<string> moduleFilter = null)
+        public virtual async Task<List<Tuple<string, List<CommandInfo>>>> GetFilteredModulesAsync(ShardedCommandContext context = null, bool usePreconditions = true, List<string> moduleFilter = null, string[] preconditionSkips = null)
         {
             var commandCollection = CommandService.Commands.ToList();
 
@@ -47,7 +47,7 @@ namespace RavenBOT.Common
                     var commands = new List<CommandInfo>();
                     foreach (var command in module.Item2)
                     {
-                        if (await CheckPreconditionsAsync(context, command))
+                        if (await CheckPreconditionsAsync(context, command, preconditionSkips))
                         {
                             commands.Add(command);
                         }
@@ -66,9 +66,9 @@ namespace RavenBOT.Common
             return modules;
         }
 
-        public virtual async Task<ReactivePager> PagedHelpAsync(ShardedCommandContext context, bool usePreconditions = true, List<string> moduleFilter = null, string additionalField = null)
+        public virtual async Task<ReactivePager> PagedHelpAsync(ShardedCommandContext context, bool usePreconditions = true, List<string> moduleFilter = null, string additionalField = null, string[] preconditionSkips = null)
         {
-            var modules = await GetFilteredModulesAsync(context, usePreconditions, moduleFilter);
+            var modules = await GetFilteredModulesAsync(context, usePreconditions, moduleFilter, preconditionSkips);
 
             var overviewFields = new List<EmbedFieldBuilder>
             {
@@ -244,7 +244,7 @@ namespace RavenBOT.Common
             preconditions.AddRange(command.Module.Preconditions);
             foreach (var precondition in preconditions)
             {
-                if (preconditionSkipTypes.Contains(precondition.GetType().Name, StringComparer.InvariantCultureIgnoreCase))
+                if (preconditionSkipTypes?.Contains(precondition.GetType().Name, StringComparer.InvariantCultureIgnoreCase) == true)
                 {
                     continue;
                 }
