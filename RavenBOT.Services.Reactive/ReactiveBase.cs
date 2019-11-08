@@ -12,7 +12,9 @@ namespace RavenBOT.Common
         public ReactiveService ReactiveService { get; set; }
 
         public Task<IUserMessage> PagedReplyAsync(ReactivePagerCallback pagerCallback)
-                            => ReactiveService.SendPagedMessageAsync(Context, pagerCallback);
+                            => ReactiveService.SendPagedMessageAsync(Context, pagerCallback); 
+        public Task<IUserMessage> SendPagedMessageAsync(IMessageChannel channel, ReactivePagerCallback pagerCallback)
+                     => ReactiveService.SendPagedMessageAsync(Context, channel, pagerCallback);
 
         public Task<IUserMessage> SimpleEmbedAsync(string content, Color? color = null)
                             => ReactiveService.SimpleEmbedAsync(Context, content, color);

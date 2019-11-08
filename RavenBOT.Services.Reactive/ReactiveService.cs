@@ -29,6 +29,13 @@ namespace RavenBOT.Common
             return pagerCallback.Message;
         }
 
+        public virtual async Task<IUserMessage> SendPagedMessageAsync(ShardedCommandContext context, IMessageChannel channel, ReactivePagerCallback pagerCallback)
+        {
+            await pagerCallback.DisplayAsync(channel, context, this);
+            callbacks.Add(pagerCallback.Message.Id, pagerCallback);
+            return pagerCallback.Message;
+        }
+
         public virtual async Task<IUserMessage> ReplyAndDeleteAsync(ShardedCommandContext context, string content, Embed embed, TimeSpan? timeout = null)
         {
             var message = await ReplyAsync(context, content, embed);

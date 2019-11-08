@@ -236,6 +236,43 @@ namespace RavenBOT.Common
             }
         }
 
+        public async Task DisplayAsync(IMessageChannel channel, ShardedCommandContext context, ReactiveService service)
+        {
+            _context = context;
+            Reactive = service;
+            var embed = BuildEmbed();
+            var message = await channel.SendMessageAsync(Pager.Content, embed: embed).ConfigureAwait(false);
+            Message = message;
+
+            //Only attempt to add reaction if the bot has permissions to do so.
+            if (_context.Channel.Id == channel.Id)
+            {
+                var canReact = _context.Guild?.CurrentUser.GetPermissions(context.Channel as SocketTextChannel).AddReactions;
+                if (canReact == null || canReact == true)
+                {
+                    if (Callbacks.Any())
+                    {
+                        await Message.AddReactionsAsync(Callbacks.Select(x => x.Key).ToArray());
+                    }
+                }
+            }
+            else
+            {
+                try
+                {
+                    if (Callbacks.Any())
+                    {
+                        await Message.AddReactionsAsync(Callbacks.Select(x => x.Key).ToArray());
+                    }
+                }
+                catch
+                {
+                    //
+                }
+            }
+
+        }
+
         /// <summary>
         /// Builder for Reactive pager.
         /// </summary>
