@@ -34,12 +34,6 @@ namespace RavenBOT.Common
 
             if (usePreconditions)
             {
-                if (modules.Sum(x => x.Item2.Count) > 20)
-                {
-                    await context?.Channel.SendMessageAsync("This command filters out all commands that you do not have sufficient permissions to access. As such it may take a moment to generate.\n" +
-                        "If you want to see every command, use the fullhelp command instead.");
-                }
-
                 var newModules = new List<Tuple<string, List<CommandInfo>>>();
                 for (int i = 0; i < modules.Count; i++)
                 {
@@ -77,6 +71,7 @@ namespace RavenBOT.Common
                 // This gives a brief overview of how to use the paginated message and help commands.
                 Name = $"Commands Summary",
                 Value =
+                usePreconditions ? "I have gone and hidden commands which you do not have sufficient permissions to use." : "" +
                 "Go to the respective page number of each module to view the commands in more detail. " +
                 "You can react with the :1234: emote and type a page number to go directly to that page too,\n" +
                 "otherwise react with the arrows (◀ ▶) to change pages.\n" +
