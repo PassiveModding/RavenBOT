@@ -3,12 +3,13 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>2.0.0.2</Version>
+    <Version>2.0.0.4</Version>
     <PackageProjectUrl>https://github.com/PassiveModding/RavenBOT</PackageProjectUrl>
     <RepositoryUrl>https://github.com/PassiveModding/RavenBOT</RepositoryUrl>
     <PackageReleaseNotes />
     <Description>A reaction callback handler for discord modules</Description>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <AssemblyVersion>2.0.0.4</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>

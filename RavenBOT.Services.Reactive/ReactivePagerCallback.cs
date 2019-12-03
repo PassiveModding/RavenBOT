@@ -134,6 +134,51 @@ namespace RavenBOT.Common
             return true;
         }
 
+        private async Task JumpHandler(SocketMessage m, SocketReaction r, TaskCompletionSource<SocketMessage> source)
+        {
+            if (m.Author.Id != r.UserId) return;
+
+            if (!int.TryParse(m.Content, out int pageNo)) return;
+
+            if (pageNo < 1 || pageNo > pages) return;
+
+            page = pageNo;
+            _ = Message.RemoveReactionAsync(r.Emote, r.User.Value);
+            await RenderAsync().ConfigureAwait(false);
+            source.SetResult(m);
+        }
+
+        public HashSet<ulong> JumpRequests = new HashSet<ulong>();
+
+        public async Task<bool> JumpAsync(SocketReaction reaction)
+        {
+            if (JumpRequests.Contains(reaction.UserId))
+            {
+                return false;
+            }
+            
+            try
+            {
+                JumpRequests.Add(reaction.UserId);
+
+                var src = new TaskCompletionSource<SocketMessage>();
+                Task Func(SocketMessage m) => JumpHandler(m, reaction, src);
+                _context.Client.MessageReceived += Func;
+                var task = await Task.WhenAny(src.Task, Task.Delay(TimeSpan.FromSeconds(15))).ConfigureAwait(false);
+                _context.Client.MessageReceived -= Func;
+                if (task == src.Task)
+                {
+                    await src.Task.ConfigureAwait(false);
+                }
+            }
+            finally
+            {
+                JumpRequests.Remove(reaction.UserId);
+            }
+
+            return false;
+        }
+
         /// <summary>
         /// Adds a new page to the end of the pager
         /// Does not change the page number.
@@ -231,7 +276,7 @@ namespace RavenBOT.Common
             {
                 if (Callbacks.Any())
                 {
-                    await Message.AddReactionsAsync(Callbacks.Select(x => x.Key).ToArray());
+                    var _ = Task.Run(async () => await Message.AddReactionsAsync(Callbacks.Select(x => x.Key).ToArray()).ConfigureAwait(false));
                 }
             }
         }
@@ -252,7 +297,7 @@ namespace RavenBOT.Common
                 {
                     if (Callbacks.Any())
                     {
-                        await Message.AddReactionsAsync(Callbacks.Select(x => x.Key).ToArray());
+                        var _ = Task.Run(async () => await Message.AddReactionsAsync(Callbacks.Select(x => x.Key).ToArray()).ConfigureAwait(false));
                     }
                 }
             }
@@ -262,7 +307,7 @@ namespace RavenBOT.Common
                 {
                     if (Callbacks.Any())
                     {
-                        await Message.AddReactionsAsync(Callbacks.Select(x => x.Key).ToArray());
+                        var _ = Task.Run(async () => await Message.AddReactionsAsync(Callbacks.Select(x => x.Key).ToArray()).ConfigureAwait(false));
                     }
                 }
                 catch
@@ -292,6 +337,12 @@ namespace RavenBOT.Common
             Callbacks.Add(new Emoji("▶"), (x, y) => NextAsync(y));
             Callbacks.Add(new Emoji("⏭"), (x, y) => LastAsync(y));
             Callbacks.Add(new Emoji("⏹"), (x, y) => TrashAsync());
+            return this;
+        }
+
+        public ReactivePagerCallback WithJump()
+        {
+            Callbacks.Add(new Emoji("🔢"), (x, y) => JumpAsync(y));
             return this;
         }
     }
