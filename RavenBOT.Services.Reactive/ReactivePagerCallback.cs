@@ -131,6 +131,7 @@ namespace RavenBOT.Common
         public async Task<bool> TrashAsync()
         {
             await Message.DeleteAsync().ConfigureAwait(false);
+            await Context.Message.DeleteAsync();
             return true;
         }
 
