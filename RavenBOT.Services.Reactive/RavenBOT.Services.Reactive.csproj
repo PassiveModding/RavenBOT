@@ -6,7 +6,7 @@
     <Version>2.0.0.4</Version>
     <PackageProjectUrl>https://github.com/PassiveModding/RavenBOT</PackageProjectUrl>
     <RepositoryUrl>https://github.com/PassiveModding/RavenBOT</RepositoryUrl>
-    <PackageReleaseNotes />
+    <PackageReleaseNotes>Added jump callback allowing users to react with the :1234: emote and then reply with the page they wish to move to</PackageReleaseNotes>
     <Description>A reaction callback handler for discord modules</Description>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <AssemblyVersion>2.0.0.4</AssemblyVersion>
