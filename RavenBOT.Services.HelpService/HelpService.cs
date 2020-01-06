@@ -20,6 +20,17 @@ namespace RavenBOT.Common
             Provider = provider;
         }
 
+        private string ReplaceLastOccurrence(string Source, string Find, string Replace)
+        {
+            int place = Source.LastIndexOf(Find);
+
+            if (place == -1)
+                return Source;
+
+            string result = Source.Remove(place, Find.Length).Insert(place, Replace);
+            return result;
+        }
+
         public virtual async Task<List<Tuple<string, List<CommandInfo>>>> GetFilteredModulesAsync(ShardedCommandContext context = null, bool usePreconditions = true, List<string> moduleFilter = null, string[] preconditionSkips = null)
         {
             var commandCollection = CommandService.Commands.ToList();
@@ -68,14 +79,12 @@ namespace RavenBOT.Common
             {
                 new EmbedFieldBuilder
                 {
-                // This gives a brief overview of how to use the paginated message and help commands.
-                Name = $"Commands Summary",
-                Value =
-                usePreconditions ? "I have gone and hidden commands which you do not have sufficient permissions to use." : "" +
-                "Go to the respective page number of each module to view the commands in more detail. " +
-                "You can react with the :1234: emote and type a page number to go directly to that page too,\n" +
-                "otherwise react with the arrows (◀ ▶) to change pages.\n" +
-                additionalField
+                    // This gives a brief overview of how to use the paginated message and help commands.
+                    Name = $"Commands Summary",
+                    Value =
+                    (usePreconditions ? "I have gone and hidden commands which you do not have sufficient permissions to use.\n" : "") +
+                    "Go to the respective page number of each module to view the commands in more detail.\n" +
+                    additionalField
                 }
             };
 
@@ -86,7 +95,7 @@ namespace RavenBOT.Common
 
                 //This will be added to the 'overview' for each module
                 var moduleContent = new StringBuilder();
-                moduleContent.AppendJoin(", ", commands.GroupBy(x => x.Name).Select(x => x.First().Aliases.First()).OrderBy(x => x));
+                moduleContent.AppendJoin(", ", commands.GroupBy(x => x.Name).Select(x => "`" + ReplaceLastOccurrence(x.First().Aliases.First(), x.Key.ToLowerInvariant(), x.Key) + "`").OrderBy(x => x));
 
                 //Handle modules with the same name and group them.
                 var duplicateModule = overviewFields.FirstOrDefault(x => x.Name.Equals(moduleName, StringComparison.InvariantCultureIgnoreCase));
@@ -127,16 +136,16 @@ namespace RavenBOT.Common
                     }
                     if (command.Remarks != null)
                     {
-                        commandContent.AppendLine($"[Remarks]{command.Remarks}");
+                        commandContent.AppendLine($"Remarks: {command.Remarks}");
                     }
                     if (command.Preconditions.Any())
                     {
 
-                        commandContent.AppendLine($"[Preconditions]\n{GetPreconditionSummaries(command.Preconditions)}");
+                        commandContent.AppendLine($"Preconditions: \n{GetPreconditionSummaries(command.Preconditions)}");
                     }
                     if (command.Aliases.Count > 1)
                     {
-                        commandContent.AppendLine($"[Aliases]{string.Join(",", command.Aliases)}");
+                        commandContent.AppendLine($"Aliases: {string.Join(",", command.Aliases)}");
                     }
                     commandContent.AppendLine($"`{command.Aliases.First() ?? command.Module.Aliases.FirstOrDefault()} {string.Join(" ", command.Parameters.Select(x => x.ParameterInformation()))}`");
 
